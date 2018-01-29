@@ -1,0 +1,7 @@
+{
+  "/": {
+    "target": "http://localhost/tvn_api_v0.91",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

@@ -1,0 +1,29 @@
+<div class="container">
+  <div class="btns">
+    <div class="btn-col">
+      <label class="upload-btn">+
+        <input type="file" uploadx  multiple accept="image/*,video/*" style="display:none">
+      </label>
+      <button class="btn red raised" (click)="uploadAll()">Upload All</button>
+      <button class="btn red raised" (click)="cancelAll()">Cancel All</button>
+      <button class="btn red raised" (click)="pauseAll()">Pause All</button>
+    </div>
+  </div>
+
+  <div class="uploads-table">
+    <div class="row" *ngFor="let ufile of uploads">
+      <span class="col-1">{{ ufile.name }}</span>
+      <span class="col-2">{{ ufile.progress }}%</span>
+      <span class="col-2">{{ ufile.status }}</span>
+      <span class="col-3 btn-row">
+        <button class="btn red raised" (click)="pause(ufile.uploadId)">pause</button>
+        <button class="btn red raised" (click)="upload(ufile.uploadId)">upload</button>
+      </span>
+    </div>
+  </div>
+
+
+</div>
+<div class="json">
+  <pre>{{state | async | json}}</pre>
+</div>

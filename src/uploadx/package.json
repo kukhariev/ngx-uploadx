@@ -1,0 +1,19 @@
+{
+  "name": "ngx-uploadx",
+  "version": "1.0.0-beta.5",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kukhariev/ngx-uploadx.git"
+  },
+  "homepage": "https://github.com/kukhariev/ngx-uploadx#readme",
+  "peerDependencies": {
+    "@angular/core": "^5.0.0",
+    "rxjs": "^5.5.2"
+  },
+  "keywords": [
+    "angular",
+    "upload",
+    "chunk"
+  ]
+}

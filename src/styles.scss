@@ -1,0 +1,183 @@
+/* You can add global styles to this file, and also import other style files */
+@import url( 'https://fonts.googleapis.com/css?family=Roboto');
+$dark: rgb(48, 48, 48);
+$red: rgb(233, 30, 99);
+$light: rgb(255, 255, 255);
+
+$background: $dark;
+$main: $light;
+
+body {
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+  background: $dark;
+  height: 100%;
+  color: $light;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.shadow {
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+}
+
+.upload-btn {
+  text-align: center;
+  margin: 20px auto;
+  font-size: 75px;
+  line-height: 75px;
+  border-radius: 75px;
+  height: 75px;
+  width: 75px;
+  cursor: pointer;
+  color: $main;
+  background-color: $red;
+  @extend .shadow;
+  transition: all 150ms;
+
+  &:hover {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3);
+    // transform: scale(1.01);
+  }
+}
+
+.container {
+  margin: 0;
+  padding: 0;
+  min-height: 250px;
+  display: flex;
+  flex-flow: row;
+}
+
+.header {
+  display: flex;
+  margin-bottom: 5px;
+  z-index: 2;
+  height: 50px;
+  line-height: 50px;
+  background-color: $red;
+  @extend .shadow;
+
+  a,
+  h4,
+  h5 {
+    // font-weight: 600;
+    color: $main;
+    margin-left: 32px;
+  }
+}
+
+.btns {
+  flex: 1 6 20%;
+  order: 1;
+  display: flex;
+  height: 230px;
+}
+
+.btn-col {
+  height: 100%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.btn-row {
+  margin: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.btn {
+  background-color: transparent;
+  text-transform: capitalize;
+  text-align: center;
+  height: 28px;
+  font-size: 13px;
+  font-weight: 600;
+  color: $light;
+  width: 90px;
+  border: transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 150ms;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+.btn.red {
+  background-color: transparentize($red, 0.8);
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+.btn.raised {
+  @extend .shadow;
+}
+
+.uploads-table {
+  background-color: $background;
+  flex: 3 1 80%;
+  order: 2;
+  font-size: 90%;
+  border-radius: 2px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  padding: 0 2px;
+  margin: 0 5px;
+  height: 230px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: $background * 1.1;
+
+  .row {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    height: 32px;
+
+    span {
+      margin: auto;
+      height: 29px;
+      line-height: 29px;
+    }
+
+    .col-1 {
+      padding-left: 10px;
+      flex: 3 1 64%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .col-2 {
+      flex: 3 1 8%;
+      padding-right: 10px;
+    }
+
+    .col-3 {
+      flex: 3 1 20%;
+    }
+  }
+}
+
+.json {
+  display: block;
+  // margin: 4px;
+  // padding: 5px;
+  min-height: 200px;
+  background-color: $background;
+
+  pre {
+    font-size: 80%;
+    padding: 5px;
+    margin: auto;
+    overflow: hidden;
+  }
+}
