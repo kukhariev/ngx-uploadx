@@ -1,8 +1,14 @@
+/*--------------------------------------------------------------
+ *  Copyright (c) 2018, Oleg Kukhariev. All rights reserved.
+ *  Licensed under the MIT License.
+ *-------------------------------------------------------------*/
+
+'use strict';
+
 /*
- *
- * ngx-uploadx server example
- *
+ * Server API eximple
  */
+
 const bytes = require('bytes');
 const crypto = require('crypto');
 const express = require('express');
@@ -180,4 +186,11 @@ app.use((err, req, res, next) => { // eslint-disable-line
 
 const server = app.listen(PORT, 'localhost', () => {
   console.log(`Server listening on port: ${server.address().port}`);
+});
+
+process.on('SIGTERM', () => {
+  server.close(() => {
+    process.exit(0);
+  });
+
 });
