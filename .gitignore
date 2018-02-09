@@ -32,6 +32,7 @@
 npm-debug.log
 testem.log
 /typings
+server/newman.json
 
 # e2e
 /e2e/*.js
@@ -40,5 +41,8 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
-server/newman.json
 
+# ?
+documentation
+
+update-cli.sh
