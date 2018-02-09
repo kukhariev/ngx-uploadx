@@ -2,7 +2,7 @@ sudo: required
 dist: trusty
 language: node_js
 node_js:
-  - '8.9.1'
+  - '8.9.4'
 
 addons:
 apt:
@@ -10,7 +10,6 @@ apt:
     - google-chrome
   packages:
     - google-chrome-stable
-    - google-chrome-beta
 
 before_install:
   - export CHROME_BIN=chromium-browser
@@ -22,4 +21,4 @@ before_script:
 - npm install
 - ng build
 
-script: ng test --single-run
+script: npm run ci
