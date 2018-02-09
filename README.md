@@ -10,7 +10,7 @@
 * Retries using exponential back-off strategy
 * Chunking
 
-## Setup
+## Setups
 
 * Add ngx-uploadx module as dependency :
 
@@ -177,9 +177,9 @@ Pull requests are welcome!
 
 ## Links
 
-* https://developers.google.com/drive/v3/web/resumable-upload
-* https://developer.vimeo.com/api/upload/videos#resumable-upload
-* https://developer.box.com/v2.0/reference#chunked-upload
+* [https://developers.google.com/drive/v3/web/resumable-upload](https://developers.google.com/drive/v3/web/resumable-upload)
+* [https://developer.vimeo.com/api/upload/videos#resumable-upload](https://developer.vimeo.com/api/upload/videos#resumable-upload)
+* [https://developer.box.com/v2.0/reference#chunked-upload](https://developer.box.com/v2.0/reference#chunked-upload)
 
 ## License
 
