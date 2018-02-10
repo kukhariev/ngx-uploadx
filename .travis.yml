@@ -20,8 +20,7 @@ script:
   - 'npm run ci'
   - 'npm run build'
 before_deploy:
-  - 'cd dist'
-  - 'ls'
+  - 'cd dist/uploadx'
 deploy:
   provider: npm
   email: q_h@inbox.ru
