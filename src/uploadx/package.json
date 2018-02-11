@@ -1,7 +1,12 @@
 {
   "name": "ngx-uploadx",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "license": "MIT",
+  "keywords": [
+    "angular",
+    "upload",
+    "chunk"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kukhariev/ngx-uploadx.git"
@@ -10,10 +15,5 @@
   "peerDependencies": {
     "@angular/core": "^5.0.0",
     "rxjs": "^5.5.2"
-  },
-  "keywords": [
-    "angular",
-    "upload",
-    "chunk"
-  ]
+  }
 }
