@@ -1,6 +1,5 @@
 export let XHRFactory = (() => {
   let stack = Array(1).fill(createXHR());
-  const noop = null;
 
   function createXHR() {
     return new XMLHttpRequest();
@@ -8,10 +7,10 @@ export let XHRFactory = (() => {
 
   return {
     release: (xhr) => {
-      xhr.onreadystatechange = noop;
-      xhr.onerror = noop;
-      xhr.onload = noop;
-      xhr.upload.onprogress = noop;
+      xhr.onreadystatechange = null;
+      xhr.onerror = null;
+      xhr.onload = null;
+      xhr.upload.onprogress = null;
       stack.push(xhr);
     },
     getInstance() {

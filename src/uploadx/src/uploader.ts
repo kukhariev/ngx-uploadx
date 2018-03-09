@@ -15,7 +15,6 @@ const noop = () => { };
  * @see
  * https://developers.google.com/drive/v3/web/resumable-upload
  * https://developer.vimeo.com/api/upload/videos#resumable-upload
- * @class Uploader
  */
 export class Uploader implements UploaderOptions {
   headers: any;
@@ -73,7 +72,7 @@ export class Uploader implements UploaderOptions {
     return this._status;
   }
   /**
-   * Emit UploadState
+   * Emit current state
    */
   private notifyState() {
     const state: UploadState = {
@@ -192,9 +191,7 @@ export class Uploader implements UploaderOptions {
     xhr.send();
   }
   /**
-   *
    * Content upload
-   * @private
    */
   private sendFile(start: number = 0): () => void {
     if (this.status === 'cancelled' || this.status === 'paused') {

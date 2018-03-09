@@ -11,7 +11,6 @@ import {
 import { Uploader } from './uploader';
 /**
  *
- * @class UploadxService
  */
 @Injectable()
 export class UploadxService {
@@ -104,18 +103,17 @@ export class UploadxService {
   }
   /**
    * Queue management
-   * @private
    */
   private processQueue() {
     const running = this.queue.filter(
       (uploader: Uploader) => uploader.status === 'uploading'
     );
 
-    const complete = this.queue.findIndex(
+    const completed = this.queue.findIndex(
       (uploader: Uploader) => uploader.status === 'complete'
     );
-    if (complete !== -1) {
-      this.queue.splice(complete, 1);
+    if (completed !== -1) {
+      this.queue.splice(completed, 1);
     }
     this.queue
       .filter((uploader: Uploader) => uploader.status === 'queue')

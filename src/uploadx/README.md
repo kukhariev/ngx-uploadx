@@ -1,8 +1,8 @@
 # ngx-uploadx
 
-[![Build Status](https://travis-ci.org/kukhariev/ngx-uploadx.svg?branch=master)](https://travis-ci.org/kukhariev/ngx-uploadx)
-
 > Angular 5+ Resumable Upload Module
+
+[![Build Status](https://travis-ci.org/kukhariev/ngx-uploadx.svg?branch=master)](https://travis-ci.org/kukhariev/ngx-uploadx)
 
 ## Key Features
 
