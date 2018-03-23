@@ -47,14 +47,13 @@ export class Uploader implements UploaderOptions {
   /**
    * Set individual file options and add to queue
    */
-  configure(item?: UploadItem) {
+  configure(item: UploadItem = {}) {
     if (this.status === 'added') {
-      this.metadata = Object.assign(
-        { name: this.name, mimeType: this.mimeType },
-        this.options.metadata || {});
+      const { metadata, headers } = item;
+      this.metadata = { name: this.name, mimeType: this.mimeType, ...this.options.metadata, ...metadata };
       this.headers = (this.options.headers instanceof Function)
         ? this.options.headers(this.file)
-        : this.options.headers;
+        : { ...this.options.headers, ...headers };
       this.url = this.options.url;
       this.method = this.options.method;
     }
