@@ -9,6 +9,7 @@ delete packageJson['private'];
 delete packageJson['dependencies'];
 packageJson.peerDependencies = {
   '@angular/core': '^5.0.0',
+  '@angular/common': '^5.0.0',
   'rxjs': '^5.5.2'
 }
 fs.writeFileSync('src/uploadx/package.json', JSON.stringify(packageJson, undefined, 2));
