@@ -17,7 +17,8 @@
     "server": "node ./server/index.js",
     "server:dev": "cd ./server  && nodemon .",
     "prebuild": "node ./scripts/prebuild.js",
-    "postversion": "npm run prebuild && git push && git push --tags",
+    "version": "npm run prebuild && git add src/uploadx/package.json && git commit -m 'version bump'",
+    "postversion": "git push && git push --tags",
     "build": "ng-packagr -p ./src/uploadx/ng-package.json",
     "ci": "npm run lint && npm run test:once && npm run e2e"
   },
