@@ -1,4 +1,3 @@
-
 export type UploadStatus =
   | 'added'
   | 'queue'
@@ -9,6 +8,7 @@ export type UploadStatus =
   | 'paused';
 
 export type UploadAction =
+  | 'create'
   | 'uploadAll'
   | 'upload'
   | 'cancel'
@@ -37,6 +37,7 @@ export interface UploadState {
   speed: number;
   status: UploadStatus;
   uploadId: string;
+  URI: string;
 }
 
 export interface UploadItem {

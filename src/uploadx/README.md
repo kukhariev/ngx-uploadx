@@ -69,12 +69,12 @@ export class AppHomeComponent {
 
 ### inputs
 
-* \[uploadx\]: *UploadxOptions*
-* \[uploadxAction\]: *UploadxControlEvent*
+* \[uploadx\]: _UploadxOptions_
+* \[uploadxAction\]: _UploadxControlEvent_
 
 ### Output
 
-* (uploadxState): $event *\<Observable\>UploadState*
+* (uploadxState): $event _\<Observable\>UploadState_
 
 ## Service
 
@@ -82,8 +82,10 @@ UploadxService
 
 ### Public Methods
 
-* init(options: *UploadxOptions*): *Observable\<UploadState\>*
+* init(options: _UploadxOptions_): _Observable\<UploadState\>_
+
   > Set global module options
+
   ```ts
   // example:
 
@@ -95,10 +97,13 @@ UploadxService
       }
   }
   ```
-* handleFileList(fileList: *FileList*): *void*
-  >Add files to the upload queue
-* control(event: *UploadxControlEvent*): *void*
-  >Send event
+
+* handleFileList(fileList: _FileList_): _void_
+  > Add files to the upload queue
+* control(event: _UploadxControlEvent_): _void_
+
+  > Send event
+
   ```ts
   // example:
 
@@ -113,63 +118,64 @@ UploadxService
 
 | Name                  | Defaults?  | Description                              |
 | --------------------- | :--------: | ---------------------------------------- |
-| **[allowedTypes]**    | -          | *Set "accept" attribute*                 |
-| **[autoUpload]**      | true       | *Auto upload with global options*        |
-| **[chunkSize]**       | 0          | *If set to > 0 use chunked upload*       |
-| **[concurrency]**     | 2          | *Limit the number of concurrent uploads* |
-| **[headers]**         | -          | *Custom headers*                         |
-| **[method]**          | "POST"     | *Upload API initial method*              |
-| **[token]**           | -          | *Auth Bearer token*                      |
-| **[url]**             | "/upload/" | *API URL*                                |
-| **[withCredentials]** | false      | *Use withCredentials xhr option*         |
+| **[allowedTypes]**    |     -      | _Set "accept" attribute_                 |
+| **[autoUpload]**      |    true    | _Auto upload with global options_        |
+| **[chunkSize]**       |     0      | _If set to > 0 use chunked upload_       |
+| **[concurrency]**     |     2      | _Limit the number of concurrent uploads_ |
+| **[headers]**         |     -      | _Custom headers_                         |
+| **[method]**          |   "POST"   | _Upload API initial method_              |
+| **[token]**           |     -      | _Auth Bearer token_                      |
+| **[url]**             | "/upload/" | _API URL_                                |
+| **[withCredentials]** |   false    | _Use withCredentials xhr option_         |
 
-### *\<Observable\>* UploadState
+### _\<Observable\>_ UploadState
 
-| Name          | Type           | Description                                                                 |
+| Name          |      Type      | Description                                                                 |
 | ------------- | :------------: | --------------------------------------------------------------------------- |
-| **file**      | *File*         | *FileAPI File*                                                              |
-| **name**      | *string*       | *file name*                                                                 |
-| **progress**  | *number*       | *progress percentage*                                                       |
-| **remaining** | *number*       | *ETA*                                                                       |
-| **response**  | *any*          | *success/error response*                                                    |
-| **size**      | *number*       | *file size*                                                                 |
-| **speed**     | *number*       | *upload speed bytes/sec*                                                    |
-| **status**    | *UploadStatus* | *'added', 'queue', 'uploading', 'complete', 'error', 'cancelled', 'paused'* |
-| **uploadId**  | *string*       | *Unique upload id*                                                          |
+| **file**      |     _File_     | _FileAPI File_                                                              |
+| **name**      |    _string_    | _file name_                                                                 |
+| **progress**  |    _number_    | _progress percentage_                                                       |
+| **remaining** |    _number_    | _ETA_                                                                       |
+| **response**  |     _any_      | _success/error response_                                                    |
+| **size**      |    _number_    | _file size_                                                                 |
+| **speed**     |    _number_    | _upload speed bytes/sec_                                                    |
+| **status**    | _UploadStatus_ | _'added', 'queue', 'uploading', 'complete', 'error', 'cancelled', 'paused'_ |
+| **uploadId**  |    _string_    | _Unique upload id_                                                          |
+| **URI**       |    _string_    | _session URI_                                                               |
 
 ### UploadItem
 
-  >Item custom options, override globals
+> Item custom options, override globals
 
-| Name           | Type                                    | Description                       |
+| Name           |                  Type                   | Description                       |
 | -------------- | :-------------------------------------: | --------------------------------- |
-| **[method]**   | *string*                                | *API initial method*              |
-| **[uploadId]** | *string*                                | *Unique upload id \( ReadOnly \)* |
-| **[url]**      | *string*                                | *Item URL*                        |
-| **[headers]**  | *{ [key: string]: string } \| Function* | *Add custom headers*              |
-| **[metadata]** | *any*                                   | *Add custom data*                 |
+| **[method]**   |                _string_                 | _API initial method_              |
+| **[uploadId]** |                _string_                 | _Unique upload id \( ReadOnly \)_ |
+| **[url]**      |                _string_                 | _Item URL_                        |
+| **[headers]**  | _{ [key: string]: string } \| Function_ | _Add custom headers_              |
+| **[metadata]** |                  _any_                  | _Add custom data_                 |
 
 ### UploadxControlEvent
 
-  >
+>
 
-| Name              | Type           | Description                                                        |
+| Name              |      Type      | Description                                                        |
 | ----------------- | :------------: | ------------------------------------------------------------------ |
-| **action**        | *UploadAction* | *'uploadAll', 'upload', 'cancel', 'cancelAll', 'pauseAll, 'pause'* |
-| **[uploadId]**    | *string*       | *Unique upload id \( ReadOnly \)*                                  |
-| **[itemOptions]** | *UploadItem*   | *Item custom options*                                              |
+| **action**        | _UploadAction_ | _'uploadAll', 'upload', 'cancel', 'cancelAll', 'pauseAll, 'pause'_ |
+| **[uploadId]**    |    _string_    | _Unique upload id \( ReadOnly \)_                                  |
+| **[itemOptions]** |  _UploadItem_  | _Item custom options_                                              |
 
 ## Run demo
 
 * Start server `npm run server`
-* Run demo app  `npm start`
+* Run demo app `npm start`
 * Navigate to `http://localhost:4200/`
 
 ## Build
 
 Run `npm run build` to build the lib.
 
-> *packaged by* [ng-packagr](https://github.com/dherges/ng-packagr)
+> _packaged by_ [ng-packagr](https://github.com/dherges/ng-packagr)
 
 ## Contributing
 
