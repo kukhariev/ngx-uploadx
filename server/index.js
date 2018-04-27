@@ -6,7 +6,7 @@
 'use strict';
 
 /*
- * Server API eximple
+ * Server API example
  */
 
 const bytes = require('bytes');
@@ -145,12 +145,8 @@ app.use('/upload/', auth, (req, res, next) => {
   };
   const upload_id = uploadsDB.save(upload).id;
 
-  const query =
-    `?upload_id=${upload_id}` +
-    Object.entries(req.query).reduce(
-      (acc, [key, value]) => acc + `&${key}=${value}`,
-      ''
-    );
+  const query = `?upload_id=${upload_id}`;
+
   const location = `${req.protocol}://${req.hostname}:${PORT}/upload/${query}`;
   res.location(location);
   res.sendStatus(200);
