@@ -36,7 +36,7 @@ import { UploadxModule } from 'ngx-uploadx';
 ```ts
 // Component code
 //...
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { UploadxOptions, UploadState } from 'ngx-uploadx';
 
 @Component({
