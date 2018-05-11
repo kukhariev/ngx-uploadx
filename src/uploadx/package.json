@@ -1,7 +1,7 @@
 {
   "name": "ngx-uploadx",
-  "version": "1.0.9",
-  "license": "MIT",
+  "version": "1.1.0",
+  "description": "Angular Resumable Upload Module",
   "keywords": [
     "angular",
     "upload",
@@ -12,9 +12,10 @@
     "url": "git+https://github.com/kukhariev/ngx-uploadx.git"
   },
   "homepage": "https://github.com/kukhariev/ngx-uploadx#readme",
+  "license": "MIT",
   "peerDependencies": {
-    "@angular/core": "^5.0.0",
-    "@angular/common": "^5.0.0",
-    "rxjs": "^5.5.2"
+    "@angular/core": "^5.2.0 || ^6.0.0",
+    "@angular/common": "^5.2.0 || ^6.0.0",
+    "rxjs": "^6.0.0"
   }
 }

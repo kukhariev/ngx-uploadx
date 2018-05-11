@@ -1,8 +1,7 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { takeUntil } from 'rxjs/operators/takeUntil';
-import { Subject } from 'rxjs/Subject';
+import { Observable ,  Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { UploadxOptions, UploadState, UploadxService, UploadItem } from '../../uploadx';
 import {Ufile} from '../ufile';

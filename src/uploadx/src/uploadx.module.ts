@@ -10,4 +10,4 @@ import { UploadxService } from './uploadx.service';
   exports: [UploadxDirective],
   providers: [UploadxService]
 })
-export class UploadxModule { }
+export class UploadxModule {}

@@ -1,10 +1,13 @@
 import { Component, OnDestroy } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { takeUntil } from 'rxjs/operators/takeUntil';
-import { Subject } from 'rxjs/Subject';
+import { Observable, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { Ufile } from '../ufile';
-import { UploadxOptions, UploadxControlEvent, UploadState } from '../../uploadx';
+import {
+  UploadxOptions,
+  UploadxControlEvent,
+  UploadState
+} from '../../uploadx';
 
 @Component({
   selector: 'app-directive-way',
