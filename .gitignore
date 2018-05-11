@@ -46,4 +46,5 @@ Thumbs.db
 documentation
 
 update-cli.sh
-src/uploadx/npmpub.js
+
+src/uploadx/package.json
