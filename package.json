@@ -22,7 +22,7 @@
     "e2e": "concurrently --kill-others -s 'first' 'npm run server' 'ng e2e'",
     "server": "node ./server/index.js",
     "server:dev": "cd ./server  && nodemon .",
-    "release": "standard-version --message 'release: cut v%s' --no-verify --dry-run",
+    "release": "standard-version --message 'release: cut v%s' --no-verify",
     "postrelease": "npm run build",
     "build": "ts-node ./scripts/build.ts",
     "ci": "npm run lint && npm run test:once && npm run e2e"

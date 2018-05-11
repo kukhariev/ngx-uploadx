@@ -14,19 +14,13 @@ before_install:
   - 'export DISPLAY=:99.0'
   - 'sh -e /etc/init.d/xvfb start'
 before_script:
+  - 'npm install -g npm@5.8.0'
   - 'npm install -g @angular/cli'
-  - 'npm install'
+  - 'npm ci'
+cache:
+  directories:
+  - "$HOME/.npm"
 script:
   - 'npm run ci'
   - 'npm run build'
-before_deploy:
-  - 'cd dist/uploadx'
-deploy:
-  provider: npm
-  email: q_h@inbox.ru
-  api_key:
-    secure: er6awev391+ZrxCfyWl65rwpm7p03qjLXxcRI4/nGuPVv+FlsW7nl0XavnlBlhd0JqFeSr12AysEzmWemfLsuS2WXuuuZsoURU4KPAHOLMLACept/28Wk67BskyXH8oTxwhMvVNK1OPO6NyXFXyo5YDxx58QyWfFmTvar0atRNBzfwq4t/ox7r8WTA6Zc32t0ZMK1YFQqZTR+casazHNavtjxCtsS48zD9xXXKAaLf5MlJwZ+gH/51DW+U2lNJmhU/M50cUoTk3tIm/CJbtUbnMil/5kNhs1NWXSf3MGfqqavSD3q7Ftrzm9p9O9jFlhis8eKtfpgIPdhVV8Bc6EwN15Xugp8jJNaEjDEGtkKuOkiM9RMEfKDnko13+hTaceeCsG75fI9Y9aN2Oh8rAoCqaIqu5yKNubcRLt0EeDiNDrzWbkDeN3dYIMstcPiJicF8YFe/OsRoJKmWEMbnGeyefRIlsB2CrzVlO5IKFFI4qwiQVl4cbl8h7MRgxqkFw+ZGpc0tAmrSrKUBMYwKz7gl/1miGYtDn2CpXSbRpf4FeCQua3sUXsNKgBx/lPuogbbhtPWjbjlRx7hxuQAnucdpYvrSpJF+l2k+d8N/+RUqgvwYtRdXApeY/bNBOeW1yiwPvI9eHXDLAe8phtycZCHGuERpe6R7V791E/TRjXgX0=
-  on:
-    tags: true
-    repo: kukhariev/ngx-uploadx
-  skip_cleanup: true
+

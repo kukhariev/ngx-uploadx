@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs/Observable';
+import { Subject, Observable } from 'rxjs';
 
 import {
   UploadxOptions,
@@ -12,7 +11,9 @@ import { Uploader } from './uploader';
 /**
  *
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class UploadxService {
   subj: Subject<UploadState> = new Subject();
   private queue: Uploader[] = [];
