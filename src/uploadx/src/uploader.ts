@@ -14,7 +14,6 @@ const noop = () => {};
  * Implements XHR/CORS Resumable Upload
  * @see
  * https://developers.google.com/drive/v3/web/resumable-upload
- * https://developer.vimeo.com/api/upload/videos#resumable-upload
  */
 export class Uploader implements UploaderOptions {
   headers: any;
