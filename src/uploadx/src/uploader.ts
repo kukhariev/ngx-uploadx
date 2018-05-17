@@ -119,8 +119,8 @@ export class Uploader implements UploaderOptions {
       return this.resume();
     }
     const xhr = new XMLHttpRequest();
-    xhr.responseType = 'json';
     xhr.open(this.method, this.options.url, true);
+    xhr.responseType = 'json';
     if (!!this.options.withCredentials) {
       xhr.withCredentials = true;
     }
@@ -149,10 +149,10 @@ export class Uploader implements UploaderOptions {
    */
   private resume(): void {
     const xhr: XMLHttpRequest = XHRFactory.getInstance();
+    xhr.open('PUT', this.url, true);
     if (xhr.responseType !== 'json') {
       xhr.responseType = 'json';
     }
-    xhr.open('PUT', this.url, true);
     if (!!this.options.withCredentials) {
       xhr.withCredentials = true;
     }
@@ -210,11 +210,10 @@ export class Uploader implements UploaderOptions {
     end = end > this.size ? this.size : end;
     const chunk: Blob = this.file.slice(start, end);
     const xhr: XMLHttpRequest = XHRFactory.getInstance();
+    xhr.open('PUT', this.url, true);
     if (xhr.responseType !== 'json') {
       xhr.responseType = 'json';
     }
-
-    xhr.open('PUT', this.url, true);
     if (!!this.options.withCredentials) {
       xhr.withCredentials = true;
     }
