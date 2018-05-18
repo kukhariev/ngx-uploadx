@@ -3,6 +3,7 @@ import { build } from 'ng-packagr';
 import * as fs from 'fs';
 import * as rimraf from 'rimraf';
 const copyFile = util.promisify(fs.copyFile);
+const unlink = util.promisify(fs.unlink);
 
 (async () => {
   rimraf.sync('dist');
@@ -24,6 +25,7 @@ const copyFile = util.promisify(fs.copyFile);
     await build({ project: 'src/uploadx/package.json' });
     await copyFile('LICENSE', 'dist/uploadx/LICENSE');
     await copyFile('README.md', 'dist/uploadx/README.md');
+    await unlink('src/uploadx/package.json');
     try {
       await copyFile('CHANGELOG.md', 'dist/uploadx/CHANGELOG.md');
     } catch (e) {}
