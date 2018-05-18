@@ -2,24 +2,22 @@
   "name": "ngx-uploadx",
   "version": "1.1.2",
   "description": "Angular Resumable Upload Module",
-  "keywords": [
-    "angular",
-    "upload",
-    "chunk"
-  ],
+  "keywords": ["angular", "upload", "chunk"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kukhariev/ngx-uploadx.git"
   },
   "homepage": "https://github.com/kukhariev/ngx-uploadx#readme",
   "license": "MIT",
+  "private": true,
   "scripts": {
     "start": "ng serve --aot",
     "build:app": "ng build",
     "test": "ng test",
     "test:once": "ng test --watch=false",
     "lint": "ng lint",
-    "e2e": "concurrently --kill-others -s \"first\" \"npm run server\" \"ng e2e\"",
+    "e2e":
+      "concurrently --kill-others -s \"first\" \"npm run server\" \"ng e2e\"",
     "server": "node ./server/index.js",
     "server:dev": "cd ./server  && nodemon .",
     "release": "standard-version --message \"release: cut v%s\" --no-verify",
