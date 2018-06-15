@@ -157,7 +157,7 @@ export class Uploader implements UploaderOptions {
       xhr.withCredentials = true;
     }
     xhr.setRequestHeader('Content-Range', `bytes */${this.size}`);
-    xhr.setRequestHeader('Content-Type', this.mimeType);
+    xhr.setRequestHeader('Content-Type', 'application/octet-stream');
     this.setHeaders(xhr);
     const onDataSendError = () => {
       // 5xx errors or network failures
@@ -221,15 +221,15 @@ export class Uploader implements UploaderOptions {
       'Content-Range',
       `bytes ${start}-${end - 1}/${this.size}`
     );
-    xhr.setRequestHeader('Content-Type', this.mimeType);
+    xhr.setRequestHeader('Content-Type', 'application/octet-stream');
     this.setHeaders(xhr);
     const updateProgress = (pEvent: ProgressEvent) => {
       const uploaded = pEvent.lengthComputable
         ? start + (end - start) * (pEvent.loaded / pEvent.total)
         : start;
-      this.progress = +(uploaded / this.size * 100).toFixed(2);
+      this.progress = +((uploaded / this.size) * 100).toFixed(2);
       const now = new Date().getTime();
-      this.speed = Math.round(uploaded / (now - this.startTime) * 1000);
+      this.speed = Math.round((uploaded / (now - this.startTime)) * 1000);
       this.remaining = Math.ceil((this.size - uploaded) / this.speed);
       this.notifyState();
     };
