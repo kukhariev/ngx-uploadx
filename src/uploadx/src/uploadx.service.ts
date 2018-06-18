@@ -22,7 +22,7 @@ export class UploadxService {
   get uploaderOptions(): UploaderOptions {
     return {
       method: this.options.method || 'POST',
-      url: this.options.url || '/upload/',
+      url: this.options.endpoint || this.options.url || '/upload/',
       headers: this.options.headers,
       token: this.options.token,
       chunkSize: this.options.chunkSize || 0,
@@ -44,7 +44,7 @@ export class UploadxService {
    *
    * Create Uploader and add to the queue
    */
-  handleFileList(fileList: FileList) {
+  async handleFileList(fileList: FileList) {
     for (let i = 0; i < fileList.length; i++) {
       const uploader: Uploader = new Uploader(
         fileList.item(i),
@@ -53,9 +53,9 @@ export class UploadxService {
       this.queue.push(uploader);
     }
     if (this.autoUpload) {
-      this.queue.forEach(upload => {
-        upload.configure();
-      });
+      for (const upload of this.queue) {
+        await upload.upload();
+      }
       this.processQueue();
     }
   }
@@ -85,8 +85,7 @@ export class UploadxService {
         break;
       case 'upload':
         const uploadId = event.uploadId || event.itemOptions.uploadId;
-        const target = this.queue.find(f => f.uploadId === uploadId);
-        target.configure(event.itemOptions);
+        this.queue.find(f => f.uploadId === uploadId).upload(event.itemOptions);
         this.processQueue();
         break;
       case 'cancel':

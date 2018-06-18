@@ -6,19 +6,19 @@
 
 ## Key Features
 
-* Pause / Resume / Cancel Uploads
-* Retries using exponential back-off strategy
-* Chunking
+- Pause / Resume / Cancel Uploads
+- Retries using exponential back-off strategy
+- Chunking
 
 ## Setups
 
-* Add ngx-uploadx module as dependency :
+- Add ngx-uploadx module as dependency :
 
 ```sh
   npm install ngx-uploadx
 ```
 
-* Import UploadxModule in the root module:
+- Import UploadxModule in the root module:
 
 ```ts
 //...
@@ -69,12 +69,12 @@ export class AppHomeComponent {
 
 ### inputs
 
-* \[uploadx\]: _UploadxOptions_
-* \[uploadxAction\]: _UploadxControlEvent_
+- \[uploadx\]: _UploadxOptions_
+- \[uploadxAction\]: _UploadxControlEvent_
 
 ### Output
 
-* (uploadxState): $event _\<Observable\>UploadState_
+- (uploadxState): $event _\<Observable\>UploadState_
 
 ## Service
 
@@ -82,7 +82,7 @@ UploadxService
 
 ### Public Methods
 
-* init(options: _UploadxOptions_): _Observable\<UploadState\>_
+- init(options: _UploadxOptions_): _Observable\<UploadState\>_
 
   > Set global module options
 
@@ -98,9 +98,9 @@ UploadxService
   }
   ```
 
-* handleFileList(fileList: _FileList_): _void_
+- handleFileList(fileList: _FileList_): _void_
   > Add files to the upload queue
-* control(event: _UploadxControlEvent_): _void_
+- control(event: _UploadxControlEvent_): _void_
 
   > Send event
 
@@ -126,6 +126,7 @@ UploadxService
 | **[method]**          |   "POST"   | _Upload API initial method_              |
 | **[token]**           |     -      | _Auth Bearer token_                      |
 | **[url]**             | "/upload/" | _API URL_                                |
+| **[endpoint]**        | "/upload/" | _API URL_ (alias)                        |
 | **[withCredentials]** |   false    | _Use withCredentials xhr option_         |
 
 ### _\<Observable\>_ UploadState
@@ -167,9 +168,11 @@ UploadxService
 
 ## Run demo
 
-* Start server `npm run server`
-* Run demo app `npm start`
-* Navigate to `http://localhost:4200/`
+- Start server `npm run server`
+- Run demo app `npm start`
+- Navigate to `http://localhost:4200/`
+
+
 
 ## Build
 
@@ -181,10 +184,9 @@ Run `npm run build` to build the lib.
 
 Pull requests are welcome!
 
-## Links
+## References
 
-* [https://developers.google.com/drive/v3/web/resumable-upload](https://developers.google.com/drive/v3/web/resumable-upload)
-* [https://developer.box.com/v2.0/reference#chunked-upload](https://developer.box.com/v2.0/reference#chunked-upload)
+- [https://developers.google.com/drive/v3/web/resumable-upload](https://developers.google.com/drive/v3/web/resumable-upload)
 
 ## License
 
