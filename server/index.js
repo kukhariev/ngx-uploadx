@@ -36,7 +36,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
-const rawBodyParser = bodyParser.raw({ type: ALLOWMIME, limit: MAXCHUNKSIZE });
+const rawBodyParser = bodyParser.raw({ limit: MAXCHUNKSIZE });
 
 // -----------------------------  FAKE DATABASE  ----------------------------
 const uploadsDB = (() => {
@@ -153,7 +153,8 @@ app.use('/upload/', auth, (req, res, next) => {
 });
 
 // ------------------------------  ERROR HANDLER  ------------------------------
-app.use((err, req, res, next) => { // eslint-disable-line
+// eslint-disable-next-line
+app.use((err, req, res, next) => {
   const errorStatuses = {
     400: 'Bad Request',
     401: 'Unauthorized',
@@ -188,5 +189,4 @@ process.on('SIGTERM', () => {
   server.close(() => {
     process.exit(0);
   });
-
 });
