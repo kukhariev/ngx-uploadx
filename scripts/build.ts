@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as rimraf from 'rimraf';
 const copyFile = util.promisify(fs.copyFile);
 const unlink = util.promisify(fs.unlink);
+console.log(process.cwd());
 
 (async () => {
   rimraf.sync('dist');
@@ -17,6 +18,13 @@ const unlink = util.promisify(fs.unlink);
       '@angular/core': '^5.2.0 || ^6.0.0',
       '@angular/common': '^5.2.0 || ^6.0.0',
       rxjs: '^6.0.0'
+    };
+    packageJson.ngPackage = {
+      $schema: './node_modules/ng-packagr/ng-package.schema.json',
+      lib: {
+        entryFile: 'src/public_api.ts'
+      },
+      dest: '../../dist/uploadx'
     };
     fs.writeFileSync(
       'src/uploadx/package.json',
