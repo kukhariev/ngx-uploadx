@@ -2,23 +2,24 @@
 
 > Angular Resumable Upload Module
 
-[![Build Status](https://travis-ci.org/kukhariev/ngx-uploadx.svg?branch=master)](https://travis-ci.org/kukhariev/ngx-uploadx)
+[![npm version][npm-image]][npm-url]
+[![Build status][travis-image]][travis-url]
 
 ## Key Features
 
-* Pause / Resume / Cancel Uploads
-* Retries using exponential back-off strategy
-* Chunking
+- Pause / Resume / Cancel Uploads
+- Retries using exponential back-off strategy
+- Chunking
 
 ## Setups
 
-* Add ngx-uploadx module as dependency :
+- Add ngx-uploadx module as dependency :
 
 ```sh
   npm install ngx-uploadx
 ```
 
-* Import UploadxModule in the root module:
+- Import UploadxModule in the root module:
 
 ```ts
 //...
@@ -57,6 +58,10 @@ export class AppHomeComponent {
  }
 ```
 
+## Server-side setup
+
+- [node-uploadx](https://github.com/kukhariev/node-uploadx)
+
 ## Directive
 
 ```html
@@ -69,12 +74,12 @@ export class AppHomeComponent {
 
 ### inputs
 
-* \[uploadx\]: _UploadxOptions_
-* \[uploadxAction\]: _UploadxControlEvent_
+- \[uploadx\]: _UploadxOptions_
+- \[uploadxAction\]: _UploadxControlEvent_
 
 ### Output
 
-* (uploadxState): $event _\<Observable\>UploadState_
+- (uploadxState): $event _\<Observable\>UploadState_
 
 ## Service
 
@@ -82,7 +87,7 @@ UploadxService
 
 ### Public Methods
 
-* init(options: _UploadxOptions_): _Observable\<UploadState\>_
+- init(options: _UploadxOptions_): _Observable\<UploadState\>_
 
   > Set global module options
 
@@ -98,9 +103,9 @@ UploadxService
   }
   ```
 
-* handleFileList(fileList: _FileList_): _void_
+- handleFileList(fileList: _FileList_): _void_
   > Add files to the upload queue
-* control(event: _UploadxControlEvent_): _void_
+- control(event: _UploadxControlEvent_): _void_
 
   > Send event
 
@@ -167,9 +172,9 @@ UploadxService
 
 ## Run demo
 
-* Start server `npm run server`
-* Run demo app `npm start`
-* Navigate to `http://localhost:4200/`
+- Start server `npm run server`
+- Run demo app `npm start`
+- Navigate to `http://localhost:4200/`
 
 ## Build
 
@@ -183,9 +188,13 @@ Pull requests are welcome!
 
 ## Links
 
-* [https://developers.google.com/drive/v3/web/resumable-upload](https://developers.google.com/drive/v3/web/resumable-upload)
-* [https://developer.box.com/v2.0/reference#chunked-upload](https://developer.box.com/v2.0/reference#chunked-upload)
+- [https://developers.google.com/drive/v3/web/resumable-upload](https://developers.google.com/drive/v3/web/resumable-upload)
 
 ## License
 
 The MIT License (see the [LICENSE](LICENSE) file for the full text)
+
+[npm-image]: https://img.shields.io/npm/v/ngx-uploadx.svg
+[npm-url]: https://www.npmjs.com/package/ngx-uploadx
+[travis-image]: https://travis-ci.org/kukhariev/ngx-uploadx.svg?branch=master
+[travis-url]: https://travis-ci.org/kukhariev/ngx-uploadx
