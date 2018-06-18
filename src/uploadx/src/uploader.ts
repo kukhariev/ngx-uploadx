@@ -102,31 +102,18 @@ export class Uploader implements UploaderOptions {
           ...this.options.metadata,
           ...metadata
         };
-<<<<<<< HEAD
 
         this.headers =
           this.options.headers instanceof Function
             ? this.options.headers(this.file)
             : { ...this.options.headers, ...headers };
 
-=======
-
-        this.headers =
-          this.options.headers instanceof Function
-            ? this.options.headers(this.file)
-            : { ...this.options.headers, ...headers };
-
->>>>>>> 91b561abe4ff21fbff245f1c6c22ea48da3fb271
         // get session
         const xhr = new XMLHttpRequest();
         xhr.open(this.options.method, this.options.url, true);
         xhr.responseType = 'json';
         xhr.withCredentials = this.options.withCredentials;
-<<<<<<< HEAD
         this.setCommonHeaders(xhr);
-=======
-        this.setHeaders(xhr);
->>>>>>> 91b561abe4ff21fbff245f1c6c22ea48da3fb271
         xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
         xhr.setRequestHeader('X-Upload-Content-Length', this.size.toString());
         xhr.setRequestHeader('X-Upload-Content-Type', this.mimeType);
@@ -135,14 +122,6 @@ export class Uploader implements UploaderOptions {
             // get secure upload link
             this.response = xhr.response;
             this.URI = xhr.getResponseHeader('Location');
-<<<<<<< HEAD
-=======
-            const url = new URL(
-              '/upload?upload_id=4854e6a16d764727bb061fd91227c827&parts=test',
-              this.options.url
-            );
-            console.log(url);
->>>>>>> 91b561abe4ff21fbff245f1c6c22ea48da3fb271
             if (!this.URI) {
               this.status = 'error';
               reject(this);
@@ -185,11 +164,7 @@ export class Uploader implements UploaderOptions {
     xhr.open('PUT', this.URI, true);
     xhr.responseType = 'json';
     xhr.withCredentials = this.options.withCredentials;
-<<<<<<< HEAD
     this.setCommonHeaders(xhr);
-=======
-    this.setHeaders(xhr);
->>>>>>> 91b561abe4ff21fbff245f1c6c22ea48da3fb271
     xhr.setRequestHeader('Content-Range', `bytes */${this.size}`);
     xhr.setRequestHeader('Content-Type', 'application/octet-stream');
     const onDataSendError = async () => {
@@ -247,11 +222,7 @@ export class Uploader implements UploaderOptions {
     xhr.open('PUT', this.URI, true);
     xhr.responseType = 'json';
     xhr.withCredentials = this.options.withCredentials;
-<<<<<<< HEAD
     this.setCommonHeaders(xhr);
-=======
-    this.setHeaders(xhr);
->>>>>>> 91b561abe4ff21fbff245f1c6c22ea48da3fb271
     xhr.setRequestHeader(
       'Content-Range',
       `bytes ${start}-${end - 1}/${this.size}`
