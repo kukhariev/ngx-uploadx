@@ -51,6 +51,11 @@ export interface UploadItem {
    * Upload API URL
    * @default '/upload/'
    */
+  endpoint?: string;
+  /**
+   * Upload API URL
+   * @default '/upload/'
+   */
   url?: string;
   /**
    * Custom headers
@@ -101,6 +106,11 @@ export class UploadxOptions implements UploadItem {
    * Authorization Bearer token
    */
   token?: string;
+  /**
+   * Upload API URL
+   * @default '/upload/'
+   */
+  endpoint?: string;
   /**
    * Upload API URL
    * @default '/upload/'
