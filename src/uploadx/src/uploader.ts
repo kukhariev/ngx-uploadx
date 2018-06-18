@@ -18,7 +18,6 @@ const noop = () => {};
 export class Uploader implements UploaderOptions {
   headers: any;
   metadata: any;
-  method: string;
   mimeType: string;
   name: string;
   progress: number;
@@ -27,7 +26,7 @@ export class Uploader implements UploaderOptions {
   size: number;
   speed: number;
   uploadId: string;
-  url: any;
+  URI: string;
   private startTime: number;
   private _status: UploadStatus;
   private retry: BackoffRetry;
@@ -45,28 +44,6 @@ export class Uploader implements UploaderOptions {
     this.status = 'added';
     this.retry = new BackoffRetry();
   }
-  /**
-   * Set individual file options and add to queue
-   */
-  configure(item: UploadItem = {}) {
-    if (this.status === 'added') {
-      const { metadata, headers } = item;
-      this.metadata = {
-        name: this.name,
-        mimeType: this.mimeType,
-        ...this.options.metadata,
-        ...metadata
-      };
-      this.headers =
-        this.options.headers instanceof Function
-          ? this.options.headers(this.file)
-          : { ...this.options.headers, ...headers };
-      this.url = this.options.url;
-      this.method = this.options.method;
-    }
-    this.status = 'queue';
-  }
-
   set status(s: UploadStatus) {
     this._status = s;
     this.notifyState();
@@ -77,6 +54,7 @@ export class Uploader implements UploaderOptions {
   get status() {
     return this._status;
   }
+
   /**
    * Emit current state
    */
@@ -91,7 +69,7 @@ export class Uploader implements UploaderOptions {
       speed: this.speed,
       status: this._status,
       uploadId: this.uploadId,
-      URI: this.url
+      URI: this.URI
     };
     // tick for control events detect
     setTimeout(() => {
@@ -105,65 +83,101 @@ export class Uploader implements UploaderOptions {
         xhr.setRequestHeader(key, this.headers[key])
       );
     }
+    if (this.options.token) {
+      xhr.setRequestHeader('Authorization', 'Bearer ' + this.options.token);
+    }
   }
+  /**
+   * Set individual file options and add to queue
+   */
 
+  create(item: UploadItem = {}) {
+    return new Promise((resolve, reject) => {
+      if (this.status === 'added') {
+        // configure
+        const { metadata, headers } = item;
+        this.metadata = {
+          name: this.name,
+          mimeType: this.mimeType,
+          ...this.options.metadata,
+          ...metadata
+        };
+
+        this.headers =
+          this.options.headers instanceof Function
+            ? this.options.headers(this.file)
+            : { ...this.options.headers, ...headers };
+
+        // get session
+        const xhr = new XMLHttpRequest();
+        xhr.open(this.options.method, this.options.url, true);
+        xhr.responseType = 'json';
+        xhr.withCredentials = this.options.withCredentials;
+        this.setHeaders(xhr);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+        xhr.setRequestHeader('X-Upload-Content-Length', this.size.toString());
+        xhr.setRequestHeader('X-Upload-Content-Type', this.mimeType);
+        xhr.onload = () => {
+          if (xhr.status < 400 && xhr.status > 199) {
+            // get secure upload link
+            this.response = xhr.response;
+            this.URI = xhr.getResponseHeader('Location');
+            const url = new URL(
+              '/upload?upload_id=4854e6a16d764727bb061fd91227c827&parts=test',
+              this.options.url
+            );
+            console.log(url);
+            if (!this.URI) {
+              this.status = 'error';
+              reject(this);
+            } else {
+              this.status = 'queue';
+              resolve(this);
+            }
+          } else {
+            this.response = xhr.response;
+            this.status = 'error';
+            reject(this);
+          }
+        };
+        xhr.send(JSON.stringify(this.metadata));
+      } else {
+        resolve(this);
+      }
+    });
+  }
   /**
    * Initiate upload
    */
-  upload() {
-    if (this.status === 'added') {
-      this.configure();
-    }
-    this.status = 'uploading';
-    if (this.progress > 0) {
-      return this.resume();
-    }
-    const xhr = new XMLHttpRequest();
-    xhr.open(this.method, this.options.url, true);
-    xhr.responseType = 'json';
-    if (!!this.options.withCredentials) {
-      xhr.withCredentials = true;
-    }
-    this.setHeaders(xhr);
-    this.options.token
-      ? xhr.setRequestHeader('Authorization', 'Bearer ' + this.options.token)
-      : noop();
-    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-    xhr.setRequestHeader('X-Upload-Content-Length', this.size.toString());
-    xhr.setRequestHeader('X-Upload-Content-Type', this.mimeType);
-    xhr.onload = () => {
-      if (xhr.status < 400 && xhr.status > 199) {
-        // get secure upload link
-        this.url = xhr.getResponseHeader('Location');
+  async upload(item: UploadItem = {}) {
+    try {
+      await this.create(item);
+      this.status = 'uploading';
+      if (this.progress > 0) {
+        this.resume();
+      } else {
         this.startTime = this.startTime || new Date().getTime();
         this.sendFile();
-      } else {
-        this.response = xhr.response;
-        this.status = 'error';
       }
-    };
-    xhr.send(JSON.stringify(this.metadata));
+    } catch {}
   }
   /**
    * Request upload state after 5xx errors or network failures
    */
   private resume(): void {
     const xhr: XMLHttpRequest = XHRFactory.getInstance();
-    xhr.open('PUT', this.url, true);
-    if (xhr.responseType !== 'json') {
-      xhr.responseType = 'json';
-    }
-    if (!!this.options.withCredentials) {
-      xhr.withCredentials = true;
-    }
+    xhr.open('PUT', this.URI, true);
+    xhr.responseType = 'json';
+    xhr.withCredentials = this.options.withCredentials;
+    this.setHeaders(xhr);
     xhr.setRequestHeader('Content-Range', `bytes */${this.size}`);
     xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-    this.setHeaders(xhr);
-    const onDataSendError = () => {
+    const onDataSendError = async () => {
       // 5xx errors or network failures
       if (xhr.status > 499 || !xhr.status) {
         XHRFactory.release(xhr);
-        this.retry.wait().then(() => this.resume());
+        await this.retry.wait();
+        this.resume();
       } else {
         // 4xx errors
         this.response = xhr.response || {
@@ -210,19 +224,15 @@ export class Uploader implements UploaderOptions {
     end = end > this.size ? this.size : end;
     const chunk: Blob = this.file.slice(start, end);
     const xhr: XMLHttpRequest = XHRFactory.getInstance();
-    xhr.open('PUT', this.url, true);
-    if (xhr.responseType !== 'json') {
-      xhr.responseType = 'json';
-    }
-    if (!!this.options.withCredentials) {
-      xhr.withCredentials = true;
-    }
+    xhr.open('PUT', this.URI, true);
+    xhr.responseType = 'json';
+    xhr.withCredentials = this.options.withCredentials;
+    this.setHeaders(xhr);
     xhr.setRequestHeader(
       'Content-Range',
       `bytes ${start}-${end - 1}/${this.size}`
     );
     xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-    this.setHeaders(xhr);
     const updateProgress = (pEvent: ProgressEvent) => {
       const uploaded = pEvent.lengthComputable
         ? start + (end - start) * (pEvent.loaded / pEvent.total)
@@ -233,11 +243,12 @@ export class Uploader implements UploaderOptions {
       this.remaining = Math.ceil((this.size - uploaded) / this.speed);
       this.notifyState();
     };
-    const onDataSendError = () => {
+    const onDataSendError = async () => {
       // 5xx errors or network failures
       if (xhr.status > 499 || !xhr.status) {
         XHRFactory.release(xhr);
-        this.retry.wait().then(() => this.resume());
+        await this.retry.wait();
+        this.resume();
       } else {
         // 4xx errors
         this.response = xhr.response || {
