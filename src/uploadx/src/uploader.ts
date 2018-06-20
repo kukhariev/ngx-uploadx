@@ -126,7 +126,6 @@ export class Uploader implements UploaderOptions {
               this.status = 'error';
               reject(this);
             } else {
-              console.log(this.options.url, location);
               this.URI = url.resolve(this.options.url, location);
               this.status = 'queue';
               resolve(this);

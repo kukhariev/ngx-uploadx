@@ -17,7 +17,7 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
   options: UploadxOptions = {
     concurrency: 2,
     allowedTypes: 'image/*,video/*',
-    url: `http://localhost:3003/upload/?parts=test`,
+    url: `/upload?parts=test`,
     token: 'someToken',
     autoUpload: false,
     chunkSize: 1024 * 256 * 8
