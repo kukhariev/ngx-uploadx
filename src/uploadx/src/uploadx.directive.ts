@@ -13,7 +13,6 @@ import { UploadxOptions, UploadState, UploadxControlEvent } from './interfaces';
 import { UploadxService } from './uploadx.service';
 
 @Directive({
-  // tslint:disable-next-line:directive-selector
   selector: '[uploadx]'
 })
 export class UploadxDirective implements OnInit, OnDestroy {
@@ -30,7 +29,7 @@ export class UploadxDirective implements OnInit, OnDestroy {
     private elementRef: ElementRef,
     private renderer: Renderer2,
     private uploadService: UploadxService
-  ) { }
+  ) {}
 
   ngOnInit() {
     if (this.uploadx) {
@@ -43,11 +42,13 @@ export class UploadxDirective implements OnInit, OnDestroy {
       }
       this.uploadService.init(this.uploadx);
     }
-    this.uploadxState.emit(
-      <Observable<UploadState>>this.uploadService.subj.asObservable()
-    );
+    this.uploadxState.emit(<Observable<UploadState>>(
+      this.uploadService.subj.asObservable()
+    ));
     this.listenerFn = this.renderer.listen(
-      this.elementRef.nativeElement, 'change', this.fileListener
+      this.elementRef.nativeElement,
+      'change',
+      this.fileListener
     );
   }
 
