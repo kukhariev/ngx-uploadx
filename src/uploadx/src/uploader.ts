@@ -1,5 +1,5 @@
 import { Subject } from 'rxjs';
-
+import * as url from 'url';
 import { BackoffRetry } from './backoffRetry';
 import { XHRFactory } from './xhrfactory';
 import {
@@ -121,11 +121,13 @@ export class Uploader implements UploaderOptions {
           if (xhr.status < 400 && xhr.status > 199) {
             // get secure upload link
             this.response = xhr.response;
-            this.URI = xhr.getResponseHeader('Location');
-            if (!this.URI) {
+            const location = xhr.getResponseHeader('Location');
+            if (!location) {
               this.status = 'error';
               reject(this);
             } else {
+              console.log(this.options.url, location);
+              this.URI = url.resolve(this.options.url, location);
               this.status = 'queue';
               resolve(this);
             }
