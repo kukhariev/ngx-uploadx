@@ -15,7 +15,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "ng serve --aot",
+    "start": "ng serve --proxy-config proxy.conf.json",
     "build:app": "ng build",
     "test": "ng test",
     "test:once": "ng test --watch=false",
