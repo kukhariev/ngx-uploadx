@@ -8,6 +8,7 @@ import {
   UploadxControlEvent,
   UploadState
 } from '../../uploadx';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-directive-way',
@@ -24,7 +25,7 @@ export class DirectiveWayComponent implements OnDestroy {
     this.options = {
       concurrency: 2,
       allowedTypes: 'image/*,video/*',
-      url: `http://localhost:3003/upload/?parts=test`,
+      url: `${environment.endpoint}`,
       token: 'someToken',
       autoUpload: true,
       withCredentials: false,

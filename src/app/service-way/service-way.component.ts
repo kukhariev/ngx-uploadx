@@ -1,30 +1,34 @@
-
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable ,  Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { UploadxOptions, UploadState, UploadxService, UploadItem } from '../../uploadx';
-import {Ufile} from '../ufile';
+import {
+  UploadxOptions,
+  UploadState,
+  UploadxService,
+  UploadItem
+} from '../../uploadx';
+import { environment } from '../../environments/environment';
+import { Ufile } from '../ufile';
 
 @Component({
   selector: 'app-service-way',
-  templateUrl: './service-way.component.html',
+  templateUrl: './service-way.component.html'
 })
-
 export class ServiceWayComponent implements OnDestroy, OnInit {
   state: Observable<UploadState>;
   uploads: Ufile[] = [];
   options: UploadxOptions = {
     concurrency: 2,
     allowedTypes: 'image/*,video/*',
-    url: `/upload?parts=test`,
+    url: `${environment.endpoint}`,
     token: 'someToken',
     autoUpload: false,
     chunkSize: 1024 * 256 * 8
   };
   private ngUnsubscribe: Subject<any> = new Subject();
 
-  constructor(private uploadService: UploadxService) { }
+  constructor(private uploadService: UploadxService) {}
 
   ngOnInit() {
     const uploadsProgress = this.uploadService.init(this.options);
@@ -64,10 +68,19 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
         const index = this.uploads.findIndex(f => f.uploadId === item.uploadId);
         if (item.status === 'added') {
           const cfg: UploadItem = {
-            headers: { 'Content-Disposition': `filename=${encodeURI(item.file.name)}` },
-            metadata: { size: item.file.size, lastModifiedDate: item.file.lastModifiedDate },
+            headers: {
+              'Content-Disposition': `filename=${encodeURI(item.file.name)}`
+            },
+            metadata: {
+              size: item.file.size,
+              lastModifiedDate: item.file.lastModifiedDate
+            }
           };
-          this.uploadService.control({ action: 'upload', itemOptions: cfg, uploadId: item.uploadId });
+          this.uploadService.control({
+            action: 'upload',
+            itemOptions: cfg,
+            uploadId: item.uploadId
+          });
           this.uploads.unshift(new Ufile(item));
         } else {
           this.uploads[index].progress = item.progress;
