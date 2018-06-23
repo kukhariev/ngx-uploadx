@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.2.1"></a>
+## [1.2.1](https://github.com/kukhariev/ngx-uploadx/compare/v1.2.0...v1.2.1) (2018-06-23)
+
+
+### Bug Fixes
+
+*  add "url" to peerDependencies ([909a8a9](https://github.com/kukhariev/ngx-uploadx/commit/909a8a9))
+
+
+
 <a name="1.2.0"></a>
 # [1.2.0](https://github.com/kukhariev/ngx-uploadx/compare/v1.1.3...v1.2.0) (2018-06-22)
 
