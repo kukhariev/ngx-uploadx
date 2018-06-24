@@ -5,5 +5,5 @@
 
 export const environment = {
   production: false,
-  endpoint: 'http://localhost:3003/upload?uploadType=uploadx'
+  api: 'http://localhost:3003'
 };

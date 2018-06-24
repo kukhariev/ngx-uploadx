@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  endpoint: '/upload?uploadType=uploadx'
+  api: 'http://localhost/api_v1'
 };
