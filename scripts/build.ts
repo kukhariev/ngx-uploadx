@@ -34,9 +34,6 @@ const unlink = util.promisify(fs.unlink);
     await copyFile('LICENSE', 'dist/uploadx/LICENSE');
     await copyFile('README.md', 'dist/uploadx/README.md');
     await unlink('src/uploadx/package.json');
-    try {
-      await copyFile('CHANGELOG.md', 'dist/uploadx/CHANGELOG.md');
-    } catch (e) {}
   } catch (error) {
     console.error(error);
     process.exit(1);

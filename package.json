@@ -24,8 +24,8 @@
     "e2e": "concurrently --kill-others -s \"first\" \"npm run server\" \"ng e2e\"",
     "server": "node ./server/index.js",
     "server:dev": "cd ./server  && nodemon .",
-    "release": "standard-version --message \"release: cut v%s\" --no-verify",
-    "postrelease": "npm run build",
+    "prepublish": "cd dist/uploadx",
+    "postversion": "npm run build && git push --follow-tags npm publish",
     "build": "ts-node ./scripts/build.ts",
     "ci": "npm run lint && npm run test:once && npm run e2e"
   },
@@ -70,7 +70,6 @@
     "nodemon": "^1.17.4",
     "protractor": "~5.3.0",
     "rimraf": "^2.6.2",
-    "standard-version": "^4.3.0",
     "ts-node": "~5.0.1",
     "tsickle": "^0.27.5",
     "tslib": "^1.7.1",
