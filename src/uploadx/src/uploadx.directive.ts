@@ -17,9 +17,11 @@ import { UploadxService } from './uploadx.service';
 })
 export class UploadxDirective implements OnInit, OnDestroy {
   listenerFn: () => void;
-  @Output() uploadxState = new EventEmitter();
-  @Input('uploadx') uploadx: UploadxOptions;
-  @Input('uploadxAction')
+  @Output()
+  uploadxState = new EventEmitter();
+  @Input()
+  uploadx: UploadxOptions;
+  @Input()
   set uploadxAction(ctrlEvent: UploadxControlEvent) {
     if (ctrlEvent && this.uploadService) {
       this.uploadService.control(ctrlEvent);

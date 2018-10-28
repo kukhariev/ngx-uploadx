@@ -73,7 +73,7 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
             },
             metadata: {
               size: item.file.size,
-              lastModifiedDate: item.file.lastModifiedDate
+              lastModified: item.file.lastModified
             }
           };
           this.uploadService.control({

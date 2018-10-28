@@ -14,8 +14,8 @@ const unlink = util.promisify(fs.unlink);
     delete packageJson['private'];
     delete packageJson['dependencies'];
     packageJson.peerDependencies = {
-      '@angular/core': '^5.2.0 || ^6.0.0',
-      '@angular/common': '^5.2.0 || ^6.0.0',
+      '@angular/core': '^5.2.0 || ^6.0.0 || ^7.0.0',
+      '@angular/common': '^5.2.0 || ^6.0.0 || ^7.0.0',
       rxjs: '^6.0.0',
       url: '^0.11.0'
     };
