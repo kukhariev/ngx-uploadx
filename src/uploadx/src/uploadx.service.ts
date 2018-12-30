@@ -11,7 +11,7 @@ import { Uploader } from './uploader';
 /**
  *
  */
-@Injectable()
+@Injectable({ providedIn: 'root'})
 export class UploadxService {
   subj: Subject<UploadState> = new Subject();
   private queue: Uploader[] = [];
