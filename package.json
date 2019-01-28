@@ -40,7 +40,6 @@
     "@angular/router": "7.2.2",
     "core-js": "^2.6.3",
     "rxjs": "^6.3.3",
-    "url": "^0.11.0",
     "zone.js": "^0.8.29"
   },
   "devDependencies": {

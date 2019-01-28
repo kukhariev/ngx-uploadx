@@ -14,10 +14,8 @@ const unlink = util.promisify(fs.unlink);
     delete packageJson['private'];
     delete packageJson['dependencies'];
     packageJson.peerDependencies = {
-      '@angular/core': '^6.0.0 || ^7.0.0',
       '@angular/common': '^6.0.0 || ^7.0.0',
-      rxjs: '^6.0.0',
-      url: '^0.11.0'
+      rxjs: '^6.0.0'
     };
     packageJson.ngPackage = {
       $schema: './node_modules/ng-packagr/ng-package.schema.json',

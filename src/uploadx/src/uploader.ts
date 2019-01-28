@@ -1,5 +1,4 @@
-import { Subject } from 'rxjs';
-import * as url from 'url';
+import { resolveUrl } from './url';
 import { BackoffRetry } from './backoffRetry';
 import { XHRFactory } from './xhrfactory';
 import {
@@ -126,7 +125,7 @@ export class Uploader implements UploaderOptions {
               this.status = 'error';
               reject(this);
             } else {
-              this.URI = url.resolve(this.options.url, location);
+              this.URI = resolveUrl(location, this.options.url);
               this.status = 'queue';
               resolve(this);
             }
