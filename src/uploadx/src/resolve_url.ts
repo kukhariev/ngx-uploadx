@@ -1,22 +1,15 @@
-const isFull = (url: string) => {
-  return (
-    url.indexOf('//') * url.indexOf('https://') * url.indexOf('http://') === 0
-  );
-};
-function isAbsolute(url: string) {
-  return url.indexOf('/') === 0;
-}
-
 export function resolveUrl(url: string, baseURI: string) {
-  if (isFull(url)) {
+  if (
+    url.indexOf('//') * url.indexOf('https://') * url.indexOf('http://') ===
+    0
+  ) {
     return url;
   }
   try {
-    const resolved = new URL(url, baseURI).href;
-    return resolved;
+    return new URL(url, baseURI).href;
   } catch {}
 
-  if (isAbsolute(url)) {
+  if (url.indexOf('/') === 0) {
     const matches = baseURI.match(/^(?:https?:)?(?:\/\/)?([^\/\?]+)/g);
     const origin = matches && matches[0];
     return origin + url;

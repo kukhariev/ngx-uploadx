@@ -1,4 +1,4 @@
-import { resolveUrl } from './url';
+import { resolveUrl } from './resolve_url';
 import { BackoffRetry } from './backoffRetry';
 import { XHRFactory } from './xhrfactory';
 import {
