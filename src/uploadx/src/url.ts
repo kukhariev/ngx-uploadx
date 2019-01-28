@@ -1,3 +1,12 @@
+const isFull = (url: string) => {
+  return (
+    url.indexOf('//') * url.indexOf('https://') * url.indexOf('http://') === 0
+  );
+};
+function isAbsolute(url: string) {
+  return url.indexOf('/') === 0;
+}
+
 export function resolveUrl(url: string, baseURI: string) {
   if (isFull(url)) {
     return url;
@@ -16,13 +25,4 @@ export function resolveUrl(url: string, baseURI: string) {
     const path = matches && matches[0];
     return path + url;
   }
-}
-
-const isFull = (url: string) => {
-  return (
-    url.indexOf('//') * url.indexOf('https://') * url.indexOf('http://') === 0
-  );
-};
-function isAbsolute(url: string) {
-  return url.indexOf('/') === 0;
 }
