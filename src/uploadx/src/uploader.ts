@@ -1,12 +1,7 @@
 import { resolveUrl } from './resolve_url';
 import { BackoffRetry } from './backoffRetry';
 import { XHRFactory } from './xhrfactory';
-import {
-  UploadStatus,
-  UploadItem,
-  UploaderOptions,
-  UploadState
-} from './interfaces';
+import { UploadStatus, UploadItem, UploaderOptions, UploadState } from './interfaces';
 
 const noop = () => {};
 /**
@@ -33,7 +28,7 @@ export class Uploader implements UploaderOptions {
   /**
    * Creates an instance of Uploader.
    */
-  constructor(private file: File, private options: UploaderOptions) {
+  constructor(private file: File, public options: UploaderOptions) {
     this.uploadId = Math.random()
       .toString(36)
       .substring(2, 15);
@@ -77,13 +72,16 @@ export class Uploader implements UploaderOptions {
   }
 
   private setCommonHeaders(xhr: XMLHttpRequest) {
-    if (this.headers) {
-      Object.keys(this.headers).forEach(key =>
-        xhr.setRequestHeader(key, this.headers[key])
-      );
-    }
-    if (this.options.token) {
-      xhr.setRequestHeader('Authorization', 'Bearer ' + this.options.token);
+    const headers =
+      this.options.headers instanceof Function
+        ? { ...this.options.headers(this.file), ...this.headers }
+        : { ...this.options.headers, ...this.headers };
+
+    Object.keys(headers).forEach(key => xhr.setRequestHeader(key, headers[key]));
+    const token =
+      this.options.token instanceof Function ? this.options.token() : this.options.token;
+    if (token) {
+      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
     }
   }
   /**
@@ -102,10 +100,7 @@ export class Uploader implements UploaderOptions {
           ...metadata
         };
 
-        this.headers =
-          this.options.headers instanceof Function
-            ? this.options.headers(this.file)
-            : { ...this.options.headers, ...headers };
+        this.headers = headers instanceof Function ? headers(this.file) : headers;
 
         // get session
         const xhr = new XMLHttpRequest();
@@ -144,7 +139,7 @@ export class Uploader implements UploaderOptions {
   /**
    * Initiate upload
    */
-  async upload(item: UploadItem = {}) {
+  async upload(item?: UploadItem) {
     try {
       await this.create(item);
       this.status = 'uploading';
@@ -213,9 +208,7 @@ export class Uploader implements UploaderOptions {
     if (this.status === 'cancelled' || this.status === 'paused') {
       return;
     }
-    let end: number = this.options.chunkSize
-      ? start + this.options.chunkSize
-      : this.size;
+    let end: number = this.options.chunkSize ? start + this.options.chunkSize : this.size;
     end = end > this.size ? this.size : end;
     const chunk: Blob = this.file.slice(start, end);
     const xhr: XMLHttpRequest = XHRFactory.getInstance();
@@ -223,10 +216,7 @@ export class Uploader implements UploaderOptions {
     xhr.responseType = 'json';
     xhr.withCredentials = this.options.withCredentials;
     this.setCommonHeaders(xhr);
-    xhr.setRequestHeader(
-      'Content-Range',
-      `bytes ${start}-${end - 1}/${this.size}`
-    );
+    xhr.setRequestHeader('Content-Range', `bytes ${start}-${end - 1}/${this.size}`);
     xhr.setRequestHeader('Content-Type', 'application/octet-stream');
     const updateProgress = (pEvent: ProgressEvent) => {
       const uploaded = pEvent.lengthComputable
