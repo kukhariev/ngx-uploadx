@@ -9,6 +9,7 @@ export type UploadStatus =
 
 export type UploadAction =
   | 'create'
+  | 'refreshToken'
   | 'uploadAll'
   | 'upload'
   | 'cancel'
@@ -16,6 +17,7 @@ export type UploadAction =
   | 'pauseAll'
   | 'pause';
 export interface UploadxControlEvent {
+  token?: string | (() => string);
   action: UploadAction;
   /**
    * override global options
@@ -24,6 +26,7 @@ export interface UploadxControlEvent {
   /** Upload unique identifier */
   uploadId?: string;
 }
+
 /**
  *  Read only upload stream events
  */
@@ -60,7 +63,7 @@ export interface UploadItem {
   /**
    * Custom headers
    */
-  headers?: { [key: string]: string } | Function;
+  headers?: { [key: string]: string } | ((file?: File) => { [key: string]: string });
   /**
    * Upload meta
    * @default
@@ -96,7 +99,7 @@ export class UploadxOptions implements UploadItem {
   /**
    * Custom headers
    */
-  headers?: { [key: string]: string } | Function;
+  headers?: { [key: string]: string } | ((file?: File) => { [key: string]: string });
   /**
    * Upload API initial method
    * @default 'POST'
@@ -105,7 +108,7 @@ export class UploadxOptions implements UploadItem {
   /**
    * Authorization Bearer token
    */
-  token?: string;
+  token?: string | (() => string);
   /**
    * Upload API URL
    * @default '/upload/'
@@ -126,7 +129,7 @@ export class UploadxOptions implements UploadItem {
  * @inner
  */
 export interface UploaderOptions extends UploadItem {
-  token?: string;
+  token?: string | (() => string);
   chunkSize?: number;
   withCredentials?: boolean;
   readonly subj?: any;
