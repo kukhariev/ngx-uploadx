@@ -96,8 +96,9 @@ export class Uploader implements UploaderOptions {
         this.metadata = {
           name: this.name,
           mimeType: this.mimeType,
-          ...this.options.metadata,
-          ...metadata
+          size: this.size,
+          ...unfunc(this.options.metadata, this.file),
+          ...unfunc(metadata, this.file)
         };
 
         this.headers = headers instanceof Function ? headers(this.file) : headers;
