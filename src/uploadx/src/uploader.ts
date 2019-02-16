@@ -57,6 +57,7 @@ export class Uploader implements UploaderOptions {
       file: this.file,
       name: this.name,
       progress: this.progress,
+      percentage: this.progress,
       remaining: this.remaining,
       response: this.response,
       size: this.size,
