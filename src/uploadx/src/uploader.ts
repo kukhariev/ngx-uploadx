@@ -13,7 +13,7 @@ export class Uploader implements UploaderOptions {
   headers: { [key: string]: string } | null;
   metadata: { [key: string]: any };
   private _status: UploadStatus;
-  private abort: () => void;
+  private abort = noop;
   private retry: BackoffRetry;
   private startTime: number;
   progress: number;
