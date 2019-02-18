@@ -149,7 +149,7 @@ app.use('/upload/', auth, (req, res, next) => {
 
   const location = `${req.protocol}://${req.hostname}:${PORT}/upload/${query}`;
   res.location(location);
-  res.sendStatus(200);
+  res.json(200, { location });
 });
 
 // ------------------------------  ERROR HANDLER  ------------------------------

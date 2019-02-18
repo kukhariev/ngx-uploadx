@@ -254,11 +254,12 @@ function getRange(xhr: XMLHttpRequest) {
   const match = getKeyFromResponse(xhr, 'Range').match(/(-1|\d+)$/g);
   return 1 + +(match && match[0]);
 }
-        };
-        this.status = 'error';
-        XHRFactory.release(xhr);
-        this.options.nextFile();
-      }
+
+function getKeyFromResponse(xhr: XMLHttpRequest, key: string) {
+  const fromHeader = xhr.getResponseHeader(key);
+  if (fromHeader) {
+    return fromHeader;
+  }
     };
     const onDataSendSuccess = () => {
       if (xhr.status === 200 || xhr.status === 201) {
