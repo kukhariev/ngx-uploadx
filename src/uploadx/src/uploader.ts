@@ -78,7 +78,7 @@ export class Uploader implements UploaderOptions {
 
   create(item: UploadItem = {}) {
     return new Promise((resolve, reject) => {
-      if (this.status === 'added' || this.status === 'error') {
+      if (!this.URI || this.status === 'error') {
         // configure
         const { metadata, headers } = item;
         this.metadata = {
