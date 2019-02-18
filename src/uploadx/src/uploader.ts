@@ -231,19 +231,29 @@ export class Uploader implements UploaderOptions {
       this.remaining = Math.ceil((this.size - uploaded) / this.speed);
       this.notifyState();
     };
-    const onDataSendError = async () => {
-      // 5xx errors or network failures
-      if (xhr.status > 499 || !xhr.status) {
-        XHRFactory.release(xhr);
-        await this.retry.wait();
-        this.resume();
-      } else {
-        // 4xx errors
-        this.response = xhr.response || {
-          error: {
-            code: +xhr.status,
-            message: xhr.statusText
-          }
+  }
+
+  private sliceFile(start: number) {
+    let end: number = this.options.chunkSize ? start + this.options.chunkSize : this.size;
+    end = end > this.size ? this.size : end;
+    const chunk: Blob = this.file.slice(start, end);
+    return { end, chunk };
+  }
+
+  private setCommonHeaders(xhr: XMLHttpRequest) {
+    const headers = { ...unfunc(this.options.headers, this.file), ...this.headers };
+    Object.keys(headers).forEach(key => xhr.setRequestHeader(key, headers[key]));
+
+    const token = unfunc(this.options.token);
+    // tslint:disable-next-line: no-unused-expression
+    token && xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+  }
+}
+
+function getRange(xhr: XMLHttpRequest) {
+  const match = getKeyFromResponse(xhr, 'Range').match(/(-1|\d+)$/g);
+  return 1 + +(match && match[0]);
+}
         };
         this.status = 'error';
         XHRFactory.release(xhr);
