@@ -10,25 +10,25 @@ const noop = () => {};
  * https://developers.google.com/drive/v3/web/resumable-upload
  */
 export class Uploader implements UploaderOptions {
-  headers: any;
-  metadata: any;
-  mimeType: string;
-  name: string;
+  headers: { [key: string]: string } | null;
+  metadata: { [key: string]: any };
+  private _status: UploadStatus;
+  private abort: () => void;
+  private retry: BackoffRetry;
+  private startTime: number;
   progress: number;
+  readonly mimeType: string;
+  readonly name: string;
+  readonly size: number;
+  readonly uploadId: string;
   remaining: number;
   response: any;
-  size: number;
   speed: number;
-  uploadId: string;
   URI: string;
-  private startTime: number;
-  private _status: UploadStatus;
-  private retry: BackoffRetry;
-  private abort;
   /**
    * Creates an instance of Uploader.
    */
-  constructor(private file: File, public options: UploaderOptions) {
+  constructor(private readonly file: File, public options: UploaderOptions) {
     this.uploadId = Math.random()
       .toString(36)
       .substring(2, 15);
@@ -72,19 +72,6 @@ export class Uploader implements UploaderOptions {
     });
   }
 
-  private setCommonHeaders(xhr: XMLHttpRequest) {
-    const headers =
-      this.options.headers instanceof Function
-        ? { ...this.options.headers(this.file), ...this.headers }
-        : { ...this.options.headers, ...this.headers };
-
-    Object.keys(headers).forEach(key => xhr.setRequestHeader(key, headers[key]));
-    const token =
-      this.options.token instanceof Function ? this.options.token() : this.options.token;
-    if (token) {
-      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-    }
-  }
   /**
    * Set individual file options and add to queue
    */
@@ -102,9 +89,9 @@ export class Uploader implements UploaderOptions {
           ...unfunc(metadata, this.file)
         };
 
-        this.headers = headers instanceof Function ? headers(this.file) : headers;
+        this.headers = unfunc(headers, this.file);
 
-        // get session
+        // get file URI
         const xhr = new XMLHttpRequest();
         xhr.open(this.options.method, this.options.url, true);
         xhr.responseType = 'json';
@@ -116,9 +103,7 @@ export class Uploader implements UploaderOptions {
         xhr.onload = () => {
           this.response = parseJson(xhr);
           if (xhr.status < 400 && xhr.status > 199) {
-            // get secure upload link
-            this.response = xhr.response;
-            const location = xhr.getResponseHeader('Location');
+            const location = getKeyFromResponse(xhr, 'location');
             if (!location) {
               this.status = 'error';
               reject(this);
@@ -128,7 +113,6 @@ export class Uploader implements UploaderOptions {
               resolve(this);
             }
           } else {
-            this.response = xhr.response;
             this.status = 'error';
             reject(this);
           }
@@ -146,36 +130,57 @@ export class Uploader implements UploaderOptions {
     try {
       await this.create(item);
       this.status = 'uploading';
-      if (this.progress > 0) {
-        this.resume();
+      if (this.progress) {
+        this.sendChunk();
       } else {
         this.startTime = this.startTime || new Date().getTime();
-        this.sendFile();
+        this.sendChunk(0);
       }
-    } catch {}
+    } catch (e) {
+      console.error(e);
+    }
   }
+
   /**
-   * Request upload state after 5xx errors or network failures
+   * Content upload
    */
-  private resume(): void {
+  private sendChunk(start?: number) {
+    if (this.status === 'cancelled' || this.status === 'paused') {
+      return;
+    }
+    const isValidRange = typeof start === 'number';
+    let body = null;
     const xhr: XMLHttpRequest = XHRFactory.getInstance();
     xhr.open('PUT', this.URI, true);
     xhr.responseType = 'json';
     xhr.withCredentials = this.options.withCredentials;
+    this.setupEvents(xhr);
+    if (isValidRange) {
+      const { end, chunk }: { end: number; chunk: Blob } = this.sliceFile(start);
+      xhr.upload.onprogress = this.setupProgressEvent(start, end);
+      body = chunk;
+      xhr.setRequestHeader('Content-Range', `bytes ${start}-${end - 1}/${this.size}`);
+    } else {
+      xhr.setRequestHeader('Content-Range', `bytes */${this.size}`);
+    }
     this.setCommonHeaders(xhr);
-    xhr.setRequestHeader('Content-Range', `bytes */${this.size}`);
     xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-    const onDataSendError = async () => {
+    xhr.send(body);
+    return () => xhr.abort();
+  }
+
+  private setupEvents(xhr: XMLHttpRequest) {
+    const onError = async () => {
       // 5xx errors or network failures
       if (xhr.status > 499 || !xhr.status) {
         XHRFactory.release(xhr);
         await this.retry.wait();
-        this.resume();
+        this.abort = this.sendChunk();
       } else {
         // stop on 4xx errors
         this.response = parseJson(xhr) || {
           error: {
-            code: xhr.status,
+            code: +xhr.status,
             message: xhr.statusText
           }
         };
@@ -184,44 +189,29 @@ export class Uploader implements UploaderOptions {
         this.options.nextFile();
       }
     };
-    const onDataSendSuccess = () => {
+    const onSuccess = () => {
       if (xhr.status === 200 || xhr.status === 201) {
         this.progress = 100;
         this.response = parseJson(xhr);
         this.status = 'complete';
         XHRFactory.release(xhr);
         this.options.nextFile();
-      } else if (xhr.status && xhr.status < 400) {
-        const range = +xhr.getResponseHeader('Range').split('-')[1] + 1;
+      } else if (xhr.status < 400) {
+        const range = getRange(xhr);
         this.retry.reset();
         XHRFactory.release(xhr);
-        this.abort = this.sendFile(range);
+        // send next chunk
+        this.abort = this.sendChunk(range);
       } else {
-        onDataSendError();
+        onError();
       }
     };
-    xhr.onerror = onDataSendError;
-    xhr.onload = onDataSendSuccess;
-    xhr.send();
+    xhr.onerror = onError;
+    xhr.onload = onSuccess;
   }
-  /**
-   * Content upload
-   */
-  private sendFile(start: number = 0): () => void {
-    if (this.status === 'cancelled' || this.status === 'paused') {
-      return;
-    }
-    let end: number = this.options.chunkSize ? start + this.options.chunkSize : this.size;
-    end = end > this.size ? this.size : end;
-    const chunk: Blob = this.file.slice(start, end);
-    const xhr: XMLHttpRequest = XHRFactory.getInstance();
-    xhr.open('PUT', this.URI, true);
-    xhr.responseType = 'json';
-    xhr.withCredentials = this.options.withCredentials;
-    this.setCommonHeaders(xhr);
-    xhr.setRequestHeader('Content-Range', `bytes ${start}-${end - 1}/${this.size}`);
-    xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-    const updateProgress = (pEvent: ProgressEvent) => {
+
+  private setupProgressEvent(start: number, end: number) {
+    return (pEvent: ProgressEvent) => {
       const uploaded = pEvent.lengthComputable
         ? start + (end - start) * (pEvent.loaded / pEvent.total)
         : start;
@@ -260,23 +250,10 @@ function getKeyFromResponse(xhr: XMLHttpRequest, key: string) {
   if (fromHeader) {
     return fromHeader;
   }
-    };
-    const onDataSendSuccess = () => {
-      if (xhr.status === 200 || xhr.status === 201) {
-        this.progress = 100;
-        this.response = xhr.response;
-        this.status = 'complete';
-        XHRFactory.release(xhr);
-        this.options.nextFile();
-      } else if (xhr.status && xhr.status < 400) {
-        const range = +xhr.getResponseHeader('Range').split('-')[1] + 1;
-        this.retry.reset();
-        XHRFactory.release(xhr);
-        // send next chunk
-        this.abort = this.sendFile(range);
-      } else {
-        onDataSendError();
-      }
+  const response = parseJson(xhr);
+  const resKey = Object.keys(response).find(k => k.toLowerCase() === key.toLowerCase());
+  return response[resKey];
+}
 
 function parseJson(xhr: XMLHttpRequest) {
   return typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText || null);
