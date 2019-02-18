@@ -93,7 +93,7 @@ export class Uploader implements UploaderOptions {
 
         // get file URI
         const xhr = new XMLHttpRequest();
-        xhr.open(this.options.method, this.options.url, true);
+        xhr.open(this.options.method, this.options.endpoint, true);
         xhr.responseType = 'json';
         xhr.withCredentials = this.options.withCredentials;
         this.setCommonHeaders(xhr);
@@ -108,7 +108,7 @@ export class Uploader implements UploaderOptions {
               this.status = 'error';
               reject(this);
             } else {
-              this.URI = resolveUrl(location, this.options.url);
+              this.URI = resolveUrl(location, this.options.endpoint);
               this.status = 'queue';
               resolve(this);
             }
