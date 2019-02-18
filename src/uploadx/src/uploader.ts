@@ -259,6 +259,6 @@ function parseJson(xhr: XMLHttpRequest) {
   return typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText || null);
 }
 
-function unfunc<T>(value: T | ((...args: any) => T), ...args: any): T {
+function unfunc<T>(value: T | ((args?: any) => T), args?: any): T {
   return value instanceof Function ? value(...args) : value;
 }
