@@ -114,6 +114,7 @@ export class Uploader implements UploaderOptions {
         xhr.setRequestHeader('X-Upload-Content-Length', this.size.toString());
         xhr.setRequestHeader('X-Upload-Content-Type', this.mimeType);
         xhr.onload = () => {
+          this.response = parseJson(xhr);
           if (xhr.status < 400 && xhr.status > 199) {
             // get secure upload link
             this.response = xhr.response;
@@ -171,8 +172,8 @@ export class Uploader implements UploaderOptions {
         await this.retry.wait();
         this.resume();
       } else {
-        // 4xx errors
-        this.response = xhr.response || {
+        // stop on 4xx errors
+        this.response = parseJson(xhr) || {
           error: {
             code: xhr.status,
             message: xhr.statusText
@@ -186,7 +187,7 @@ export class Uploader implements UploaderOptions {
     const onDataSendSuccess = () => {
       if (xhr.status === 200 || xhr.status === 201) {
         this.progress = 100;
-        this.response = xhr.response;
+        this.response = parseJson(xhr);
         this.status = 'complete';
         XHRFactory.release(xhr);
         this.options.nextFile();
@@ -265,13 +266,8 @@ export class Uploader implements UploaderOptions {
       } else {
         onDataSendError();
       }
-    };
-    xhr.onerror = onDataSendError;
-    xhr.onload = onDataSendSuccess;
-    xhr.upload.onprogress = updateProgress;
-    xhr.send(chunk);
-    return () => {
-      xhr.abort();
-    };
-  }
+
+function parseJson(xhr: XMLHttpRequest) {
+  return typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText || null);
+}
 }
