@@ -34,6 +34,7 @@ export interface UploadState {
   file: File;
   name: string;
   progress: number;
+  percentage: number;
   remaining: number;
   response: any;
   size: number;
@@ -58,6 +59,7 @@ export interface UploadItem {
   /**
    * Upload API URL
    * @default '/upload/'
+   * @deprecated
    */
   url?: string;
   /**
@@ -117,6 +119,7 @@ export class UploadxOptions implements UploadItem {
   /**
    * Upload API URL
    * @default '/upload/'
+   * @deprecated
    */
   url?: string;
   /**

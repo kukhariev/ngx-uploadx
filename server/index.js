@@ -28,9 +28,7 @@ const ALLOWMIME = ['video/*'];
 // ----------------------------  CONFIGURE EXPRESS  ----------------------------
 const app = express();
 app.enable('trust proxy');
-app.use(
-  require('morgan')('dev', { skip: (req, res) => res.statusCode === 204 })
-);
+app.use(require('morgan')('dev', { skip: (req, res) => res.statusCode === 204 }));
 const corsOptions = {
   exposedHeaders: ['Range', 'Location']
 };
@@ -149,7 +147,7 @@ app.use('/upload/', auth, (req, res, next) => {
 
   const location = `${req.protocol}://${req.hostname}:${PORT}/upload/${query}`;
   res.location(location);
-  res.sendStatus(200);
+  res.json(200, { location });
 });
 
 // ------------------------------  ERROR HANDLER  ------------------------------

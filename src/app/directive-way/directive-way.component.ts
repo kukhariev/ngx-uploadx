@@ -3,11 +3,7 @@ import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { Ufile } from '../ufile';
-import {
-  UploadxOptions,
-  UploadxControlEvent,
-  UploadState
-} from '../../uploadx';
+import { UploadxOptions, UploadxControlEvent, UploadState } from '../../uploadx';
 import { environment } from '../../environments/environment';
 
 @Component({
@@ -26,7 +22,9 @@ export class DirectiveWayComponent implements OnDestroy {
       concurrency: 2,
       allowedTypes: 'image/*,video/*',
       url: `${environment.api}/upload?uploadType=uploadx`,
-      token: 'someToken',
+      token: () => {
+        return 'sometoken';
+      },
       autoUpload: true,
       withCredentials: false,
       chunkSize: 1024 * 256 * 8,
@@ -57,18 +55,14 @@ export class DirectiveWayComponent implements OnDestroy {
   }
   onUpload(uploadsOutStream: Observable<UploadState>) {
     this.state = uploadsOutStream;
-    uploadsOutStream
-      .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe((ufile: UploadState) => {
-        const index = this.uploads.findIndex(
-          f => f.uploadId === ufile.uploadId
-        );
-        if (ufile.status === 'added') {
-          this.uploads.push(new Ufile(ufile));
-        } else {
-          this.uploads[index].progress = ufile.progress;
-          this.uploads[index].status = ufile.status;
-        }
-      });
+    uploadsOutStream.pipe(takeUntil(this.ngUnsubscribe)).subscribe((ufile: UploadState) => {
+      const index = this.uploads.findIndex(f => f.uploadId === ufile.uploadId);
+      if (ufile.status === 'added') {
+        this.uploads.push(new Ufile(ufile));
+      } else {
+        this.uploads[index].progress = ufile.progress;
+        this.uploads[index].status = ufile.status;
+      }
+    });
   }
 }

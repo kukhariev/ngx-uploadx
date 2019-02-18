@@ -17,6 +17,9 @@ export class UploadxService {
   get uploaderOptions(): UploaderOptions {
     return {
       method: this.options.method || 'POST',
+      // tslint:disable-next-line: deprecation
+      endpoint: this.options.endpoint || this.options.url || '/upload/',
+      // tslint:disable-next-line: deprecation
       url: this.options.endpoint || this.options.url || '/upload/',
       headers: this.options.headers,
       token: this.options.token,

@@ -65,7 +65,12 @@ export class AppHomeComponent {
 ## Directive
 
 ```html
-<input type="file" [uploadx]="options" [uploadxAction]="control" (uploadxState)="onUpload($event)">
+<input
+  type="file"
+  [uploadx]="options"
+  [uploadxAction]="control"
+  (uploadxState)="onUpload($event)"
+/>
 ```
 
 ### Selector
@@ -79,7 +84,7 @@ export class AppHomeComponent {
 
 ### Output
 
-- (uploadxState): $event _\<Observable\>UploadState_
+- (uploadxState): \$event _\<Observable\>UploadState_
 
 ## Service
 
@@ -93,7 +98,16 @@ UploadxService
 
   ```ts
   // example:
-
+  uploadxOptions: UploadxOptions = {
+    concurrency: 2,
+    allowedTypes: 'image/*,video/*',
+    endpoint: `${environment.api}/upload?uploadType=uploadx`,
+    token:  () => {
+      return localStorage.getItem('access_token');
+    },
+    autoUpload: false,
+    chunkSize: 1024 * 256 * 8
+  };
   ngOnInit() {
     this.uploadService.init(this.uploadxOptions)
       .subscribe((item: UploadState) => {
@@ -129,46 +143,48 @@ UploadxService
 | **[concurrency]**     |     2      | _Limit the number of concurrent uploads_ |
 | **[headers]**         |     -      | _Custom headers_                         |
 | **[method]**          |   "POST"   | _Upload API initial method_              |
-| **[token]**           |     -      | _Auth Bearer token_                      |
-| **[url]**             | "/upload/" | _API URL_                                |
+| **[token]**           |     -      | _Auth Bearer token _                     |
+| **[endpoint]**        | "/upload/" | _API URL_                                |
+| **[url]**             | "/upload/" | _(alias) API URL_                        |
 | **[withCredentials]** |   false    | _Use withCredentials xhr option_         |
 
 ### _\<Observable\>_ UploadState
 
-| Name          |      Type      | Description                                                                 |
-| ------------- | :------------: | --------------------------------------------------------------------------- |
-| **file**      |     _File_     | _FileAPI File_                                                              |
-| **name**      |    _string_    | _file name_                                                                 |
-| **progress**  |    _number_    | _progress percentage_                                                       |
-| **remaining** |    _number_    | _ETA_                                                                       |
-| **response**  |     _any_      | _success/error response_                                                    |
-| **size**      |    _number_    | _file size_                                                                 |
-| **speed**     |    _number_    | _upload speed bytes/sec_                                                    |
-| **status**    | _UploadStatus_ | _'added', 'queue', 'uploading', 'complete', 'error', 'cancelled', 'paused'_ |
-| **uploadId**  |    _string_    | _Unique upload id_                                                          |
-| **URI**       |    _string_    | _session URI_                                                               |
+| Name           |      Type      | Description                                                                 |
+| -------------- | :------------: | --------------------------------------------------------------------------- |
+| **file**       |     _File_     | _FileAPI File_                                                              |
+| **name**       |    _string_    | _file name_                                                                 |
+| **progress**   |    _number_    | _progress percentage_                                                       |
+| **percentage** |    _number_    | _(alias) progress percentage_                                               |
+| **remaining**  |    _number_    | _ETA_                                                                       |
+| **response**   |     _any_      | _success/error response_                                                    |
+| **size**       |    _number_    | _file size_                                                                 |
+| **speed**      |    _number_    | _upload speed bytes/sec_                                                    |
+| **status**     | _UploadStatus_ | _'added', 'queue', 'uploading', 'complete', 'error', 'cancelled', 'paused'_ |
+| **uploadId**   |    _string_    | _internal upload id_                                                        |
+| **URI**        |    _string_    | _file URI_                                                                  |
 
 ### UploadItem
 
 > Item custom options, override globals
 
-| Name           |                  Type                   | Description                       |
-| -------------- | :-------------------------------------: | --------------------------------- |
-| **[method]**   |                _string_                 | _API initial method_              |
-| **[uploadId]** |                _string_                 | _Unique upload id \( ReadOnly \)_ |
-| **[url]**      |                _string_                 | _Item URL_                        |
-| **[headers]**  | _{ [key: string]: string } \| Function_ | _Add custom headers_              |
-| **[metadata]** |                  _any_                  | _Add custom data_                 |
+| Name           |            Type             | Description                         |
+| -------------- | :-------------------------: | ----------------------------------- |
+| **[method]**   |          _string_           | _API initial method_                |
+| **[uploadId]** |          _string_           | _internal upload id \( ReadOnly \)_ |
+| **[URI]**      |          _string_           | _Item URL_                          |
+| **[headers]**  | _{ [key: string]: string }_ | _Add custom headers_                |
+| **[metadata]** |            _any_            | _Add custom data_                   |
 
 ### UploadxControlEvent
 
 >
 
-| Name              |      Type      | Description                                                        |
-| ----------------- | :------------: | ------------------------------------------------------------------ |
-| **action**        | _UploadAction_ | _'uploadAll', 'upload', 'cancel', 'cancelAll', 'pauseAll, 'pause'_ |
-| **[uploadId]**    |    _string_    | _Unique upload id \( ReadOnly \)_                                  |
-| **[itemOptions]** |  _UploadItem_  | _Item custom options_                                              |
+| Name              |      Type      | Description                                                                        |
+| ----------------- | :------------: | ---------------------------------------------------------------------------------- |
+| **action**        | _UploadAction_ | _'uploadAll', 'upload', 'cancel', 'cancelAll', 'pauseAll, 'pause', 'refreshToken'_ |
+| **[uploadId]**    |    _string_    | _internal upload id \( ReadOnly \)_                                                  |
+| **[itemOptions]** |  _UploadItem_  | _Item custom options_                                                              |
 
 ## Run demo
 
