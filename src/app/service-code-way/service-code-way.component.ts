@@ -65,8 +65,9 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   }
 
   async onChange() {
-    for (const file of this.getFiles()) {
-      await this.uploadService.handleFile(file);
+    const files = this.getFiles();
+    for (let i = 0; i < files.length; i++) {
+      await this.uploadService.handleFile(files[i]);
     }
   }
 

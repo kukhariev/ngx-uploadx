@@ -58,7 +58,9 @@ describe('ServiceCodeWayComponent', () => {
 
   describe('onChange', () => {
     it('should upload the files after the input files change', async(() => {
-      spyOn(comp, 'getFiles').and.returnValue([{} as File] as FileList);
+      const dataTransfer = new ClipboardEvent('').clipboardData || new DataTransfer();
+      dataTransfer.items.add(new File(['foo'], 'programmatically_created.txt'));
+      spyOn(comp, 'getFiles').and.returnValue(dataTransfer.files);
       comp.onChange();
       expect(uploadService.handleFile).toHaveBeenCalled();
     }));
