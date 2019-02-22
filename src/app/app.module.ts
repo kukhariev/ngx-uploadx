@@ -7,12 +7,14 @@ import { AppRoutes } from './app.routes';
 import { AppComponent } from './app.component';
 import { DirectiveWayComponent } from './directive-way/directive-way.component';
 import { ServiceWayComponent } from './service-way/service-way.component';
+import { ServiceCodeWayComponent } from './service-code-way/service-code-way.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     DirectiveWayComponent,
-    ServiceWayComponent
+    ServiceWayComponent,
+    ServiceCodeWayComponent
   ],
   imports: [
     RouterModule.forRoot(AppRoutes),
