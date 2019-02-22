@@ -23,7 +23,7 @@ const UPLOADDIR = require('os').tmpdir();
 const PORT = 3003;
 const MAXUPLOADSIZE = bytes('2gb');
 const MAXCHUNKSIZE = bytes('20mb');
-const ALLOWMIME = ['video/*'];
+const ALLOWMIME = ['video/*', 'image/*'];
 
 // ----------------------------  CONFIGURE EXPRESS  ----------------------------
 const app = express();
