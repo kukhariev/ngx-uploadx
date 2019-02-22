@@ -11,7 +11,6 @@ import {
 } from '../../uploadx';
 import {environment} from '../../environments/environment';
 import {Ufile} from '../ufile';
-import {fromPromise} from 'rxjs/internal-compatibility';
 
 @Component({
   selector: 'app-service-way',

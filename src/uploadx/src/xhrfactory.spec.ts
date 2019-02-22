@@ -1,5 +1,5 @@
-
 import { XHRFactory } from './xhrfactory';
+
 let xhr: XMLHttpRequest;
 
 describe('XHRFactory', () => {
