@@ -66,9 +66,13 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   }
 
   async onChange() {
-    for (const file of this.fileInput.nativeElement.files) {
+    for (const file of this.getFiles()) {
       await this.uploadService.handleFile(file);
     }
+  }
+
+  getFiles(): FileList {
+    return this.fileInput.nativeElement.files;
   }
 
   onUpload(uploadsOutStream: Observable<UploadState>) {
