@@ -58,7 +58,7 @@ describe('ServiceCodeWayComponent', () => {
 
   describe('onChange', () => {
     it('should upload the files after the input files change', async(() => {
-      spyOn(comp, 'getFiles').and.returnValue([null] as FileList);
+      spyOn(comp, 'getFiles').and.returnValue([{} as File] as FileList);
       comp.onChange();
       expect(uploadService.handleFile).toHaveBeenCalled();
     }));
