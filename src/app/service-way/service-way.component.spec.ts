@@ -17,8 +17,8 @@ describe('ServiceWayComponent', () => {
       control: () => ({})
     };
     TestBed.configureTestingModule({
-      declarations: [ ServiceWayComponent ],
-      schemas: [ NO_ERRORS_SCHEMA ],
+      declarations: [ServiceWayComponent],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [
         { provide: Observable, useValue: observableStub },
         { provide: UploadxService, useValue: uploadServiceStub }
@@ -35,7 +35,8 @@ describe('ServiceWayComponent', () => {
   // xdescribe('onUpload', () => {
   //   it('makes expected calls', () => {
   //     const observableStub: Observable<any> = fixture.debugElement.injector.get(Observable);
-  //     const uploadServiceStub: UploadxService = fixture.debugElement.injector.get(UploadxService);
+  //     const uploadServiceStub: UploadxService =
+  //       fixture.debugElement.injector.get(UploadxService);
   //     spyOn(uploadServiceStub, 'control');
   //     comp.onUpload(observableStub);
   //     expect(uploadServiceStub.control).toHaveBeenCalled();
@@ -68,5 +69,4 @@ describe('ServiceWayComponent', () => {
       expect(uploadServiceStub.control).toHaveBeenCalled();
     });
   });
-
 });
