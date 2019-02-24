@@ -3,12 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import {
-  UploadxOptions,
-  UploadState,
-  UploadxService,
-  UploadItem
-} from '../../uploadx';
+import { UploadxOptions, UploadState, UploadxService, UploadItem } from '../../uploadx';
 import { environment } from '../../environments/environment';
 import { Ufile } from '../ufile';
 
@@ -63,30 +58,28 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
 
   onUpload(uploadsOutStream: Observable<UploadState>) {
     this.state = uploadsOutStream;
-    uploadsOutStream
-      .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe((item: UploadState) => {
-        const index = this.uploads.findIndex(f => f.uploadId === item.uploadId);
-        if (item.status === 'added') {
-          const cfg: UploadItem = {
-            headers: {
-              'Content-Disposition': `filename=${encodeURI(item.file.name)}`
-            },
-            metadata: {
-              size: item.file.size,
-              lastModified: item.file.lastModified
-            }
-          };
-          this.uploadService.control({
-            action: 'upload',
-            itemOptions: cfg,
-            uploadId: item.uploadId
-          });
-          this.uploads.unshift(new Ufile(item));
-        } else {
-          this.uploads[index].progress = item.progress;
-          this.uploads[index].status = item.status;
-        }
-      });
+    uploadsOutStream.pipe(takeUntil(this.ngUnsubscribe)).subscribe((item: UploadState) => {
+      const index = this.uploads.findIndex(f => f.uploadId === item.uploadId);
+      if (item.status === 'added') {
+        const cfg: UploadItem = {
+          headers: {
+            'Content-Disposition': `filename=${encodeURI(item.file.name)}`
+          },
+          metadata: {
+            size: item.file.size,
+            lastModified: item.file.lastModified
+          }
+        };
+        this.uploadService.control({
+          action: 'upload',
+          itemOptions: cfg,
+          uploadId: item.uploadId
+        });
+        this.uploads.unshift(new Ufile(item));
+      } else {
+        this.uploads[index].progress = item.progress;
+        this.uploads[index].status = item.status;
+      }
+    });
   }
 }

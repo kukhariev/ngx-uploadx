@@ -20,8 +20,13 @@ export class AppPage {
     return element(by.css('app-root pre')).getText();
   }
   waitForComplete() {
-    browser.wait(() => element(by.css('app-root pre')).getText()
-      .then(text => text.indexOf('complete') > 0), 15000);
+    browser.wait(
+      () =>
+        element(by.css('app-root pre'))
+          .getText()
+          .then(text => text.indexOf('complete') > 0),
+      15000
+    );
     return 'complete';
   }
 }

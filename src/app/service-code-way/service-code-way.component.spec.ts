@@ -1,10 +1,10 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
-import {Observable} from 'rxjs';
+import { Observable } from 'rxjs';
 
-import {UploadxService} from '../../uploadx';
-import {ServiceCodeWayComponent} from './service-code-way.component';
+import { UploadxService } from '../../uploadx';
+import { ServiceCodeWayComponent } from './service-code-way.component';
 
 describe('ServiceCodeWayComponent', () => {
   let comp: ServiceCodeWayComponent;
@@ -22,8 +22,8 @@ describe('ServiceCodeWayComponent', () => {
       declarations: [ServiceCodeWayComponent],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
-        {provide: Observable, useValue: observableStub},
-        {provide: UploadxService, useValue: uploadServiceStub}
+        { provide: Observable, useValue: observableStub },
+        { provide: UploadxService, useValue: uploadServiceStub }
       ]
     });
     fixture = TestBed.createComponent(ServiceCodeWayComponent);
@@ -65,5 +65,4 @@ describe('ServiceCodeWayComponent', () => {
       expect(uploadService.handleFile).toHaveBeenCalled();
     }));
   });
-
 });

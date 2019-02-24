@@ -6,7 +6,7 @@ export let XHRFactory = (() => {
   }
 
   return {
-    release: (xhr) => {
+    release: xhr => {
       xhr.onreadystatechange = null;
       xhr.onerror = null;
       xhr.onload = null;

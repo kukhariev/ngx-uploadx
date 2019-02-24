@@ -10,18 +10,9 @@ import { ServiceWayComponent } from './service-way/service-way.component';
 import { ServiceCodeWayComponent } from './service-code-way/service-code-way.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    DirectiveWayComponent,
-    ServiceWayComponent,
-    ServiceCodeWayComponent
-  ],
-  imports: [
-    RouterModule.forRoot(AppRoutes),
-    BrowserModule,
-    UploadxModule
-  ],
+  declarations: [AppComponent, DirectiveWayComponent, ServiceWayComponent, ServiceCodeWayComponent],
+  imports: [RouterModule.forRoot(AppRoutes), BrowserModule, UploadxModule],
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

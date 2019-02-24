@@ -3,7 +3,7 @@ const absolutePath = require('path').resolve('./e2e/test.mp4');
 
 describe('uploader App', () => {
   let page: AppPage;
-    page = new AppPage();
+  page = new AppPage();
 
   it('should have input type=file', () => {
     page.navigateTo('/directive-way');
@@ -23,5 +23,4 @@ describe('uploader App', () => {
     page.getFileInput().sendKeys(absolutePath);
     expect(page.waitForComplete()).toEqual('complete');
   });
-
 });

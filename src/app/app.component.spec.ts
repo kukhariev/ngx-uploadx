@@ -9,8 +9,8 @@ describe('AppComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ AppComponent ],
-      schemas: [ NO_ERRORS_SCHEMA ]
+      declarations: [AppComponent],
+      schemas: [NO_ERRORS_SCHEMA]
     });
     fixture = TestBed.createComponent(AppComponent);
     comp = fixture.componentInstance;
@@ -19,5 +19,4 @@ describe('AppComponent', () => {
   it('can load instance', () => {
     expect(comp).toBeTruthy();
   });
-
 });

@@ -27,5 +27,4 @@ describe('XHRFactory', () => {
     xhr.abort();
     XHRFactory.release(xhr);
   });
-
 });

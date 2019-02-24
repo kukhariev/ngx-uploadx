@@ -12,11 +12,9 @@ describe('DirectiveWayComponent', () => {
   beforeEach(() => {
     const observableStub = {};
     TestBed.configureTestingModule({
-      declarations: [ DirectiveWayComponent ],
-      schemas: [ NO_ERRORS_SCHEMA ],
-      providers: [
-        { provide: Observable, useValue: observableStub }
-      ]
+      declarations: [DirectiveWayComponent],
+      schemas: [NO_ERRORS_SCHEMA],
+      providers: [{ provide: Observable, useValue: observableStub }]
     });
     fixture = TestBed.createComponent(DirectiveWayComponent);
     comp = fixture.componentInstance;
@@ -25,5 +23,4 @@ describe('DirectiveWayComponent', () => {
   it('can load instance', () => {
     expect(comp).toBeTruthy();
   });
-
 });

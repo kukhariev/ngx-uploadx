@@ -24,10 +24,7 @@ const unlink = util.promisify(fs.unlink);
       },
       dest: '../../dist/uploadx'
     };
-    fs.writeFileSync(
-      'src/uploadx/package.json',
-      JSON.stringify(packageJson, undefined, 2)
-    );
+    fs.writeFileSync('src/uploadx/package.json', JSON.stringify(packageJson, undefined, 2));
     await build({ project: 'src/uploadx/package.json' });
     await copyFile('LICENSE', 'dist/uploadx/LICENSE');
     await copyFile('README.md', 'dist/uploadx/README.md');

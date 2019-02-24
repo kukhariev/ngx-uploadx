@@ -11,11 +11,7 @@ export class BackoffRetry {
    * maxInterval = minInterval * 120 (2 min)
    * k = 2
    */
-  constructor(
-    private minInterval = 1000,
-    private maxInterval = minInterval * 120,
-    private k = 2
-  ) {
+  constructor(private minInterval = 1000, private maxInterval = minInterval * 120, private k = 2) {
     this.delay = this.minInterval;
   }
   // TODO implement the "Retry-After"
