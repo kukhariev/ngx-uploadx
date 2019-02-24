@@ -16,6 +16,7 @@ export type UploadAction =
   | 'cancelAll'
   | 'pauseAll'
   | 'pause';
+
 export interface UploadxControlEvent {
   token?: string | (() => string);
   action: UploadAction;
@@ -47,19 +48,19 @@ export interface UploadState {
 export interface UploadItem {
   /**
    * Upload API initial method
-   * @default 'POST'
+   * @defaultValue 'POST'
    */
   method?: string;
   readonly uploadId?: string;
   /**
    * Upload API URL
-   * @default '/upload/'
+   * @defaultValue '/upload/'
    */
   endpoint?: string;
   /**
    * Upload API URL
-   * @default '/upload/'
-   * @deprecated
+   * @defaultValue '/upload/'
+   * @deprecated Use {@link UploadItem.endpoint} instead.
    */
   url?: string;
   /**
@@ -68,7 +69,7 @@ export interface UploadItem {
   headers?: { [key: string]: string } | ((file?: File) => { [key: string]: string });
   /**
    * Upload meta
-   * @default
+   * @defaultValue
    * { name: File.Filename, mimeType: File.type }
    */
   metadata?: any;
@@ -85,17 +86,17 @@ export class UploadxOptions implements UploadItem {
   allowedTypes?: string;
   /**
    * Auto upload with global options
-   * @default true
+   * @defaultValue true
    */
   autoUpload?: boolean;
   /**
    * If set use chunks for upload
-   * @default 0
+   * @defaultValue 0
    */
   chunkSize?: number;
   /**
    * Uploads in parallel
-   * @default 2
+   * @defaultValue 2
    */
   concurrency?: number;
   /**
@@ -104,7 +105,7 @@ export class UploadxOptions implements UploadItem {
   headers?: { [key: string]: string } | ((file?: File) => { [key: string]: string });
   /**
    * Upload API initial method
-   * @default 'POST'
+   * @defaultValue 'POST'
    */
   method?: string;
   /**
@@ -113,23 +114,23 @@ export class UploadxOptions implements UploadItem {
   token?: string | (() => string);
   /**
    * Upload API URL
-   * @default '/upload/'
+   * @defaultValue '/upload/'
    */
   endpoint?: string;
   /**
    * Upload API URL
-   * @default '/upload/'
-   * @deprecated
+   * @defaultValue '/upload/'
+   * @deprecated Use {@link UploadxOptions.endpoint} instead.
    */
   url?: string;
   /**
    * Use withCredentials xhr option?
-   * @default false
+   * @defaultValue false
    */
   withCredentials?: boolean;
 }
 /**
- * @inner
+ *
  */
 export interface UploaderOptions extends UploadItem {
   token?: string | (() => string);
