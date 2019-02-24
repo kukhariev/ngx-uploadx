@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 
-import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import {Observable, Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 import {
   UploadxOptions,
@@ -9,14 +9,14 @@ import {
   UploadxService,
   UploadItem
 } from '../../uploadx';
-import { environment } from '../../environments/environment';
-import { Ufile } from '../ufile';
+import {environment} from '../../environments/environment';
+import {Ufile} from '../ufile';
 
 @Component({
   selector: 'app-service-way',
-  templateUrl: './service-way.component.html'
+  templateUrl: './service-code-way.component.html'
 })
-export class ServiceWayComponent implements OnDestroy, OnInit {
+export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   state: Observable<UploadState>;
   uploads: Ufile[] = [];
   options: UploadxOptions = {
@@ -29,7 +29,10 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
   };
   private ngUnsubscribe: Subject<any> = new Subject();
 
-  constructor(private uploadService: UploadxService) {}
+  @ViewChild('file', {read: ElementRef}) fileInput: ElementRef;
+
+  constructor(private uploadService: UploadxService) {
+  }
 
   ngOnInit() {
     const uploadsProgress = this.uploadService.init(this.options);
@@ -42,23 +45,34 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
   }
 
   cancelAll() {
-    this.uploadService.control({ action: 'cancelAll' });
+    this.uploadService.control({action: 'cancelAll'});
   }
 
   uploadAll() {
-    this.uploadService.control({ action: 'uploadAll' });
+    this.uploadService.control({action: 'uploadAll'});
   }
 
   pauseAll() {
-    this.uploadService.control({ action: 'pauseAll' });
+    this.uploadService.control({action: 'pauseAll'});
   }
 
   pause(uploadId: string) {
-    this.uploadService.control({ action: 'pause', uploadId });
+    this.uploadService.control({action: 'pause', uploadId});
   }
 
   upload(uploadId: string) {
-    this.uploadService.control({ action: 'upload', uploadId });
+    this.uploadService.control({action: 'upload', uploadId});
+  }
+
+  async onChange() {
+    const files = this.getFiles();
+    for (let i = 0; i < files.length; i++) {
+      await this.uploadService.handleFile(files[i]);
+    }
+  }
+
+  getFiles(): FileList {
+    return this.fileInput.nativeElement.files;
   }
 
   onUpload(uploadsOutStream: Observable<UploadState>) {

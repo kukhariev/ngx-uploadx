@@ -1,4 +1,5 @@
 import { UploadState } from '../uploadx';
+
 export class Ufile {
   name: string;
   uploadId: string;

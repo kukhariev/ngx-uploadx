@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+
 import { Subject, Observable } from 'rxjs';
 
 import { UploadxOptions, UploadState, UploadxControlEvent, UploaderOptions } from './interfaces';
@@ -47,6 +48,22 @@ export class UploadxService {
       const uploader: Uploader = new Uploader(fileList.item(i), this.uploaderOptions);
       this.queue.push(uploader);
     }
+    await this.autoUploadFiles();
+  }
+  /**
+   *
+   * Create Uploader for the file and add to the queue
+   */
+  async handleFile(file: File) {
+    const uploader: Uploader = new Uploader(file, this.uploaderOptions);
+    this.queue.push(uploader);
+    await this.autoUploadFiles();
+  }
+  /**
+   *
+   * Auto upload the files if the flag is true
+   */
+  async autoUploadFiles() {
     if (this.autoUpload) {
       for (const upload of this.queue) {
         await upload.upload();

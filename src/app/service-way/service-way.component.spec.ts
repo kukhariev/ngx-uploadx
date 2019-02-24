@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+
 import { Observable } from 'rxjs';
+
 import { UploadxService } from '../../uploadx';
 import { ServiceWayComponent } from './service-way.component';
 

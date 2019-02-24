@@ -1,4 +1,5 @@
 import { UploadxService } from './uploadx.service';
+
 const options = {
   concurrency: 3,
   allowedTypes: 'image/*,video/*',
