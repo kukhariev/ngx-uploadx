@@ -134,10 +134,10 @@ export class Uploader implements UploaderOptions {
       await this.create(item);
       this.status = 'uploading';
       if (this.progress) {
-        this.sendChunk();
+        this.abort = this.sendChunk();
       } else {
         this.startTime = this.startTime || new Date().getTime();
-        this.sendChunk(0);
+        this.abort = this.sendChunk(0);
       }
     } catch (e) {
       console.error(e);
