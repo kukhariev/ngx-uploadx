@@ -1,8 +1,18 @@
 <div class="container">
   <div class="btns">
     <div class="btn-col">
-      <label class="upload-btn">+
-        <input type="file" [uploadx]="options" [uploadxAction]="control" (uploadxState)="onUpload($event)" multiple  style="display:none">
+      <label class="upload-btn"
+        >+
+        <input
+          #files
+          (click)="files.value = ''"
+          type="file"
+          [uploadx]="options"
+          [uploadxAction]="control"
+          (uploadxState)="onUpload($event)"
+          multiple
+          style="display:none"
+        />
       </label>
       <button class="btn red raised" (click)="uploadAll()">Upload All</button>
       <button class="btn red raised" (click)="cancelAll()">Cancel All</button>
@@ -21,9 +31,7 @@
       </span>
     </div>
   </div>
-
-
 </div>
 <div class="json">
-  <pre>{{state | async | json}}</pre>
+  <pre>{{ state | async | json }}</pre>
 </div>
