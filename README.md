@@ -117,8 +117,12 @@ UploadxService
   }
   ```
 
-- handleFileList(fileList: _FileList_): _void_
+- handleFile(file: File): _Promise\<void\>_
+  > Create Uploader for the file and add to the queue
+
+- handleFileList(fileList: _FileList_): _Promise\<void\>_
   > Add files to the upload queue
+
 - control(event: _UploadxControlEvent_): _void_
 
   > Send event
@@ -130,6 +134,9 @@ UploadxService
     this.uploadService.control({ action: 'pause', uploadId });
   }
   ```
+
+- queue: Uploader[]
+  > Uploaders array
 
 ## Interfaces
 
@@ -183,7 +190,7 @@ UploadxService
 | Name              |      Type      | Description                                                                        |
 | ----------------- | :------------: | ---------------------------------------------------------------------------------- |
 | **action**        | _UploadAction_ | _'uploadAll', 'upload', 'cancel', 'cancelAll', 'pauseAll, 'pause', 'refreshToken'_ |
-| **[uploadId]**    |    _string_    | _internal upload id \( ReadOnly \)_                                                  |
+| **[uploadId]**    |    _string_    | _internal upload id \( ReadOnly \)_                                                |
 | **[itemOptions]** |  _UploadItem_  | _Item custom options_                                                              |
 
 ## Run demo
