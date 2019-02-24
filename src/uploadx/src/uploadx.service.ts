@@ -20,8 +20,6 @@ export class UploadxService {
       method: this.options.method || 'POST',
       // tslint:disable-next-line: deprecation
       endpoint: this.options.endpoint || this.options.url || '/upload/',
-      // tslint:disable-next-line: deprecation
-      url: this.options.endpoint || this.options.url || '/upload/',
       headers: this.options.headers,
       token: this.options.token,
       chunkSize: this.options.chunkSize || 0,
@@ -63,7 +61,7 @@ export class UploadxService {
    *
    * Auto upload the files if the flag is true
    */
-  async autoUploadFiles() {
+  private async autoUploadFiles() {
     if (this.autoUpload) {
       for (const upload of this.queue) {
         await upload.upload();
@@ -115,10 +113,6 @@ export class UploadxService {
   private processQueue() {
     const running = this.queue.filter((uploader: Uploader) => uploader.status === 'uploading');
 
-    const completed = this.queue.findIndex((uploader: Uploader) => uploader.status === 'complete');
-    if (completed !== -1) {
-      this.queue.splice(completed, 1);
-    }
     this.queue
       .filter((uploader: Uploader) => uploader.status === 'queue')
       .slice(0, this.concurrency - running.length)

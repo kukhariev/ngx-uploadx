@@ -22,5 +22,4 @@ describe('UploadxService', () => {
     expect(service.uploaderOptions.token).toEqual('iamtoken');
     expect(service.uploaderOptions.chunkSize).toEqual(1024 * 256 * 8);
   });
-
 });
