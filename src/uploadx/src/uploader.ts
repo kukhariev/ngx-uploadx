@@ -39,6 +39,9 @@ export class Uploader implements UploaderOptions {
     this.retry = new BackoffRetry();
   }
   set status(s: UploadStatus) {
+    if (this._status === 'cancelled' || this._status === 'complete') {
+      return;
+    }
     if (s !== this._status) {
       this._status = s;
       this.notifyState();
