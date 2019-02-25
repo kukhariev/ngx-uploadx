@@ -78,16 +78,16 @@ export class UploadxService {
   control(event: UploadxControlEvent) {
     switch (event.action) {
       case 'cancelAll':
-        this.queue.map(f => (f.status = 'cancelled'));
+        this.queue.forEach(f => (f.status = 'cancelled'));
         break;
       case 'pauseAll':
-        this.queue.map(f => (f.status = 'paused'));
+        this.queue.forEach(f => (f.status = 'paused'));
         break;
       case 'refreshToken':
-        this.queue.map(f => (f.options.token = event.token));
+        this.queue.forEach(f => (f.options.token = event.token));
         break;
       case 'uploadAll':
-        this.queue.filter(f => f.status !== 'uploading').map(f => (f.status = 'queue'));
+        this.queue.filter(f => f.status !== 'uploading').forEach(f => (f.status = 'queue'));
         this.processQueue();
         break;
       case 'upload':
