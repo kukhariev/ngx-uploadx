@@ -19,7 +19,7 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
     allowedTypes: 'image/*,video/*',
     url: `${environment.api}/upload?uploadType=uploadx`,
     token: 'someToken',
-    autoUpload: true,
+    autoUpload: false,
     chunkSize: 1024 * 256 * 8
   };
   private ngUnsubscribe: Subject<any> = new Subject();

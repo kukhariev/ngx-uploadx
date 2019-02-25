@@ -6,8 +6,8 @@ import { takeUntil } from 'rxjs/operators';
 import { UploadxOptions, UploadState, UploadxService, UploadItem } from '../../uploadx';
 import { environment } from '../../environments/environment';
 import { Ufile } from '../ufile';
-import {Uploader} from '../../uploadx/src/uploader';
-import {UploadStatus} from '../../uploadx/src/interfaces';
+import { Uploader } from '../../uploadx/src/uploader';
+import { UploadStatus } from '../../uploadx/src/interfaces';
 
 @Component({
   selector: 'app-service-way',
@@ -21,7 +21,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
     allowedTypes: 'image/*,video/*',
     url: `${environment.api}/upload?uploadType=uploadx`,
     token: 'someToken',
-    autoUpload: true,
+    autoUpload: false,
     chunkSize: 1024 * 256 * 8
   };
   private ngUnsubscribe: Subject<any> = new Subject();
