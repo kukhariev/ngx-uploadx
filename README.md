@@ -105,7 +105,7 @@ UploadxService
     token:  () => {
       return localStorage.getItem('access_token');
     },
-    autoUpload: false,
+    autoUpload: true,
     chunkSize: 1024 * 256 * 8
   };
   ngOnInit() {
@@ -117,10 +117,10 @@ UploadxService
   }
   ```
 
-- handleFile(file: File): _Promise\<void\>_
+- handleFile(file: File): _\<void\>_
   > Create Uploader for the file and add to the queue
 
-- handleFileList(fileList: _FileList_): _Promise\<void\>_
+- handleFileList(fileList: _FileList_): _\<void\>_
   > Add files to the upload queue
 
 - control(event: _UploadxControlEvent_): _void_
@@ -150,7 +150,7 @@ UploadxService
 | **[concurrency]**     |     2      | _Limit the number of concurrent uploads_ |
 | **[headers]**         |     -      | _Custom headers_                         |
 | **[method]**          |   "POST"   | _Upload API initial method_              |
-| **[token]**           |     -      | _Auth Bearer token _                     |
+| **[token]**           |     -      | _Auth Bearer token_                     |
 | **[endpoint]**        | "/upload/" | _API URL_                                |
 | **[url]**             | "/upload/" | _(alias) API URL_                        |
 | **[withCredentials]** |   false    | _Use withCredentials xhr option_         |
