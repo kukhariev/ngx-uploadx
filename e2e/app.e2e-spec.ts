@@ -18,8 +18,14 @@ describe('uploader App', () => {
     expect(page.waitForComplete()).toEqual('complete');
   });
 
-  it('should upload a file (Service)', () => {
+  it('should upload a file (Mixed)', () => {
     page.navigateTo('/service-way');
+    page.getFileInput().sendKeys(absolutePath);
+    expect(page.waitForComplete()).toEqual('complete');
+  });
+
+  it('should upload a file (Service)', () => {
+    page.navigateTo('/service-code-way');
     page.getFileInput().sendKeys(absolutePath);
     expect(page.waitForComplete()).toEqual('complete');
   });
