@@ -59,7 +59,7 @@ export class UploadxService {
    *
    * Create Uploader and add to the queue
    */
-  async handleFileList(fileList: FileList) {
+  handleFileList(fileList: FileList) {
     for (let i = 0; i < fileList.length; i++) {
       const uploader: Uploader = new Uploader(fileList.item(i), this.uploaderOptions);
       this.queue.push(uploader);
@@ -70,7 +70,7 @@ export class UploadxService {
    *
    * Create Uploader for the file and add to the queue
    */
-  async handleFile(file: File) {
+  handleFile(file: File) {
     const uploader: Uploader = new Uploader(file, this.uploaderOptions);
     this.queue.push(uploader);
     this.autoUploadFiles();
