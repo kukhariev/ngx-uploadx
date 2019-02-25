@@ -1,8 +1,14 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 
 import { Subject, Observable } from 'rxjs';
 
-import {UploadxOptions, UploadState, UploadxControlEvent, UploaderOptions, UploadStatus} from './interfaces';
+import {
+  UploadxOptions,
+  UploadState,
+  UploadxControlEvent,
+  UploaderOptions,
+  UploadStatus
+} from './interfaces';
 import { Uploader } from './uploader';
 /**
  *
@@ -31,7 +37,11 @@ export class UploadxService {
 
   constructor() {
     this.subj.subscribe((uploadState: UploadState) => {
-      if (uploadState.status === 'complete' || uploadState.status === 'cancelled' || uploadState.status === 'error') {
+      if (
+        uploadState.status === 'complete' ||
+        uploadState.status === 'cancelled' ||
+        uploadState.status === 'error'
+      ) {
         this.autoUploadFiles();
       }
     });
@@ -71,6 +81,7 @@ export class UploadxService {
    */
   private autoUploadFiles() {
     if (this.autoUpload) {
+      this.queue.filter(f => f.status === 'added').forEach(f => (f.status = 'queue'));
       this.processQueue();
     }
   }
@@ -101,7 +112,7 @@ export class UploadxService {
         const upload = this.queue.find(f => f.uploadId === uploadId);
         if (this.concurrency - this.runningProcess() > 0) {
           upload.upload(event.itemOptions);
-        } else if (upload.status === 'added' as UploadStatus) {
+        } else if (upload.status === ('added' as UploadStatus)) {
           upload.status = 'queue' as UploadStatus;
         }
         break;
