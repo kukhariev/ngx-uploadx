@@ -1,7 +1,7 @@
-import {resolveUrl} from './resolve_url';
-import {BackoffRetry} from './backoffRetry';
-import {XHRFactory} from './xhrfactory';
-import {UploadStatus, UploadItem, UploaderOptions, UploadState} from './interfaces';
+import { resolveUrl } from './resolve_url';
+import { BackoffRetry } from './backoffRetry';
+import { XHRFactory } from './xhrfactory';
+import { UploadStatus, UploadItem, UploaderOptions, UploadState } from './interfaces';
 
 const noop = () => {};
 
@@ -42,13 +42,16 @@ export class Uploader implements UploaderOptions {
   }
 
   set status(s: UploadStatus) {
-    if (this._status === 'cancelled' as UploadStatus || this._status === 'complete' as UploadStatus) {
+    if (
+      this._status === ('cancelled' as UploadStatus) ||
+      this._status === ('complete' as UploadStatus)
+    ) {
       return;
     }
     if (s !== this._status) {
       this._status = s;
       this.notifyState();
-      if (this.abort && (s === 'cancelled' as UploadStatus || s === 'paused' as UploadStatus)) {
+      if (this.abort && (s === ('cancelled' as UploadStatus) || s === ('paused' as UploadStatus))) {
         this.abort();
       }
     }
@@ -87,9 +90,9 @@ export class Uploader implements UploaderOptions {
 
   create(item: UploadItem = {}) {
     return new Promise((resolve, reject) => {
-      if (!this.URI || this.status === 'error' as UploadStatus) {
+      if (!this.URI || this.status === ('error' as UploadStatus)) {
         // configure
-        const {metadata, headers} = item;
+        const { metadata, headers } = item;
         this.metadata = {
           name: this.name,
           mimeType: this.mimeType,
@@ -155,7 +158,10 @@ export class Uploader implements UploaderOptions {
    * Content upload
    */
   private sendChunk(start?: number) {
-    if (this.status === 'cancelled' as UploadStatus || this.status === 'paused' as UploadStatus) {
+    if (
+      this.status === ('cancelled' as UploadStatus) ||
+      this.status === ('paused' as UploadStatus)
+    ) {
       return;
     }
     const isValidRange = typeof start === 'number';
@@ -166,7 +172,7 @@ export class Uploader implements UploaderOptions {
     xhr.withCredentials = this.options.withCredentials;
     this.setupEvents(xhr);
     if (isValidRange) {
-      const {end, chunk}: { end: number; chunk: Blob } = this.sliceFile(start);
+      const { end, chunk }: { end: number; chunk: Blob } = this.sliceFile(start);
       xhr.upload.onprogress = this.setupProgressEvent(start, end);
       body = chunk;
       xhr.setRequestHeader('Content-Range', `bytes ${start}-${end - 1}/${this.size}`);
@@ -237,11 +243,11 @@ export class Uploader implements UploaderOptions {
     let end: number = this.options.chunkSize ? start + this.options.chunkSize : this.size;
     end = end > this.size ? this.size : end;
     const chunk: Blob = this.file.slice(start, end);
-    return {end, chunk};
+    return { end, chunk };
   }
 
   private setCommonHeaders(xhr: XMLHttpRequest) {
-    const headers = {...unfunc(this.options.headers, this.file), ...this.headers};
+    const headers = { ...unfunc(this.options.headers, this.file), ...this.headers };
     Object.keys(headers).forEach(key => xhr.setRequestHeader(key, headers[key]));
 
     const token = unfunc(this.options.token);
