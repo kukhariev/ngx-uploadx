@@ -6,6 +6,8 @@ import { takeUntil } from 'rxjs/operators';
 import { UploadxOptions, UploadState, UploadxService, UploadItem } from '../../uploadx';
 import { environment } from '../../environments/environment';
 import { Ufile } from '../ufile';
+import {Uploader} from '../../uploadx/src/uploader';
+import {UploadStatus} from '../../uploadx/src/interfaces';
 
 @Component({
   selector: 'app-service-way',
@@ -23,6 +25,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
     chunkSize: 1024 * 256 * 8
   };
   private ngUnsubscribe: Subject<any> = new Subject();
+  numberOfCopies = 0;
 
   @ViewChild('file', { read: ElementRef }) fileInput: ElementRef;
 
@@ -72,6 +75,8 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   onUpload(uploadsOutStream: Observable<UploadState>) {
     this.state = uploadsOutStream;
     uploadsOutStream.pipe(takeUntil(this.ngUnsubscribe)).subscribe((item: UploadState) => {
+      this.numberOfCopies = this.uploadService.queue
+        .filter((uploader: Uploader) => uploader.status === 'uploading' as UploadStatus).length;
       const index = this.uploads.findIndex(f => f.uploadId === item.uploadId);
       if (item.status === 'added') {
         const cfg: UploadItem = {

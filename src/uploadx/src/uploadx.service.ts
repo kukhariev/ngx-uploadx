@@ -63,9 +63,6 @@ export class UploadxService {
    */
   private async autoUploadFiles() {
     if (this.autoUpload) {
-      for (const upload of this.queue) {
-        await upload.upload();
-      }
       this.processQueue();
     }
   }
@@ -92,7 +89,8 @@ export class UploadxService {
         break;
       case 'upload':
         const uploadId = event.uploadId || event.itemOptions.uploadId;
-        this.queue.find(f => f.uploadId === uploadId).upload(event.itemOptions);
+        // noinspection TsLint
+        (this.concurrency - this.runningProcess() > 0) && this.queue.find(f => f.uploadId === uploadId).upload(event.itemOptions);
         this.processQueue();
         break;
       case 'cancel':
@@ -109,13 +107,17 @@ export class UploadxService {
    * Queue management
    */
   private processQueue() {
-    const running = this.queue.filter((uploader: Uploader) => uploader.status === 'uploading');
+    const running = this.runningProcess();
 
     this.queue
       .filter((uploader: Uploader) => uploader.status === 'queue')
-      .slice(0, Math.max(this.concurrency - running.length, 0))
+      .slice(0, Math.max(this.concurrency - running, 0))
       .forEach((uploader: Uploader) => {
         uploader.upload();
       });
+  }
+
+  runningProcess(): number {
+    return this.queue.filter((uploader: Uploader) => uploader.status === 'uploading').length;
   }
 }
