@@ -26,7 +26,7 @@ export class UploadxService {
       withCredentials: this.options.withCredentials || false,
       subj: this.subj,
       nextFile: () => this.processQueue()
-    };
+    } as UploaderOptions;
   }
   /**
    * Set global module options
@@ -113,7 +113,7 @@ export class UploadxService {
 
     this.queue
       .filter((uploader: Uploader) => uploader.status === 'queue')
-      .slice(0, this.concurrency - running.length)
+      .slice(0, Math.max(this.concurrency - running.length, 0))
       .forEach((uploader: Uploader) => {
         uploader.upload();
       });
