@@ -118,9 +118,11 @@ UploadxService
   ```
 
 - handleFile(file: File): _\<void\>_
+
   > Create Uploader for the file and add to the queue
 
 - handleFileList(fileList: _FileList_): _\<void\>_
+
   > Add files to the upload queue
 
 - control(event: _UploadxControlEvent_): _void_
@@ -150,7 +152,7 @@ UploadxService
 | **[concurrency]**     |     2      | _Limit the number of concurrent uploads_ |
 | **[headers]**         |     -      | _Custom headers_                         |
 | **[method]**          |   "POST"   | _Upload API initial method_              |
-| **[token]**           |     -      | _Auth Bearer token_                     |
+| **[token]**           |     -      | _Auth Bearer token_                      |
 | **[endpoint]**        | "/upload/" | _API URL_                                |
 | **[url]**             | "/upload/" | _(alias) API URL_                        |
 | **[withCredentials]** |   false    | _Use withCredentials xhr option_         |
@@ -208,6 +210,12 @@ Run `npm run build` to build the lib.
 ## Contributing
 
 Pull requests are welcome!
+
+## Collaborators
+
+<table><tbody><tr><th align="left">wil92</th><td><a href="https://github.com/wil92">GitHub/wil92</a></td></tr>
+<tr><th align="left">kukhariev</th><td><a href="https://github.com/kukhariev">GitHub/kukhariev</a></td></tr>
+</tbody></table>
 
 ## Links
 
