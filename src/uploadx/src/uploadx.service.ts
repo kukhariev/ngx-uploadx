@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
 import { Subject, Observable } from 'rxjs';
 
-import { UploadxOptions, UploadState, UploadxControlEvent, UploaderOptions } from './interfaces';
+import {UploadxOptions, UploadState, UploadxControlEvent, UploaderOptions, UploadStatus} from './interfaces';
 import { Uploader } from './uploader';
 /**
  *
@@ -28,6 +28,14 @@ export class UploadxService {
       nextFile: () => this.processQueue()
     } as UploaderOptions;
   }
+
+  constructor() {
+    this.subj.subscribe((uploadState: UploadState) => {
+      if (uploadState.status === 'complete' || uploadState.status === 'cancelled' || uploadState.status === 'error') {
+        this.autoUploadFiles();
+      }
+    });
+  }
   /**
    * Set global module options
    */
@@ -46,7 +54,7 @@ export class UploadxService {
       const uploader: Uploader = new Uploader(fileList.item(i), this.uploaderOptions);
       this.queue.push(uploader);
     }
-    await this.autoUploadFiles();
+    this.autoUploadFiles();
   }
   /**
    *
@@ -55,13 +63,13 @@ export class UploadxService {
   async handleFile(file: File) {
     const uploader: Uploader = new Uploader(file, this.uploaderOptions);
     this.queue.push(uploader);
-    await this.autoUploadFiles();
+    this.autoUploadFiles();
   }
   /**
    *
    * Auto upload the files if the flag is true
    */
-  private async autoUploadFiles() {
+  private autoUploadFiles() {
     if (this.autoUpload) {
       this.processQueue();
     }
@@ -90,8 +98,12 @@ export class UploadxService {
       case 'upload':
         const uploadId = event.uploadId || event.itemOptions.uploadId;
         // noinspection TsLint
-        (this.concurrency - this.runningProcess() > 0) && this.queue.find(f => f.uploadId === uploadId).upload(event.itemOptions);
-        this.processQueue();
+        const upload = this.queue.find(f => f.uploadId === uploadId);
+        if (this.concurrency - this.runningProcess() > 0) {
+          upload.upload(event.itemOptions);
+        } else if (upload.status === 'added' as UploadStatus) {
+          upload.status = 'queue' as UploadStatus;
+        }
         break;
       case 'cancel':
         this.queue.find(f => f.uploadId === event.uploadId).status = 'cancelled';
@@ -103,6 +115,7 @@ export class UploadxService {
         break;
     }
   }
+
   /**
    * Queue management
    */

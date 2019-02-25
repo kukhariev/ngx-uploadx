@@ -21,7 +21,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
     allowedTypes: 'image/*,video/*',
     url: `${environment.api}/upload?uploadType=uploadx`,
     token: 'someToken',
-    autoUpload: false,
+    autoUpload: true,
     chunkSize: 1024 * 256 * 8
   };
   private ngUnsubscribe: Subject<any> = new Subject();
@@ -75,8 +75,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   onUpload(uploadsOutStream: Observable<UploadState>) {
     this.state = uploadsOutStream;
     uploadsOutStream.pipe(takeUntil(this.ngUnsubscribe)).subscribe((item: UploadState) => {
-      this.numberOfCopies = this.uploadService.queue
-        .filter((uploader: Uploader) => uploader.status === 'uploading' as UploadStatus).length;
+      this.numberOfCopies = this.uploadService.runningProcess();
       const index = this.uploads.findIndex(f => f.uploadId === item.uploadId);
       if (item.status === 'added') {
         const cfg: UploadItem = {
