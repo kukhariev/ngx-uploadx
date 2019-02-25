@@ -2,7 +2,13 @@ import { Injectable } from '@angular/core';
 
 import { Subject, Observable } from 'rxjs';
 
-import { UploadxOptions, UploadState, UploadxControlEvent, UploaderOptions } from './interfaces';
+import {
+  UploadxOptions,
+  UploadState,
+  UploadxControlEvent,
+  UploaderOptions,
+  UploadStatus
+} from './interfaces';
 import { Uploader } from './uploader';
 /**
  *
@@ -26,7 +32,19 @@ export class UploadxService {
       withCredentials: this.options.withCredentials || false,
       subj: this.subj,
       nextFile: () => this.processQueue()
-    };
+    } as UploaderOptions;
+  }
+
+  constructor() {
+    this.subj.subscribe((uploadState: UploadState) => {
+      if (
+        uploadState.status === 'complete' ||
+        uploadState.status === 'cancelled' ||
+        uploadState.status === 'error'
+      ) {
+        this.autoUploadFiles();
+      }
+    });
   }
   /**
    * Set global module options
@@ -41,31 +59,29 @@ export class UploadxService {
    *
    * Create Uploader and add to the queue
    */
-  async handleFileList(fileList: FileList) {
+  handleFileList(fileList: FileList) {
     for (let i = 0; i < fileList.length; i++) {
       const uploader: Uploader = new Uploader(fileList.item(i), this.uploaderOptions);
       this.queue.push(uploader);
     }
-    await this.autoUploadFiles();
+    this.autoUploadFiles();
   }
   /**
    *
    * Create Uploader for the file and add to the queue
    */
-  async handleFile(file: File) {
+  handleFile(file: File) {
     const uploader: Uploader = new Uploader(file, this.uploaderOptions);
     this.queue.push(uploader);
-    await this.autoUploadFiles();
+    this.autoUploadFiles();
   }
   /**
    *
    * Auto upload the files if the flag is true
    */
-  private async autoUploadFiles() {
+  private autoUploadFiles() {
     if (this.autoUpload) {
-      for (const upload of this.queue) {
-        await upload.upload();
-      }
+      this.queue.filter(f => f.status === 'added').forEach(f => (f.status = 'queue'));
       this.processQueue();
     }
   }
@@ -78,22 +94,27 @@ export class UploadxService {
   control(event: UploadxControlEvent) {
     switch (event.action) {
       case 'cancelAll':
-        this.queue.map(f => (f.status = 'cancelled'));
+        this.queue.forEach(f => (f.status = 'cancelled'));
         break;
       case 'pauseAll':
-        this.queue.map(f => (f.status = 'paused'));
+        this.queue.forEach(f => (f.status = 'paused'));
         break;
       case 'refreshToken':
-        this.queue.map(f => (f.options.token = event.token));
+        this.queue.forEach(f => (f.options.token = event.token));
         break;
       case 'uploadAll':
-        this.queue.filter(f => f.status !== 'uploading').map(f => (f.status = 'queue'));
+        this.queue.filter(f => f.status !== 'uploading').forEach(f => (f.status = 'queue'));
         this.processQueue();
         break;
       case 'upload':
         const uploadId = event.uploadId || event.itemOptions.uploadId;
-        this.queue.find(f => f.uploadId === uploadId).upload(event.itemOptions);
-        this.processQueue();
+        // noinspection TsLint
+        const upload = this.queue.find(f => f.uploadId === uploadId);
+        if (this.concurrency - this.runningProcess() > 0) {
+          upload.upload(event.itemOptions);
+        } else if (upload.status === ('added' as UploadStatus)) {
+          upload.status = 'queue' as UploadStatus;
+        }
         break;
       case 'cancel':
         this.queue.find(f => f.uploadId === event.uploadId).status = 'cancelled';
@@ -105,17 +126,22 @@ export class UploadxService {
         break;
     }
   }
+
   /**
    * Queue management
    */
   private processQueue() {
-    const running = this.queue.filter((uploader: Uploader) => uploader.status === 'uploading');
+    const running = this.runningProcess();
 
     this.queue
       .filter((uploader: Uploader) => uploader.status === 'queue')
-      .slice(0, this.concurrency - running.length)
+      .slice(0, Math.max(this.concurrency - running, 0))
       .forEach((uploader: Uploader) => {
         uploader.upload();
       });
+  }
+
+  runningProcess(): number {
+    return this.queue.filter((uploader: Uploader) => uploader.status === 'uploading').length;
   }
 }
