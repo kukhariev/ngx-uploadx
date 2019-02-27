@@ -200,18 +200,16 @@ export class Uploader implements UploaderOptions {
             message: xhr.statusText
           }
         };
-        this.status = 'error' as UploadStatus;
         XHRFactory.release(xhr);
-        this.options.nextFile();
+        this.status = 'error' as UploadStatus;
       }
     };
     const onSuccess = () => {
       if (xhr.status === 200 || xhr.status === 201) {
         this.progress = 100;
         this.response = parseJson(xhr);
-        this.status = 'complete' as UploadStatus;
         XHRFactory.release(xhr);
-        this.options.nextFile();
+        this.status = 'complete' as UploadStatus;
       } else if (xhr.status < 400) {
         const range = getRange(xhr);
         this.retry.reset();

@@ -30,8 +30,7 @@ export class UploadxService {
       token: this.options.token,
       chunkSize: this.options.chunkSize || 0,
       withCredentials: this.options.withCredentials || false,
-      subj: this.subj,
-      nextFile: () => this.processQueue()
+      subj: this.subj
     } as UploaderOptions;
   }
 
