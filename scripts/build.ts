@@ -13,6 +13,8 @@ const unlink = util.promisify(fs.unlink);
     delete packageJson['scripts'];
     delete packageJson['private'];
     delete packageJson['dependencies'];
+    delete packageJson['husky'];
+    delete packageJson['lint-staged'];
     packageJson.peerDependencies = {
       '@angular/common': '^6.0.0 || ^7.0.0',
       rxjs: '^6.0.0'
