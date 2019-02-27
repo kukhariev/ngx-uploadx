@@ -102,8 +102,8 @@ app.put('/upload/', rawBodyParser, (req, res, next) => {
     }
   }
   // --------- chunking upload ---------
-  const [, , , total] = contentRange.match(/(\d+)-(\d+)\/(\d+)/).map(s => +s);
-  if (upload.fileStream.bytesWritten < total) {
+  const [fm, start, end, total] = contentRange.match(/(\d+)-(\d+)\/(\d+)/).map(s => +s);
+  if (end + 1 < total) {
     upload.fileStream.write(req.body, () => {
       res.set('Range', `bytes=0-${upload.fileStream.bytesWritten - 1}`);
       return res.status(308).send('Resume Incomplete');
