@@ -121,7 +121,7 @@ export class Uploader implements UploaderOptions {
               reject(this);
             } else {
               this.URI = resolveUrl(location, this.options.endpoint);
-              this.status = 'queue' as UploadStatus;
+              this.status = 'uploading' as UploadStatus;
               resolve(this);
             }
           } else {
@@ -140,9 +140,9 @@ export class Uploader implements UploaderOptions {
    * Initiate upload
    */
   async upload(item?: UploadItem) {
+    this.status = 'uploading' as UploadStatus;
     try {
       await this.create(item);
-      this.status = 'uploading' as UploadStatus;
       if (this.progress) {
         this.abort = this.sendChunk();
       } else {

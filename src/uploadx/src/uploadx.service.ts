@@ -10,6 +10,7 @@ import {
   UploadStatus
 } from './interfaces';
 import { Uploader } from './uploader';
+
 /**
  *
  */
@@ -41,7 +42,7 @@ export class UploadxService {
         uploadState.status === 'cancelled' ||
         uploadState.status === 'error'
       ) {
-        this.autoUploadFiles();
+        this.processQueue();
       }
     });
   }
