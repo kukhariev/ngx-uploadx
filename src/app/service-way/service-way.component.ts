@@ -75,7 +75,7 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
           itemOptions: cfg,
           uploadId: item.uploadId
         });
-        this.uploads.unshift(new Ufile(item));
+        this.uploads.push(new Ufile(item));
       } else {
         this.uploads[index].progress = item.progress;
         this.uploads[index].status = item.status;
