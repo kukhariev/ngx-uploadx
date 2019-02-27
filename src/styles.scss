@@ -135,7 +135,7 @@ body {
   height: 230px;
   overflow-y: auto;
   overflow-x: hidden;
-  background-color: $background * 1.1;
+  background-color: lighting($background, 2%);
 
   .row {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
