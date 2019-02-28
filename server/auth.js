@@ -8,7 +8,7 @@ function auth(req, res, next) {
       .slice(7)
       .trim()
       .split('token-');
-      console.log(mark);
+      // console.log(mark);
 
     if (mark && +mark !== new Date().getSeconds()) {
       return next(401);
