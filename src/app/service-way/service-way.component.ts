@@ -6,6 +6,7 @@ import { takeUntil } from 'rxjs/operators';
 import { UploadxOptions, UploadState, UploadxService, UploadItem } from '../../uploadx';
 import { environment } from '../../environments/environment';
 import { Ufile } from '../ufile';
+import { AuthService, tokenGetter } from '../auth.service';
 
 @Component({
   selector: 'app-service-way',
@@ -18,13 +19,13 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
     concurrency: 2,
     allowedTypes: 'image/*,video/*',
     url: `${environment.api}/upload?uploadType=uploadx`,
-    token: 'someToken',
-    autoUpload: false,
+    token: tokenGetter,
+    autoUpload: true,
     chunkSize: 1024 * 256 * 8
   };
   private ngUnsubscribe: Subject<any> = new Subject();
 
-  constructor(private uploadService: UploadxService) {}
+  constructor(private uploadService: UploadxService, private aut: AuthService) {}
 
   ngOnInit() {
     const uploadsProgress = this.uploadService.init(this.options);
@@ -61,21 +62,11 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
     uploadsOutStream.pipe(takeUntil(this.ngUnsubscribe)).subscribe((item: UploadState) => {
       const index = this.uploads.findIndex(f => f.uploadId === item.uploadId);
       if (item.status === 'added') {
-        const cfg: UploadItem = {
-          headers: {
-            'Content-Disposition': `filename=${encodeURI(item.file.name)}`
-          },
-          metadata: {
-            size: item.file.size,
-            lastModified: item.file.lastModified
-          }
-        };
-        this.uploadService.control({
-          action: 'upload',
-          itemOptions: cfg,
-          uploadId: item.uploadId
-        });
         this.uploads.push(new Ufile(item));
+      } else if (item.status === 'error') {
+        //  Error Handler
+        this.uploadService.control({ action: 'refreshToken', token: 'newToken' });
+        this.uploadService.control({ action: 'upload', uploadId: item.uploadId });
       } else {
         this.uploads[index].progress = item.progress;
         this.uploads[index].status = item.status;
