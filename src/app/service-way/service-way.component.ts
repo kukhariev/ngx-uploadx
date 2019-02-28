@@ -25,7 +25,7 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
   };
   private ngUnsubscribe: Subject<any> = new Subject();
 
-  constructor(private uploadService: UploadxService, private aut: AuthService) {}
+  constructor(private uploadService: UploadxService, private auth: AuthService) {}
 
   ngOnInit() {
     const uploadsProgress = this.uploadService.init(this.options);
