@@ -24,6 +24,7 @@ export class Uploader implements UploaderOptions {
   readonly uploadId: string;
   remaining: number;
   response: any;
+  responseStatus: number;
   speed: number;
   URI: string;
 
@@ -72,6 +73,7 @@ export class Uploader implements UploaderOptions {
       percentage: this.progress,
       remaining: this.remaining,
       response: this.response,
+      responseStatus: this.responseStatus,
       size: this.size,
       speed: this.speed,
       status: this._status,
@@ -113,6 +115,7 @@ export class Uploader implements UploaderOptions {
         xhr.setRequestHeader('X-Upload-Content-Length', this.size.toString());
         xhr.setRequestHeader('X-Upload-Content-Type', this.mimeType);
         xhr.onload = () => {
+          this.responseStatus = xhr.status;
           this.response = parseJson(xhr);
           if (xhr.status < 400 && xhr.status > 199) {
             const location = getKeyFromResponse(xhr, 'location');
@@ -187,6 +190,7 @@ export class Uploader implements UploaderOptions {
 
   private setupEvents(xhr: XMLHttpRequest) {
     const onError = async () => {
+      this.responseStatus = xhr.status;
       // 5xx errors or network failures
       if (xhr.status > 499 || !xhr.status) {
         XHRFactory.release(xhr);
@@ -205,6 +209,7 @@ export class Uploader implements UploaderOptions {
       }
     };
     const onSuccess = () => {
+      this.responseStatus = xhr.status;
       if (xhr.status === 200 || xhr.status === 201) {
         this.progress = 100;
         this.response = parseJson(xhr);

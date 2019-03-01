@@ -38,6 +38,7 @@ export interface UploadState {
   percentage: number;
   remaining: number;
   response: any;
+  responseStatus: number;
   size: number;
   speed: number;
   status: UploadStatus;
