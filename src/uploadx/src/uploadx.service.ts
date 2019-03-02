@@ -47,12 +47,12 @@ export class UploadxService {
     });
   }
   /**
-   * Set global module options
+   * Set global options
    */
   init(options: UploadxOptions): Observable<UploadState> {
     this.options = options;
     this.concurrency = options.concurrency || this.concurrency;
-    this.autoUpload = options.autoUpload || false;
+    this.autoUpload = !(options.autoUpload === false);
     return this.subj.asObservable();
   }
   /**
@@ -86,7 +86,7 @@ export class UploadxService {
     }
   }
   /**
-   * Control upload status
+   * Control uploads status
    * @example
    * this.uploadService.control({ action: 'pauseAll' });
    *
@@ -110,11 +110,9 @@ export class UploadxService {
         const uploadId = event.uploadId || event.itemOptions.uploadId;
         // noinspection TsLint
         const upload = this.queue.find(f => f.uploadId === uploadId);
-        if (this.concurrency - this.runningProcess() > 0) {
-          upload.upload(event.itemOptions);
-        } else if (upload.status === ('added' as UploadStatus)) {
-          upload.status = 'queue' as UploadStatus;
-        }
+        upload.configure(event.itemOptions);
+        upload.status = 'queue' as UploadStatus;
+        this.processQueue();
         break;
       case 'cancel':
         this.queue.find(f => f.uploadId === event.uploadId).status = 'cancelled';

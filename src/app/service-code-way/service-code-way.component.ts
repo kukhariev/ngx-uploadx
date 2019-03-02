@@ -6,8 +6,6 @@ import { takeUntil } from 'rxjs/operators';
 import { UploadxOptions, UploadState, UploadxService, UploadItem } from '../../uploadx';
 import { environment } from '../../environments/environment';
 import { Ufile } from '../ufile';
-import { Uploader } from '../../uploadx/src/uploader';
-import { UploadStatus } from '../../uploadx/src/interfaces';
 
 @Component({
   selector: 'app-service-way',
@@ -18,10 +16,9 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   uploads: Ufile[] = [];
   options: UploadxOptions = {
     concurrency: 2,
-    allowedTypes: 'image/*,video/*',
     url: `${environment.api}/upload?uploadType=uploadx`,
     token: 'someToken',
-    autoUpload: false,
+    autoUpload: true,
     chunkSize: 1024 * 256 * 8
   };
   private ngUnsubscribe: Subject<any> = new Subject();
@@ -61,10 +58,10 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
     this.uploadService.control({ action: 'upload', uploadId });
   }
 
-  async onChange() {
+  onChange() {
     const files = this.getFiles();
     for (let i = 0; i < files.length; i++) {
-      await this.uploadService.handleFile(files[i]);
+      this.uploadService.handleFile(files[i]);
     }
   }
 
@@ -78,20 +75,6 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
       this.numberOfCopies = this.uploadService.runningProcess();
       const index = this.uploads.findIndex(f => f.uploadId === item.uploadId);
       if (item.status === 'added') {
-        const cfg: UploadItem = {
-          headers: {
-            'Content-Disposition': `filename=${encodeURI(item.file.name)}`
-          },
-          metadata: {
-            size: item.file.size,
-            lastModified: item.file.lastModified
-          }
-        };
-        this.uploadService.control({
-          action: 'upload',
-          itemOptions: cfg,
-          uploadId: item.uploadId
-        });
         this.uploads.push(new Ufile(item));
       } else {
         this.uploads[index].progress = item.progress;

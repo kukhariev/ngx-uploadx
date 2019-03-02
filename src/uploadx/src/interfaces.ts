@@ -38,6 +38,7 @@ export interface UploadState {
   percentage: number;
   remaining: number;
   response: any;
+  responseStatus: number;
   size: number;
   speed: number;
   status: UploadStatus;
@@ -73,6 +74,10 @@ export interface UploadItem {
    * { name: File.Filename, mimeType: File.type }
    */
   metadata?: any;
+  /**
+   * Authorization Bearer token
+   */
+  token?: string | (() => string);
 }
 /**
  * Global Options
@@ -137,5 +142,4 @@ export interface UploaderOptions extends UploadItem {
   chunkSize?: number;
   withCredentials?: boolean;
   readonly subj?: any;
-  readonly nextFile?: () => void;
 }

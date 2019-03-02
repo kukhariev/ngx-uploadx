@@ -48,10 +48,10 @@ export class DirectiveWayComponent implements OnDestroy {
   pauseAll() {
     this.control = { action: 'pauseAll' };
   }
-  pause(uploadId) {
+  pause(uploadId: string) {
     this.control = { action: 'pause', uploadId };
   }
-  upload(uploadId) {
+  upload(uploadId: string) {
     this.control = { action: 'upload', uploadId };
   }
   onUpload(uploadsOutStream: Observable<UploadState>) {

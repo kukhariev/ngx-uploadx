@@ -5,6 +5,8 @@
 
 'use strict';
 
+const { auth } = require('./auth');
+
 /*
  * Server API example
  */
@@ -57,18 +59,8 @@ const uploadsDB = (() => {
   };
 })();
 
-// --------------------  FAKE AUTHORIZATION  MIDDLEWARE  --------------------
-function auth(req, res, next) {
-  if (!req.header('authorization')) {
-    return next(403);
-  } else {
-    req.user = 'user1';
-    return next();
-  }
-}
-
 // ------------ get content ------------
-app.put('/upload/', rawBodyParser, (req, res, next) => {
+app.put('/upload/', auth, rawBodyParser, (req, res, next) => {
   if (!req.query.upload_id) {
     return next();
   }
@@ -147,7 +139,7 @@ app.use('/upload/', auth, (req, res, next) => {
 
   const location = `${req.protocol}://${req.hostname}:${PORT}/upload/${query}`;
   res.location(location);
-  res.json(200, { location });
+  res.status(200).json({ location });
 });
 
 // ------------------------------  ERROR HANDLER  ------------------------------
