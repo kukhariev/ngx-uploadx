@@ -27,6 +27,7 @@ export class Uploader implements UploaderOptions {
   responseStatus: number;
   speed: number;
   URI: string;
+  token: string | (() => string);
 
   /**
    * Creates an instance of Uploader.
@@ -38,8 +39,24 @@ export class Uploader implements UploaderOptions {
     this.name = file.name;
     this.size = file.size;
     this.mimeType = file.type || 'application/octet-stream';
-    this.status = 'added' as UploadStatus;
     this.retry = new BackoffRetry();
+    this.configure(options);
+    this.status = 'added' as UploadStatus;
+  }
+
+  /**
+   * configure or reconfigure uploader
+   */
+  configure(item = {} as UploaderOptions | UploadItem): void {
+    const { metadata, headers, token } = item;
+    this.metadata = {
+      name: this.name,
+      mimeType: this.mimeType,
+      size: this.size,
+      ...unfunc(metadata || this.metadata, this.file)
+    };
+    this.token = unfunc(token || this.token);
+    this.headers = { ...unfunc(headers, this.file), ...this.headers };
   }
 
   set status(s: UploadStatus) {
