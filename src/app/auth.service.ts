@@ -10,5 +10,6 @@ export class AuthService {
 }
 
 export function tokenGetter() {
-  return localStorage.getItem('token');
+  // return localStorage.getItem('token');
+  return `token-${new Date().getSeconds()}`;
 }

@@ -16,11 +16,9 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
   state: Observable<UploadState>;
   uploads: Ufile[] = [];
   options: UploadxOptions = {
-    concurrency: 2,
-    allowedTypes: 'image/*,video/*',
     url: `${environment.api}/upload?uploadType=uploadx`,
-    token: tokenGetter,
-    autoUpload: true,
+    token: tokenGetter(), // string
+    // token: tokenGetter,
     chunkSize: 1024 * 256 * 8
   };
   private ngUnsubscribe: Subject<any> = new Subject();
@@ -63,13 +61,18 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
       const index = this.uploads.findIndex(f => f.uploadId === item.uploadId);
       if (item.status === 'added') {
         this.uploads.push(new Ufile(item));
-      } else if (item.status === 'error') {
-        //  Error Handler
-        this.uploadService.control({ action: 'refreshToken', token: 'newToken' });
-        this.uploadService.control({ action: 'upload', uploadId: item.uploadId });
       } else {
         this.uploads[index].progress = item.progress;
         this.uploads[index].status = item.status;
+      }
+      if (item.status === 'error') {
+        if (item.responseStatus === 401) {
+          // this.uploadService.control({ action: 'refreshToken', token: tokenGetter() });
+          this.uploadService.control({
+            action: 'upload',
+            itemOptions: { uploadId: item.uploadId, token: tokenGetter() }
+          });
+        }
       }
     });
   }

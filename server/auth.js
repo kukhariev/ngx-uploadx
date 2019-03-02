@@ -8,9 +8,8 @@ function auth(req, res, next) {
       .slice(7)
       .trim()
       .split('token-');
-      // console.log(mark);
 
-    if (mark && +mark !== new Date().getSeconds()) {
+    if (mark && Math.random() < 0.1) {
       return next(401);
     }
     req.user = 'user1';
