@@ -52,7 +52,7 @@ export class UploadxService {
   init(options: UploadxOptions): Observable<UploadState> {
     this.options = options;
     this.concurrency = options.concurrency || this.concurrency;
-    this.autoUpload = options.autoUpload || false;
+    this.autoUpload = !(options.autoUpload === false);
     return this.subj.asObservable();
   }
   /**
