@@ -1,3 +1,9 @@
+/**
+ * Implements XHR/CORS Resumable Upload
+ * @see
+ * https://developers.google.com/drive/v3/web/resumable-upload
+ */
+
 import { resolveUrl } from './resolve_url';
 import { BackoffRetry } from './backoffRetry';
 import { XHRFactory } from './xhrfactory';
@@ -5,11 +11,6 @@ import { UploadStatus, UploadItem, UploaderOptions, UploadState } from './interf
 
 const noop = () => {};
 
-/**
- * Implements XHR/CORS Resumable Upload
- * @see
- * https://developers.google.com/drive/v3/web/resumable-upload
- */
 export class Uploader implements UploaderOptions {
   headers: { [key: string]: string } | null;
   metadata: { [key: string]: any };
@@ -60,10 +61,7 @@ export class Uploader implements UploaderOptions {
   }
 
   set status(s: UploadStatus) {
-    if (
-      this._status === ('cancelled' as UploadStatus) ||
-      this._status === ('complete' as UploadStatus)
-    ) {
+    if (this._status === 'cancelled' || this._status === 'complete') {
       return;
     }
     if (s !== this._status) {
@@ -103,25 +101,9 @@ export class Uploader implements UploaderOptions {
     });
   }
 
-  /**
-   * Set individual file options and add to queue
-   */
-
-  create(item: UploadItem = {}) {
+  private create() {
     return new Promise((resolve, reject) => {
-      if (!this.URI || this.status === ('error' as UploadStatus)) {
-        // configure
-        const { metadata, headers } = item;
-        this.metadata = {
-          name: this.name,
-          mimeType: this.mimeType,
-          size: this.size,
-          ...unfunc(this.options.metadata, this.file),
-          ...unfunc(metadata, this.file)
-        };
-
-        this.headers = unfunc(headers, this.file);
-
+      if (!this.URI || this.status === 'error') {
         // get file URI
         const xhr = new XMLHttpRequest();
         xhr.open(this.options.method, this.options.endpoint, true);
@@ -133,25 +115,27 @@ export class Uploader implements UploaderOptions {
         xhr.setRequestHeader('X-Upload-Content-Type', this.mimeType);
         xhr.onload = () => {
           this.responseStatus = xhr.status;
-          this.response = parseJson(xhr);
+          this.response = parseJson(xhr) || {
+            error: {
+              code: +xhr.status,
+              message: xhr.statusText
+            }
+          };
           if (xhr.status < 400 && xhr.status > 199) {
             const location = getKeyFromResponse(xhr, 'location');
             if (!location) {
-              this.status = 'error' as UploadStatus;
-              reject(this);
+              reject(new Error('invalid response: missing location url'));
             } else {
               this.URI = resolveUrl(location, this.options.endpoint);
-              this.status = 'uploading' as UploadStatus;
-              resolve(this);
+              resolve();
             }
           } else {
-            this.status = 'error' as UploadStatus;
-            reject(this);
+            reject(new Error(`invalid response code: ${this.responseStatus}`));
           }
         };
         xhr.send(JSON.stringify(this.metadata));
       } else {
-        resolve(this);
+        resolve();
       }
     });
   }
@@ -159,10 +143,17 @@ export class Uploader implements UploaderOptions {
   /**
    * Initiate upload
    */
-  async upload(item?: UploadItem) {
+  async upload(item?: UploadItem | undefined) {
+    if (item) this.configure(item);
+
+    if (this.status === 'error') {
+      await this.retry.wait();
+    }
+    this.responseStatus = undefined;
     this.status = 'uploading' as UploadStatus;
     try {
-      await this.create(item);
+      await this.create();
+      this.retry.reset();
       if (this.progress) {
         this.abort = this.sendChunk();
       } else {
@@ -170,39 +161,37 @@ export class Uploader implements UploaderOptions {
         this.abort = this.sendChunk(0);
       }
     } catch (e) {
+      this.status = 'error' as UploadStatus;
       console.error(e);
     }
   }
 
   /**
    * Content upload
+   * @param offset
    */
-  private sendChunk(start?: number) {
-    if (
-      this.status === ('cancelled' as UploadStatus) ||
-      this.status === ('paused' as UploadStatus)
-    ) {
-      return;
+  private sendChunk(offset?: number) {
+    if (this.status === 'uploading') {
+      const isValidRange = offset >= 0 && offset < this.size;
+      let body = null;
+      const xhr: XMLHttpRequest = XHRFactory.getInstance();
+      xhr.open('PUT', this.URI, true);
+      xhr.responseType = 'json';
+      xhr.withCredentials = this.options.withCredentials;
+      this.setupEvents(xhr);
+      if (isValidRange) {
+        const { end, chunk }: { end: number; chunk: Blob } = this.sliceFile(offset);
+        xhr.upload.onprogress = this.setupProgressEvent(offset, end);
+        body = chunk;
+        xhr.setRequestHeader('Content-Range', `bytes ${offset}-${end - 1}/${this.size}`);
+        xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+      } else {
+        xhr.setRequestHeader('Content-Range', `bytes */${this.size}`);
+      }
+      this.setCommonHeaders(xhr);
+      xhr.send(body);
+      return () => xhr.abort();
     }
-    const isValidRange = typeof start === 'number';
-    let body = null;
-    const xhr: XMLHttpRequest = XHRFactory.getInstance();
-    xhr.open('PUT', this.URI, true);
-    xhr.responseType = 'json';
-    xhr.withCredentials = this.options.withCredentials;
-    this.setupEvents(xhr);
-    if (isValidRange) {
-      const { end, chunk }: { end: number; chunk: Blob } = this.sliceFile(start);
-      xhr.upload.onprogress = this.setupProgressEvent(start, end);
-      body = chunk;
-      xhr.setRequestHeader('Content-Range', `bytes ${start}-${end - 1}/${this.size}`);
-    } else {
-      xhr.setRequestHeader('Content-Range', `bytes */${this.size}`);
-    }
-    this.setCommonHeaders(xhr);
-    xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-    xhr.send(body);
-    return () => xhr.abort();
   }
 
   private setupEvents(xhr: XMLHttpRequest) {
@@ -260,19 +249,17 @@ export class Uploader implements UploaderOptions {
   }
 
   private sliceFile(start: number) {
-    let end: number = this.options.chunkSize ? start + this.options.chunkSize : this.size;
-    end = end > this.size ? this.size : end;
+    const end = this.options.chunkSize
+      ? Math.min(start + this.options.chunkSize, this.size)
+      : this.size;
     const chunk: Blob = this.file.slice(start, end);
     return { end, chunk };
   }
 
   private setCommonHeaders(xhr: XMLHttpRequest) {
-    const headers = { ...unfunc(this.options.headers, this.file), ...this.headers };
-    Object.keys(headers).forEach(key => xhr.setRequestHeader(key, headers[key]));
-
-    const token = unfunc(this.options.token);
+    Object.keys(this.headers).forEach(key => xhr.setRequestHeader(key, this.headers[key]));
     // tslint:disable-next-line: no-unused-expression
-    token && xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+    this.token && xhr.setRequestHeader('Authorization', `Bearer ${this.token}`);
   }
 }
 
