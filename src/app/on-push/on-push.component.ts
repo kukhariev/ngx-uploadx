@@ -1,11 +1,9 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
-import { UploadState, UploadxOptions, UploadxService } from '../../uploadx';
-import { AuthService } from '../auth.service';
-import { Ufile } from '../ufile';
 import { map } from 'rxjs/operators';
-import { Uploader } from 'src/uploadx/src/uploader';
+import { environment } from '../../environments/environment';
+import { Uploader, UploadState, UploadxOptions, UploadxService } from '../../uploadx';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-on-push',
