@@ -58,7 +58,21 @@ const uploadsDB = (() => {
     findById: id => map.get(id)
   };
 })();
-
+app.delete('/upload/', auth, (req, res, next) => {
+  if (!req.query.upload_id) {
+    return next(404);
+  }
+  const upload_id = req.query.upload_id;
+  const upload = uploadsDB.findById(upload_id);
+  if (!upload) {
+    return next(404);
+  }
+  try {
+    fs.unlinkSync(upload.dstpath);
+  } catch (error) {}
+  uploadsDB.ready(upload_id);
+  return res.json();
+});
 // ------------ get content ------------
 app.put('/upload/', auth, rawBodyParser, (req, res, next) => {
   if (!req.query.upload_id) {
