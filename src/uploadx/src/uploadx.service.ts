@@ -50,6 +50,7 @@ export class UploadxService {
    * Set global options
    */
   init(options: UploadxOptions): Observable<UploadState> {
+    this.queue = [];
     this.options = options;
     this.concurrency = options.concurrency || this.concurrency;
     this.autoUpload = !(options.autoUpload === false);
