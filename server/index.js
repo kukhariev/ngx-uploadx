@@ -55,6 +55,10 @@ const uploadsDB = (() => {
       console.log(`${map.get(id).dstpath}: upload complete`);
       map.delete(id);
     },
+    deleted: id => {
+      console.log(`${map.get(id).dstpath}: upload canceled`);
+      map.delete(id);
+    },
     findById: id => map.get(id)
   };
 })();
@@ -69,8 +73,8 @@ app.delete('/upload/', auth, (req, res, next) => {
   }
   try {
     fs.unlinkSync(upload.dstpath);
+    uploadsDB.deleted(upload_id);
   } catch (error) {}
-  uploadsDB.ready(upload_id);
   return res.json();
 });
 // ------------ get content ------------
