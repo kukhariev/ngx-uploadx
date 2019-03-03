@@ -42,7 +42,6 @@ export class Uploader implements UploaderOptions {
     this.mimeType = file.type || 'application/octet-stream';
     this.retry = new BackoffRetry();
     this.configure(options);
-    this.status = 'added' as UploadStatus;
   }
 
   /**
@@ -95,10 +94,7 @@ export class Uploader implements UploaderOptions {
       uploadId: this.uploadId,
       URI: this.URI
     };
-    // tick for control events detect
-    setTimeout(() => {
-      this.options.subj.next(state);
-    });
+    this.options.subj.next(state);
   }
 
   private create() {

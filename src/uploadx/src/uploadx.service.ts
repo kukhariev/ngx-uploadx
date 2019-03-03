@@ -64,6 +64,7 @@ export class UploadxService {
     for (let i = 0; i < fileList.length; i++) {
       const uploader: Uploader = new Uploader(fileList.item(i), this.uploaderOptions);
       this.queue.push(uploader);
+      uploader.status = 'added';
     }
     this.autoUploadFiles();
   }
@@ -74,6 +75,7 @@ export class UploadxService {
   handleFile(file: File) {
     const uploader: Uploader = new Uploader(file, this.uploaderOptions);
     this.queue.push(uploader);
+    uploader.status = 'added';
     this.autoUploadFiles();
   }
   /**
