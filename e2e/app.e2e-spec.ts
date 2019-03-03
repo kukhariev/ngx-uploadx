@@ -29,4 +29,10 @@ describe('uploader App', () => {
     page.getFileInput().sendKeys(absolutePath);
     expect(page.waitForComplete()).toEqual('complete');
   });
+
+  it('should upload a file (onPush)', () => {
+    page.navigateTo('/on-push');
+    page.getFileInput().sendKeys(absolutePath);
+    expect(page.waitForComplete()).toEqual('complete');
+  });
 });
