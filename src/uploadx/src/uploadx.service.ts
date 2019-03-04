@@ -37,7 +37,9 @@ export class UploadxService {
 
   constructor() {
     this.subj.subscribe((uploadState: UploadState) => {
-      this.processQueue();
+      if (uploadState.status !== 'uploading') {
+        this.processQueue();
+      }
     });
   }
   /**
