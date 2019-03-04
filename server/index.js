@@ -55,10 +55,28 @@ const uploadsDB = (() => {
       console.log(`${map.get(id).dstpath}: upload complete`);
       map.delete(id);
     },
+    deleted: id => {
+      console.log(`${map.get(id).dstpath}: upload canceled`);
+      map.delete(id);
+    },
     findById: id => map.get(id)
   };
 })();
-
+app.delete('/upload/', auth, (req, res, next) => {
+  if (!req.query.upload_id) {
+    return next(404);
+  }
+  const upload_id = req.query.upload_id;
+  const upload = uploadsDB.findById(upload_id);
+  if (!upload) {
+    return next(404);
+  }
+  try {
+    fs.unlinkSync(upload.dstpath);
+    uploadsDB.deleted(upload_id);
+  } catch (error) {}
+  return res.json();
+});
 // ------------ get content ------------
 app.put('/upload/', auth, rawBodyParser, (req, res, next) => {
   if (!req.query.upload_id) {

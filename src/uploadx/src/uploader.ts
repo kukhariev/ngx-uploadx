@@ -42,7 +42,6 @@ export class Uploader implements UploaderOptions {
     this.mimeType = file.type || 'application/octet-stream';
     this.retry = new BackoffRetry();
     this.configure(options);
-    this.status = 'added' as UploadStatus;
   }
 
   /**
@@ -70,6 +69,9 @@ export class Uploader implements UploaderOptions {
       if (this.abort && (s === ('cancelled' as UploadStatus) || s === ('paused' as UploadStatus))) {
         this.abort();
       }
+      if (s === 'cancelled') {
+        this.cancel();
+      }
     }
   }
 
@@ -95,10 +97,7 @@ export class Uploader implements UploaderOptions {
       uploadId: this.uploadId,
       URI: this.URI
     };
-    // tick for control events detect
-    setTimeout(() => {
-      this.options.subj.next(state);
-    });
+    this.options.subj.next(state);
   }
 
   private create() {
@@ -260,6 +259,32 @@ export class Uploader implements UploaderOptions {
     Object.keys(this.headers).forEach(key => xhr.setRequestHeader(key, this.headers[key]));
     // tslint:disable-next-line: no-unused-expression
     this.token && xhr.setRequestHeader('Authorization', `Bearer ${this.token}`);
+  }
+
+  private cancel() {
+    return new Promise((resolve, reject) => {
+      if (this.URI && this.status === 'cancelled') {
+        const xhr: XMLHttpRequest = XHRFactory.getInstance();
+        xhr.open('DELETE', this.URI, true);
+        xhr.responseType = 'json';
+        xhr.withCredentials = this.options.withCredentials;
+        this.setCommonHeaders(xhr);
+        xhr.onload = xhr.onerror = () => {
+          this.responseStatus = xhr.status;
+          this.response = parseJson(xhr) || {
+            status: {
+              code: +xhr.status,
+              message: xhr.statusText
+            }
+          };
+          XHRFactory.release(xhr);
+          resolve();
+        };
+        xhr.send();
+      } else {
+        resolve();
+      }
+    });
   }
 }
 

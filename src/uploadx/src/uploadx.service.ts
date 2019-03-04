@@ -37,19 +37,14 @@ export class UploadxService {
 
   constructor() {
     this.subj.subscribe((uploadState: UploadState) => {
-      if (
-        uploadState.status === 'complete' ||
-        uploadState.status === 'cancelled' ||
-        uploadState.status === 'error'
-      ) {
-        this.processQueue();
-      }
+      this.processQueue();
     });
   }
   /**
    * Set global options
    */
   init(options: UploadxOptions): Observable<UploadState> {
+    this.queue = [];
     this.options = options;
     this.concurrency = options.concurrency || this.concurrency;
     this.autoUpload = !(options.autoUpload === false);
@@ -63,6 +58,7 @@ export class UploadxService {
     for (let i = 0; i < fileList.length; i++) {
       const uploader: Uploader = new Uploader(fileList.item(i), this.uploaderOptions);
       this.queue.push(uploader);
+      uploader.status = 'added';
     }
     this.autoUploadFiles();
   }
@@ -73,6 +69,7 @@ export class UploadxService {
   handleFile(file: File) {
     const uploader: Uploader = new Uploader(file, this.uploaderOptions);
     this.queue.push(uploader);
+    uploader.status = 'added';
     this.autoUploadFiles();
   }
   /**
@@ -82,7 +79,6 @@ export class UploadxService {
   private autoUploadFiles() {
     if (this.autoUpload) {
       this.queue.filter(f => f.status === 'added').forEach(f => (f.status = 'queue'));
-      this.processQueue();
     }
   }
   /**
@@ -104,15 +100,12 @@ export class UploadxService {
         break;
       case 'uploadAll':
         this.queue.filter(f => f.status !== 'uploading').forEach(f => (f.status = 'queue'));
-        this.processQueue();
         break;
       case 'upload':
         const uploadId = event.uploadId || event.itemOptions.uploadId;
-        // noinspection TsLint
         const upload = this.queue.find(f => f.uploadId === uploadId);
         upload.configure(event.itemOptions);
         upload.status = 'queue' as UploadStatus;
-        this.processQueue();
         break;
       case 'cancel':
         this.queue.find(f => f.uploadId === event.uploadId).status = 'cancelled';
