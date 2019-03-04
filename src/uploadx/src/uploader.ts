@@ -15,7 +15,7 @@ export class Uploader implements UploaderOptions {
   headers: { [key: string]: string } | null;
   metadata: { [key: string]: any };
   private _status: UploadStatus;
-  private abort = noop;
+  private xhrRequest: XMLHttpRequest;
   private retry: BackoffRetry;
   private startTime: number;
   progress: number;
@@ -64,14 +64,18 @@ export class Uploader implements UploaderOptions {
       return;
     }
     if (s !== this._status) {
-      this._status = s;
-      this.notifyState();
-      if (this.abort && (s === ('cancelled' as UploadStatus) || s === ('paused' as UploadStatus))) {
-        this.abort();
+      if (
+        this.xhrRequest &&
+        (s === ('cancelled' as UploadStatus) || s === ('paused' as UploadStatus))
+      ) {
+        this.xhrRequest.abort();
+        XHRFactory.release(this.xhrRequest);
       }
       if (s === 'cancelled') {
         this.cancel();
       }
+      this._status = s;
+      this.notifyState();
     }
   }
 
@@ -97,7 +101,8 @@ export class Uploader implements UploaderOptions {
       uploadId: this.uploadId,
       URI: this.URI
     };
-    this.options.subj.next(state);
+    //
+    setTimeout(() => this.options.subj.next(state));
   }
 
   private create() {
@@ -154,10 +159,10 @@ export class Uploader implements UploaderOptions {
       await this.create();
       this.retry.reset();
       if (this.progress) {
-        this.abort = this.sendChunk();
+        this.xhrRequest = this.sendChunk();
       } else {
         this.startTime = this.startTime || new Date().getTime();
-        this.abort = this.sendChunk(0);
+        this.xhrRequest = this.sendChunk(0);
       }
     } catch (e) {
       this.status = 'error' as UploadStatus;
@@ -189,7 +194,7 @@ export class Uploader implements UploaderOptions {
       }
       this.setCommonHeaders(xhr);
       xhr.send(body);
-      return () => xhr.abort();
+      return xhr;
     }
   }
 
@@ -200,7 +205,7 @@ export class Uploader implements UploaderOptions {
       if (xhr.status > 499 || !xhr.status) {
         XHRFactory.release(xhr);
         await this.retry.wait();
-        this.abort = this.sendChunk();
+        this.xhrRequest = this.sendChunk();
       } else {
         // stop on 4xx errors
         this.response = parseJson(xhr) || {
@@ -225,7 +230,7 @@ export class Uploader implements UploaderOptions {
         this.retry.reset();
         XHRFactory.release(xhr);
         // send next chunk
-        this.abort = this.sendChunk(range);
+        this.xhrRequest = this.sendChunk(range);
       } else {
         onError();
       }
@@ -263,7 +268,7 @@ export class Uploader implements UploaderOptions {
 
   private cancel() {
     return new Promise((resolve, reject) => {
-      if (this.URI && this.status === 'cancelled') {
+      if (this.URI && this._status === 'cancelled') {
         const xhr: XMLHttpRequest = XHRFactory.getInstance();
         xhr.open('DELETE', this.URI, true);
         xhr.responseType = 'json';
