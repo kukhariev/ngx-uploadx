@@ -1,19 +1,19 @@
 export let XHRFactory = (() => {
-  let stack = Array(1).fill(createXHR());
+  let stack: XMLHttpRequest[] = Array(1).fill(createXHR());
 
-  function createXHR() {
+  function createXHR(): XMLHttpRequest {
     return new XMLHttpRequest();
   }
 
   return {
-    release: xhr => {
+    release: (xhr: XMLHttpRequest) => {
       xhr.onreadystatechange = null;
       xhr.onerror = null;
       xhr.onload = null;
       xhr.upload.onprogress = null;
       stack.push(xhr);
     },
-    getInstance() {
+    getInstance(): XMLHttpRequest {
       if (!stack.length) {
         return createXHR();
       } else {
