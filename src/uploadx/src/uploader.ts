@@ -112,12 +112,7 @@ export class Uploader implements UploaderOptions {
         xhr.setRequestHeader('X-Upload-Content-Type', this.mimeType);
         xhr.onload = () => {
           this.responseStatus = xhr.status;
-          this.response = parseJson(xhr) || {
-            error: {
-              code: +xhr.status,
-              message: xhr.statusText
-            }
-          };
+          this.response = parseJson(xhr);
           if (xhr.status < 400 && xhr.status > 199) {
             const location = getKeyFromResponse(xhr, 'location');
             if (!location) {
@@ -150,14 +145,14 @@ export class Uploader implements UploaderOptions {
     if (this.status === 'error') {
       await this.retry.wait();
     }
-    this.status = 'uploading' as UploadStatus;
+    this.status = 'uploading';
     try {
       await this.create();
       this.retry.reset();
       this.startTime = this.startTime || new Date().getTime();
       this.abort = this.sendChunk(this.URI ? undefined : 0);
     } catch (e) {
-      this.status = 'error' as UploadStatus;
+      this.status = 'error';
       console.error(e);
     }
   }
@@ -198,12 +193,7 @@ export class Uploader implements UploaderOptions {
         this.abort = this.sendChunk();
       } else {
         // stop on 4xx errors
-        this.response = parseJson(xhr) || {
-          error: {
-            code: +xhr.status,
-            message: xhr.statusText
-          }
-        };
+        this.response = parseJson(xhr);
         this.status = 'error' as UploadStatus;
       }
     };
@@ -261,14 +251,9 @@ export class Uploader implements UploaderOptions {
         xhr.responseType = 'json';
         xhr.withCredentials = this.options.withCredentials;
         this.setCommonHeaders(xhr);
-        xhr.onload = xhr.onerror = () => {
+        xhr.onload = () => {
           this.responseStatus = xhr.status;
-          this.response = parseJson(xhr) || {
-            status: {
-              code: +xhr.status,
-              message: xhr.statusText
-            }
-          };
+          this.response = parseJson(xhr);
           resolve();
         };
         xhr.send();
