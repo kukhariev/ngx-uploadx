@@ -6,7 +6,6 @@
 
 import { resolveUrl } from './resolve_url';
 import { BackoffRetry } from './backoffRetry';
-import { XHRFactory } from './xhrfactory';
 import { UploadStatus, UploadItem, UploaderOptions, UploadState } from './interfaces';
 
 const noop = () => {};
@@ -15,7 +14,7 @@ export class Uploader implements UploaderOptions {
   headers: { [key: string]: string } | null;
   metadata: { [key: string]: any };
   private _status: UploadStatus;
-  private xhrRequest: XMLHttpRequest;
+  private abort: any;
   private retry: BackoffRetry;
   private startTime: number;
   progress: number;
@@ -64,12 +63,9 @@ export class Uploader implements UploaderOptions {
       return;
     }
     if (s !== this._status) {
-      if (
-        this.xhrRequest &&
-        (s === ('cancelled' as UploadStatus) || s === ('paused' as UploadStatus))
-      ) {
-        this.xhrRequest.abort();
-        XHRFactory.release(this.xhrRequest);
+      if (s === 'cancelled' || s === 'paused') {
+        // tslint:disable-next-line: no-unused-expression
+        this.abort && this.abort();
       }
       if (s === 'cancelled') {
         this.cancel();
@@ -164,10 +160,10 @@ export class Uploader implements UploaderOptions {
       await this.create();
       this.retry.reset();
       if (this.progress) {
-        this.xhrRequest = this.sendChunk();
+        this.abort = this.sendChunk();
       } else {
         this.startTime = this.startTime || new Date().getTime();
-        this.xhrRequest = this.sendChunk(0);
+        this.abort = this.sendChunk(0);
       }
     } catch (e) {
       this.status = 'error' as UploadStatus;
@@ -183,7 +179,7 @@ export class Uploader implements UploaderOptions {
     if (this.status === 'uploading') {
       const isValidRange = offset >= 0 && offset < this.size;
       let body = null;
-      const xhr: XMLHttpRequest = XHRFactory.getInstance();
+      const xhr: XMLHttpRequest = new XMLHttpRequest();
       xhr.open('PUT', this.URI, true);
       xhr.responseType = 'json';
       xhr.withCredentials = this.options.withCredentials;
@@ -199,7 +195,7 @@ export class Uploader implements UploaderOptions {
       }
       this.setCommonHeaders(xhr);
       xhr.send(body);
-      return xhr;
+      return () => xhr.abort();
     }
   }
 
@@ -207,9 +203,8 @@ export class Uploader implements UploaderOptions {
     const onError = async () => {
       // 5xx errors or network failures
       if (xhr.status > 499 || !xhr.status) {
-        XHRFactory.release(xhr);
         await this.retry.wait();
-        this.xhrRequest = this.sendChunk();
+        this.abort = this.sendChunk();
       } else {
         // stop on 4xx errors
         this.response = parseJson(xhr) || {
@@ -218,7 +213,6 @@ export class Uploader implements UploaderOptions {
             message: xhr.statusText
           }
         };
-        XHRFactory.release(xhr);
         this.status = 'error' as UploadStatus;
       }
     };
@@ -227,14 +221,12 @@ export class Uploader implements UploaderOptions {
       if (xhr.status === 200 || xhr.status === 201) {
         this.progress = 100;
         this.response = parseJson(xhr);
-        XHRFactory.release(xhr);
         this.status = 'complete' as UploadStatus;
       } else if (xhr.status < 400) {
         const range = getRange(xhr);
         this.retry.reset();
-        XHRFactory.release(xhr);
         // send next chunk
-        this.xhrRequest = this.sendChunk(range);
+        this.abort = this.sendChunk(range);
       } else {
         onError();
       }
