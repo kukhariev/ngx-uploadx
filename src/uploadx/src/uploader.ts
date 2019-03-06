@@ -61,9 +61,8 @@ export class Uploader implements UploaderOptions {
       return;
     }
     if (s !== this._status) {
-      if (s === 'cancelled' || s === 'paused') {
-        // tslint:disable-next-line: no-unused-expression
-        this.abort && this.abort();
+      if ((this.abort && s === 'cancelled') || s === 'paused') {
+        this.abort();
       }
       if (s === 'cancelled') {
         this.cancel();
