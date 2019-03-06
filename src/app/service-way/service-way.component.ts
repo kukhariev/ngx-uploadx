@@ -66,7 +66,7 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
         this.uploads[index].status = item.status;
       }
       if (item.status === 'error') {
-        if (item.responseStatus === 401) {
+        if ([401, 404].includes(item.responseStatus)) {
           // this.uploadService.control({ action: 'refreshToken', token: tokenGetter() });
           this.uploadService.control({
             action: 'upload',

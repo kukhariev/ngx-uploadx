@@ -100,7 +100,7 @@ export class Uploader implements UploaderOptions {
 
   private create() {
     return new Promise((resolve, reject) => {
-      if (!this.URI || this.status === 'error') {
+      if (!this.URI || this.responseStatus === 404) {
         // get file URI
         const xhr: XMLHttpRequest = new XMLHttpRequest();
         xhr.open(this.options.method, this.options.endpoint, true);
@@ -148,20 +148,14 @@ export class Uploader implements UploaderOptions {
     if (item) this.configure(item);
 
     if (this.status === 'error') {
-      this.status = 'uploading';
       await this.retry.wait();
     }
-    this.responseStatus = undefined;
     this.status = 'uploading' as UploadStatus;
     try {
       await this.create();
       this.retry.reset();
-      if (this.progress) {
-        this.abort = this.sendChunk();
-      } else {
-        this.startTime = this.startTime || new Date().getTime();
-        this.abort = this.sendChunk(0);
-      }
+      this.startTime = this.startTime || new Date().getTime();
+      this.abort = this.sendChunk(this.URI ? undefined : 0);
     } catch (e) {
       this.status = 'error' as UploadStatus;
       console.error(e);
