@@ -109,7 +109,7 @@ export class Uploader implements UploaderOptions {
     return new Promise((resolve, reject) => {
       if (!this.URI || this.status === 'error') {
         // get file URI
-        const xhr = new XMLHttpRequest();
+        const xhr: XMLHttpRequest = new XMLHttpRequest();
         xhr.open(this.options.method, this.options.endpoint, true);
         xhr.responseType = 'json';
         xhr.withCredentials = this.options.withCredentials;
@@ -137,6 +137,10 @@ export class Uploader implements UploaderOptions {
             reject(new Error(`invalid response code: ${this.responseStatus}`));
           }
         };
+        xhr.onerror = () => {
+          this.status = 'error';
+          this.upload();
+        };
         xhr.send(JSON.stringify(this.metadata));
       } else {
         resolve();
@@ -151,6 +155,7 @@ export class Uploader implements UploaderOptions {
     if (item) this.configure(item);
 
     if (this.status === 'error') {
+      this.status = 'uploading';
       await this.retry.wait();
     }
     this.responseStatus = undefined;
@@ -200,7 +205,6 @@ export class Uploader implements UploaderOptions {
 
   private setupEvents(xhr: XMLHttpRequest) {
     const onError = async () => {
-      this.responseStatus = xhr.status;
       // 5xx errors or network failures
       if (xhr.status > 499 || !xhr.status) {
         XHRFactory.release(xhr);
@@ -268,8 +272,8 @@ export class Uploader implements UploaderOptions {
 
   private cancel() {
     return new Promise((resolve, reject) => {
-      if (this.URI && this._status === 'cancelled') {
-        const xhr: XMLHttpRequest = XHRFactory.getInstance();
+      if (this.URI) {
+        const xhr: XMLHttpRequest = new XMLHttpRequest();
         xhr.open('DELETE', this.URI, true);
         xhr.responseType = 'json';
         xhr.withCredentials = this.options.withCredentials;
@@ -282,7 +286,6 @@ export class Uploader implements UploaderOptions {
               message: xhr.statusText
             }
           };
-          XHRFactory.release(xhr);
           resolve();
         };
         xhr.send();
