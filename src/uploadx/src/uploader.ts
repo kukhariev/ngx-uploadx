@@ -61,7 +61,7 @@ export class Uploader implements UploaderOptions {
       return;
     }
     if (s !== this._status) {
-      if ((this.abort && s === 'cancelled') || s === 'paused') {
+      if (this.abort && (s === 'cancelled' || s === 'paused')) {
         this.abort();
       }
       if (s === 'cancelled') {
