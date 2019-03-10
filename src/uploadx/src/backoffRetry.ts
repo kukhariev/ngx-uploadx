@@ -3,31 +3,42 @@
  */
 export class BackoffRetry {
   private delay: number;
+  private code = -1;
+  retryAttempts = 1;
   /**
-   *
-   * Creates an instance of BackoffRetry.
-   * @default
-   * minInterval = 1000 ms
-   * maxInterval = minInterval * 120 (2 min)
-   * k = 2
+   * @param min  Initial retry delay
+   * @param max  Max retry delay
+   * @param k    Increase factor
    */
-  constructor(private minInterval = 1000, private maxInterval = minInterval * 120, private k = 2) {
-    this.delay = this.minInterval;
+  constructor(private min = 200, private max = min * 300, private k = 2) {
+    this.delay = this.min;
   }
-  // TODO implement the "Retry-After"
   /**
    * Delay Retry
+   * @param code
    */
-  wait(): Promise<{}> {
+  wait(code?: number): Promise<number> {
     return new Promise(resolve => {
-      setTimeout(resolve, this.delay + Math.floor(Math.random() * this.minInterval));
-      this.delay = Math.min(this.delay * this.k, this.maxInterval);
+      if (code === this.code) {
+        this.retryAttempts++;
+        this.delay = Math.min(this.delay * this.k, this.max);
+      } else {
+        this.delay = this.min;
+        this.retryAttempts = 1;
+      }
+      this.code = code;
+      setTimeout(
+        () => resolve(this.retryAttempts),
+        this.delay + Math.floor(Math.random() * this.min)
+      );
     });
   }
   /**
-   * Reset Retry Interval
+   * Reset Retry
    */
   reset(): void {
-    this.delay = this.minInterval;
+    this.delay = this.min;
+    this.retryAttempts = 1;
+    this.code = -1;
   }
 }
