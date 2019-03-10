@@ -6,14 +6,24 @@
 
 import { resolveUrl } from './resolve_url';
 import { BackoffRetry } from './backoffRetry';
-import { UploadStatus, UploadItem, UploaderOptions, UploadState } from './interfaces';
+import { UploadStatus, UploadItem, UploadState } from './interfaces';
 
-export class Uploader implements UploaderOptions {
+/**
+ *
+ */
+export interface UploaderOptions extends UploadItem {
+  maxRetryAttempts: number;
+  chunkSize?: number;
+  withCredentials?: boolean;
+  readonly stateChange?: any;
+}
+const noop = () => {};
+
+export class Uploader {
   headers: { [key: string]: string } | null;
   metadata: { [key: string]: any };
   private _status: UploadStatus;
-  private abort: () => void;
-  private retry: BackoffRetry;
+  private retry = new BackoffRetry();
   private startTime: number;
   progress: number;
   readonly mimeType: string;
@@ -26,46 +36,23 @@ export class Uploader implements UploaderOptions {
   speed: number;
   URI: string;
   token: string | (() => string);
-
-  /**
-   * Creates an instance of Uploader.
-   */
-  constructor(private readonly file: File, public options: UploaderOptions) {
-    this.uploadId = Math.random()
-      .toString(36)
-      .substring(2, 15);
-    this.name = file.name;
-    this.size = file.size;
-    this.mimeType = file.type || 'application/octet-stream';
-    this.retry = new BackoffRetry();
-    this.configure(options);
-  }
-
-  /**
-   * configure or reconfigure uploader
-   */
-  configure(item = {} as UploaderOptions | UploadItem): void {
-    const { metadata, headers, token } = item;
-    this.metadata = {
-      name: this.name,
-      mimeType: this.mimeType,
-      size: this.size,
-      ...unfunc(metadata || this.metadata, this.file)
-    };
-    this.token = unfunc(token || this.token);
-    this.headers = { ...unfunc(headers, this.file), ...this.headers };
-  }
+  private statusType: number;
+  private _token: string;
+  private _xhr_: XMLHttpRequest;
+  private chunkSize = 1048576;
+  private maxRetryAttempts = 3;
+  private stateChange: (evt: UploadState) => void;
 
   set status(s: UploadStatus) {
     if (this._status === 'cancelled' || this._status === 'complete') {
       return;
     }
     if (s !== this._status) {
-      if ((this.abort && s === 'cancelled') || s === 'paused') {
-        this.abort();
+      if (this._xhr_ && (s === 'cancelled' || s === 'paused')) {
+        this._xhr_.abort();
       }
       if (s === 'cancelled') {
-        this.cancel();
+        this.request('delete');
       }
       this._status = s;
       this.notifyState();
@@ -77,9 +64,40 @@ export class Uploader implements UploaderOptions {
   }
 
   /**
+   * Creates an instance of Uploader.
+   */
+  constructor(private readonly file: File, public options: UploaderOptions) {
+    this.uploadId = Math.random()
+      .toString(36)
+      .substring(2, 15);
+    this.name = file.name;
+    this.size = file.size;
+    this.mimeType = file.type || 'application/octet-stream';
+    this.stateChange = options.stateChange || noop;
+    this.configure(options);
+  }
+
+  /**
+   * configure or reconfigure uploader
+   */
+  configure(item = {} as UploadItem): void {
+    const { metadata, headers, token } = item;
+    this.metadata = {
+      name: this.name,
+      mimeType: this.mimeType,
+      size: this.size,
+      ...unfunc(metadata || this.metadata, this.file)
+    };
+    this.chunkSize = this.options.chunkSize || this.chunkSize;
+    this.maxRetryAttempts = this.options.maxRetryAttempts || this.maxRetryAttempts;
+    this.refreshToken(token);
+    this.headers = { ...this.headers, ...unfunc(headers, this.file) };
+  }
+
+  /**
    * Emit current state
    */
-  private notifyState() {
+  private notifyState(): void {
     const state: UploadState = {
       file: this.file,
       name: this.name,
@@ -94,46 +112,56 @@ export class Uploader implements UploaderOptions {
       uploadId: this.uploadId,
       URI: this.URI
     };
-    //
-    setTimeout(() => this.options.subj.next(state));
+    this.stateChange(state);
   }
 
-  private create() {
+  private processResponse(xhr: XMLHttpRequest): void {
+    this.responseStatus = xhr.status;
+    this.response = parseJson(xhr);
+    this.statusType = xhr.status - (xhr.status % 100);
+  }
+
+  refreshToken(token?: any): void {
+    this.token = token || this.token;
+    this._token = unfunc(this.token);
+  }
+
+  private maxAttemptsReached(): boolean | never {
+    if (this.retry.retryAttempts === this.maxRetryAttempts && this.statusType === 400) {
+      this.retry.reset();
+      console.error(
+        `Error: Maximum number of retry attempts reached:
+          file: ${this.name},
+          statusCode: ${this.responseStatus}`
+      );
+      return true;
+    }
+  }
+
+  private create(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.URI || this.responseStatus === 404) {
         // get file URI
         const xhr: XMLHttpRequest = new XMLHttpRequest();
-        xhr.open(this.options.method, this.options.endpoint, true);
-        xhr.responseType = 'json';
-        xhr.withCredentials = this.options.withCredentials;
-        this.setCommonHeaders(xhr);
+        xhr.open(this.options.method.toUpperCase(), this.options.endpoint, true);
+        this.setupXHR(xhr);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
         xhr.setRequestHeader('X-Upload-Content-Length', this.size.toString());
         xhr.setRequestHeader('X-Upload-Content-Type', this.mimeType);
         xhr.onload = () => {
-          this.responseStatus = xhr.status;
-          this.response = parseJson(xhr) || {
-            error: {
-              code: +xhr.status,
-              message: xhr.statusText
-            }
-          };
-          if (xhr.status < 400 && xhr.status > 199) {
-            const location = getKeyFromResponse(xhr, 'location');
-            if (!location) {
-              reject(new Error('invalid response: missing location url'));
-            } else {
-              this.URI = resolveUrl(location, this.options.endpoint);
-              resolve();
-            }
+          this.processResponse(xhr);
+          const location = this.statusType === 200 && getKeyFromResponse(xhr, 'location');
+          if (!location) {
+            // limit attempts
+            this.statusType = 400;
+            reject();
           } else {
-            reject(new Error(`invalid response code: ${this.responseStatus}`));
+            this.URI = resolveUrl(location, this.options.endpoint);
+            this.retry.reset();
+            resolve();
           }
         };
-        xhr.onerror = () => {
-          this.status = 'error';
-          this.upload();
-        };
+        xhr.onerror = () => reject();
         xhr.send(JSON.stringify(this.metadata));
       } else {
         resolve();
@@ -144,80 +172,81 @@ export class Uploader implements UploaderOptions {
   /**
    * Initiate upload
    */
-  async upload(item?: UploadItem | undefined) {
+  async upload(item?: UploadItem | undefined): Promise<void> {
     if (item) this.configure(item);
-
-    if (this.status === 'error') {
-      await this.retry.wait();
+    if (this._status === 'cancelled' || this._status === 'complete' || this._status === 'paused') {
+      return;
     }
-    this.status = 'uploading' as UploadStatus;
+    this.status = 'uploading';
+    this.refreshToken();
     try {
       await this.create();
-      this.retry.reset();
-      this.startTime = this.startTime || new Date().getTime();
-      this.abort = this.sendChunk(this.URI ? undefined : 0);
+      this.startTime = new Date().getTime();
+      this.sendChunk(this.progress ? undefined : 0);
     } catch (e) {
-      this.status = 'error' as UploadStatus;
-      console.error(e);
+      if (this.maxAttemptsReached()) {
+        this.status = 'error';
+      } else {
+        this.status = 'retry';
+        await this.retry.wait(this.responseStatus);
+        this.status = 'queue';
+      }
     }
   }
 
   /**
-   * Content upload
-   * @param offset
+   * Chunk upload +/ get offset
    */
-  private sendChunk(offset?: number) {
+  private sendChunk(offset?: number): void {
     if (this.status === 'uploading') {
-      const isValidRange = offset >= 0 && offset < this.size;
       let body = null;
       const xhr: XMLHttpRequest = new XMLHttpRequest();
       xhr.open('PUT', this.URI, true);
-      xhr.responseType = 'json';
-      xhr.withCredentials = this.options.withCredentials;
+      this.setupXHR(xhr);
       this.setupEvents(xhr);
-      if (isValidRange) {
-        const { end, chunk }: { end: number; chunk: Blob } = this.sliceFile(offset);
+      if (offset >= 0 && offset < this.size) {
+        const end = this.chunkSize ? Math.min(offset + this.chunkSize, this.size) : this.size;
+        body = this.file.slice(offset, end);
         xhr.upload.onprogress = this.setupProgressEvent(offset, end);
-        body = chunk;
         xhr.setRequestHeader('Content-Range', `bytes ${offset}-${end - 1}/${this.size}`);
         xhr.setRequestHeader('Content-Type', 'application/octet-stream');
       } else {
         xhr.setRequestHeader('Content-Range', `bytes */${this.size}`);
       }
-      this.setCommonHeaders(xhr);
       xhr.send(body);
-      return () => xhr.abort();
     }
   }
 
-  private setupEvents(xhr: XMLHttpRequest) {
+  private setupEvents(xhr: XMLHttpRequest): void {
     const onError = async () => {
-      // 5xx errors or network failures
-      if (xhr.status > 499 || !xhr.status) {
-        await this.retry.wait();
-        this.abort = this.sendChunk();
-      } else {
-        // stop on 4xx errors
-        this.response = parseJson(xhr) || {
-          error: {
-            code: +xhr.status,
-            message: xhr.statusText
-          }
-        };
-        this.status = 'error' as UploadStatus;
+      if (this.maxAttemptsReached()) {
+        this.status = 'error';
+        return;
       }
+      this.status = 'retry';
+      await this.retry.wait(xhr.status);
+      if (xhr.status === 404) {
+        this.status = 'queue';
+        return;
+      }
+      if (xhr.status === 413) {
+        this.chunkSize /= 2;
+      }
+      this.refreshToken();
+      this.status = 'uploading';
+      // request offset
+      this.sendChunk();
     };
     const onSuccess = () => {
-      this.responseStatus = xhr.status;
-      if (xhr.status === 200 || xhr.status === 201) {
-        this.progress = 100;
-        this.response = parseJson(xhr);
-        this.status = 'complete' as UploadStatus;
-      } else if (xhr.status < 400) {
-        const range = getRange(xhr);
+      this.processResponse(xhr);
+      const offset = this.statusType === 300 && this.getNextChunkOffset(xhr);
+      if (typeof offset === 'number') {
+        //  next chunk
         this.retry.reset();
-        // send next chunk
-        this.abort = this.sendChunk(range);
+        this.sendChunk(offset);
+      } else if (this.statusType === 200 && this.response) {
+        this.progress = 100;
+        this.status = 'complete';
       } else {
         onError();
       }
@@ -226,11 +255,11 @@ export class Uploader implements UploaderOptions {
     xhr.onload = onSuccess;
   }
 
-  private setupProgressEvent(start: number, end: number) {
+  private setupProgressEvent(offset: number, end: number) {
     return (pEvent: ProgressEvent) => {
       const uploaded = pEvent.lengthComputable
-        ? start + (end - start) * (pEvent.loaded / pEvent.total)
-        : start;
+        ? offset + (end - offset) * (pEvent.loaded / pEvent.total)
+        : offset;
       this.progress = +((uploaded / this.size) * 100).toFixed(2);
       const now = new Date().getTime();
       this.speed = Math.round((uploaded / (now - this.startTime)) * 1000);
@@ -239,36 +268,35 @@ export class Uploader implements UploaderOptions {
     };
   }
 
-  private sliceFile(start: number) {
-    const end = this.options.chunkSize
-      ? Math.min(start + this.options.chunkSize, this.size)
-      : this.size;
-    const chunk: Blob = this.file.slice(start, end);
-    return { end, chunk };
+  private getNextChunkOffset(xhr: XMLHttpRequest) {
+    const str = getKeyFromResponse(xhr, 'Range');
+    const [match] = str && str.match(/(-1|\d+)$/g);
+    return match && +match + 1;
   }
 
-  private setCommonHeaders(xhr: XMLHttpRequest) {
+  private setupXHR(xhr: XMLHttpRequest) {
+    //reset response
+    this.responseStatus = null;
+    this.response = null;
+    this.statusType = null;
+
+    this._xhr_ = xhr;
+
+    xhr.responseType = 'json';
+    xhr.withCredentials = this.options.withCredentials;
     Object.keys(this.headers).forEach(key => xhr.setRequestHeader(key, this.headers[key]));
     // tslint:disable-next-line: no-unused-expression
-    this.token && xhr.setRequestHeader('Authorization', `Bearer ${this.token}`);
+    this._token && xhr.setRequestHeader('Authorization', `Bearer ${this._token}`);
   }
 
-  private cancel() {
-    return new Promise((resolve, reject) => {
+  private request(method: string) {
+    return new Promise(resolve => {
       if (this.URI) {
         const xhr: XMLHttpRequest = new XMLHttpRequest();
-        xhr.open('DELETE', this.URI, true);
-        xhr.responseType = 'json';
-        xhr.withCredentials = this.options.withCredentials;
-        this.setCommonHeaders(xhr);
-        xhr.onload = xhr.onerror = () => {
-          this.responseStatus = xhr.status;
-          this.response = parseJson(xhr) || {
-            status: {
-              code: +xhr.status,
-              message: xhr.statusText
-            }
-          };
+        xhr.open(method.toUpperCase(), this.URI, true);
+        this.setupXHR(xhr);
+        xhr.onload = () => {
+          this.processResponse(xhr);
           resolve();
         };
         xhr.send();
@@ -279,17 +307,12 @@ export class Uploader implements UploaderOptions {
   }
 }
 
-function getRange(xhr: XMLHttpRequest) {
-  const match = getKeyFromResponse(xhr, 'Range').match(/(-1|\d+)$/g);
-  return 1 + +(match && match[0]);
-}
-
 function getKeyFromResponse(xhr: XMLHttpRequest, key: string) {
   const fromHeader = xhr.getResponseHeader(key);
   if (fromHeader) {
     return fromHeader;
   }
-  const response = parseJson(xhr);
+  const response = parseJson(xhr) || {};
   const resKey = Object.keys(response).find(k => k.toLowerCase() === key.toLowerCase());
   return response[resKey];
 }

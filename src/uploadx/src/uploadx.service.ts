@@ -1,27 +1,29 @@
 import { Injectable } from '@angular/core';
-
-import { Subject, Observable } from 'rxjs';
-
+import { Observable, Subject } from 'rxjs';
 import {
-  UploadxOptions,
   UploadState,
+  UploadStatus,
   UploadxControlEvent,
-  UploaderOptions,
-  UploadStatus
+  UploadxOptions,
+  UploadEvent
 } from './interfaces';
-import { Uploader } from './uploader';
+import { Uploader, UploaderOptions } from './uploader';
 
 /**
  *
  */
 @Injectable({ providedIn: 'root' })
 export class UploadxService {
-  subj: Subject<UploadState> = new Subject();
+  eventsStream: Subject<UploadState> = new Subject();
   queue: Uploader[] = [];
   private concurrency = 2;
   private autoUpload = true;
   private options: UploadxOptions;
-
+  stateChange = (evt: UploadState) => {
+    setTimeout(() => {
+      this.eventsStream.next(evt);
+    });
+  };
   get uploaderOptions(): UploaderOptions {
     return {
       method: this.options.method || 'POST',
@@ -29,15 +31,16 @@ export class UploadxService {
       endpoint: this.options.endpoint || this.options.url || '/upload/',
       headers: this.options.headers,
       token: this.options.token,
-      chunkSize: this.options.chunkSize || 0,
-      withCredentials: this.options.withCredentials || false,
-      subj: this.subj
-    } as UploaderOptions;
+      chunkSize: this.options.chunkSize,
+      withCredentials: this.options.withCredentials,
+      maxRetryAttempts: this.options.maxRetryAttempts,
+      stateChange: this.stateChange
+    };
   }
 
   constructor() {
-    this.subj.subscribe((uploadState: UploadState) => {
-      if (uploadState.status !== 'uploading') {
+    this.eventsStream.subscribe((evt: UploadEvent) => {
+      if (evt.status !== 'uploading' && evt.status !== 'added') {
         this.processQueue();
       }
     });
@@ -50,7 +53,7 @@ export class UploadxService {
     this.options = options;
     this.concurrency = options.concurrency || this.concurrency;
     this.autoUpload = !(options.autoUpload === false);
-    return this.subj.asObservable();
+    return this.eventsStream.asObservable();
   }
   /**
    *
@@ -135,6 +138,8 @@ export class UploadxService {
   }
 
   runningProcess(): number {
-    return this.queue.filter((uploader: Uploader) => uploader.status === 'uploading').length;
+    return this.queue.filter(
+      (uploader: Uploader) => uploader.status === 'uploading' || uploader.status === 'retry'
+    ).length;
   }
 }

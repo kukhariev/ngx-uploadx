@@ -5,7 +5,8 @@ export type UploadStatus =
   | 'complete'
   | 'error'
   | 'cancelled'
-  | 'paused';
+  | 'paused'
+  | 'retry';
 
 export type UploadAction =
   | 'create'
@@ -31,6 +32,8 @@ export interface UploadxControlEvent {
 /**
  *  Read only upload stream events
  */
+export type UploadEvent = UploadState;
+
 export interface UploadState {
   file: File;
   name: string;
@@ -82,7 +85,7 @@ export interface UploadItem {
 /**
  * Global Options
  */
-export class UploadxOptions implements UploadItem {
+export class UploadxOptions {
   /**
    *  Set "accept" attribute
    * @example
@@ -133,13 +136,9 @@ export class UploadxOptions implements UploadItem {
    * @defaultValue false
    */
   withCredentials?: boolean;
-}
-/**
- *
- */
-export interface UploaderOptions extends UploadItem {
-  token?: string | (() => string);
-  chunkSize?: number;
-  withCredentials?: boolean;
-  readonly subj?: any;
+  /**
+   * Max status 4xx retries
+   * @defaultValue 3
+   */
+  maxRetryAttempts?: number;
 }

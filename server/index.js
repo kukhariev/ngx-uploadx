@@ -1,84 +1,70 @@
-/*--------------------------------------------------------------
- *  Copyright (c) 2018, Oleg Kukhariev. All rights reserved.
- *  Licensed under the MIT License.
- *-------------------------------------------------------------*/
+// @ts-check
 
 'use strict';
 
-const { auth } = require('./auth');
+const { logger } = require('./logger');
 
 /*
- * Server API example
+ *  uploads testing server
+ *
+ * https://github.com/kukhariev/node-uploadx
+ *
  */
 
 const bytes = require('bytes');
-const crypto = require('crypto');
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-// ----------------------------------  CONFIG  ---------------------------------
+const { uploadsDB } = require('./uploadsDB');
+const { auth } = require('./auth');
+const { errorsInjector } = require('./errorsInjector');
 
-const UPLOADDIR = require('os').tmpdir();
+// ----------------------------------  CONFIG  ---------------------------------
+const ENV = process.env['NODE_ENV'];
+const UPLOAD_DIR = require('os').tmpdir();
 const PORT = 3003;
-const MAXUPLOADSIZE = bytes('2gb');
-const MAXCHUNKSIZE = bytes('20mb');
-const ALLOWMIME = ['video/*', 'image/*'];
+const MAX_FILE_SIZE = bytes('2gb');
+const MAX_CHUNK_SIZE = bytes('2mb');
+const ALLOWED_MIME = ['video/*', 'image/*'];
 
 // ----------------------------  CONFIGURE EXPRESS  ----------------------------
 const app = express();
 app.enable('trust proxy');
-app.use(require('morgan')('dev', { skip: (req, res) => res.statusCode === 204 }));
+
+process.env['NODE_ENV'] === 'development' && app.use(logger);
+
 const corsOptions = {
   exposedHeaders: ['Range', 'Location']
 };
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
-const rawBodyParser = bodyParser.raw({ limit: MAXCHUNKSIZE });
+const rawBodyParser = bodyParser.raw({ limit: MAX_CHUNK_SIZE });
 
-// -----------------------------  FAKE DATABASE  ----------------------------
-const uploadsDB = (() => {
-  const map = new Map();
-  return {
-    save: data => {
-      const id = crypto
-        .createHash('md5')
-        .update(JSON.stringify(data), 'utf8')
-        .digest('hex');
-      data.id = id;
-      map.set(id, data);
-      return map.get(id);
-    },
-    ready: id => {
-      console.log(`${map.get(id).dstpath}: upload complete`);
-      map.delete(id);
-    },
-    deleted: id => {
-      console.log(`${map.get(id).dstpath}: upload canceled`);
-      map.delete(id);
-    },
-    findById: id => map.get(id)
-  };
-})();
-app.delete('/upload/', auth, (req, res, next) => {
-  if (!req.query.upload_id) {
-    return next(404);
-  }
-  const upload_id = req.query.upload_id;
-  const upload = uploadsDB.findById(upload_id);
-  if (!upload) {
-    return next(404);
-  }
-  try {
-    fs.unlinkSync(upload.dstpath);
-    uploadsDB.deleted(upload_id);
-  } catch (error) {}
-  return res.json();
+app.delete('/upload/', auth, del);
+app.put('/upload/', errorsInjector, auth, rawBodyParser, fileChunk);
+app.use('/upload/', errorsInjector, auth, newFile);
+
+app.use(errorHandler);
+
+const server = app.listen(PORT, () => {
+  console.log(`Server listening on port: ${server.address()['port']}`);
+  console.log('MAX_FILE_SIZE: ', MAX_FILE_SIZE);
+  console.log('MAX_CHUNK_SIZE: ', MAX_CHUNK_SIZE);
 });
-// ------------ get content ------------
-app.put('/upload/', auth, rawBodyParser, (req, res, next) => {
+process.on('SIGTERM', () => {
+  server.close(() => {
+    process.exit(0);
+  });
+});
+// ----------------------------  MDLWRs  ----------------------------
+
+/**
+ *  Save chunk to disk and/or return offset for next chunk
+ */
+async function fileChunk(req, res, next) {
   if (!req.query.upload_id) {
     return next();
   }
@@ -87,57 +73,63 @@ app.put('/upload/', auth, rawBodyParser, (req, res, next) => {
   if (!upload) {
     return next(404);
   }
-  // limit file/chunk size
-  if (+req.get('content-length') > MAXCHUNKSIZE) {
+  // check file/chunk size limit
+  if (+req.get('content-length') > MAX_CHUNK_SIZE) {
     return next(413);
   }
-
+  res.set('Cache-Control', 'no-store');
   const contentRange = req.get('content-range');
   // -------- non chunking upload --------
   if (!contentRange) {
-    return upload.fileStream.write(req.body, () => {
+    return upload.fileStream.write(req.body, async () => {
       upload.fileStream.end();
-      uploadsDB.ready(upload_id);
-      res.json(upload.metadata);
+      const md5 = await uploadsDB.ready(upload_id);
+      res.json({ ...upload.metadata, md5 });
     });
   }
-  // ---------- resume upload ----------
+  // ---------- return offset for next chunk ----------
   if (contentRange.includes('*')) {
     const [, total] = contentRange.match(/\*\/(\d+)/g);
     if (+total === upload.fileStream.bytesWritten) {
-      return res.json(upload.metadata);
+      const md5 = await uploadsDB.ready(upload_id);
+      res.json({ ...upload.metadata, md5 });
     } else {
       res.set('Range', `bytes=0-${upload.fileStream.bytesWritten - 1}`);
       return res.status(308).send('Resume Incomplete');
     }
   }
-  // --------- chunking upload ---------
+  // --------- append chunk data to file ---------
   const [fm, start, end, total] = contentRange.match(/(\d+)-(\d+)\/(\d+)/).map(s => +s);
+  if (total !== upload.size) {
+    return next(400);
+  }
   if (end + 1 < total) {
     upload.fileStream.write(req.body, () => {
       res.set('Range', `bytes=0-${upload.fileStream.bytesWritten - 1}`);
       return res.status(308).send('Resume Incomplete');
     });
   } else {
-    return upload.fileStream.write(req.body, () => {
-      res.json(upload.metadata);
+    return upload.fileStream.write(req.body, async () => {
       upload.fileStream.end();
-      uploadsDB.ready(upload_id);
+      const md5 = await uploadsDB.ready(upload_id);
+      res.json({ ...upload.metadata, md5 });
     });
   }
-});
+}
 
-// ---------------------------  GENERATE SECURE LINK  --------------------------
-app.use('/upload/', auth, (req, res, next) => {
+/**
+ *  Save chunk to disk || return offset for next chunk
+ */
+function newFile(req, res, next) {
   // optional: limit file size
-  if (+req.get('x-upload-content-length') > MAXUPLOADSIZE) {
+  if (+req.get('x-upload-content-length') > MAX_FILE_SIZE) {
     return next(413);
   }
   // optional: check  mime type
-  if (!new RegExp(ALLOWMIME.join('|')).test(req.get('x-upload-content-type'))) {
+  if (!new RegExp(ALLOWED_MIME.join('|')).test(req.get('x-upload-content-type'))) {
     return next(415);
   }
-  const dstpath = path.join(UPLOADDIR, req.body.name || req.body.title);
+  const dstpath = path.join(UPLOAD_DIR, req.body.name || req.body.title);
   // overwrite file
   try {
     fs.unlinkSync(dstpath);
@@ -152,17 +144,34 @@ app.use('/upload/', auth, (req, res, next) => {
     fileStream: fs.createWriteStream(dstpath, { flags: 'a' })
   };
   const upload_id = uploadsDB.save(upload).id;
-
   const query = `?upload_id=${upload_id}`;
-
-  const location = `${req.protocol}://${req.hostname}:${PORT}/upload/${query}`;
+  const location = `${req.protocol}://${req.hostname}:${PORT}${req.baseUrl}/${query}`;
   res.location(location);
   res.status(200).json({ location });
-});
+}
+
+/**
+ *  delete upload
+ */
+function del(req, res, next) {
+  if (!req.query.upload_id) {
+    return next(404);
+  }
+  const upload_id = req.query.upload_id;
+  const upload = uploadsDB.findById(upload_id);
+  if (!upload) {
+    return next(404);
+  }
+  try {
+    fs.unlinkSync(upload.dstpath);
+    uploadsDB.deleted(upload_id);
+  } catch (error) {}
+  return res.json();
+}
 
 // ------------------------------  ERROR HANDLER  ------------------------------
-// eslint-disable-next-line
-app.use((err, req, res, next) => {
+
+function errorHandler(err, req, res, next) {
   const errorStatuses = {
     400: 'Bad Request',
     401: 'Unauthorized',
@@ -174,27 +183,14 @@ app.use((err, req, res, next) => {
   if (typeof err === 'number') {
     res.status(err).json({
       error: {
-        code: err,
+        statusCode: err,
         message: errorStatuses[err]
       }
     });
   } else {
-    console.error(err.stack);
-    res.status(500).json({
-      error: {
-        code: err.code || 500,
-        message: err.message
-      }
+    err.status && console.log(err);
+    res.status(err.status).json({
+      error: err
     });
   }
-});
-
-const server = app.listen(PORT, 'localhost', () => {
-  console.log(`Server listening on port: ${server.address().port}`);
-});
-
-process.on('SIGTERM', () => {
-  server.close(() => {
-    process.exit(0);
-  });
-});
+}

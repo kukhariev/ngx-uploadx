@@ -24,7 +24,7 @@
     "lint": "ng lint",
     "e2e": "concurrently --kill-others -s \"first\" \"npm run server\" \"ng e2e\"",
     "server": "node ./server/index.js",
-    "server:dev": "cd ./server  && nodemon .",
+    "server:dev": "cd ./server  && NODE_ENV=development nodemon .",
     "postversion": "npm run build && git push --follow-tags",
     "build": "ts-node ./scripts/build.ts",
     "ci": "npm run lint && npm run test:once && npm run e2e"
