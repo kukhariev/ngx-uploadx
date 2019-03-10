@@ -153,7 +153,7 @@ UploadxService
 | **[method]**           |   "POST"   | _Upload API initial method_              |
 | **[token]**            |     -      | _Auth Bearer token \/ token Getter_      |
 | **[endpoint]**         | "/upload/" | _API URL_                                |
-| **[maxRetryAttempts]** |     3      | _ Maximum number of retries to allow _   |
+| **[maxRetryAttempts]** |     3      | _Maximum number of retries to allow_     |
 | **[withCredentials]**  |   false    | _CORS option_                            |
 
 ### _\<Observable\>_ UploadState
