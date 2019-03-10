@@ -16,7 +16,7 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
   state: Observable<UploadState>;
   uploads: Ufile[] = [];
   options: UploadxOptions = {
-    url: `${environment.api}/upload?uploadType=uploadx`,
+    url: `${environment.api}/upload`,
     token: tokenGetter(), // string
     // token: tokenGetter,
     chunkSize: 1024 * 256 * 8
@@ -64,15 +64,6 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
       } else {
         this.uploads[index].progress = item.progress;
         this.uploads[index].status = item.status;
-      }
-      if (item.status === 'error') {
-        if ([401, 404].includes(item.responseStatus)) {
-          // this.uploadService.control({ action: 'refreshToken', token: tokenGetter() });
-          this.uploadService.control({
-            action: 'upload',
-            itemOptions: { uploadId: item.uploadId, token: tokenGetter() }
-          });
-        }
       }
     });
   }

@@ -45,7 +45,7 @@ export class UploadxDirective implements OnInit, OnDestroy {
       }
       this.uploadService.init(this.uploadx);
     }
-    this.uploadxState.emit(<Observable<UploadState>>this.uploadService.subj.asObservable());
+    this.uploadxState.emit(<Observable<UploadState>>this.uploadService.eventsStream.asObservable());
     this.listenerFn = this.renderer.listen(
       this.elementRef.nativeElement,
       'change',
