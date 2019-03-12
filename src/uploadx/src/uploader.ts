@@ -51,7 +51,7 @@ export class Uploader {
       if (this._xhr_ && (s === 'cancelled' || s === 'paused')) {
         this._xhr_.abort();
       }
-      if (s === 'cancelled') {
+      if (s === 'cancelled' && this.URI) {
         this.request('delete');
       }
       this._status = s;
@@ -289,20 +289,18 @@ export class Uploader {
     this._token && xhr.setRequestHeader('Authorization', `Bearer ${this._token}`);
   }
 
-  private request(method: string) {
-    return new Promise(resolve => {
-      if (this.URI) {
-        const xhr: XMLHttpRequest = new XMLHttpRequest();
-        xhr.open(method.toUpperCase(), this.URI, true);
-        this.setupXHR(xhr);
-        xhr.onload = () => {
-          this.processResponse(xhr);
-          resolve();
-        };
-        xhr.send();
-      } else {
+  request(method: string, payload = null) {
+    return new Promise((resolve, reject) => {
+      const xhr: XMLHttpRequest = new XMLHttpRequest();
+      xhr.open(method.toUpperCase(), this.URI, true);
+      this.setupXHR(xhr);
+      xhr.onload = () => {
+        this.processResponse(xhr);
         resolve();
-      }
+      };
+      xhr.onerror = () => reject();
+      const body = typeof payload === 'object' ? JSON.stringify(payload) : null;
+      xhr.send(body);
     });
   }
 }
