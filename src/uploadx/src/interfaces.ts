@@ -76,7 +76,7 @@ export interface UploadItem {
    * @defaultValue
    * { name: File.Filename, mimeType: File.type }
    */
-  metadata?: any;
+  metadata?: { [key: string]: any } | ((file?: File) => { [key: string]: any });
   /**
    * Authorization Bearer token
    */
@@ -116,6 +116,12 @@ export class UploadxOptions {
    * @defaultValue 'POST'
    */
   method?: string;
+  /**
+   * Upload meta
+   * @defaultValue
+   * { name: File.Filename, mimeType: File.type }
+   */
+  metadata?: { [key: string]: any } | ((file?: File) => { [key: string]: any });
   /**
    * Authorization Bearer token
    */
