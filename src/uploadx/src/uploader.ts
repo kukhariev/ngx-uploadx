@@ -299,7 +299,7 @@ export class Uploader {
         resolve();
       };
       xhr.onerror = () => reject();
-      const body = typeof payload === 'object' ? JSON.stringify(payload) : null;
+      const body = payload ? JSON.stringify(payload) : null;
       xhr.send(body);
     });
   }

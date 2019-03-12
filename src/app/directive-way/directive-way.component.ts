@@ -26,6 +26,7 @@ export class DirectiveWayComponent implements OnDestroy {
       token: () => {
         return 'sometoken';
       },
+      metadata: (f: File) => ({ title: f.name }),
       autoUpload: true,
       withCredentials: false,
       chunkSize: 1024 * 256 * 8,

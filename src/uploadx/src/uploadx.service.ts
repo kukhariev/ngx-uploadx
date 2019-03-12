@@ -30,6 +30,7 @@ export class UploadxService {
       // tslint:disable-next-line: deprecation
       endpoint: this.options.endpoint || this.options.url || '/upload/',
       headers: this.options.headers,
+      metadata: this.options.metadata,
       token: this.options.token,
       chunkSize: this.options.chunkSize,
       withCredentials: this.options.withCredentials,
