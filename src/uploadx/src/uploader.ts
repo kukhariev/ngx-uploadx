@@ -2,12 +2,7 @@ import { Subject } from 'rxjs';
 import * as url from 'url';
 import { BackoffRetry } from './backoffRetry';
 import { XHRFactory } from './xhrfactory';
-import {
-  UploadStatus,
-  UploadItem,
-  UploaderOptions,
-  UploadState
-} from './interfaces';
+import { UploadStatus, UploadItem, UploaderOptions, UploadState } from './interfaces';
 
 const noop = () => {};
 /**
@@ -79,9 +74,7 @@ export class Uploader implements UploaderOptions {
 
   private setCommonHeaders(xhr: XMLHttpRequest) {
     if (this.headers) {
-      Object.keys(this.headers).forEach(key =>
-        xhr.setRequestHeader(key, this.headers[key])
-      );
+      Object.keys(this.headers).forEach(key => xhr.setRequestHeader(key, this.headers[key]));
     }
     if (this.options.token) {
       xhr.setRequestHeader('Authorization', 'Bearer ' + this.options.token);
@@ -99,6 +92,7 @@ export class Uploader implements UploaderOptions {
         this.metadata = {
           name: this.name,
           mimeType: this.mimeType,
+          size: this.size,
           ...this.options.metadata,
           ...metadata
         };
@@ -214,9 +208,7 @@ export class Uploader implements UploaderOptions {
     if (this.status === 'cancelled' || this.status === 'paused') {
       return;
     }
-    let end: number = this.options.chunkSize
-      ? start + this.options.chunkSize
-      : this.size;
+    let end: number = this.options.chunkSize ? start + this.options.chunkSize : this.size;
     end = end > this.size ? this.size : end;
     const chunk: Blob = this.file.slice(start, end);
     const xhr: XMLHttpRequest = XHRFactory.getInstance();
@@ -224,10 +216,7 @@ export class Uploader implements UploaderOptions {
     xhr.responseType = 'json';
     xhr.withCredentials = this.options.withCredentials;
     this.setCommonHeaders(xhr);
-    xhr.setRequestHeader(
-      'Content-Range',
-      `bytes ${start}-${end - 1}/${this.size}`
-    );
+    xhr.setRequestHeader('Content-Range', `bytes ${start}-${end - 1}/${this.size}`);
     xhr.setRequestHeader('Content-Type', 'application/octet-stream');
     const updateProgress = (pEvent: ProgressEvent) => {
       const uploaded = pEvent.lengthComputable
