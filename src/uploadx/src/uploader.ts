@@ -22,6 +22,7 @@ const noop = () => {};
 export class Uploader {
   headers: { [key: string]: string } | null;
   metadata: { [key: string]: any };
+  endpoint: string;
   private _status: UploadStatus;
   private retry = new BackoffRetry();
   private startTime: number;
@@ -39,7 +40,7 @@ export class Uploader {
   private statusType: number;
   private _token: string;
   private _xhr_: XMLHttpRequest;
-  private chunkSize = 1048576;
+  private chunkSize = 1_048_576;
   private maxRetryAttempts = 3;
   private stateChange: (evt: UploadState) => void;
 
@@ -81,7 +82,7 @@ export class Uploader {
    * configure or reconfigure uploader
    */
   configure(item = {} as UploadItem): void {
-    const { metadata, headers, token } = item;
+    const { metadata, headers, token, endpoint } = item;
     this.metadata = {
       name: this.name,
       mimeType: this.mimeType,
@@ -89,6 +90,7 @@ export class Uploader {
       lastModified: this.file.lastModified,
       ...unfunc(metadata || this.metadata, this.file)
     };
+    this.endpoint = endpoint || this.options.endpoint;
     this.chunkSize = this.options.chunkSize || this.chunkSize;
     this.maxRetryAttempts = this.options.maxRetryAttempts || this.maxRetryAttempts;
     this.refreshToken(token);
@@ -144,7 +146,7 @@ export class Uploader {
       if (!this.URI || this.responseStatus === 404) {
         // get file URI
         const xhr: XMLHttpRequest = new XMLHttpRequest();
-        xhr.open(this.options.method.toUpperCase(), this.options.endpoint, true);
+        xhr.open(this.options.method.toUpperCase(), this.endpoint, true);
         this.setupXHR(xhr);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
         xhr.setRequestHeader('X-Upload-Content-Length', this.size.toString());
@@ -157,7 +159,7 @@ export class Uploader {
             this.statusType = 400;
             reject();
           } else {
-            this.URI = resolveUrl(location, this.options.endpoint);
+            this.URI = resolveUrl(location, this.endpoint);
             this.retry.reset();
             resolve();
           }
