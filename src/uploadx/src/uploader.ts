@@ -85,7 +85,8 @@ export class Uploader {
     this.metadata = {
       name: this.name,
       mimeType: this.mimeType,
-      size: this.size,
+      size: this.file.size,
+      lastModified: this.file.lastModified,
       ...unfunc(metadata || this.metadata, this.file)
     };
     this.chunkSize = this.options.chunkSize || this.chunkSize;
