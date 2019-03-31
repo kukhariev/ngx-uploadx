@@ -73,6 +73,13 @@ export class UploadxService {
   }
 
   /**
+   * Kill uploads
+   */
+  disconnect() {
+    this.queue.forEach(f => (f.status = 'paused'));
+    this.queue = [];
+  }
+  /**
    *
    * Create Uploader and add to the queue
    */
