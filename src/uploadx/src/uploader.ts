@@ -247,7 +247,7 @@ export class Uploader {
         //  next chunk
         this.retry.reset();
         this.sendChunk(offset);
-      } else if (this.statusType === 200 && this.response) {
+      } else if (this.statusType === 200) {
         this.progress = 100;
         this.status = 'complete';
       } else {
