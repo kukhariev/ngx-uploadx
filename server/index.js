@@ -38,7 +38,7 @@ function resetStorageBeforeTest(storage) {
   for (const id in files) {
     try {
       unlinkSync(files[id].path);
-    } catch {}
+    } catch (err) {}
   }
   storage.metaStore.clear();
 }
