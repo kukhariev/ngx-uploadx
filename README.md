@@ -19,7 +19,7 @@
   npm install ngx-uploadx
 ```
 
-- Import UploadxModule in the root module:
+- Import UploadxModule:
 
 ```ts
 //...
@@ -93,6 +93,7 @@ UploadxService
 ### Public Methods
 
 - init(options: _UploadxOptions_): _Observable\<UploadState\>_
+- connect(options: _UploadxOptions_): _Observable\<Uploader[]\>_
 
   > Set global module options
 
@@ -137,7 +138,12 @@ UploadxService
   ```
 
 - queue: Uploader[]
+
   > Uploaders array
+
+- events: _Observable\<UploadState\>_
+
+  > Uploadx Events
 
 ## Interfaces
 
@@ -152,7 +158,7 @@ UploadxService
 | **[headers]**          |     -      | _Custom headers_                         |
 | **[method]**           |   "POST"   | _Upload API initial method_              |
 | **[token]**            |     -      | _Auth Bearer token \/ token Getter_      |
-| **[endpoint]**         | "/upload/" | _API URL_                                |
+| **[endpoint]**         | "/upload" | _API URL_                                |
 | **[maxRetryAttempts]** |     3      | _Maximum number of retries to allow_     |
 | **[withCredentials]**  |   false    | _CORS option_                            |
 
