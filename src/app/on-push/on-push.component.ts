@@ -1,6 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { Uploader, UploadState, UploadxOptions, UploadxService } from '../../uploadx';
 import { AuthService } from '../auth.service';
@@ -10,20 +9,23 @@ import { AuthService } from '../auth.service';
   templateUrl: './on-push.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class OnPushComponent implements OnInit {
+export class OnPushComponent implements OnDestroy {
   state: Observable<UploadState>;
   uploads$: Observable<Uploader[]>;
   options: UploadxOptions = {
     url: `${environment.api}/upload?uploadType=uploadx`,
-    token: 'sometoken',
+    token: 'token',
     chunkSize: 1024 * 256 * 8
   };
-  constructor(private uploadService: UploadxService, private auth: AuthService) {}
-
-  ngOnInit() {
-    this.state = this.uploadService.init(this.options);
-    this.uploads$ = this.state.pipe(map(() => this.uploadService.queue));
+  constructor(private uploadService: UploadxService, private auth: AuthService) {
+    this.uploads$ = this.uploadService.connect(this.options);
+    this.state = this.uploadService.events;
   }
+
+  ngOnDestroy(): void {
+    this.uploadService.disconnect();
+  }
+
   cancelAll() {
     this.uploadService.control({ action: 'cancelAll' });
   }
