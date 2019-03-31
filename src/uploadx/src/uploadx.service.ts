@@ -60,6 +60,17 @@ export class UploadxService {
     this.autoUpload = !(options.autoUpload === false);
     return this.events;
   }
+  /**
+   * Set global options
+   *
+   */
+  connect(options: UploadxOptions): Observable<Uploader[]> {
+    this.queue = [];
+    this.options = options;
+    this.concurrency = options.concurrency || this.concurrency;
+    this.autoUpload = !(options.autoUpload === false);
+    return this.events.pipe(map(() => this.queue));
+  }
 
   /**
    *
