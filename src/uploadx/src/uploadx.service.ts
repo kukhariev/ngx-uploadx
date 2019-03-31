@@ -8,13 +8,17 @@ import {
   UploadEvent
 } from './interfaces';
 import { Uploader, UploaderOptions } from './uploader';
+import { map } from 'rxjs/operators';
 
 /**
  *
  */
 @Injectable({ providedIn: 'root' })
 export class UploadxService {
-  eventsStream: Subject<UploadState> = new Subject();
+  private eventsStream: Subject<UploadState> = new Subject();
+  get events() {
+    return this.eventsStream.asObservable();
+  }
   queue: Uploader[] = [];
   private concurrency = 2;
   private autoUpload = true;
@@ -28,7 +32,7 @@ export class UploadxService {
     return {
       method: this.options.method || 'POST',
       // tslint:disable-next-line: deprecation
-      endpoint: this.options.endpoint || this.options.url || '/upload/',
+      endpoint: this.options.endpoint || this.options.url || '/upload',
       headers: this.options.headers,
       metadata: this.options.metadata,
       token: this.options.token,
@@ -40,7 +44,7 @@ export class UploadxService {
   }
 
   constructor() {
-    this.eventsStream.subscribe((evt: UploadEvent) => {
+    this.events.subscribe((evt: UploadEvent) => {
       if (evt.status !== 'uploading' && evt.status !== 'added') {
         this.processQueue();
       }
@@ -54,7 +58,26 @@ export class UploadxService {
     this.options = options;
     this.concurrency = options.concurrency || this.concurrency;
     this.autoUpload = !(options.autoUpload === false);
-    return this.eventsStream.asObservable();
+    return this.events;
+  }
+  /**
+   * Set global options
+   *
+   */
+  connect(options: UploadxOptions): Observable<Uploader[]> {
+    this.queue = [];
+    this.options = options;
+    this.concurrency = options.concurrency || this.concurrency;
+    this.autoUpload = !(options.autoUpload === false);
+    return this.events.pipe(map(() => this.queue));
+  }
+
+  /**
+   * Kill uploads
+   */
+  disconnect() {
+    this.queue.forEach(f => (f.status = 'paused'));
+    this.queue = [];
   }
   /**
    *

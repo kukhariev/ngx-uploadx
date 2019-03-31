@@ -3,7 +3,7 @@ import { UploadxService } from './uploadx.service';
 const options = {
   concurrency: 3,
   allowedTypes: 'image/*,video/*',
-  endpoint: `http://localhost:3003/upload/?user_id=test`,
+  endpoint: `http://localhost:3003/upload?user_id=test`,
   token: 'iamtoken',
   autoUpload: false,
   chunkSize: 1024 * 256 * 8,
@@ -16,9 +16,15 @@ describe('UploadxService', () => {
     service = new UploadxService();
   });
 
-  it('#init should overwrite default options', () => {
+  it('#init() should overwrite default options', () => {
     service.init(options);
-    expect(service.uploaderOptions.endpoint).toEqual(`http://localhost:3003/upload/?user_id=test`);
+    expect(service.uploaderOptions.endpoint).toEqual(`http://localhost:3003/upload?user_id=test`);
+    expect(service.uploaderOptions.token).toEqual('iamtoken');
+    expect(service.uploaderOptions.chunkSize).toEqual(1024 * 256 * 8);
+  });
+  it('#connect() should overwrite default options', () => {
+    service.connect(options);
+    expect(service.uploaderOptions.endpoint).toEqual(`http://localhost:3003/upload?user_id=test`);
     expect(service.uploaderOptions.token).toEqual('iamtoken');
     expect(service.uploaderOptions.chunkSize).toEqual(1024 * 256 * 8);
   });
