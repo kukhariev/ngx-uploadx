@@ -75,92 +75,120 @@ export class AppHomeComponent {
 
 ### Selector
 
-\[uploadx\]
+#### \[uploadx\]
 
 ### inputs
 
-- \[uploadx\]: _UploadxOptions_
-- \[uploadxAction\]: _UploadxControlEvent_
+#### \[uploadx\]: _UploadxOptions_
+
+#### \[uploadxAction\]: _UploadxControlEvent_
 
 ### Output
 
-- (uploadxState): \$event _\<Observable\>UploadState_
+#### (uploadxState): \$event _\<Observable\>UploadState_
 
 ## Service
 
-UploadxService
+### UploadxService
 
 ### Public Methods
 
-- init(options: _UploadxOptions_): _Observable\<UploadState\>_
-- connect(options: _UploadxOptions_): _Observable\<Uploader[]\>_
+#### init(options: _UploadxOptions_): _Observable\<UploadState\>_
 
-  > Set global module options
+> Set global module options
 
-  ```ts
-  // example:
-  uploadxOptions: UploadxOptions = {
-    concurrency: 2,
+```ts
+// example:
+uploadxOptions: UploadxOptions = {
+  concurrency: 2,
+  endpoint: `${environment.api}/upload?uploadType=uploadx`,
+  token:  () => {
+    return localStorage.getItem('access_token');
+  },
+  autoUpload: true,
+  chunkSize: 1024 * 256 * 8
+};
+ngOnInit() {
+  this.uploadService.init(this.uploadxOptions)
+    .subscribe((item: UploadState) => {
+      console.log(item);
+      //...
+    }
+}
+```
+
+#### connect(options: _UploadxOptions_): _Observable\<Uploader[]\>_
+
+> Set global module options
+
+```ts
+// example:
+@Component({
+  template: `
+    <input type="file" uploadx">
+    <div *ngFor="let item of uploads$ | async">{{item.name}}</div>
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class UploadsComponent {
+  uploads$: Observable<Uploader[]>;
+  options: UploadxOptions = {
     endpoint: `${environment.api}/upload?uploadType=uploadx`,
-    token:  () => {
-      return localStorage.getItem('access_token');
-    },
-    autoUpload: true,
-    chunkSize: 1024 * 256 * 8
-  };
-  ngOnInit() {
-    this.uploadService.init(this.uploadxOptions)
-      .subscribe((item: UploadState) => {
-        console.log(item);
-        //...
-      }
+    token:  () => localStorage.getItem('access_token'),
   }
-  ```
-
-- handleFile(file: File): _\<void\>_
-
-  > Create Uploader for the file and add to the queue
-
-- handleFileList(fileList: _FileList_): _\<void\>_
-
-  > Add files to the upload queue
-
-- control(event: _UploadxControlEvent_): _void_
-
-  > Send event
-
-  ```ts
-  // example:
-
-  pause(uploadId: string) {
-    this.uploadService.control({ action: 'pause', uploadId });
+  constructor(private uploadService: UploadxService) {
+    this.uploads$ = this.uploadService.connect(this.options);
   }
-  ```
+```
+#### disconnect(): _\<void\>_
 
-- queue: Uploader[]
+> Abort all uploads
 
-  > Uploaders array
+#### handleFile(file: File): _\<void\>_
 
-- events: _Observable\<UploadState\>_
+> Create Uploader for the file and add to the queue
 
-  > Uploadx Events
+#### handleFileList(fileList: _FileList_): _\<void\>_
+
+> Add files to the upload queue
+
+#### control(event: _UploadxControlEvent_): _void_
+
+> Send event
+
+```ts
+// example:
+
+pause(uploadId: string) {
+  this.uploadService.control({ action: 'pause', uploadId });
+}
+```
+
+### Public props
+
+#### queue: Uploader[]
+
+> Uploaders array
+
+#### events: _Observable\<UploadState\>_
+
+> Uploadx Events
 
 ## Interfaces
 
 ### UploadxOptions
 
-| Name                   | Defaults?  | Description                              |
-| ---------------------- | :--------: | ---------------------------------------- |
-| **[allowedTypes]**     |     -      | _Set "accept" attribute_                 |
-| **[autoUpload]**       |    true    | _Auto upload with global options_        |
-| **[chunkSize]**        |    1MiB    | _If set to > 0 use chunked upload_       |
-| **[concurrency]**      |     2      | _Limit the number of concurrent uploads_ |
-| **[headers]**          |     -      | _Custom headers_                         |
-| **[method]**           |   "POST"   | _Upload API initial method_              |
-| **[token]**            |     -      | _Auth Bearer token \/ token Getter_      |
+| Name                   | Defaults? | Description                              |
+| ---------------------- | :-------: | ---------------------------------------- |
+| **[allowedTypes]**     |     -     | _Set "accept" attribute_                 |
+| **[autoUpload]**       |   true    | _Auto upload with global options_        |
+| **[chunkSize]**        |   1MiB    | _If set to > 0 use chunked upload_       |
+| **[concurrency]**      |     2     | _Limit the number of concurrent uploads_ |
+| **[headers]**          |     -     | _Custom headers_                         |
+| **[method]**           |  "POST"   | _Upload API initial method_              |
+| **[token]**            |     -     | _Auth Bearer token \/ token Getter_      |
 | **[endpoint]**         | "/upload" | _API URL_                                |
-| **[maxRetryAttempts]** |     3      | _Maximum number of retries to allow_     |
-| **[withCredentials]**  |   false    | _CORS option_                            |
+| **[maxRetryAttempts]** |     3     | _Maximum number of retries to allow_     |
 
 ### _\<Observable\>_ UploadState
 
@@ -189,6 +217,7 @@ UploadxService
 | **[URI]**      |          _string_           | _Item URL_                          |
 | **[headers]**  | _{ [key: string]: string }_ | _Add custom headers_                |
 | **[metadata]** |            _any_            | _Add custom data_                   |
+| **[endpoint]**  |           string           | _Custom url_                   |
 
 ### UploadxControlEvent
 
