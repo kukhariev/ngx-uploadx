@@ -140,6 +140,7 @@ export class UploadsComponent {
     this.uploads$ = this.uploadService.connect(this.options);
   }
 ```
+
 #### disconnect(): _\<void\>_
 
 > Abort all uploads
@@ -217,7 +218,7 @@ pause(uploadId: string) {
 | **[URI]**      |          _string_           | _Item URL_                          |
 | **[headers]**  | _{ [key: string]: string }_ | _Add custom headers_                |
 | **[metadata]** |            _any_            | _Add custom data_                   |
-| **[endpoint]**  |           string           | _Custom url_                   |
+| **[endpoint]** |           string            | _Custom url_                        |
 
 ### UploadxControlEvent
 
