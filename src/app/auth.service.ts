@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { of } from 'rxjs';
+import { delay } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -6,6 +8,11 @@ import { Injectable } from '@angular/core';
 export class AuthService {
   constructor() {
     localStorage.setItem('token', `token-${new Date().getSeconds()}`);
+  }
+  refresh() {
+    const token = `token-${new Date().getSeconds()}`;
+    localStorage.setItem('token', token);
+    return of(token).pipe(delay(100));
   }
 }
 
