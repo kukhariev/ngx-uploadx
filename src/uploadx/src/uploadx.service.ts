@@ -125,7 +125,7 @@ export class UploadxService {
         this.queue.forEach(f => (f.status = 'paused'));
         break;
       case 'refreshToken':
-        this.queue.forEach(f => (f.options.token = event.token));
+        this.queue.forEach(f => f.refreshToken(event.token));
         break;
       case 'uploadAll':
         this.queue.filter(f => f.status !== 'uploading').forEach(f => (f.status = 'queue'));
