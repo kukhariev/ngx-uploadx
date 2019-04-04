@@ -13,7 +13,7 @@ const uploads = new Uploadx({ storage });
 uploads.on('error', console.error);
 const server = http.createServer((req, res) => {
   if (DEV && Math.random() < 0.1) {
-    res.writeHead(401, { 'Content-Type': 'text/plan' });
+    res.writeHead(401, { 'Content-Type': 'text/plan', 'Access-Control-Allow-Origin': '*' });
     res.end('Unauthorized');
     return;
   }
