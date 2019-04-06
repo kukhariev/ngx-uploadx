@@ -51,10 +51,10 @@ export class UploadxService {
 
       // Remove Cancelled Items from local queue
       if (evt.status === 'cancelled') {
-        let uploader: Uploader = this.queue.find(f => f.uploadId === evt.uploadId);
+        const uploader: Uploader = this.queue.find(f => f.uploadId === evt.uploadId);
 
         if (uploader !== null) {
-          let uploaderIndex: number = this.queue.indexOf(uploader);
+          const uploaderIndex: number = this.queue.indexOf(uploader);
           if (uploaderIndex >= 0) {
             this.queue.splice(uploaderIndex, 1);
           }
