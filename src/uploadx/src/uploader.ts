@@ -45,7 +45,8 @@ export class Uploader {
   private stateChange: (evt: UploadState) => void;
 
   set status(s: UploadStatus) {
-    if (this._status === 'cancelled' || this._status === 'complete') {
+    // Return if State is cancelled or complete (but allow cancel of an complete upload to remove from list and from server)
+    if (this._status === 'cancelled' || (this._status === 'complete' && s !== 'cancelled')) {
       return;
     }
     if (s !== this._status) {
