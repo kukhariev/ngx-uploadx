@@ -1,8 +1,20 @@
-<div class="header">
-  <h4>ngx-uploadx</h4>
-  <a routerLink="/directive-way">directive-way</a>
-  <a routerLink="/service-way">service-way</a>
-  <a routerLink="/service-code-way">service-code-way</a>
-  <a routerLink="/on-push">on-push</a>
-</div>
+<header class="header">
+  <nav class="site-nav">
+    <a href="#" class="logo">ngx-uploadx</a>
+    <ul>
+      <li>
+        <a routerLink="/directive-way" routerLinkActive="active">directive</a>
+      </li>
+      <li>
+        <a routerLink="/service-way" routerLinkActive="active">mixed</a>
+      </li>
+      <li>
+        <a routerLink="/service-code-way" routerLinkActive="active">service</a>
+      </li>
+      <li>
+        <a routerLink="/on-push" routerLinkActive="active">on-push</a>
+      </li>
+    </ul>
+  </nav>
+</header>
 <router-outlet></router-outlet>

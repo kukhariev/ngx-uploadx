@@ -1,5 +1,6 @@
 // @ts-check
 const DEV = process.env.NODE_ENV === 'development';
+const PORT = 3003;
 const http = require('http');
 const url = require('url');
 const { unlinkSync } = require('fs');
@@ -12,7 +13,7 @@ DEV && resetStorageBeforeTest(storage);
 const uploads = new Uploadx({ storage });
 uploads.on('error', console.error);
 const server = http.createServer((req, res) => {
-  if (DEV && Math.random() < 0.1) {
+  if (DEV && Math.random() < 0.1 && req.method !== 'OPTIONS') {
     res.writeHead(401, { 'Content-Type': 'text/plan', 'Access-Control-Allow-Origin': '*' });
     res.end('Unauthorized');
     return;
@@ -26,11 +27,11 @@ const server = http.createServer((req, res) => {
   }
 });
 
-server.listen(3003, error => {
+server.listen(PORT, error => {
   if (error) {
     return console.error('something bad happened', error);
   }
-  console.log('listening on port:', server.address()['port']);
+  DEV && console.log('listening on port:', PORT);
 });
 
 function resetStorageBeforeTest(storage) {

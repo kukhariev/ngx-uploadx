@@ -48,18 +48,6 @@ export class UploadxService {
       if (evt.status !== 'uploading' && evt.status !== 'added') {
         this.processQueue();
       }
-
-      // Remove Cancelled Items from local queue
-      if (evt.status === 'cancelled') {
-        const uploader: Uploader = this.queue.find(f => f.uploadId === evt.uploadId);
-
-        if (uploader !== null) {
-          const uploaderIndex: number = this.queue.indexOf(uploader);
-          if (uploaderIndex >= 0) {
-            this.queue.splice(uploaderIndex, 1);
-          }
-        }
-      }
     });
   }
   /**
@@ -163,6 +151,9 @@ export class UploadxService {
    * Queue management
    */
   private processQueue() {
+    // Remove Cancelled Items from local queue
+    this.queue = this.queue.filter(f => f.status !== 'cancelled');
+
     const running = this.runningProcess();
 
     this.queue
