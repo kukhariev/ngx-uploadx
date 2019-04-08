@@ -52,7 +52,7 @@ body {
   flex-flow: row;
 }
 
-.header {
+header {
   color: $light;
   .active {
     font-weight: bold;
@@ -68,7 +68,7 @@ body {
     margin: auto 0;
     font-weight: bold;
   }
-  .site-nav {
+  nav {
     display: flex;
     flex-direction: row;
     ul {
