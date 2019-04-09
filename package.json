@@ -17,10 +17,10 @@
   "scripts": {
     "prettier": "prettier --write \"**/*.{ts,tsx}\"",
     "start": "ng serve",
-    "start:exp": "ng serve --host=0.0.0.0",
     "build:app": "ng build",
     "test:watch": "ng test",
-    "test": "ng test --watch=false",
+    "test:coverage": "ng test --codeCoverage=true --progress=false",
+    "test": "ng test --watch=false --progress=false",
     "lint": "ng lint",
     "e2e": "concurrently --kill-others -s \"first\" \"npm run server\" \"ng e2e\"",
     "server": "node ./server/index.js",
