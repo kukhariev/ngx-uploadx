@@ -5,7 +5,7 @@
  */
 
 import { resolveUrl } from './resolve_url';
-import { BackoffRetry } from './backoffRetry';
+import { BackoffRetry } from './backoff_retry';
 import { UploadStatus, UploadItem, UploadState } from './interfaces';
 
 /**

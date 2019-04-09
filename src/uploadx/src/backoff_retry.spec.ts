@@ -1,4 +1,4 @@
-import { BackoffRetry } from './backoffRetry';
+import { BackoffRetry } from './backoff_retry';
 
 describe('BackoffRetry', function() {
   describe('constructor', function() {
