@@ -64,8 +64,8 @@ export class UploadxService {
    * @param options global options
    * @returns Observable that emits the current queue
    */
-  connect(options: UploadxOptions): Observable<Uploader[]> {
-    return this.init(options).pipe(
+  connect(options?: UploadxOptions): Observable<Uploader[]> {
+    return this.init(options || this.options).pipe(
       startWith(0),
       map(() => this.queue)
     );
