@@ -101,10 +101,8 @@ export class AppHomeComponent {
 // example:
 uploadxOptions: UploadxOptions = {
   concurrency: 2,
-  endpoint: `${environment.api}/upload?uploadType=uploadx`,
-  token:  () => {
-    return localStorage.getItem('access_token');
-  },
+  endpoint: `${environment.api}/upload`,
+  token:  () => localStorage.getItem('access_token'),
   autoUpload: true,
   chunkSize: 1024 * 256 * 8
 };
@@ -119,7 +117,7 @@ ngOnInit() {
 
 #### connect(options?: _UploadxOptions_): _Observable\<Uploader[]\>_
 
-> Initializes service. Observable that emits the current queue
+> Initializes service. Returns Observable that emits the current queue
 
 ```ts
 // example:
@@ -179,17 +177,17 @@ pause(uploadId: string) {
 
 ### UploadxOptions
 
-| Name                   | Defaults? | Description                              |
-| ---------------------- | :-------: | ---------------------------------------- |
-| **[allowedTypes]**     |     -     | _Set "accept" attribute_                 |
-| **[autoUpload]**       |   true    | _Auto upload with global options_        |
-| **[chunkSize]**        |   1MiB    | _If set to > 0 use chunked upload_       |
-| **[concurrency]**      |     2     | _Limit the number of concurrent uploads_ |
-| **[headers]**          |     -     | _Custom headers_                         |
-| **[method]**           |  "POST"   | _Upload API initial method_              |
-| **[token]**            |     -     | _Auth Bearer token \/ token Getter_      |
-| **[endpoint]**         | "/upload" | _API URL_                                |
-| **[maxRetryAttempts]** |     3     | _Maximum number of retries to allow_     |
+| Name                   | Defaults? | Description                                                |
+| ---------------------- | :-------: | ---------------------------------------------------------- |
+| **[allowedTypes]**     |     -     | _Set "accept" attribute_                                   |
+| **[autoUpload]**       |   true    | _Auto upload with global options_                          |
+| **[chunkSize]**        |   1MiB    | _If set to > 0 use chunked upload_                         |
+| **[concurrency]**      |     2     | _Limit the number of concurrent uploads_                   |
+| **[headers]**          |     -     | _Custom headers_                                           |
+| **[method]**           |  "POST"   | _Upload API initial method_                                |
+| **[token]**            |     -     | _Auth Bearer token \/ token Getter_                        |
+| **[endpoint]**         | "/upload" | _API URL_                                                  |
+| **[maxRetryAttempts]** |     3     | _Maximum number of retries to allow (client errors (4xx))_ |
 
 ### _\<Observable\>_ UploadState
 
