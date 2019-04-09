@@ -8,14 +8,11 @@ import {
   UploadEvent
 } from './interfaces';
 import { Uploader, UploaderOptions } from './uploader';
-import { map } from 'rxjs/operators';
+import { map, startWith } from 'rxjs/operators';
 
-/**
- *
- */
 @Injectable({ providedIn: 'root' })
 export class UploadxService {
-  private eventsStream: Subject<UploadState> = new Subject();
+  private readonly eventsStream: Subject<UploadState> = new Subject();
   get events() {
     return this.eventsStream.asObservable();
   }
@@ -28,6 +25,7 @@ export class UploadxService {
       this.eventsStream.next(evt);
     });
   };
+
   get uploaderOptions(): UploaderOptions {
     return {
       method: this.options.method || 'POST',
@@ -51,36 +49,36 @@ export class UploadxService {
     });
   }
   /**
-   * Set global options
+   * Initializes service
+   * @param options global options
+   * @returns Observable that emits a new value on progress or status changes
    */
   init(options: UploadxOptions): Observable<UploadState> {
-    this.queue = [];
     this.options = options;
     this.concurrency = options.concurrency || this.concurrency;
     this.autoUpload = !(options.autoUpload === false);
     return this.events;
   }
   /**
-   * Set global options
-   *
+   * Initializes service
+   * @param options global options
+   * @returns Observable that emits the current queue
    */
   connect(options: UploadxOptions): Observable<Uploader[]> {
-    this.queue = [];
-    this.options = options;
-    this.concurrency = options.concurrency || this.concurrency;
-    this.autoUpload = !(options.autoUpload === false);
-    return this.events.pipe(map(() => this.queue));
+    return this.init(options).pipe(
+      startWith(0),
+      map(() => this.queue)
+    );
   }
 
   /**
-   * Kill uploads
+   * Terminate all uploads and clears the queue
    */
   disconnect() {
     this.queue.forEach(f => (f.status = 'paused'));
     this.queue = [];
   }
   /**
-   *
    * Create Uploader and add to the queue
    */
   handleFileList(fileList: FileList) {
@@ -92,20 +90,19 @@ export class UploadxService {
     this.autoUploadFiles();
   }
   /**
-   *
    * Create Uploader for the file and add to the queue
    */
-  handleFile(file: File) {
+  handleFile(file: File): void {
     const uploader: Uploader = new Uploader(file, this.uploaderOptions);
     this.queue.push(uploader);
     uploader.status = 'added';
     this.autoUploadFiles();
   }
   /**
-   *
    * Auto upload the files if the flag is true
+   * @internal
    */
-  private autoUploadFiles() {
+  private autoUploadFiles(): void {
     if (this.autoUpload) {
       this.queue.filter(f => f.status === 'added').forEach(f => (f.status = 'queue'));
     }
@@ -116,7 +113,7 @@ export class UploadxService {
    * this.uploadService.control({ action: 'pauseAll' });
    *
    */
-  control(event: UploadxControlEvent) {
+  control(event: UploadxControlEvent): void {
     switch (event.action) {
       case 'cancelAll':
         this.queue.forEach(f => (f.status = 'cancelled'));
@@ -149,6 +146,7 @@ export class UploadxService {
 
   /**
    * Queue management
+   * @internal
    */
   private processQueue() {
     // Remove Cancelled Items from local queue
@@ -163,7 +161,9 @@ export class UploadxService {
         uploader.upload();
       });
   }
-
+  /**
+   * @returns  number of active uploads
+   */
   runningProcess(): number {
     return this.queue.filter(
       (uploader: Uploader) => uploader.status === 'uploading' || uploader.status === 'retry'
