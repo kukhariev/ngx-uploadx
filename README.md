@@ -11,7 +11,7 @@
 - Retries using exponential back-off strategy
 - Chunking
 
-## Setups
+## Setup
 
 - Add ngx-uploadx module as dependency :
 
@@ -95,7 +95,7 @@ export class AppHomeComponent {
 
 #### init(options: _UploadxOptions_): _Observable\<UploadState\>_
 
-> Set global module options
+> Initializes service. Returns Observable that emits a new value on progress or status changes
 
 ```ts
 // example:
@@ -117,9 +117,9 @@ ngOnInit() {
 }
 ```
 
-#### connect(options: _UploadxOptions_): _Observable\<Uploader[]\>_
+#### connect(options?: _UploadxOptions_): _Observable\<Uploader[]\>_
 
-> Set global module options
+> Initializes service. Observable that emits the current queue
 
 ```ts
 // example:
@@ -143,7 +143,7 @@ export class UploadsComponent {
 
 #### disconnect(): _\<void\>_
 
-> Abort all uploads
+> Terminate all uploads and clears the queue
 
 #### handleFile(file: File): _\<void\>_
 
