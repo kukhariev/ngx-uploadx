@@ -23,9 +23,7 @@ export class DirectiveWayComponent implements OnDestroy {
       concurrency: 2,
       allowedTypes: 'image/*,video/*',
       url: `${environment.api}/upload?uploadType=uploadx`,
-      token: () => {
-        return 'sometoken';
-      },
+      token: () => 'someone',
       metadata: (f: File) => ({ title: f.name }),
       autoUpload: true,
       withCredentials: false,
