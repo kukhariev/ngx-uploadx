@@ -19,7 +19,7 @@ describe('resolveUrl', () => {
     expect(resolved).toBe('http://www.example.com/files?upload_id=12345');
   });
 });
-describe('polyfill', function() {
+describe('resolveUrl:polyfill', function() {
   it('relative', () => {
     window.URL = undefined;
     const resolved = resolveUrl(rel, base);
