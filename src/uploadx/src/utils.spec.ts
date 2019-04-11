@@ -1,4 +1,4 @@
-import { resolveUrl } from './resolve_url';
+import { resolveUrl } from './utils';
 const _URL = window.URL;
 const base = 'http://www.example.com/upload';
 const rel = '/upload?upload_id=12345';
