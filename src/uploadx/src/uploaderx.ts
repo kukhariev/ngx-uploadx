@@ -5,7 +5,7 @@
  */
 
 import { resolveUrl } from './utils';
-import { Uploader } from './base_uploader';
+import { Uploader } from './uploader';
 import { UploadStatus, UploadItem, UploadState, UploadxOptions } from './interfaces';
 
 /**

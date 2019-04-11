@@ -25,11 +25,13 @@ export abstract class Uploader {
   token: string | (() => string);
   protected _token: string;
   status: string;
-  protected constructor(readonly file: File) {
+
+  constructor(readonly file: File) {
     this.name = file.name;
     this.size = file.size;
     this.mimeType = file.type || 'application/octet-stream';
   }
+
   abstract upload(item?: UploadItem | undefined): Promise<void>;
 
   refreshToken(token?: any): void {

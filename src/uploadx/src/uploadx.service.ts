@@ -8,7 +8,7 @@ import {
   UploadEvent
 } from './interfaces';
 import { UploaderX } from './uploaderx';
-import { Uploader } from './base_uploader';
+import { Uploader } from './uploader';
 import { map, startWith } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
