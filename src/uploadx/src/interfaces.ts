@@ -58,12 +58,12 @@ export interface UploadItem {
   readonly uploadId?: string;
   /**
    * Upload API URL
-   * @defaultValue '/upload/'
+   * @defaultValue '/upload'
    */
   endpoint?: string;
   /**
    * Upload API URL
-   * @defaultValue '/upload/'
+   * @defaultValue '/upload'
    * @deprecated Use {@link UploadItem.endpoint} instead.
    */
   url?: string;
@@ -74,7 +74,15 @@ export interface UploadItem {
   /**
    * Upload meta
    * @defaultValue
-   * { name: File.Filename, mimeType: File.type }
+   *
+  ```ts
+   {
+    name: File.Filename,
+    mimeType: File.type,
+    size: File.size,
+    lastModified: File.lastModified
+   }
+  ```
    */
   metadata?: { [key: string]: any } | ((file?: File) => { [key: string]: any });
   /**
@@ -85,66 +93,12 @@ export interface UploadItem {
 /**
  * Global Options
  */
-export class UploadxOptions {
-  /**
-   *  Set "accept" attribute
-   * @example
-   * allowedTypes: 'image/*, video/*'
-   */
-  allowedTypes?: string;
-  /**
-   * Auto upload with global options
-   * @defaultValue true
-   */
-  autoUpload?: boolean;
-  /**
-   * If set use chunks for upload
-   * @defaultValue 0
-   */
-  chunkSize?: number;
-  /**
-   * Uploads in parallel
-   * @defaultValue 2
-   */
-  concurrency?: number;
-  /**
-   * Custom headers
-   */
-  headers?: { [key: string]: string } | ((file?: File) => { [key: string]: string });
-  /**
-   * Upload API initial method
-   * @defaultValue 'POST'
-   */
-  method?: string;
-  /**
-   * Upload meta
-   * @defaultValue
-   * { name: File.Filename, mimeType: File.type }
-   */
-  metadata?: { [key: string]: any } | ((file?: File) => { [key: string]: any });
-  /**
-   * Authorization Bearer token
-   */
-  token?: string | (() => string);
-  /**
-   * Upload API URL
-   * @defaultValue '/upload/'
-   */
-  endpoint?: string;
-  /**
-   * Upload API URL
-   * @defaultValue '/upload/'
-   * @deprecated Use {@link UploadxOptions.endpoint} instead.
-   */
-  url?: string;
-  /**
-   * Use withCredentials xhr option?
-   * @defaultValue false
-   */
-  withCredentials?: boolean;
-  /**
-   * Max status 4xx retries
-   * @defaultValue 3
-   */
+export interface UploadxOptions extends UploadItem {
   maxRetryAttempts?: number;
+  chunkSize?: number;
+  withCredentials?: boolean;
+  readonly stateChange?: any;
+  concurrency?: number;
+  autoUpload?: boolean;
+  allowedTypes?: any;
 }
