@@ -4,4 +4,4 @@ export { UploadxOptions, UploadxControlEvent, UploadState, UploadItem } from './
 
 export { UploadxService } from './uploadx.service';
 
-export { Uploader } from './uploader';
+export { Uploader } from './base_uploader';

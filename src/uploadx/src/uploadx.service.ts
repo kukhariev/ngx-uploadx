@@ -7,11 +7,13 @@ import {
   UploadxOptions,
   UploadEvent
 } from './interfaces';
-import { Uploader, UploaderOptions } from './uploader';
+import { UploaderX } from './uploaderx';
+import { Uploader } from './base_uploader';
 import { map, startWith } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class UploadxService {
+  private UploaderClass = UploaderX;
   private readonly eventsStream: Subject<UploadState> = new Subject();
   get events() {
     return this.eventsStream.asObservable();
@@ -26,11 +28,11 @@ export class UploadxService {
     });
   };
 
-  get uploaderOptions(): UploaderOptions {
+  get uploaderOptions(): UploadxOptions {
     return {
       method: this.options.method || 'POST',
       // tslint:disable-next-line: deprecation
-      endpoint: this.options.endpoint || this.options.url || '/upload',
+      endpoint: this.options.endpoint || this.options.url,
       headers: this.options.headers,
       metadata: this.options.metadata,
       token: this.options.token,
@@ -83,7 +85,7 @@ export class UploadxService {
    */
   handleFileList(fileList: FileList) {
     for (let i = 0; i < fileList.length; i++) {
-      const uploader: Uploader = new Uploader(fileList.item(i), this.uploaderOptions);
+      const uploader = new this.UploaderClass(fileList.item(i), this.uploaderOptions);
       this.queue.push(uploader);
       uploader.status = 'added';
     }
@@ -93,7 +95,7 @@ export class UploadxService {
    * Create Uploader for the file and add to the queue
    */
   handleFile(file: File): void {
-    const uploader: Uploader = new Uploader(file, this.uploaderOptions);
+    const uploader = new UploaderX(file, this.uploaderOptions);
     this.queue.push(uploader);
     uploader.status = 'added';
     this.autoUploadFiles();

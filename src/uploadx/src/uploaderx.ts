@@ -4,44 +4,20 @@
  * https://developers.google.com/drive/v3/web/resumable-upload
  */
 
-import { resolveUrl } from './resolve_url';
-import { BackoffRetry } from './backoff_retry';
-import { UploadStatus, UploadItem, UploadState } from './interfaces';
+import { resolveUrl } from './utils';
+import { Uploader } from './base_uploader';
+import { UploadStatus, UploadItem, UploadState, UploadxOptions } from './interfaces';
 
 /**
  *
  */
-export interface UploaderOptions extends UploadItem {
-  maxRetryAttempts: number;
-  chunkSize?: number;
-  withCredentials?: boolean;
-  readonly stateChange?: any;
-}
+
 const noop = () => {};
 
-export class Uploader {
-  headers: { [key: string]: string } | null;
-  metadata: { [key: string]: any };
-  endpoint: string;
+export class UploaderX extends Uploader {
   private _status: UploadStatus;
-  private retry = new BackoffRetry();
-  private startTime: number;
-  progress: number;
-  readonly mimeType: string;
-  readonly name: string;
-  readonly size: number;
-  readonly uploadId: string;
-  remaining: number;
-  response: any;
-  responseStatus: number;
-  speed: number;
-  URI: string;
-  token: string | (() => string);
-  private statusType: number;
-  private _token: string;
   private _xhr_: XMLHttpRequest;
-  private chunkSize = 1_048_576;
-  private maxRetryAttempts = 3;
+  chunkSize = 1_048_576;
   private stateChange: (evt: UploadState) => void;
 
   set status(s: UploadStatus) {
@@ -68,34 +44,10 @@ export class Uploader {
   /**
    * Creates an instance of Uploader.
    */
-  constructor(private readonly file: File, public options: UploaderOptions) {
-    this.uploadId = Math.random()
-      .toString(36)
-      .substring(2, 15);
-    this.name = file.name;
-    this.size = file.size;
-    this.mimeType = file.type || 'application/octet-stream';
+  constructor(readonly file: File, public options: UploadxOptions) {
+    super(file);
     this.stateChange = options.stateChange || noop;
     this.configure(options);
-  }
-
-  /**
-   * configure or reconfigure uploader
-   */
-  configure(item = {} as UploadItem): void {
-    const { metadata, headers, token, endpoint } = item;
-    this.metadata = {
-      name: this.name,
-      mimeType: this.mimeType,
-      size: this.file.size,
-      lastModified: this.file.lastModified,
-      ...unfunc(metadata || this.metadata, this.file)
-    };
-    this.endpoint = endpoint || this.options.endpoint;
-    this.chunkSize = this.options.chunkSize || this.chunkSize;
-    this.maxRetryAttempts = this.options.maxRetryAttempts || this.maxRetryAttempts;
-    this.refreshToken(token);
-    this.headers = { ...this.headers, ...unfunc(headers, this.file) };
   }
 
   /**
@@ -119,29 +71,6 @@ export class Uploader {
     this.stateChange(state);
   }
 
-  private processResponse(xhr: XMLHttpRequest): void {
-    this.responseStatus = xhr.status;
-    this.response = parseJson(xhr);
-    this.statusType = xhr.status - (xhr.status % 100);
-  }
-
-  refreshToken(token?: any): void {
-    this.token = token || this.token;
-    this._token = unfunc(this.token);
-  }
-
-  private maxAttemptsReached(): boolean | never {
-    if (this.retry.retryAttempts === this.maxRetryAttempts && this.statusType === 400) {
-      this.retry.reset();
-      console.error(
-        `Error: Maximum number of retry attempts reached:
-          file: ${this.name},
-          statusCode: ${this.responseStatus}`
-      );
-      return true;
-    }
-  }
-
   private create(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.URI || this.responseStatus === 404) {
@@ -154,7 +83,7 @@ export class Uploader {
         xhr.setRequestHeader('X-Upload-Content-Type', this.mimeType);
         xhr.onload = () => {
           this.processResponse(xhr);
-          const location = this.statusType === 200 && getKeyFromResponse(xhr, 'location');
+          const location = this.statusType === 200 && this.getKeyFromResponse(xhr, 'location');
           if (!location) {
             // limit attempts
             this.statusType = 400;
@@ -188,7 +117,7 @@ export class Uploader {
       this.startTime = new Date().getTime();
       this.sendChunk(this.progress ? undefined : 0);
     } catch (e) {
-      if (this.maxAttemptsReached()) {
+      if (this.isMaxAttemptsReached()) {
         this.status = 'error';
       } else {
         this.status = 'retry';
@@ -200,8 +129,9 @@ export class Uploader {
 
   /**
    * Chunk upload +/ get offset
+   * @internal
    */
-  private sendChunk(offset?: number): void {
+  sendChunk(offset?: number): void {
     if (this.status === 'uploading') {
       let body = null;
       const xhr: XMLHttpRequest = new XMLHttpRequest();
@@ -223,7 +153,7 @@ export class Uploader {
 
   private setupEvents(xhr: XMLHttpRequest): void {
     const onError = async () => {
-      if (this.maxAttemptsReached()) {
+      if (this.isMaxAttemptsReached()) {
         this.status = 'error';
         return;
       }
@@ -273,26 +203,38 @@ export class Uploader {
   }
 
   private getNextChunkOffset(xhr: XMLHttpRequest) {
-    const str = getKeyFromResponse(xhr, 'Range');
+    const str = this.getKeyFromResponse(xhr, 'Range');
     const [match] = str && str.match(/(-1|\d+)$/g);
     return match && +match + 1;
   }
 
   private setupXHR(xhr: XMLHttpRequest) {
-    //reset response
     this.responseStatus = null;
     this.response = null;
     this.statusType = null;
-
     this._xhr_ = xhr;
-
     xhr.responseType = 'json';
     xhr.withCredentials = this.options.withCredentials;
     Object.keys(this.headers).forEach(key => xhr.setRequestHeader(key, this.headers[key]));
-    // tslint:disable-next-line: no-unused-expression
     this._token && xhr.setRequestHeader('Authorization', `Bearer ${this._token}`);
   }
-
+  processResponse(xhr: XMLHttpRequest): void {
+    this.responseStatus = xhr.status;
+    this.response = this.parseJson(xhr);
+    this.statusType = xhr.status - (xhr.status % 100);
+  }
+  getKeyFromResponse(xhr: XMLHttpRequest, key: string) {
+    const fromHeader = xhr.getResponseHeader(key);
+    if (fromHeader) {
+      return fromHeader;
+    }
+    const response = this.parseJson(xhr) || {};
+    const resKey = Object.keys(response).find(k => k.toLowerCase() === key.toLowerCase());
+    return response[resKey];
+  }
+  parseJson(xhr: XMLHttpRequest) {
+    return typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText || null);
+  }
   request(method: string, payload = null) {
     return new Promise((resolve, reject) => {
       const xhr: XMLHttpRequest = new XMLHttpRequest();
@@ -307,22 +249,4 @@ export class Uploader {
       xhr.send(body);
     });
   }
-}
-
-function getKeyFromResponse(xhr: XMLHttpRequest, key: string) {
-  const fromHeader = xhr.getResponseHeader(key);
-  if (fromHeader) {
-    return fromHeader;
-  }
-  const response = parseJson(xhr) || {};
-  const resKey = Object.keys(response).find(k => k.toLowerCase() === key.toLowerCase());
-  return response[resKey];
-}
-
-function parseJson(xhr: XMLHttpRequest) {
-  return typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText || null);
-}
-
-function unfunc<T>(value: T | ((file: File) => T), file?: File): T {
-  return value instanceof Function ? value(file) : value;
 }
