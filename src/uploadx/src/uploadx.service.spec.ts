@@ -79,10 +79,6 @@ describe('UploadxService', () => {
   });
 });
 
-function getFile() {
-  const blob = new Blob(['']);
-  blob['lastModifiedDate'] = '';
-  blob['name'] = 'filename.mp4';
-  const file = <File>blob;
-  return file;
+function getFile(): File {
+  return new File([''], 'filename.mp4');
 }
