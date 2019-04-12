@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 import {
+  UploadEvent,
   UploadState,
   UploadStatus,
   UploadxControlEvent,
-  UploadxOptions,
-  UploadEvent
+  UploadxOptions
 } from './interfaces';
-import { UploaderX } from './uploaderx';
 import { Uploader } from './uploader';
-import { map, startWith } from 'rxjs/operators';
+import { UploaderX } from './uploaderx';
 
 @Injectable({ providedIn: 'root' })
 export class UploadxService {
