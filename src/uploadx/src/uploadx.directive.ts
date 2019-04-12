@@ -1,16 +1,14 @@
 import {
   Directive,
   ElementRef,
-  Renderer2,
-  OnInit,
-  OnDestroy,
+  EventEmitter,
   Input,
+  OnDestroy,
+  OnInit,
   Output,
-  EventEmitter
+  Renderer2
 } from '@angular/core';
-import { Observable } from 'rxjs';
-
-import { UploadxOptions, UploadState, UploadxControlEvent } from './interfaces';
+import { UploadxControlEvent, UploadxOptions } from './interfaces';
 import { UploadxService } from './uploadx.service';
 
 @Directive({
@@ -45,7 +43,7 @@ export class UploadxDirective implements OnInit, OnDestroy {
       }
       this.uploadService.init(this.uploadx);
     }
-    this.uploadxState.emit(<Observable<UploadState>>this.uploadService.events);
+    this.uploadxState.emit(this.uploadService.events);
     this.listenerFn = this.renderer.listen(
       this.elementRef.nativeElement,
       'change',

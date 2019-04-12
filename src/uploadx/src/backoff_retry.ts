@@ -15,7 +15,7 @@ export class BackoffRetry {
   }
   /**
    * Delay Retry
-   * @param code
+   * @param code xhr status code
    * @returns retryAttempts
    */
   wait(code?: number): Promise<number> {
