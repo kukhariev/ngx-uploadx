@@ -56,9 +56,7 @@ export class UploadxService {
    * @returns Observable that emits a new value on progress or status changes
    */
   init(options: UploadxOptions): Observable<UploadState> {
-    this.options = options;
-    this.concurrency = options.concurrency || this.concurrency;
-    this.autoUpload = !(options.autoUpload === false);
+    this.options = { ...this.options, ...options };
     return this.events;
   }
   /**

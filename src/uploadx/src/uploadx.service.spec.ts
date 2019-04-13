@@ -16,8 +16,21 @@ describe('UploadxService', () => {
     service = new UploadxService();
   });
 
+  it('should set default options', () => {
+    service.init({});
+    expect(service.uploaderOptions.concurrency).toEqual(2);
+    expect(service.uploaderOptions.autoUpload).toEqual(true);
+  });
   it('should overwrite default options', () => {
     service.init(options);
+    expect(service.uploaderOptions.endpoint).toEqual(`http://localhost:3003/upload?user_id=test`);
+    expect(service.uploaderOptions.token).toEqual('%token%');
+    expect(service.uploaderOptions.chunkSize).toEqual(4096);
+  });
+  it('should keep the settings', () => {
+    service.init(options);
+    service.init({});
+    service.connect();
     expect(service.uploaderOptions.endpoint).toEqual(`http://localhost:3003/upload?user_id=test`);
     expect(service.uploaderOptions.token).toEqual('%token%');
     expect(service.uploaderOptions.chunkSize).toEqual(4096);
@@ -67,6 +80,8 @@ describe('UploadxService', () => {
     service.control({ ...upload, action: 'cancel' });
     service.control({ action: 'cancelAll' });
     service.control({ action: '???' as UploadAction });
+    expect(service.queue[0].status).toEqual('cancelled');
+    service.control({ action: 'uploadAll' });
     expect(service.queue[0].status).toEqual('cancelled');
   });
 
