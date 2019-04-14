@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ngx-uploadx": {
+    "app-uploadx": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -37,35 +37,24 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ]
-            },
-            "nginx": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.nginx.ts"
-                }
-              ]
             }
           }
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "ngx-uploadx:build"
+            "browserTarget": "app-uploadx:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "ngx-uploadx:build:production"
-            },
-            "nginx": {
-              "browserTarget": "ngx-uploadx:build:nginx"
+              "browserTarget": "app-uploadx:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "ngx-uploadx:build"
+            "browserTarget": "app-uploadx:build"
           }
         },
         "test": {
@@ -89,7 +78,7 @@
         }
       }
     },
-    "ngx-uploadx-e2e": {
+    "app-uploadx-e2e": {
       "root": "",
       "sourceRoot": "",
       "projectType": "application",
@@ -98,7 +87,7 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "./protractor.conf.js",
-            "devServerTarget": "ngx-uploadx:serve"
+            "devServerTarget": "app-uploadx:serve"
           }
         },
         "lint": {
@@ -111,11 +100,11 @@
       }
     }
   },
-  "defaultProject": "ngx-uploadx",
+  "defaultProject": "app-uploadx",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",
-      "styleext": "css"
+      "styleext": "scss"
     },
     "@schematics/angular:directive": {
       "prefix": "app"
