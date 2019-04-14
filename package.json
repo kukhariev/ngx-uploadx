@@ -15,7 +15,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "prettier": "prettier --write \"**/*.{ts,tsx}\"",
+    "prettier": "prettier --write \"**/*.{json,scss,md,ts,html,component.html}\"",
     "start": "ng serve",
     "build:app": "ng build",
     "test:watch": "ng test",
@@ -30,13 +30,13 @@
     "ci": "npm run lint && npm run test && npm run e2e"
   },
   "dependencies": {
-    "@angular/common": "7.2.11",
-    "@angular/compiler": "7.2.11",
-    "@angular/core": "7.2.11",
-    "@angular/forms": "7.2.11",
-    "@angular/platform-browser": "7.2.11",
-    "@angular/platform-browser-dynamic": "7.2.11",
-    "@angular/router": "7.2.11",
+    "@angular/common": "~7.2.0",
+    "@angular/compiler": "~7.2.0",
+    "@angular/core": "~7.2.0",
+    "@angular/forms": "~7.2.0",
+    "@angular/platform-browser": "~7.2.0",
+    "@angular/platform-browser-dynamic": "~7.2.0",
+    "@angular/router": "~7.2.0",
     "core-js": "^2.6.3",
     "rxjs": "^6.3.3",
     "zone.js": "^0.8.29"
@@ -44,8 +44,8 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.13.7",
     "@angular/cli": "^7.3.7",
-    "@angular/compiler-cli": "7.2.11",
-    "@angular/language-service": "7.2.11",
+    "@angular/compiler-cli": "~7.2.0",
+    "@angular/language-service": "~7.2.0",
     "@commitlint/cli": "^7.5.2",
     "@commitlint/config-conventional": "^7.5.0",
     "@commitlint/travis-cli": "^7.5.2",
@@ -66,16 +66,17 @@
     "karma-jasmine-html-reporter": "^1.4.0",
     "lint-staged": "8.1.4",
     "ng-packagr": "^5.0.1",
-    "node-uploadx": "^1.2.1",
+    "node-uploadx": "^1.2.2",
     "nodemon": "^1.18.9",
-    "prettier": "1.16.4",
+    "prettier": "1.17.0",
     "protractor": "^5.4.2",
     "rimraf": "^2.6.3",
     "ts-node": "~7.0.1",
-    "tsickle": "0.34.0",
+    "tsickle": ">=0.34.0",
     "tslib": "^1.9.0",
     "tslint": "~5.11.0",
-    "typescript": "3.2.4"
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "~3.2.4"
   },
   "husky": {
     "hooks": {
@@ -84,7 +85,7 @@
     }
   },
   "lint-staged": {
-    "*.{ts,tsx}": [
+    "*.{json,scss,md,ts,html,component.html}": [
       "prettier --write",
       "git add"
     ]

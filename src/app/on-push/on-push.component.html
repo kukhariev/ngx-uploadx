@@ -12,7 +12,7 @@
   </div>
 
   <div class="uploads-table">
-    <div class="row" *ngFor="let ufile of (uploads$ | async)">
+    <div class="row" *ngFor="let ufile of uploads$ | async">
       <span class="col-1">{{ ufile.name }}</span>
       <span class="col-2">{{ ufile.progress }}%</span>
       <span class="col-2">{{ ufile.status }}</span>
