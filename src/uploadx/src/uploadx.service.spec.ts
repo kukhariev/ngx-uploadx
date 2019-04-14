@@ -1,17 +1,16 @@
 import { UploadxService } from './uploadx.service';
 import { UploadAction } from './interfaces';
-
+const ENDPOINT = `http://localhost:3003/upload?user_id=test`;
 const options = {
   concurrency: 3,
   allowedTypes: 'image/*,video/*',
-  endpoint: `http://localhost:3003/upload?user_id=test`,
+  endpoint: ENDPOINT,
   token: '%token%',
   autoUpload: false,
   chunkSize: 4096
 };
 describe('UploadxService', () => {
   let service: UploadxService;
-
   beforeEach(() => {
     service = new UploadxService();
   });
@@ -21,9 +20,15 @@ describe('UploadxService', () => {
     expect(service.uploaderOptions.concurrency).toEqual(2);
     expect(service.uploaderOptions.autoUpload).toEqual(true);
   });
+  it('should set endpoint', () => {
+    service.init({ url: ENDPOINT });
+    expect(service.uploaderOptions.concurrency).toEqual(2);
+    expect(service.uploaderOptions.autoUpload).toEqual(true);
+    expect(service.uploaderOptions.endpoint).toEqual(ENDPOINT);
+  });
   it('should overwrite default options', () => {
     service.init(options);
-    expect(service.uploaderOptions.endpoint).toEqual(`http://localhost:3003/upload?user_id=test`);
+    expect(service.uploaderOptions.endpoint).toEqual(ENDPOINT);
     expect(service.uploaderOptions.token).toEqual('%token%');
     expect(service.uploaderOptions.chunkSize).toEqual(4096);
   });
@@ -31,13 +36,13 @@ describe('UploadxService', () => {
     service.init(options);
     service.init({});
     service.connect();
-    expect(service.uploaderOptions.endpoint).toEqual(`http://localhost:3003/upload?user_id=test`);
+    expect(service.uploaderOptions.endpoint).toEqual(ENDPOINT);
     expect(service.uploaderOptions.token).toEqual('%token%');
     expect(service.uploaderOptions.chunkSize).toEqual(4096);
   });
   it('should overwrite default options', () => {
     service.connect(options);
-    expect(service.uploaderOptions.endpoint).toEqual(`http://localhost:3003/upload?user_id=test`);
+    expect(service.uploaderOptions.endpoint).toEqual(ENDPOINT);
     expect(service.uploaderOptions.token).toEqual('%token%');
     expect(service.uploaderOptions.chunkSize).toEqual(4096);
   });
@@ -76,6 +81,7 @@ describe('UploadxService', () => {
     service.control({ ...upload, action: 'pause' });
     expect(service.queue[0].status).toEqual('paused');
     service.control({ ...upload, action: 'upload' });
+    service.control({ action: 'upload', itemOptions: upload });
     expect(service.queue[0].status).toEqual('queue');
     service.control({ ...upload, action: 'cancel' });
     service.control({ action: 'cancelAll' });

@@ -19,28 +19,14 @@ export class UploadxService {
     return this.eventsStream.asObservable();
   }
   queue: Uploader[] = [];
-  private concurrency = 2;
-  private autoUpload = true;
-  private options: UploadxOptions;
-  stateChange = (evt: UploadState) => {
-    setTimeout(() => {
-      this.eventsStream.next(evt);
-    });
+  private options: UploadxOptions = {
+    autoUpload: true,
+    concurrency: 2,
+    stateChange: (evt: UploadState) => setTimeout(() => this.eventsStream.next(evt))
   };
 
   get uploaderOptions(): UploadxOptions {
-    return {
-      method: this.options.method || 'POST',
-      // tslint:disable-next-line: deprecation
-      endpoint: this.options.endpoint || this.options.url,
-      headers: this.options.headers,
-      metadata: this.options.metadata,
-      token: this.options.token,
-      chunkSize: this.options.chunkSize,
-      withCredentials: this.options.withCredentials,
-      maxRetryAttempts: this.options.maxRetryAttempts,
-      stateChange: this.stateChange
-    };
+    return this.options;
   }
 
   constructor() {
@@ -56,7 +42,9 @@ export class UploadxService {
    * @returns Observable that emits a new value on progress or status changes
    */
   init(options: UploadxOptions): Observable<UploadState> {
-    this.options = { ...this.options, ...options };
+    // tslint:disable-next-line: deprecation
+    const endpoint = options.endpoint || options.url || this.options.endpoint;
+    this.options = { ...this.options, ...options, ...{ endpoint } };
     return this.events;
   }
   /**
@@ -74,14 +62,14 @@ export class UploadxService {
   /**
    * Terminate all uploads and clears the queue
    */
-  disconnect() {
+  disconnect(): void {
     this.queue.forEach(f => (f.status = 'paused'));
     this.queue = [];
   }
   /**
    * Create Uploader and add to the queue
    */
-  handleFileList(fileList: FileList) {
+  handleFileList(fileList: FileList): void {
     for (let i = 0; i < fileList.length; i++) {
       const uploader = new this.UploaderClass(fileList.item(i), this.uploaderOptions);
       this.queue.push(uploader);
@@ -93,7 +81,7 @@ export class UploadxService {
    * Create Uploader for the file and add to the queue
    */
   handleFile(file: File): void {
-    const uploader = new UploaderX(file, this.uploaderOptions);
+    const uploader = new this.UploaderClass(file, this.uploaderOptions);
     this.queue.push(uploader);
     uploader.status = 'added';
     this.autoUploadFiles();
@@ -103,7 +91,7 @@ export class UploadxService {
    * @internal
    */
   private autoUploadFiles(): void {
-    if (this.autoUpload) {
+    if (this.options.autoUpload) {
       this.queue.filter(f => f.status === 'added').forEach(f => (f.status = 'queue'));
     }
   }
@@ -148,7 +136,7 @@ export class UploadxService {
    * Queue management
    * @internal
    */
-  private processQueue() {
+  private processQueue(): void {
     // Remove Cancelled Items from local queue
     this.queue = this.queue.filter(f => f.status !== 'cancelled');
 
@@ -156,7 +144,7 @@ export class UploadxService {
 
     this.queue
       .filter((uploader: Uploader) => uploader.status === 'queue')
-      .slice(0, Math.max(this.concurrency - running, 0))
+      .slice(0, Math.max(this.options.concurrency - running, 0))
       .forEach((uploader: Uploader) => {
         uploader.upload();
       });
