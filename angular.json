@@ -48,6 +48,9 @@
           "configurations": {
             "production": {
               "browserTarget": "app-uploadx:build:production"
+            },
+            "ci": {
+              "progress": false
             }
           }
         },
@@ -88,6 +91,11 @@
           "options": {
             "protractorConfig": "./protractor.conf.js",
             "devServerTarget": "app-uploadx:serve"
+          },
+          "configurations": {
+            "ci": {
+              "devServerTarget": "app-uploadx:serve:ci"
+            }
           }
         },
         "lint": {

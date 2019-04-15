@@ -22,9 +22,9 @@
     "test:coverage": "ng test --codeCoverage=true --progress=false",
     "test": "ng test --watch=false --progress=false",
     "lint": "ng lint",
-    "e2e": "concurrently --kill-others -s \"first\" \"npm run server\" \"ng e2e\"",
-    "server": "node ./server/index.js",
-    "server:dev": "cd ./server  && NODE_ENV=development nodemon .",
+    "e2e": "ng e2e -c=ci",
+    "server": "node ./server/ --reset",
+    "server:dev": "NODE_ENV=development node ./server/ --reset --errors",
     "postversion": "npm run build && git push --follow-tags",
     "build": "ts-node ./scripts/build.ts",
     "ci": "npm run lint && npm run test && npm run e2e"
