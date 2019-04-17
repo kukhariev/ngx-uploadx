@@ -21,17 +21,19 @@ exit && process.exit();
 const uploads = new Uploadx({ storage });
 uploads.on('error', console.error);
 const server = http.createServer((req, res) => {
-  if (emitErrors && Math.random() < 0.1 && req.method !== 'OPTIONS') {
-    res.writeHead(401, { 'Content-Type': 'text/plan', 'Access-Control-Allow-Origin': '*' });
-    res.end('Unauthorized');
+  if (emitErrors && Math.random() < 0.2 && req.method !== 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.statusCode = 401;
+    res.end();
     return;
   }
   const pathname = url.parse(req.url).pathname.toLowerCase();
   if (pathname === '/upload') {
     uploads.handle(req, res);
   } else {
-    res.writeHead(404, { 'Content-Type': 'text/plan' });
-    res.end('Not Found');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.statusCode = 404;
+    res.end();
   }
 });
 
