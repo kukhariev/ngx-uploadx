@@ -73,16 +73,6 @@ export interface UploadItem {
   headers?: { [key: string]: string } | ((file?: File) => { [key: string]: string });
   /**
    * Upload meta
-   * @defaultValue
-   *
-  ```ts
-   {
-    name: File.Filename,
-    mimeType: File.type,
-    size: File.size,
-    lastModified: File.lastModified
-   }
-  ```
    */
   metadata?: { [key: string]: any } | ((file?: File) => { [key: string]: any });
   /**
@@ -97,7 +87,7 @@ export interface UploadxOptions extends UploadItem {
   maxRetryAttempts?: number;
   chunkSize?: number;
   withCredentials?: boolean;
-  readonly stateChange?: any;
+  readonly stateChange?: (evt: UploadState) => void;
   concurrency?: number;
   autoUpload?: boolean;
   allowedTypes?: any;
