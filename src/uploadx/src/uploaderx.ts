@@ -18,60 +18,59 @@ export class UploaderX extends Uploader {
     this.responseType = 'json' as XMLHttpRequestResponseType;
   }
 
-  create(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      if (!this.URI || this.responseStatus === 404) {
-        // get file URI
-        const xhr: XMLHttpRequest = new XMLHttpRequest();
-        xhr.open('POST', this.endpoint, true);
-        this.setupXHR(xhr);
-        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-        xhr.setRequestHeader('X-Upload-Content-Length', this.size.toString());
-        xhr.setRequestHeader('X-Upload-Content-Type', this.mimeType);
-        xhr.onload = () => {
-          this.processResponse(xhr);
-          const location = this.statusType === 200 && this.getKeyFromResponse(xhr, 'location');
-          if (!location) {
-            // limit attempts
-            this.statusType = 400;
-            reject();
-          } else {
-            this.URI = resolveUrl(location, this.endpoint);
-            this.retry.reset();
-            resolve();
-          }
-        };
-        xhr.onerror = () => reject();
-        xhr.send(JSON.stringify(this.metadata));
-      } else {
-        resolve();
+  create(): Promise<any> {
+    const headers = {
+      'Content-Type': 'application/json; charset=UTF-8',
+      'X-Upload-Content-Length': `${this.size}`,
+      'X-Upload-Content-Type': `${this.mimeType}`
+    };
+    const payload = JSON.stringify(this.metadata);
+    return this.request({
+      method: 'POST',
+      payload,
+      url: this.endpoint,
+      headers
+    }).then(_ => {
+      const location = this.statusType === 200 && this.getKeyFromResponse(this._xhr_, 'location');
+      this.URI = resolveUrl(location, this.endpoint);
+      this.retry.reset();
+    });
+  }
+  sendChunk(offset: number): Promise<any> {
+    const end = this.chunkSize ? Math.min(offset + this.chunkSize, this.size) : this.size;
+    const payload = this.file.slice(offset, end);
+    const headers = {
+      'Content-Type': 'application/octet-stream',
+      'Content-Range': `bytes ${offset}-${end - 1}/${this.size}`
+    };
+
+    return this.request({ method: 'PUT', payload, url: this.URI, headers, progress: true }).then(
+      _ => {
+        this.retry.reset();
+        if (this.statusType === 200) {
+          this.progress = 100;
+          this.status = 'complete';
+        }
+      }
+    );
+  }
+  resume(): Promise<any> {
+    const headers = {
+      'Content-Type': 'application/octet-stream',
+      'Content-Range': `bytes */${this.size}`
+    };
+    return this.request({ method: 'PUT', url: this.URI, headers }).then(_ => {
+      this.retry.reset();
+      if (this.statusType === 200) {
+        this.progress = 100;
+        this.status = 'complete';
       }
     });
   }
-
   /**
    * Chunk upload +/ get offset
    * @internal
    */
-  sendChunk(offset?: number): void {
-    if (this.status === 'uploading') {
-      let body = null;
-      const xhr: XMLHttpRequest = new XMLHttpRequest();
-      xhr.open('PUT', this.URI, true);
-      this.setupXHR(xhr);
-      this.setupEvents(xhr);
-      if (offset >= 0 && offset < this.size) {
-        const end = this.chunkSize ? Math.min(offset + this.chunkSize, this.size) : this.size;
-        body = this.file.slice(offset, end);
-        xhr.upload.onprogress = this.setupProgressEvent(offset, end);
-        xhr.setRequestHeader('Content-Range', `bytes ${offset}-${end - 1}/${this.size}`);
-        xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-      } else {
-        xhr.setRequestHeader('Content-Range', `bytes */${this.size}`);
-      }
-      xhr.send(body);
-    }
-  }
 
   getNextChunkOffset(xhr: XMLHttpRequest) {
     if (this.statusType === 300) {

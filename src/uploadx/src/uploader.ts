@@ -28,7 +28,8 @@ export abstract class Uploader {
   private _status: UploadStatus;
   protected responseType: XMLHttpRequestResponseType = '';
   private stateChange: (evt: UploadState) => void;
-  private _xhr_: XMLHttpRequest;
+  protected _xhr_: XMLHttpRequest;
+  offset: number;
   constructor(readonly file: File, public options: UploadxOptions) {
     this.name = file.name;
     this.size = file.size;
@@ -38,7 +39,8 @@ export abstract class Uploader {
   }
 
   set status(s: UploadStatus) {
-    // Return if State is cancelled or complete (but allow cancel of an complete upload to remove from list and from server)
+    // Return if State is cancelled or complete
+    // (but allow cancel of an complete upload to remove from list and from server)
     if (this._status === 'cancelled' || (this._status === 'complete' && s !== 'cancelled')) {
       return;
     }
@@ -47,7 +49,7 @@ export abstract class Uploader {
         this._xhr_.abort();
       }
       if (s === 'cancelled' && this.URI) {
-        this.request('delete');
+        this.request({ method: 'delete' });
       }
       this._status = s;
       this.notifyState();
@@ -61,7 +63,9 @@ export abstract class Uploader {
    * Initiate upload
    */
   async upload(item?: UploadItem | undefined): Promise<void> {
-    if (item) this.configure(item);
+    if (item) {
+      this.configure(item);
+    }
     if (this.status === 'cancelled' || this.status === 'complete' || this.status === 'paused') {
       return;
     }
@@ -70,9 +74,9 @@ export abstract class Uploader {
     try {
       await this.create();
       this.startTime = new Date().getTime();
-      this.sendChunk(this.progress ? undefined : 0);
+      this.start();
     } catch (e) {
-      if (this.isMaxAttemptsReached()) {
+      if (this.isMaxAttemptsReached) {
         this.status = 'error';
       } else {
         this.status = 'retry';
@@ -83,6 +87,7 @@ export abstract class Uploader {
   }
   protected abstract create(): Promise<void>;
   protected abstract sendChunk(offset?: number): void;
+  protected abstract resume(): void;
   protected abstract getNextChunkOffset(xhr: XMLHttpRequest): number;
   /**
    * Emit current state
@@ -129,101 +134,104 @@ export abstract class Uploader {
     this.refreshToken(token);
   }
 
-  protected setupXHR(xhr: XMLHttpRequest) {
-    this.responseStatus = null;
-    this.response = null;
-    this.statusType = null;
+  protected setupXHR(xhr: XMLHttpRequest, headers?: any) {
     this._xhr_ = xhr;
     xhr.responseType = this.responseType;
     xhr.withCredentials = this.options.withCredentials;
-    Object.keys(this.headers).forEach(key => xhr.setRequestHeader(key, this.headers[key]));
+    const _headers = { ...this.headers, ...headers };
+    Object.keys(_headers).forEach(key => xhr.setRequestHeader(key, _headers[key]));
   }
-  protected isMaxAttemptsReached(): boolean | never {
-    if (this.retry.retryAttempts === this.maxRetryAttempts && this.statusType === 400) {
-      this.retry.reset();
-      console.error(
-        `Error: Maximum number of retry attempts reached:
-          file: ${this.name},
-          statusCode: ${this.responseStatus}`
-      );
-      return true;
-    }
+  private resetResponse() {
+    this.responseStatus = null;
+    this.response = null;
+    this.statusType = null;
+  }
+
+  private get isMaxAttemptsReached(): boolean {
+    return this.retry.retryAttempts === this.maxRetryAttempts && this.statusType === 400;
   }
   protected parseJson(xhr: XMLHttpRequest) {
-    return typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText || null);
+    let body = 'response' in (xhr as any) ? xhr.response : xhr.responseText;
+    if (this.responseType === 'json' && body && typeof body === 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch {}
+    }
+    return body;
   }
 
   protected getKeyFromResponse(xhr: XMLHttpRequest, key: string) {
-    const fromHeader = xhr.getResponseHeader(key);
-    if (fromHeader) {
-      return fromHeader;
-    }
-    const response = this.parseJson(xhr) || {};
-    const resKey = Object.keys(response).find(k => k.toLowerCase() === key.toLowerCase());
-    return response[resKey];
+    return xhr.getResponseHeader(key);
   }
 
-  private request(method: string, payload = null) {
+  protected request({
+    method,
+    payload = null,
+    url,
+    headers = {},
+    progress = false
+  }: {
+    method: string;
+    payload?: any;
+    url?: string;
+    headers?: any;
+    progress?: boolean;
+  }): Promise<number> {
     return new Promise((resolve, reject) => {
       const xhr: XMLHttpRequest = new XMLHttpRequest();
-      xhr.open(method.toUpperCase(), this.URI, true);
-      this.setupXHR(xhr);
+      xhr.open(method.toUpperCase(), url || this.URI, true);
+      if (progress && payload) {
+        xhr.upload.onprogress = this.setupProgressEvent((payload as Blob).size);
+      }
+      this.setupXHR(xhr, headers);
       xhr.onload = () => {
         this.processResponse(xhr);
-        resolve();
+        this.statusType > 300 ? reject(this.responseStatus) : resolve(this.responseStatus);
       };
-      xhr.onerror = () => reject();
-      const body = payload ? JSON.stringify(payload) : null;
-      xhr.send(body);
+      xhr.onerror = () => {
+        this.resetResponse();
+        reject(this.responseStatus);
+      };
+      xhr.send(payload);
     });
   }
 
+  async start() {
+    this.offset = undefined;
+    while (this.status === 'uploading' || this.status === 'retry') {
+      try {
+        if (isNaN(this.offset)) {
+          const _ = await this.resume();
+        } else {
+          const _ = await this.sendChunk(this.offset);
+        }
+        this.offset = this.getNextChunkOffset(this._xhr_);
+      } catch {
+        if (this.isMaxAttemptsReached) {
+          this.status = 'error';
+          break;
+        }
+        this.status = 'retry';
+        this.offset = undefined;
+        const _ = await this.retry.wait(this.responseStatus);
+        this.status = 'uploading';
+      }
+    }
+  }
   protected processResponse(xhr: XMLHttpRequest): void {
-    this.responseStatus = xhr.status;
     this.response = this.parseJson(xhr);
-    this.statusType = xhr.status - (xhr.status % 100);
+    this.responseStatus = xhr.status;
+    if (xhr.status === 0) {
+      this.responseStatus = this.response ? 200 : 0;
+    }
+    this.statusType = xhr.status - (this.responseStatus % 100);
   }
-  protected setupEvents(xhr: XMLHttpRequest): void {
-    const onError = async () => {
-      if (this.isMaxAttemptsReached()) {
-        this.status = 'error';
-        return;
-      }
-      this.status = 'retry';
-      await this.retry.wait(xhr.status);
-      if (xhr.status === 404) {
-        this.status = 'queue';
-        return;
-      }
-      if (xhr.status === 413) {
-        this.chunkSize /= 2;
-      }
-      this.refreshToken();
-      this.status = 'uploading';
-      // request offset
-      this.sendChunk();
-    };
-    const onSuccess = () => {
-      this.processResponse(xhr);
-      const offset = this.getNextChunkOffset(xhr);
-      if (typeof offset === 'number') {
-        //  next chunk
-        this.retry.reset();
-        this.sendChunk(offset);
-      } else if (this.statusType === 200) {
-        this.progress = 100;
-        this.status = 'complete';
-      } else {
-        onError();
-      }
-    };
-    xhr.onerror = onError;
-    xhr.onload = onSuccess;
-  }
-  protected setupProgressEvent(offset: number, end: number) {
+
+  protected setupProgressEvent(chunkSize: number) {
     return (pEvent: ProgressEvent) => {
+      const offset = this.offset;
       const uploaded = pEvent.lengthComputable
-        ? offset + (end - offset) * (pEvent.loaded / pEvent.total)
+        ? offset + chunkSize * (pEvent.loaded / pEvent.total)
         : offset;
       this.progress = +((uploaded / this.size) * 100).toFixed(2);
       const now = new Date().getTime();
