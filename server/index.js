@@ -21,7 +21,7 @@ exit && process.exit();
 const uploads = new Uploadx({ storage });
 uploads.on('error', console.error);
 const server = http.createServer((req, res) => {
-  if (emitErrors && Math.random() < 0.2 && req.method !== 'OPTIONS') {
+  if (emitErrors && Math.random() < 0.1 && req.method !== 'OPTIONS' && req.method !== 'DELETE') {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.statusCode = 401;
     res.end();
