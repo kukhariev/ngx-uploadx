@@ -10,7 +10,7 @@ export class BackoffRetry {
    * @param max  Max retry delay
    * @param k    Increase factor
    */
-  constructor(private min = 200, private max = min * 300, private k = 2) {
+  constructor(private min = 500, private max = min * 300, private k = 2) {
     this.delay = this.min;
   }
   /**

@@ -5,8 +5,8 @@ describe('BackoffRetry', function() {
     it('should set to defaults if no parameters are specified', async function() {
       const bf: any = new BackoffRetry();
       expect(bf.retryAttempts).toBe(1);
-      expect(bf.min).toBe(200);
-      expect(bf.max).toBe(60_000);
+      expect(bf.min).toBe(500);
+      expect(bf.max).toBe(150_000);
       expect(bf.k).toBe(2);
     });
     it('should set custom params', async () => {
