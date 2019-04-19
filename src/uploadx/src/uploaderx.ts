@@ -1,82 +1,85 @@
+import { UploadxOptions } from './interfaces';
+import { Uploader } from './uploader';
+import { resolveUrl } from './utils';
+
 /**
  * Implements XHR/CORS Resumable Upload
  * @see
  * https://developers.google.com/drive/v3/web/resumable-upload
  */
-
-import { UploadxOptions } from './interfaces';
-import { Uploader } from './uploader';
-import { resolveUrl } from './utils';
-
 export class UploaderX extends Uploader {
   chunkSize = 1_048_576;
-  /**
-   * Creates an instance of Uploader.
-   */
   constructor(readonly file: File, options: UploadxOptions) {
     super(file, options);
     this.responseType = 'json' as XMLHttpRequestResponseType;
   }
 
-  create(): Promise<any> {
+  /**
+   * Get & set URI
+   * @internal
+   */
+  async create(): Promise<any> {
     const headers = {
       'Content-Type': 'application/json; charset=UTF-8',
       'X-Upload-Content-Length': `${this.size}`,
       'X-Upload-Content-Type': `${this.mimeType}`
     };
-    const payload = JSON.stringify(this.metadata);
-    return this.request({
+    const body = JSON.stringify(this.metadata);
+    const _ = await this.request({
       method: 'POST',
-      payload,
+      body,
       url: this.endpoint,
       headers
-    }).then(_ => {
-      const location = this.statusType === 200 && this.getKeyFromResponse(this._xhr_, 'location');
-      this.URI = resolveUrl(location, this.endpoint);
-      this.retry.reset();
     });
+    const location = this.statusType === 200 && this.getKeyFromResponse('location');
+    this.URI = resolveUrl(location, this.endpoint);
+    this.offset = this.responseStatus === 201 ? 0 : undefined;
   }
-  sendChunk(offset: number): Promise<any> {
-    const end = this.chunkSize ? Math.min(offset + this.chunkSize, this.size) : this.size;
-    const payload = this.file.slice(offset, end);
+  /**
+   * Upload chunk & set new offset
+   * @internal
+   */
+  async sendChunk(): Promise<void> {
+    const end = this.chunkSize ? Math.min(this.offset + this.chunkSize, this.size) : this.size;
+    const body = this.file.slice(this.offset, end);
     const headers = {
       'Content-Type': 'application/octet-stream',
-      'Content-Range': `bytes ${offset}-${end - 1}/${this.size}`
+      'Content-Range': `bytes ${this.offset}-${end - 1}/${this.size}`
     };
-
-    return this.request({ method: 'PUT', payload, url: this.URI, headers, progress: true }).then(
-      _ => {
-        this.retry.reset();
-        if (this.statusType === 200) {
-          this.progress = 100;
-          this.status = 'complete';
-        }
-      }
-    );
+    const _ = await this.request({
+      method: 'PUT',
+      body,
+      url: this.URI,
+      headers,
+      progress: true
+    });
+    this.offset = this.getOffset();
   }
-  resume(): Promise<any> {
+  /**
+   * Get & set offset
+   * @internal
+   */
+  async resume(): Promise<void> {
     const headers = {
       'Content-Type': 'application/octet-stream',
       'Content-Range': `bytes */${this.size}`
     };
-    return this.request({ method: 'PUT', url: this.URI, headers }).then(_ => {
-      this.retry.reset();
-      if (this.statusType === 200) {
-        this.progress = 100;
-        this.status = 'complete';
-      }
-    });
+    const _ = await this.request({ method: 'PUT', url: this.URI, headers });
+    this.offset = this.getOffset();
   }
   /**
-   * Chunk upload +/ get offset
-   * @internal
+   * Return next chunk offset or complete upload
    */
-
-  getNextChunkOffset(xhr: XMLHttpRequest) {
+  private getOffset() {
     if (this.statusType === 300) {
-      const str = this.getKeyFromResponse(xhr, 'Range');
+      const str = this.getKeyFromResponse('Range');
       const [match] = str && str.match(/(-1|\d+)$/g);
       return match && +match + 1;
+    } else if (this.statusType === 200) {
+      this.progress = 100;
+      this.status = 'complete';
+      return this.size;
     }
+    return;
   }
 }
