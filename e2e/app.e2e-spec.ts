@@ -8,10 +8,10 @@ describe('uploader App', () => {
 
   it('should have input type=file', () => {
     page.navigateTo('/directive-way');
-    expect(page.getFileInput()).toBeTruthy();
+    expect(page.getFileInput().isPresent()).toBe(true);
   });
   it('should have table', () => {
-    expect(page.getTable()).toBeTruthy();
+    expect(page.getTable().isPresent()).toBe(true);
     expect(page.getPreText()).toEqual('null');
   });
   it('should upload a file (Directive)', () => {
@@ -38,7 +38,7 @@ describe('uploader App', () => {
   it('should upload a file (onPush)', () => {
     page.navigateTo('/on-push');
     page.getFileInput().sendKeys(absolutePath);
-    expect(page.waitForComplete()).toEqual('complete');
+    expect(page.waitForCompleteTable()).toEqual('complete');
     reset();
   });
 });
