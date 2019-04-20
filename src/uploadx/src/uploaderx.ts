@@ -14,70 +14,56 @@ export class UploaderX extends Uploader {
     this.responseType = 'json' as XMLHttpRequestResponseType;
   }
 
-  /**
-   * Get & set URI
-   * @internal
-   */
-  async create(): Promise<any> {
+  async getURI(): Promise<string> {
     const headers = {
       'Content-Type': 'application/json; charset=UTF-8',
       'X-Upload-Content-Length': `${this.size}`,
       'X-Upload-Content-Type': `${this.mimeType}`
     };
     const body = JSON.stringify(this.metadata);
-    const _ = await this.request({
+    const _ = await this.makeRequest({
       method: 'POST',
       body,
       url: this.endpoint,
       headers
     });
-    const location = this.statusType === 200 && this.getKeyFromResponse('location');
-    this.URI = resolveUrl(location, this.endpoint);
+    const location = this.statusType === 200 && this.getValueFromResponse('location');
     this.offset = this.responseStatus === 201 ? 0 : undefined;
+    return resolveUrl(location, this.endpoint);
   }
-  /**
-   * Upload chunk & set new offset
-   * @internal
-   */
-  async sendChunk(): Promise<void> {
+
+  async sendFileContent(): Promise<number> {
     const end = this.chunkSize ? Math.min(this.offset + this.chunkSize, this.size) : this.size;
     const body = this.file.slice(this.offset, end);
     const headers = {
       'Content-Type': 'application/octet-stream',
       'Content-Range': `bytes ${this.offset}-${end - 1}/${this.size}`
     };
-    const _ = await this.request({
+    const _ = await this.makeRequest({
       method: 'PUT',
       body,
       url: this.URI,
       headers,
       progress: true
     });
-    this.offset = this.getOffset();
+    return this.getOffsetFromResponse();
   }
-  /**
-   * Get & set offset
-   * @internal
-   */
-  async resume(): Promise<void> {
+
+  async getOffset(): Promise<number> {
     const headers = {
       'Content-Type': 'application/octet-stream',
       'Content-Range': `bytes */${this.size}`
     };
-    const _ = await this.request({ method: 'PUT', url: this.URI, headers });
-    this.offset = this.getOffset();
+    const _ = await this.makeRequest({ method: 'PUT', url: this.URI, headers });
+    return this.getOffsetFromResponse();
   }
-  /**
-   * Return next chunk offset or complete upload
-   */
-  private getOffset() {
+
+  private getOffsetFromResponse() {
     if (this.statusType === 300) {
-      const str = this.getKeyFromResponse('Range');
+      const str = this.getValueFromResponse('Range');
       const [match] = str && str.match(/(-1|\d+)$/g);
       return match && +match + 1;
     } else if (this.statusType === 200) {
-      this.progress = 100;
-      this.status = 'complete';
       return this.size;
     }
     return;
