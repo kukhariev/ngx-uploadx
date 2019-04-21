@@ -1,27 +1,27 @@
 import { UploadxOptions } from './interfaces';
 import { Uploader } from './uploader';
 import { resolveUrl } from './utils';
-
+const DEFAULT_CHUNK_SIZE = 1_048_576;
 /**
  * Implements XHR/CORS Resumable Upload
  * @see
  * https://developers.google.com/drive/v3/web/resumable-upload
  */
 export class UploaderX extends Uploader {
-  chunkSize = 1_048_576;
+  chunkSize = DEFAULT_CHUNK_SIZE;
   constructor(readonly file: File, options: UploadxOptions) {
     super(file, options);
     this.responseType = 'json' as XMLHttpRequestResponseType;
   }
 
-  async getURI(): Promise<string> {
+  async getFileURI(): Promise<string> {
     const headers = {
       'Content-Type': 'application/json; charset=UTF-8',
       'X-Upload-Content-Length': `${this.size}`,
       'X-Upload-Content-Type': `${this.mimeType}`
     };
     const body = JSON.stringify(this.metadata);
-    const _ = await this.makeRequest({
+    const _ = await this.request({
       method: 'POST',
       body,
       url: this.endpoint,
@@ -39,7 +39,7 @@ export class UploaderX extends Uploader {
       'Content-Type': 'application/octet-stream',
       'Content-Range': `bytes ${this.offset}-${end - 1}/${this.size}`
     };
-    const _ = await this.makeRequest({
+    const _ = await this.request({
       method: 'PUT',
       body,
       url: this.URI,
@@ -54,7 +54,7 @@ export class UploaderX extends Uploader {
       'Content-Type': 'application/octet-stream',
       'Content-Range': `bytes */${this.size}`
     };
-    const _ = await this.makeRequest({ method: 'PUT', url: this.URI, headers });
+    const _ = await this.request({ method: 'PUT', url: this.URI, headers });
     return this.getOffsetFromResponse();
   }
 

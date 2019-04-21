@@ -1,3 +1,5 @@
+import { Uploader } from './uploader';
+
 export type UploadStatus =
   | 'added'
   | 'queue'
@@ -50,11 +52,6 @@ export interface UploadState {
 }
 
 export interface UploadItem {
-  /**
-   * Upload API initial method
-   * @defaultValue 'POST'
-   */
-  method?: string;
   readonly uploadId?: string;
   /**
    * Upload API URL
@@ -80,14 +77,20 @@ export interface UploadItem {
    */
   token?: string | (() => string);
 }
-/**
- * Global Options
- */
-export interface UploadxOptions extends UploadItem {
+export interface UploaderOptions extends Pick<UploadItem, Exclude<keyof UploadItem, 'uploadId'>> {
   maxRetryAttempts?: number;
   chunkSize?: number;
   withCredentials?: boolean;
   readonly stateChange?: (evt: UploadState) => void;
+}
+/**
+ * Global Options
+ */
+export interface UploadxOptions extends UploaderOptions {
+  /**
+   * @beta
+   */
+  uploaderClass?: new (f: File, options: UploadxOptions) => Uploader;
   concurrency?: number;
   autoUpload?: boolean;
   allowedTypes?: any;

@@ -6,28 +6,26 @@ import {
   UploadState,
   UploadStatus,
   UploadxControlEvent,
-  UploadxOptions
+  UploadxOptions,
+  UploaderOptions
 } from './interfaces';
 import { Uploader } from './uploader';
 import { UploaderX } from './uploaderx';
 
 @Injectable({ providedIn: 'root' })
 export class UploadxService {
-  private UploaderClass = UploaderX;
+  private uploaderClass: { new (f: File, options: UploadxOptions): Uploader };
   private readonly eventsStream: Subject<UploadState> = new Subject();
   get events() {
     return this.eventsStream.asObservable();
   }
   queue: Uploader[] = [];
-  private options: UploadxOptions = {
+  options: UploadxOptions = {
     autoUpload: true,
     concurrency: 2,
+    uploaderClass: UploaderX,
     stateChange: (evt: UploadState) => setTimeout(() => this.eventsStream.next(evt))
   };
-
-  get uploaderOptions(): UploadxOptions {
-    return this.options;
-  }
 
   constructor() {
     this.events.subscribe((evt: UploadEvent) => {
@@ -45,12 +43,13 @@ export class UploadxService {
     // tslint:disable-next-line: deprecation
     const endpoint = options.endpoint || options.url || this.options.endpoint;
     this.options = { ...this.options, ...options, ...{ endpoint } };
+    this.uploaderClass = this.options.uploaderClass;
     return this.events;
   }
   /**
    * Initializes service
    * @param options global options
-   * @returns Observable that emits the current queue
+   * @returns Observable that emits the current uploaders
    */
   connect(options?: UploadxOptions): Observable<Uploader[]> {
     return this.init(options || this.options).pipe(
@@ -70,22 +69,22 @@ export class UploadxService {
    * Create Uploader and add to the queue
    */
   handleFileList(fileList: FileList): void {
-    for (let i = 0; i < fileList.length; i++) {
-      const uploader = new this.UploaderClass(fileList.item(i), this.uploaderOptions);
-      this.queue.push(uploader);
-      uploader.status = 'added';
-    }
+    Array.from(fileList).forEach(file => this.addUploaderInstance(file));
     this.autoUploadFiles();
   }
   /**
    * Create Uploader for the file and add to the queue
    */
   handleFile(file: File): void {
-    const uploader = new this.UploaderClass(file, this.uploaderOptions);
-    this.queue.push(uploader);
-    uploader.status = 'added';
+    this.addUploaderInstance(file);
     this.autoUploadFiles();
   }
+  private addUploaderInstance(file: File) {
+    const uploader = new this.uploaderClass(file, this.options as UploaderOptions);
+    this.queue.push(uploader);
+    uploader.status = 'added';
+  }
+
   /**
    * Auto upload the files if the flag is true
    * @internal

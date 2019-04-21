@@ -1,5 +1,5 @@
 import { BackoffRetry } from './backoff_retry';
-import { UploadItem, UploadxOptions, UploadState, UploadStatus } from './interfaces';
+import { UploaderOptions, UploadItem, UploadState, UploadStatus } from './interfaces';
 import { unfunc } from './utils';
 const noop = () => {};
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD';
@@ -30,7 +30,7 @@ export abstract class Uploader {
   /**
    * Upload start time
    */
-  protected startTime: number;
+  private startTime: number;
   /**
    * Progress percentage
    */
@@ -82,7 +82,7 @@ export abstract class Uploader {
    */
   chunkSize: number;
   /**
-   * Auth Bearer token / tokenGetter
+   * Auth Bearer token/tokenGetter
    */
   token: string | (() => string);
   /**
@@ -102,19 +102,36 @@ export abstract class Uploader {
    * Active HttpRequest
    * @internal
    */
-  protected _xhr_: XMLHttpRequest;
+  protected _xhr: XMLHttpRequest;
   /**
    * byte offset within the whole file
    * @internal
    */
   protected offset = 0;
 
-  constructor(readonly file: File, public options: UploadxOptions) {
+  constructor(readonly file: File, public options: UploaderOptions) {
     this.name = file.name;
     this.size = file.size;
     this.mimeType = file.type || 'application/octet-stream';
     this.stateChange = options.stateChange || noop;
     this.configure(options);
+  }
+
+  /**
+   * Configure or Reconfigure uploader
+   */
+  configure(item = {} as UploadItem): void {
+    const { metadata, headers, token, endpoint } = item;
+    this.metadata = {
+      name: this.name,
+      mimeType: this.mimeType,
+      size: this.size,
+      lastModified: this.file.lastModified,
+      ...unfunc(metadata || this.metadata, this.file)
+    };
+    this.endpoint = endpoint || this.endpoint;
+    this.headers = { ...this.headers, ...unfunc(headers, this.file) };
+    this.token = token || this.token;
   }
   /**
    * Upload status
@@ -126,11 +143,11 @@ export abstract class Uploader {
       return;
     }
     if (s !== this._status) {
-      if (this._xhr_ && (s === 'cancelled' || s === 'paused')) {
-        this._xhr_.abort();
+      if (this._xhr && (s === 'cancelled' || s === 'paused')) {
+        this._xhr.abort();
       }
       if (s === 'cancelled' && this.URI) {
-        this.makeRequest({ method: 'DELETE' });
+        this.request({ method: 'DELETE' });
       }
       this._status = s;
       this.notifyState();
@@ -153,7 +170,7 @@ export abstract class Uploader {
     this.status = 'uploading';
     this.refreshToken();
     try {
-      this.URI = await this.getURI();
+      this.URI = await this.getFileURI();
       this.retry.reset();
       this.startTime = new Date().getTime();
       this.start();
@@ -171,7 +188,7 @@ export abstract class Uploader {
   /**
    * Get file URI
    */
-  protected abstract getURI(): Promise<string>;
+  protected abstract getFileURI(): Promise<string>;
   /**
    * Send file content
    */
@@ -184,7 +201,7 @@ export abstract class Uploader {
   /**
    * Emit current state
    */
-  protected notifyState(): void {
+  private notifyState(): void {
     const state: UploadState = {
       file: this.file,
       name: this.name,
@@ -206,9 +223,9 @@ export abstract class Uploader {
   /**
    *  Gets the value from response
    */
-  protected getValueFromResponse(key: string): any;
+
   protected getValueFromResponse(key: string): string {
-    return this._xhr_.getResponseHeader(key);
+    return this._xhr.getResponseHeader(key);
   }
 
   /**
@@ -217,26 +234,9 @@ export abstract class Uploader {
   refreshToken(token?: any): void {
     this.token = token || this.token;
     if (this.token) {
-      const _token = unfunc(this.token);
+      const _token = unfunc(this.token, this.responseStatus);
       this.headers = { ...this.headers, ...{ Authorization: `Bearer ${_token}` } };
     }
-  }
-
-  /**
-   * Configure or Reconfigure uploader
-   */
-  configure(item = {} as UploadItem): void {
-    const { metadata, headers, token, endpoint } = item;
-    this.metadata = {
-      name: this.name,
-      mimeType: this.mimeType,
-      size: this.size,
-      lastModified: this.file.lastModified,
-      ...unfunc(metadata || this.metadata, this.file)
-    };
-    this.endpoint = endpoint || this.endpoint;
-    this.headers = { ...this.headers, ...unfunc(headers, this.file) };
-    this.refreshToken(token);
   }
 
   /**
@@ -252,7 +252,7 @@ export abstract class Uploader {
           this.status = 'complete';
         }
       } catch {
-        this.offset = undefined;
+        this.offset = this.responseStatus ? undefined : this.offset;
         if (this.isMaxAttemptsReached) {
           this.status = 'error';
           break;
@@ -272,7 +272,7 @@ export abstract class Uploader {
   /**
    * Request method
    */
-  protected makeRequest({
+  protected request({
     method,
     body = null,
     url,
@@ -282,14 +282,14 @@ export abstract class Uploader {
     method: HttpMethod;
     body?: any;
     url?: string;
-    headers?: any;
+    headers?: { [key: string]: string };
     progress?: boolean;
   }): Promise<number> {
     return new Promise((resolve, reject) => {
       const xhr: XMLHttpRequest = new XMLHttpRequest();
       xhr.open(method.toUpperCase(), url || this.URI, true);
       if (progress && body) {
-        xhr.upload.onprogress = this.setupProgressEvent((body as Blob).size);
+        xhr.upload.onprogress = this.onprogress((body as any).size);
       }
       this.setupXhr(xhr, headers);
       xhr.onload = () => {
@@ -304,7 +304,7 @@ export abstract class Uploader {
     });
   }
   private setupXhr(xhr: XMLHttpRequest, headers?: any) {
-    this._xhr_ = xhr;
+    this._xhr = xhr;
     xhr.responseType = this.responseType;
     xhr.withCredentials = this.options.withCredentials;
     const _headers = { ...this.headers, ...headers };
@@ -337,12 +337,11 @@ export abstract class Uploader {
     this.statusType = (xhr.status - (this.responseStatus % 100)) as any;
   }
 
-  private setupProgressEvent(chunkSize: number) {
+  private onprogress(chunkSize: number) {
     return (pEvent: ProgressEvent) => {
-      const offset = this.offset;
       const uploaded = pEvent.lengthComputable
-        ? offset + chunkSize * (pEvent.loaded / pEvent.total)
-        : offset;
+        ? this.offset + chunkSize * (pEvent.loaded / pEvent.total)
+        : this.offset;
       this.progress = +((uploaded / this.size) * 100).toFixed(2);
       const now = new Date().getTime();
       this.speed = Math.round((uploaded / (now - this.startTime)) * 1000);
