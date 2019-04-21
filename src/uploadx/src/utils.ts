@@ -17,3 +17,7 @@ export function resolveUrl(url: string, baseURI: string) {
     }
   }
 }
+
+export function unfunc<T, V>(value: T | ((ref: V) => T), ref?: V): T {
+  return value instanceof Function ? value(ref) : value;
+}

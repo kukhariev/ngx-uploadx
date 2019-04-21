@@ -1,3 +1,5 @@
+import { Uploader } from './uploader';
+
 export type UploadStatus =
   | 'added'
   | 'queue'
@@ -50,20 +52,15 @@ export interface UploadState {
 }
 
 export interface UploadItem {
-  /**
-   * Upload API initial method
-   * @defaultValue 'POST'
-   */
-  method?: string;
   readonly uploadId?: string;
   /**
    * Upload API URL
-   * @defaultValue '/upload/'
+   * @defaultValue '/upload'
    */
   endpoint?: string;
   /**
    * Upload API URL
-   * @defaultValue '/upload/'
+   * @defaultValue '/upload'
    * @deprecated Use {@link UploadItem.endpoint} instead.
    */
   url?: string;
@@ -73,8 +70,6 @@ export interface UploadItem {
   headers?: { [key: string]: string } | ((file?: File) => { [key: string]: string });
   /**
    * Upload meta
-   * @defaultValue
-   * { name: File.Filename, mimeType: File.type }
    */
   metadata?: { [key: string]: any } | ((file?: File) => { [key: string]: any });
   /**
@@ -82,69 +77,21 @@ export interface UploadItem {
    */
   token?: string | (() => string);
 }
+export interface UploaderOptions extends Pick<UploadItem, Exclude<keyof UploadItem, 'uploadId'>> {
+  maxRetryAttempts?: number;
+  chunkSize?: number;
+  withCredentials?: boolean;
+  readonly stateChange?: (evt: UploadState) => void;
+}
 /**
  * Global Options
  */
-export class UploadxOptions {
+export interface UploadxOptions extends UploaderOptions {
   /**
-   *  Set "accept" attribute
-   * @example
-   * allowedTypes: 'image/*, video/*'
+   * @beta
    */
-  allowedTypes?: string;
-  /**
-   * Auto upload with global options
-   * @defaultValue true
-   */
-  autoUpload?: boolean;
-  /**
-   * If set use chunks for upload
-   * @defaultValue 0
-   */
-  chunkSize?: number;
-  /**
-   * Uploads in parallel
-   * @defaultValue 2
-   */
+  uploaderClass?: new (f: File, options: UploadxOptions) => Uploader;
   concurrency?: number;
-  /**
-   * Custom headers
-   */
-  headers?: { [key: string]: string } | ((file?: File) => { [key: string]: string });
-  /**
-   * Upload API initial method
-   * @defaultValue 'POST'
-   */
-  method?: string;
-  /**
-   * Upload meta
-   * @defaultValue
-   * { name: File.Filename, mimeType: File.type }
-   */
-  metadata?: { [key: string]: any } | ((file?: File) => { [key: string]: any });
-  /**
-   * Authorization Bearer token
-   */
-  token?: string | (() => string);
-  /**
-   * Upload API URL
-   * @defaultValue '/upload/'
-   */
-  endpoint?: string;
-  /**
-   * Upload API URL
-   * @defaultValue '/upload/'
-   * @deprecated Use {@link UploadxOptions.endpoint} instead.
-   */
-  url?: string;
-  /**
-   * Use withCredentials xhr option?
-   * @defaultValue false
-   */
-  withCredentials?: boolean;
-  /**
-   * Max status 4xx retries
-   * @defaultValue 3
-   */
-  maxRetryAttempts?: number;
+  autoUpload?: boolean;
+  allowedTypes?: any;
 }

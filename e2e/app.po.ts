@@ -1,7 +1,7 @@
 import { browser, by, element } from 'protractor';
 
 export class AppPage {
-  navigateTo(path) {
+  navigateTo(path: string) {
     return browser.get(path);
   }
   sleep(t) {
@@ -11,10 +11,10 @@ export class AppPage {
     return element(by.css('app-root input'));
   }
   getUploadButton() {
-    return element(by.css('app-root upload'));
+    return element(by.css('app-root .upload'));
   }
   getTable() {
-    return element(by.css('app-root uploads-table'));
+    return element(by.css('app-root .uploads-table'));
   }
   getPreText() {
     return element(by.css('app-root pre')).getText();
@@ -24,7 +24,17 @@ export class AppPage {
       () =>
         element(by.css('app-root pre'))
           .getText()
-          .then(text => text.indexOf('complete') > 0),
+          .then(text => text.indexOf('complete') >= 0),
+      15000
+    );
+    return 'complete';
+  }
+  waitForCompleteTable() {
+    browser.wait(
+      () =>
+        element(by.css('.uploads-table'))
+          .getText()
+          .then(text => text.indexOf('complete') >= 0),
       15000
     );
     return 'complete';

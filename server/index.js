@@ -1,4 +1,11 @@
 // @ts-check
+
+const args = process.argv.slice(2);
+
+const reset = args.includes('--reset');
+const emitErrors = args.includes('--errors');
+const exit = args.includes('--exit');
+
 const DEV = process.env.NODE_ENV === 'development';
 const PORT = 3003;
 const http = require('http');
@@ -8,22 +15,25 @@ const { tmpdir } = require('os');
 const { Uploadx, DiskStorage } = require('node-uploadx');
 
 const storage = new DiskStorage({ dest: (req, file) => `${tmpdir()}/ngx/${file.filename}` });
-DEV && resetStorageBeforeTest(storage);
+reset && resetStorageBeforeTest(storage);
+exit && process.exit();
 
 const uploads = new Uploadx({ storage });
 uploads.on('error', console.error);
 const server = http.createServer((req, res) => {
-  if (DEV && Math.random() < 0.1 && req.method !== 'OPTIONS') {
-    res.writeHead(401, { 'Content-Type': 'text/plan', 'Access-Control-Allow-Origin': '*' });
-    res.end('Unauthorized');
+  if (emitErrors && Math.random() < 0.1 && req.method !== 'OPTIONS' && req.method !== 'DELETE') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.statusCode = 401;
+    res.end();
     return;
   }
   const pathname = url.parse(req.url).pathname.toLowerCase();
   if (pathname === '/upload') {
     uploads.handle(req, res);
   } else {
-    res.writeHead(404, { 'Content-Type': 'text/plan' });
-    res.end('Not Found');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.statusCode = 404;
+    res.end();
   }
 });
 
@@ -33,7 +43,7 @@ server.listen(PORT, error => {
   }
   DEV && console.log('listening on port:', PORT);
 });
-
+DEV && process.once('exit', () => console.log('exiting...'));
 function resetStorageBeforeTest(storage) {
   const files = storage.metaStore.all;
   for (const id in files) {
@@ -43,3 +53,5 @@ function resetStorageBeforeTest(storage) {
   }
   storage.metaStore.clear();
 }
+
+exports.reset = () => resetStorageBeforeTest(storage);

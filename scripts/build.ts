@@ -1,3 +1,4 @@
+/* tslint:disable */
 import * as util from 'util';
 import { build } from 'ng-packagr';
 import * as fs from 'fs';

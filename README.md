@@ -184,7 +184,7 @@ pause(uploadId: string) {
 | **[chunkSize]**        |   1MiB    | _If set to > 0 use chunked upload_                         |
 | **[concurrency]**      |     2     | _Limit the number of concurrent uploads_                   |
 | **[headers]**          |     -     | _Custom headers_                                           |
-| **[method]**           |  "POST"   | _Upload API initial method_                                |
+| **[uploaderClass]**    | UploaderX | _Upload API implementation_                                |
 | **[token]**            |     -     | _Auth Bearer token \/ token Getter_                        |
 | **[endpoint]**         | "/upload" | _API URL_                                                  |
 | **[maxRetryAttempts]** |     3     | _Maximum number of retries to allow (client errors (4xx))_ |

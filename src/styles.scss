@@ -60,24 +60,21 @@ header {
   margin-bottom: 5px;
   background-color: $red;
   @extend .shadow;
-  .logo {
-    text-decoration: none;
-    text-align: center;
-    color: $light;
-    width: 115px;
-    margin: auto 0;
-    font-weight: bold;
-  }
+
   nav {
     display: flex;
     flex-direction: row;
+    .logo {
+      height: 100%;
+      text-decoration: none;
+      text-align: center;
+      color: $light;
+      width: 115px;
+      margin: auto 0;
+      font-weight: bold;
+    }
     ul {
       display: flex;
-      flex-direction: row;
-      align-items: center;
-      list-style: none;
-      margin: 0;
-      padding: 0;
       width: 80wv;
     }
     li {
