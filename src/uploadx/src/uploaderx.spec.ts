@@ -8,6 +8,11 @@ describe('Uploader', () => {
     const uploader: Uploader = new UploaderX(file, {} as UploadxOptions);
     expect(uploader.chunkSize).toEqual(1_048_576);
   });
+  it('should set chunkSize', async function() {
+    const file = getFile();
+    const uploader: Uploader = new UploaderX(file, { chunkSize: 4_194_304 } as UploadxOptions);
+    expect(uploader.chunkSize).toEqual(4_194_304);
+  });
   it('should upload', async function() {
     const file = getFile();
     const uploader: Uploader = new UploaderX(file, {} as UploadxOptions);

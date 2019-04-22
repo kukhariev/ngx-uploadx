@@ -2,6 +2,7 @@ import { BackoffRetry } from './backoff_retry';
 import { UploaderOptions, UploadItem, UploadState, UploadStatus } from './interfaces';
 import { unfunc } from './utils';
 const noop = () => {};
+const DEFAULT_CHUNK_SIZE = 1_048_576;
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD';
 
 /**
@@ -80,7 +81,7 @@ export abstract class Uploader {
   /**
    * Chunk size in bytes
    */
-  chunkSize: number;
+  chunkSize: number = DEFAULT_CHUNK_SIZE;
   /**
    * Auth Bearer token/tokenGetter
    */
@@ -114,6 +115,7 @@ export abstract class Uploader {
     this.size = file.size;
     this.mimeType = file.type || 'application/octet-stream';
     this.stateChange = options.stateChange || noop;
+    this.chunkSize = options.chunkSize || this.chunkSize;
     this.configure(options);
   }
 

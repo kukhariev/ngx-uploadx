@@ -1,14 +1,12 @@
 import { UploadxOptions } from './interfaces';
 import { Uploader } from './uploader';
 import { resolveUrl } from './utils';
-const DEFAULT_CHUNK_SIZE = 1_048_576;
 /**
  * Implements XHR/CORS Resumable Upload
  * @see
  * https://developers.google.com/drive/v3/web/resumable-upload
  */
 export class UploaderX extends Uploader {
-  chunkSize = DEFAULT_CHUNK_SIZE;
   constructor(readonly file: File, options: UploadxOptions) {
     super(file, options);
     this.responseType = 'json' as XMLHttpRequestResponseType;
