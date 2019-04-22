@@ -25,7 +25,7 @@ export class UploaderNginxUploadModule extends Uploader {
     const headers = {
       'Content-Type': this.mimeType,
       'Session-ID': `${this.uploadId}`,
-      'Content-Disposition': 'attachment; filename="' + encodeURIComponent(this.name) + '"',
+      'Content-Disposition': `attachment; filename="${encodeURIComponent(this.name)}"`,
       'Content-Range': `bytes ${this.offset}-${end - 1}/${this.size}`
     };
     const _ = await this.request({
