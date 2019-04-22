@@ -1,10 +1,10 @@
 import { UploadxOptions, Uploader } from 'ngx-uploadx';
+
 /**
  * Implements nginx-upload-module resumable uploads protocol.
  * @see
  * https://github.com/fdintino/nginx-upload-module/blob/master/upload-protocol.md
  */
-
 export class UploaderNginxUploadModule extends Uploader {
   ready = 0;
   constructor(readonly file: File, options: UploadxOptions) {
