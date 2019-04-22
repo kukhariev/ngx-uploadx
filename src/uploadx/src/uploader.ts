@@ -225,7 +225,11 @@ export abstract class Uploader {
    */
 
   protected getValueFromResponse(key: string): string {
-    return this._xhr.getResponseHeader(key);
+    const value = this._xhr.getResponseHeader(key);
+    if (!value) {
+      throw new Error('Invalid Response');
+    }
+    return value;
   }
 
   /**
