@@ -3,12 +3,12 @@ import { UploadxOptions } from './interfaces';
 import { Uploader } from './uploader';
 
 describe('Uploader', () => {
-  it('should set to defaults if no options are specified', async function() {
+  it('should set to adaptive chunkSize if no options are specified', async function() {
     const file = getFile();
     const uploader: Uploader = new UploaderX(file, {} as UploadxOptions);
-    expect(uploader.chunkSize).toEqual(1_048_576);
+    expect(uploader.chunkSize).toEqual(4096 * 64);
   });
-  it('should set chunkSize', async function() {
+  it('should set fixed chunkSize', async function() {
     const file = getFile();
     const uploader: Uploader = new UploaderX(file, { chunkSize: 4_194_304 } as UploadxOptions);
     expect(uploader.chunkSize).toEqual(4_194_304);
