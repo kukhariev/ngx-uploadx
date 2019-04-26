@@ -9,6 +9,7 @@ import { resolveUrl } from './utils';
 export class UploaderX extends Uploader {
   constructor(readonly file: File, options: UploadxOptions) {
     super(file, options);
+    Uploader.addaptiveChunkSize = !options.chunkSize;
     this.responseType = 'json' as XMLHttpRequestResponseType;
   }
 

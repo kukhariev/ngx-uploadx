@@ -5,6 +5,7 @@ const noop = () => {};
 //
 const MIN_CHUNK_SIZE = 4096; // default blocksize of most fss
 const STARTING_CHUNK_SIZE = MIN_CHUNK_SIZE * 64;
+const DEFAULT_CHUNK_SIZE = MIN_CHUNK_SIZE * 256;
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD';
 
 /**
@@ -36,7 +37,7 @@ export abstract class Uploader {
   }
 
   private get isMaxAttemptsReached(): boolean {
-    return this.retry.retryAttempts === this.maxRetryAttempts && this.statusType === 400;
+    return this.retry.retryAttempts === Uploader.maxRetryAttempts && this.statusType === 400;
   }
   /**
    * Max 4xx errors
@@ -44,8 +45,7 @@ export abstract class Uploader {
   static maxRetryAttempts = 3;
   static maxChunkSize = Number.MAX_SAFE_INTEGER;
   static startingChunkSize = STARTING_CHUNK_SIZE;
-  private static addaptiveChunkSize = true;
-
+  protected static addaptiveChunkSize: boolean;
   /**
    * Original File name
    */
@@ -97,10 +97,7 @@ export abstract class Uploader {
    * Upload endpoint
    */
   endpoint = '/upload';
-  /**
-   * Max 4xx errors
-   */
-  protected maxRetryAttempts = 3;
+
   /**
    * Retries handler
    * @internal
@@ -152,13 +149,7 @@ export abstract class Uploader {
     this.size = file.size;
     this.mimeType = file.type || 'application/octet-stream';
     this.stateChange = options.stateChange || noop;
-    if (options.chunkSize) {
-      this.chunkSize = options.chunkSize;
-      Uploader.addaptiveChunkSize = false;
-    } else {
-      this.chunkSize = Uploader.startingChunkSize;
-    }
-
+    this.chunkSize = options.chunkSize ? options.chunkSize : DEFAULT_CHUNK_SIZE;
     this.configure(options);
   }
   /**
