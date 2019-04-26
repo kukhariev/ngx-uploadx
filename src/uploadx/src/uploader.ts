@@ -38,6 +38,10 @@ export abstract class Uploader {
   private get isMaxAttemptsReached(): boolean {
     return this.retry.retryAttempts === this.maxRetryAttempts && this.statusType === 400;
   }
+  /**
+   * Max 4xx errors
+   */
+  static maxRetryAttempts = 3;
   static maxChunkSize = Number.MAX_SAFE_INTEGER;
   static startingChunkSize = STARTING_CHUNK_SIZE;
   private static addaptiveChunkSize = true;
