@@ -34,6 +34,7 @@ export class UploadxService {
       }
     });
   }
+
   /**
    * Initializes service
    * @param options global options
@@ -59,12 +60,13 @@ export class UploadxService {
   }
 
   /**
-   * Terminate all uploads and clears the queue
+   * Terminates all uploads and clears the queue
    */
   disconnect(): void {
     this.queue.forEach(f => (f.status = 'paused'));
     this.queue = [];
   }
+
   /**
    * Create Uploader and add to the queue
    */
@@ -72,6 +74,7 @@ export class UploadxService {
     Array.from(fileList).forEach(file => this.addUploaderInstance(file));
     this.autoUploadFiles();
   }
+
   /**
    * Create Uploader for the file and add to the queue
    */
@@ -79,6 +82,7 @@ export class UploadxService {
     this.addUploaderInstance(file);
     this.autoUploadFiles();
   }
+
   private addUploaderInstance(file: File) {
     const uploader = new this.uploaderClass(file, this.options as UploaderOptions);
     this.queue.push(uploader);
@@ -98,7 +102,6 @@ export class UploadxService {
    * Control uploads status
    * @example
    * this.uploadService.control({ action: 'pauseAll' });
-   *
    */
   control(event: UploadxControlEvent): void {
     switch (event.action) {
@@ -148,6 +151,7 @@ export class UploadxService {
         uploader.upload();
       });
   }
+
   /**
    * @returns  number of active uploads
    */

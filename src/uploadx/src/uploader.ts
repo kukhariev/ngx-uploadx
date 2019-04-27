@@ -3,7 +3,7 @@ import { UploaderOptions, UploadItem, UploadState, UploadStatus } from './interf
 import { unfunc } from './utils';
 const noop = () => {};
 
-// default blocksize of most FSs
+// Default blocksize of most FSs
 const MIN_CHUNK_SIZE = 4096;
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD';
@@ -31,7 +31,6 @@ export abstract class Uploader {
     this._status = s;
     this.notifyState();
   }
-
   get status() {
     return this._status;
   }
@@ -48,7 +47,7 @@ export abstract class Uploader {
    */
   static maxChunkSize = Number.MAX_SAFE_INTEGER;
   /**
-   * Starting adaptive chunk size
+   * Initial chunk size
    */
   static startingChunkSize = MIN_CHUNK_SIZE * 64;
   /**
@@ -126,7 +125,7 @@ export abstract class Uploader {
    */
   token: string | (() => string);
   /**
-   * Status  of uploader
+   * Status of uploader
    * @internal
    */
   private _status: UploadStatus;
@@ -211,7 +210,7 @@ export abstract class Uploader {
    */
   protected abstract sendFileContent(): Promise<number>;
   /**
-   * Get offset for next request
+   * Get an offset for the next request
    */
   protected abstract getOffset(): Promise<number>;
 
@@ -236,10 +235,10 @@ export abstract class Uploader {
 
     this.stateChange(state);
   }
-  /**
-   * increases chunk size if request time is less than 1 sec
-   * and decreases if more than 10 secs
-   */
+
+  // Increases the chunkSize if the time of the request
+  // is less than 1 second,
+  // and decreases it if more than 10 seconds
   private setChunkSize() {
     const t = this.chunkSize / this.speed;
     if (t < 1 && this.chunkSize < Uploader.maxChunkSize) {
@@ -252,15 +251,15 @@ export abstract class Uploader {
     }
   }
 
-  protected abort() {
+  protected abort(): void {
     this._xhr.abort();
   }
 
-  protected onCancel() {
+  protected onCancel(): void {
     this.request({ method: 'DELETE' });
   }
   /**
-   *  Gets the value from response
+   *  Gets the value from the response
    */
   protected getValueFromResponse(key: string): string {
     const value = this._xhr.getResponseHeader(key);
@@ -282,7 +281,7 @@ export abstract class Uploader {
   }
 
   /**
-   * Start uploading
+   * Starts the actual uploading
    */
   async start() {
     while (this.status === 'uploading' || this.status === 'retry') {

@@ -21,7 +21,7 @@ export type UploadAction =
   | 'pause';
 
 export interface UploadxControlEvent {
-  token?: string | (() => string);
+  token?: string | ((httpStatus?: number) => string);
   action: UploadAction;
   /**
    * override global options
@@ -75,7 +75,7 @@ export interface UploadItem {
   /**
    * Authorization Bearer token
    */
-  token?: string | (() => string);
+  token?: string | ((httpStatus?: number) => string);
 }
 export interface UploaderOptions extends Pick<UploadItem, Exclude<keyof UploadItem, 'uploadId'>> {
   chunkSize?: number;
