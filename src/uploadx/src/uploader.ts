@@ -2,9 +2,10 @@ import { BackoffRetry } from './backoff_retry';
 import { UploaderOptions, UploadItem, UploadState, UploadStatus } from './interfaces';
 import { unfunc } from './utils';
 const noop = () => {};
-//
-const MIN_CHUNK_SIZE = 4096; // default blocksize of most fss
-const STARTING_CHUNK_SIZE = MIN_CHUNK_SIZE * 64;
+
+// default blocksize of most FSs
+const MIN_CHUNK_SIZE = 4096;
+
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD';
 
 /**
@@ -15,22 +16,22 @@ export abstract class Uploader {
    * Upload status
    */
   set status(s: UploadStatus) {
-    // Return if State is cancelled or complete
-    // (but allow cancel of an complete upload to remove from list and from server)
-    if (this._status === 'cancelled' || (this._status === 'complete' && s !== 'cancelled')) {
+    if (
+      s === this._status ||
+      this._status === 'cancelled' ||
+      (this._status === 'complete' && s !== 'cancelled')
+    ) {
       return;
     }
-    if (s !== this._status) {
-      if (this._xhr && (s === 'cancelled' || s === 'paused')) {
-        this._xhr.abort();
-      }
-      if (s === 'cancelled' && this.URI) {
-        this.request({ method: 'DELETE' });
-      }
-      this._status = s;
-      this.notifyState();
-    }
+
+    this._xhr && (s === 'cancelled' || s === 'paused') && this.abort();
+
+    s === 'cancelled' && this.URI && this.onCancel();
+
+    this._status = s;
+    this.notifyState();
   }
+
   get status() {
     return this._status;
   }
@@ -42,9 +43,14 @@ export abstract class Uploader {
    * Max 4xx errors
    */
   static maxRetryAttempts = 3;
+  /**
+   * Limits max chunk size
+   */
   static maxChunkSize = Number.MAX_SAFE_INTEGER;
-  static startingChunkSize = STARTING_CHUNK_SIZE;
-  protected static addaptiveChunkSize = false;
+  /**
+   * Starting adaptive chunk size
+   */
+  static startingChunkSize = MIN_CHUNK_SIZE * 64;
   /**
    * Original File name
    */
@@ -148,12 +154,11 @@ export abstract class Uploader {
     this.size = file.size;
     this.mimeType = file.type || 'application/octet-stream';
     this.stateChange = options.stateChange || noop;
-    Uploader.addaptiveChunkSize = !options.chunkSize;
     this.chunkSize = options.chunkSize ? options.chunkSize : Uploader.startingChunkSize;
     this.configure(options);
   }
   /**
-   * Configure or Reconfigure uploader
+   * Configure or reconfigure uploader
    */
   configure(item = {} as UploadItem): void {
     const { metadata, headers, token, endpoint } = item;
@@ -231,6 +236,10 @@ export abstract class Uploader {
 
     this.stateChange(state);
   }
+  /**
+   * increases chunk size if request time is less than 1 sec
+   * and decreases if more than 10 secs
+   */
   private setChunkSize() {
     const t = this.chunkSize / this.speed;
     if (t < 1 && this.chunkSize < Uploader.maxChunkSize) {
@@ -242,10 +251,17 @@ export abstract class Uploader {
       Uploader.startingChunkSize = this.chunkSize * 2;
     }
   }
+
+  protected abort() {
+    this._xhr.abort();
+  }
+
+  protected onCancel() {
+    this.request({ method: 'DELETE' });
+  }
   /**
    *  Gets the value from response
    */
-
   protected getValueFromResponse(key: string): string {
     const value = this._xhr.getResponseHeader(key);
     if (!value) {
@@ -273,7 +289,7 @@ export abstract class Uploader {
       try {
         this.offset = isNaN(this.offset) ? await this.getOffset() : await this.sendFileContent();
         this.retry.reset();
-        Uploader.addaptiveChunkSize && this.setChunkSize();
+        !this.options.chunkSize && this.setChunkSize();
         if (this.offset >= this.size) {
           this.progress = 100;
           this.status = 'complete';

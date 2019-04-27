@@ -54,4 +54,9 @@ export class UploaderNginxUploadModule extends Uploader {
     }
     return this.ready;
   }
+
+  // abort and delete not supported
+  abort() {}
+
+  onCancel() {}
 }
