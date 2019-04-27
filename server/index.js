@@ -14,11 +14,12 @@ const { unlinkSync } = require('fs');
 const { tmpdir } = require('os');
 const { Uploadx, DiskStorage } = require('node-uploadx');
 
+const maxChunkSize = '8MB';
 const storage = new DiskStorage({ dest: (req, file) => `${tmpdir()}/ngx/${file.filename}` });
 reset && resetStorageBeforeTest(storage);
 exit && process.exit();
 
-const uploads = new Uploadx({ storage });
+const uploads = new Uploadx({ storage, maxChunkSize });
 uploads.on('error', console.error);
 const server = http.createServer((req, res) => {
   if (emitErrors && Math.random() < 0.1 && req.method !== 'OPTIONS' && req.method !== 'DELETE') {

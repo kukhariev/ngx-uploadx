@@ -177,33 +177,32 @@ pause(uploadId: string) {
 
 ### UploadxOptions
 
-| Name                   | Defaults? | Description                                                |
-| ---------------------- | :-------: | ---------------------------------------------------------- |
-| **[allowedTypes]**     |     -     | _Set "accept" attribute_                                   |
-| **[autoUpload]**       |   true    | _Auto upload with global options_                          |
-| **[chunkSize]**        |   1MiB    | _If set to > 0 use chunked upload_                         |
-| **[concurrency]**      |     2     | _Limit the number of concurrent uploads_                   |
-| **[headers]**          |     -     | _Custom headers_                                           |
-| **[uploaderClass]**    | UploaderX | _Upload API implementation_                                |
-| **[token]**            |     -     | _Auth Bearer token \/ token Getter_                        |
-| **[endpoint]**         | "/upload" | _API URL_                                                  |
-| **[maxRetryAttempts]** |     3     | _Maximum number of retries to allow (client errors (4xx))_ |
+| Name                | Defaults? | Description                              |
+| ------------------- | :-------: | ---------------------------------------- |
+| **[allowedTypes]**  |     -     | _Set "accept" attribute_                 |
+| **[autoUpload]**    |   true    | _Auto upload with global options_        |
+| **[chunkSize]**     |   auto    | _Force constant chunk size_              |
+| **[concurrency]**   |     2     | _Limit the number of concurrent uploads_ |
+| **[headers]**       |     -     | _Custom headers_                         |
+| **[uploaderClass]** | UploaderX | _Upload API implementation_              |
+| **[token]**         |     -     | _Auth Bearer token \/ token Getter_      |
+| **[endpoint]**      | "/upload" | _API URL_                                |
 
 ### _\<Observable\>_ UploadState
 
-| Name               |       Type       | Description                                                                         |
-| ------------------ | :--------------: | ----------------------------------------------------------------------------------- |
-| **file**           |      _File_      | _FileAPI File_                                                                      |
-| **name**           |     _string_     | _file name_                                                                         |  |
-| **percentage**     |     _number_     | _progress percentage_                                                               |
-| **remaining**      |     _number_     | _ETA_                                                                               |
-| **response**       | _Object \| null_ | _response body_                                                                     |
-| **responseStatus** |     _number_     | _response’s status_                                                                 |
-| **size**           |     _number_     | _file size_                                                                         |
-| **speed**          |     _number_     | _upload speed bytes/sec_                                                            |
-| **status**         |  _UploadStatus_  | _'added', 'queue', 'uploading', 'complete','retry', 'error', 'cancelled', 'paused'_ |
-| **uploadId**       |     _string_     | _upload id_                                                                         |
-| **URI**            |     _string_     | _file URI_                                                                          |
+| Name               |      Type      | Description                                                                         |
+| ------------------ | :------------: | ----------------------------------------------------------------------------------- |
+| **file**           |     _File_     | _FileAPI File_                                                                      |
+| **name**           |    _string_    | _file name_                                                                         |
+| **percentage**     |    _number_    | _progress percentage_                                                               |
+| **remaining**      |    _number_    | _ETA_                                                                               |
+| **response**       |     _any_      | _response body_                                                                     |
+| **responseStatus** |    _number_    | _response’s status_                                                                 |
+| **size**           |    _number_    | _file size_                                                                         |
+| **speed**          |    _number_    | _upload speed bytes/sec_                                                            |
+| **status**         | _UploadStatus_ | _'added', 'queue', 'uploading', 'complete','retry', 'error', 'cancelled', 'paused'_ |
+| **uploadId**       |    _string_    | _upload id_                                                                         |
+| **URI**            |    _string_    | _file URI_                                                                          |
 
 ### UploadItem
 
@@ -244,13 +243,7 @@ Run `npm run build` to build the lib.
 
 Pull requests are welcome!
 
-## Collaborators
-
-<table><tbody><tr><th align="left">wil92</th><td><a href="https://github.com/wil92">GitHub/wil92</a></td></tr>
-<tr><th align="left">kukhariev</th><td><a href="https://github.com/kukhariev">GitHub/kukhariev</a></td></tr>
-</tbody></table>
-
-## Links
+## References
 
 - [https://developers.google.com/drive/v3/web/resumable-upload](https://developers.google.com/drive/v3/web/resumable-upload)
 

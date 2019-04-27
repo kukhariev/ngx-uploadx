@@ -78,7 +78,6 @@ export interface UploadItem {
   token?: string | (() => string);
 }
 export interface UploaderOptions extends Pick<UploadItem, Exclude<keyof UploadItem, 'uploadId'>> {
-  maxRetryAttempts?: number;
   chunkSize?: number;
   withCredentials?: boolean;
   readonly stateChange?: (evt: UploadState) => void;

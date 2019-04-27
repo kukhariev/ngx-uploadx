@@ -27,7 +27,7 @@ export class DirectiveWayComponent implements OnDestroy {
       metadata: (f: File) => ({ title: f.name }),
       autoUpload: true,
       withCredentials: false,
-      chunkSize: 1024 * 256 * 8,
+      // chunkSize: 1024 * 256 * 8,
       headers: (f: File) => ({
         'Content-Disposition': `filename=${encodeURI(f.name)}`
       })
