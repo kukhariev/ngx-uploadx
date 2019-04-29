@@ -50,7 +50,7 @@ export class UploadxService {
   /**
    * Initializes service
    * @param options global options
-   * @returns Observable that emits the current uploaders
+   * @returns Observable that emits the current array of uploaders
    */
   connect(options?: UploadxOptions): Observable<Uploader[]> {
     return this.init(options || this.options).pipe(
@@ -153,7 +153,7 @@ export class UploadxService {
   }
 
   /**
-   * @returns  number of active uploads
+   * @returns number of active uploads
    */
   runningProcess(): number {
     return this.queue.filter(
