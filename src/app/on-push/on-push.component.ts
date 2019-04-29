@@ -13,9 +13,8 @@ export class OnPushComponent implements OnDestroy {
   state: Observable<UploadState>;
   uploads$: Observable<Uploader[]>;
   options: UploadxOptions = {
-    url: `${environment.api}/upload?uploadType=uploadx`,
-    token: 'token',
-    chunkSize: 1024 * 256 * 8
+    url: `${environment.api}/upload`,
+    token: this.tokenGetter.bind(this)
   };
   constructor(private uploadService: UploadxService, private auth: AuthService) {
     this.uploads$ = this.uploadService.connect(this.options);
@@ -44,5 +43,13 @@ export class OnPushComponent implements OnDestroy {
 
   upload(uploadId: string) {
     this.uploadService.control({ action: 'upload', uploadId });
+  }
+
+  async tokenGetter(httpStatus: number) {
+    const token =
+      httpStatus === 401
+        ? await this.auth.refreshToken().toPromise()
+        : localStorage.getItem('token');
+    return token;
   }
 }

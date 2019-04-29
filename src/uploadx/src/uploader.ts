@@ -3,9 +3,6 @@ import { UploaderOptions, UploadItem, UploadState, UploadStatus } from './interf
 import { unfunc } from './utils';
 const noop = () => {};
 
-// Default blocksize of most FSs
-const MIN_CHUNK_SIZE = 4096;
-
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD';
 
 /**
@@ -23,9 +20,7 @@ export abstract class Uploader {
     ) {
       return;
     }
-
-    this._xhr && (s === 'cancelled' || s === 'paused') && this.abort();
-
+    (s === 'cancelled' || s === 'paused') && this.abort();
     s === 'cancelled' && this.URI && this.onCancel();
 
     this._status = s;
@@ -43,19 +38,23 @@ export abstract class Uploader {
    */
   static maxRetryAttempts = 3;
   /**
-   * Limits max chunk size
+   * Maximum chunk size
    */
   static maxChunkSize = Number.MAX_SAFE_INTEGER;
   /**
+   * Minimum chunk size
+   */
+  static minChunkSize = 4096; // efault blocksize of most FSs
+  /**
    * Initial chunk size
    */
-  static startingChunkSize = MIN_CHUNK_SIZE * 64;
+  static startingChunkSize = Uploader.minChunkSize * 64;
   /**
    * Original File name
    */
   readonly name: string;
   /**
-   * Size in bytes
+   * File size in bytes
    */
   readonly size: number;
   /**
@@ -104,7 +103,6 @@ export abstract class Uploader {
 
   /**
    * Retries handler
-   * @internal
    */
   protected retry = new BackoffRetry();
   /**
@@ -113,7 +111,6 @@ export abstract class Uploader {
   response: any;
   /**
    * HTTP response status category
-   * @internal
    */
   protected statusType: 200 | 300 | 400 | 500;
   /**
@@ -123,10 +120,9 @@ export abstract class Uploader {
   /**
    * Auth Bearer token/tokenGetter
    */
-  token: string | (() => string);
+  token: string | ((status: number) => string);
   /**
    * Status of uploader
-   * @internal
    */
   private _status: UploadStatus;
   /**
@@ -139,12 +135,10 @@ export abstract class Uploader {
   private stateChange: (evt: UploadState) => void;
   /**
    * Active HttpRequest
-   * @internal
    */
   protected _xhr: XMLHttpRequest;
   /**
    * byte offset within the whole file
-   * @internal
    */
   protected offset = 0;
 
@@ -156,6 +150,7 @@ export abstract class Uploader {
     this.chunkSize = options.chunkSize ? options.chunkSize : Uploader.startingChunkSize;
     this.configure(options);
   }
+
   /**
    * Configure or reconfigure uploader
    */
@@ -245,21 +240,21 @@ export abstract class Uploader {
       this.chunkSize *= 2;
       Uploader.startingChunkSize = this.chunkSize / 4;
     }
-    if (t > 10 && this.chunkSize > MIN_CHUNK_SIZE) {
+    if (t > 10 && this.chunkSize > Uploader.minChunkSize) {
       this.chunkSize /= 2;
       Uploader.startingChunkSize = this.chunkSize * 2;
     }
   }
 
   protected abort(): void {
-    this._xhr.abort();
+    this._xhr && this._xhr.abort();
   }
 
   protected onCancel(): void {
     this.request({ method: 'DELETE' });
   }
   /**
-   *  Gets the value from the response
+   * Gets the value from the response
    */
   protected getValueFromResponse(key: string): string {
     const value = this._xhr.getResponseHeader(key);
@@ -272,10 +267,10 @@ export abstract class Uploader {
   /**
    * Set auth token
    */
-  refreshToken(token?: any): void {
+  async refreshToken(token?: any) {
     this.token = token || this.token;
     if (this.token) {
-      const _token = unfunc(this.token, this.responseStatus);
+      const _token = await unfunc(this.token, this.responseStatus);
       this.headers = { ...this.headers, ...{ Authorization: `Bearer ${_token}` } };
     }
   }
@@ -335,7 +330,7 @@ export abstract class Uploader {
       const xhr: XMLHttpRequest = new XMLHttpRequest();
       xhr.open(method.toUpperCase(), url || this.URI, true);
       if (progress && body) {
-        xhr.upload.onprogress = this.onprogress((body as any).size);
+        xhr.upload.onprogress = this.onProgress((body as any).size);
       }
       this.setupXhr(xhr, headers);
       xhr.onload = () => {
@@ -349,6 +344,7 @@ export abstract class Uploader {
       xhr.send(body);
     });
   }
+
   private setupXhr(xhr: XMLHttpRequest, headers?: any) {
     this._xhr = xhr;
     xhr.responseType = this.responseType;
@@ -379,7 +375,7 @@ export abstract class Uploader {
     this.statusType = (xhr.status - (this.responseStatus % 100)) as any;
   }
 
-  private onprogress(chunkSize: number) {
+  private onProgress(chunkSize: number) {
     return (pEvent: ProgressEvent) => {
       const uploaded = pEvent.lengthComputable
         ? this.offset + chunkSize * (pEvent.loaded / pEvent.total)
