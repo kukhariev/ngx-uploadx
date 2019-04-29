@@ -1,5 +1,6 @@
 import { UploadxService } from './uploadx.service';
 import { UploadAction } from './interfaces';
+import { NgZone } from '@angular/core';
 const ENDPOINT = `http://localhost:3003/upload?user_id=test`;
 const options = {
   concurrency: 3,
@@ -31,7 +32,7 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 describe('UploadxService', () => {
   let service: UploadxService;
   beforeEach(() => {
-    service = new UploadxService();
+    service = new UploadxService(new NgZone({}));
   });
 
   it('should set default options', () => {
