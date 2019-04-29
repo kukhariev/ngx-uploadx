@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import {
@@ -24,13 +24,15 @@ export class UploadxService {
     autoUpload: true,
     concurrency: 2,
     uploaderClass: UploaderX,
-    stateChange: (evt: UploadState) => setTimeout(() => this.eventsStream.next(evt))
+    stateChange: (evt: UploadState) => {
+      setTimeout(() => this.ngZone.run(() => this.eventsStream.next(evt)));
+    }
   };
 
-  constructor() {
+  constructor(private ngZone: NgZone) {
     this.events.subscribe((evt: UploadEvent) => {
       if (evt.status !== 'uploading' && evt.status !== 'added') {
-        this.processQueue();
+        this.ngZone.runOutsideAngular(() => this.processQueue());
       }
     });
   }
