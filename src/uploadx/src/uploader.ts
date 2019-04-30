@@ -179,7 +179,7 @@ export abstract class Uploader {
       return;
     }
     this.status = 'uploading';
-    this.refreshToken();
+    await this.refreshToken();
     try {
       this.URI = await this.getFileURI();
       this.retry.reset();
@@ -302,7 +302,7 @@ export abstract class Uploader {
           this.status = 'queue';
           break;
         }
-        this.refreshToken();
+        await this.refreshToken();
         this.status = 'retry';
         const _ = await this.retry.wait(this.responseStatus);
         this.status = 'uploading';
