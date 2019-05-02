@@ -72,7 +72,7 @@ export class AppHomeComponent {
 
 - `chunkSize`: set a fixed chunk size. If not specified, the optimal size will be automatically adjusted based on the network speed.
 
-- `concurrency`: set the maximum parallel downloads. Default value: `2`
+- `concurrency`: set the maximum parallel uploads. Default value: `2`
 
 - `headers`: headers to be appended to each HTTP request
 
