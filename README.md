@@ -66,40 +66,23 @@ export class AppHomeComponent {
 
 ## Options
 
-- allowedTypes
+- `allowedTypes`: allowed file type filtering (directive only)
 
-  > allowed file type filtering (directive only)
+- `autoUpload`: automatically start upload when files added. Default value: `true`
 
-- autoUpload
+- `chunkSize`: set a fixed chunk size. If not specified, the optimal size will be automatically adjusted based on the network speed.
 
-  > automatically start upload when files added. Default value: `true`
+- `concurrency`: set the maximum parallel downloads. Default value: `2`
 
-- chunkSize
+- `headers`: headers to be appended to each HTTP request
 
-  > set a fixed chunk size. If not specified, the optimal size will be automatically adjusted based on the network speed.
+- `metadata`: add custom metadata to upload
 
-- concurrency
+- `uploaderClass`: provide a user-defined class to support another upload protocol or to extend an existing one. Examples : [internal](src/uploadx/src/uploaderx.ts) and [uploader-examples](uploader-examples)
 
-  > set the maximum parallel downloads. Default value: `2`
+- `token`: authorization Bearer token as a `string` or function returning a `string` or `Promise<string>`.
 
-- headers
-
-  > headers to be appended to each HTTP request
-
-- metadata
-
-  > add custom metadata to upload
-
-- uploaderClass
-
-  > provide a user-defined class to support another upload protocol or to extend an existing one. Examples : [internal](src/uploadx/src/uploaderx.ts) and [uploader-examples](uploader-examples)
-
-- token
-
-  > authorization Bearer token as a string or function returning a string or Promise\<string\>.
-
-- endpoint
-  > URL to create new uploads. Default value: `'/upload'`
+- `endpoint`: URL to create new uploads. Default value: `'/upload'`
 
 ## Directive
 
