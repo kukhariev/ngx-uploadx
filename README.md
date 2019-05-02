@@ -58,9 +58,49 @@ export class AppHomeComponent {
  }
 ```
 
+### Please navigate to the [src/app sub-folder](src/app) for more detailed examples
+
 ## Server-side setup
 
 - [node-uploadx](https://github.com/kukhariev/node-uploadx)
+
+## Options
+
+### allowedTypes
+
+> allowed file type filtering (directive only)
+
+### autoUpload
+
+> automatically start upload when files added. Default value: `true`
+
+### chunkSize
+
+> set a fixed chunk size. If not specified, the optimal size will be automatically adjusted based on the network speed.
+
+### concurrency
+
+> set the maximum parallel downloads. Default value: `2`
+
+### headers
+
+> headers to be appended to each HTTP request
+
+### metadata
+
+> add custom metadata to upload
+
+### uploaderClass
+
+> provide a user-defined class to support another upload protocol or to extend an existing one. Examples : [internal](src/uploadx/src/uploaderx.ts) and [uploader-examples](uploader-examples)
+
+### token
+
+> authorization Bearer token as a string or function returning a string or Promise\<string\>.
+
+### endpoint
+
+> URL to create new uploads. Default value: `'/upload'`
 
 ## Directive
 
@@ -103,8 +143,6 @@ uploadxOptions: UploadxOptions = {
   concurrency: 2,
   endpoint: `${environment.api}/upload`,
   token:  () => localStorage.getItem('access_token'),
-  autoUpload: true,
-  chunkSize: 1024 * 256 * 8
 };
 ngOnInit() {
   this.uploadService.init(this.uploadxOptions)

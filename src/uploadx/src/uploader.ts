@@ -179,8 +179,8 @@ export abstract class Uploader {
       return;
     }
     this.status = 'uploading';
-    await this.refreshToken();
     try {
+      await this.refreshToken();
       this.URI = await this.getFileURI();
       this.retry.reset();
       this.startTime = new Date().getTime();
@@ -328,7 +328,7 @@ export abstract class Uploader {
   }): Promise<number> {
     return new Promise((resolve, reject) => {
       const xhr: XMLHttpRequest = new XMLHttpRequest();
-      xhr.open(method.toUpperCase(), url || this.URI, true);
+      xhr.open(method, url || this.URI, true);
       if (progress && body) {
         xhr.upload.onprogress = this.onProgress((body as any).size);
       }
