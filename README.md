@@ -58,7 +58,7 @@ export class AppHomeComponent {
  }
 ```
 
-### Please navigate to the [src/app sub-folder](src/app) for more detailed examples
+> Please navigate to the [src/app sub-folder](src/app) for more detailed examples
 
 ## Server-side setup
 
@@ -66,41 +66,40 @@ export class AppHomeComponent {
 
 ## Options
 
-### allowedTypes
+- allowedTypes
 
-> allowed file type filtering (directive only)
+  > allowed file type filtering (directive only)
 
-### autoUpload
+- autoUpload
 
-> automatically start upload when files added. Default value: `true`
+  > automatically start upload when files added. Default value: `true`
 
-### chunkSize
+- chunkSize
 
-> set a fixed chunk size. If not specified, the optimal size will be automatically adjusted based on the network speed.
+  > set a fixed chunk size. If not specified, the optimal size will be automatically adjusted based on the network speed.
 
-### concurrency
+- concurrency
 
-> set the maximum parallel downloads. Default value: `2`
+  > set the maximum parallel downloads. Default value: `2`
 
-### headers
+- headers
 
-> headers to be appended to each HTTP request
+  > headers to be appended to each HTTP request
 
-### metadata
+- metadata
 
-> add custom metadata to upload
+  > add custom metadata to upload
 
-### uploaderClass
+- uploaderClass
 
-> provide a user-defined class to support another upload protocol or to extend an existing one. Examples : [internal](src/uploadx/src/uploaderx.ts) and [uploader-examples](uploader-examples)
+  > provide a user-defined class to support another upload protocol or to extend an existing one. Examples : [internal](src/uploadx/src/uploaderx.ts) and [uploader-examples](uploader-examples)
 
-### token
+- token
 
-> authorization Bearer token as a string or function returning a string or Promise\<string\>.
+  > authorization Bearer token as a string or function returning a string or Promise\<string\>.
 
-### endpoint
-
-> URL to create new uploads. Default value: `'/upload'`
+- endpoint
+  > URL to create new uploads. Default value: `'/upload'`
 
 ## Directive
 
@@ -213,7 +212,7 @@ pause(uploadId: string) {
 
 ## Interfaces
 
-### UploadxOptions
+### UploadxOptions interface
 
 | Name                | Defaults? | Description                              |
 | ------------------- | :-------: | ---------------------------------------- |
