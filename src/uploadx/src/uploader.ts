@@ -120,7 +120,7 @@ export abstract class Uploader {
   /**
    * Auth Bearer token/tokenGetter
    */
-  token: string | ((status: number) => string);
+  token: string | ((status: number) => string | Promise<string>);
   /**
    * Status of uploader
    */

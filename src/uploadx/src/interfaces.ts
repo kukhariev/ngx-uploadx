@@ -54,30 +54,34 @@ export interface UploadState {
 export interface UploadItem {
   readonly uploadId?: string;
   /**
-   * Upload API URL
+   * URL to create new uploads.
    * @defaultValue '/upload'
    */
   endpoint?: string;
   /**
-   * Upload API URL
+   * URL to create new uploads.
    * @defaultValue '/upload'
    * @deprecated Use {@link UploadItem.endpoint} instead.
    */
   url?: string;
   /**
-   * Custom headers
+   * Headers to be appended to each HTTP request
    */
   headers?: { [key: string]: string } | ((file?: File) => { [key: string]: string });
   /**
-   * Upload meta
+   * Custom uploads metadata
    */
   metadata?: { [key: string]: any } | ((file?: File) => { [key: string]: any });
   /**
-   * Authorization Bearer token
+   * Authorization  token as a `string` or function returning a `string` or `Promise<string>`
    */
-  token?: string | ((httpStatus?: number) => string);
+  token?: string | ((httpStatus?: number) => string | Promise<string>);
 }
 export interface UploaderOptions extends Pick<UploadItem, Exclude<keyof UploadItem, 'uploadId'>> {
+  /**
+   * Set a fixed chunk size.
+   * If not specified, the optimal size will be automatically adjusted based on the network speed.
+   */
   chunkSize?: number;
   withCredentials?: boolean;
   readonly stateChange?: (evt: UploadState) => void;
@@ -87,10 +91,16 @@ export interface UploaderOptions extends Pick<UploadItem, Exclude<keyof UploadIt
  */
 export interface UploadxOptions extends UploaderOptions {
   /**
-   * @beta
+   * Provide a user-defined class to support another upload protocol or to extend an existing one.
    */
   uploaderClass?: new (f: File, options: UploadxOptions) => Uploader;
+  /**
+   * Set the maximum parallel uploads
+   */
   concurrency?: number;
+  /**
+   * Automatically start upload when files added
+   */
   autoUpload?: boolean;
   allowedTypes?: any;
 }

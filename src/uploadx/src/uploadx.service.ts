@@ -101,7 +101,7 @@ export class UploadxService {
     }
   }
   /**
-   * Control uploads status
+   * Control the uploads status
    * @example
    * this.uploadService.control({ action: 'pauseAll' });
    */
