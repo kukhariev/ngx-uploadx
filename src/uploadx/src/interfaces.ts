@@ -21,7 +21,7 @@ export type UploadAction =
   | 'pause';
 
 export interface UploadxControlEvent {
-  token?: string | ((httpStatus?: number) => string);
+  token?: string | ((httpStatus?: number) => string | Promise<string>);
   action: UploadAction;
   /**
    * override global options
