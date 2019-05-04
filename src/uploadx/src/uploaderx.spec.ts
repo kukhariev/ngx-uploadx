@@ -15,9 +15,12 @@ describe('Uploader', () => {
   });
   it('should upload', async function() {
     const file = getFile();
-    const uploader: Uploader = new UploaderX(file, {} as UploadxOptions);
+    const uploader: Uploader = new UploaderX(file, {
+      token: () => Promise.resolve('_token_')
+    } as UploadxOptions);
     await uploader.upload();
     expect(uploader.responseStatus).toEqual(404);
+    expect(uploader.headers.Authorization).toBeDefined();
   });
 });
 

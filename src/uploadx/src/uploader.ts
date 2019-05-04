@@ -91,7 +91,7 @@ export abstract class Uploader {
   /**
    * Custom headers
    */
-  headers: { [key: string]: string } | null;
+  headers: { [key: string]: string } | null = {};
   /**
    * Metadata Object
    */
@@ -271,7 +271,7 @@ export abstract class Uploader {
     this.token = token || this.token;
     if (this.token) {
       const _token = await unfunc(this.token, this.responseStatus);
-      this.headers = { ...this.headers, ...{ Authorization: `Bearer ${_token}` } };
+      this.headers.Authorization = `Bearer ${_token}`;
     }
   }
 
@@ -281,7 +281,8 @@ export abstract class Uploader {
   async start() {
     while (this.status === 'uploading' || this.status === 'retry') {
       try {
-        this.offset = isNaN(this.offset) ? await this.getOffset() : await this.sendFileContent();
+        this.offset =
+          typeof this.offset === 'number' ? await this.sendFileContent() : await this.getOffset();
         this.retry.reset();
         !this.options.chunkSize && this.setChunkSize();
         if (this.offset >= this.size) {
