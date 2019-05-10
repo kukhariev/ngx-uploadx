@@ -54,8 +54,9 @@ export class AppHomeComponent {
       .subscribe((item: UploadState) => {
          console.log(item);
          //...
-      }
- }
+      });
+  }
+}
 ```
 
 > Please navigate to the [src/app sub-folder](src/app) for more detailed examples
