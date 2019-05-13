@@ -21,7 +21,7 @@
     "test:watch": "ng test",
     "test:coverage": "ng test --codeCoverage=true --progress=false",
     "test": "ng test --watch=false --progress=false",
-    "lint": "ng lint",
+    "lint": "npm run prettier && ng lint",
     "e2e": "ng e2e -c=ci",
     "server": "node ./server/ --reset",
     "server:dev": "NODE_ENV=development node ./server/ --reset --errors",
