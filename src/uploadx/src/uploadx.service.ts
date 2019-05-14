@@ -21,6 +21,7 @@ export class UploadxService {
   }
   queue: Uploader[] = [];
   options: UploadxOptions = {
+    endpoint: '/upload',
     autoUpload: true,
     concurrency: 2,
     uploaderClass: UploaderX,

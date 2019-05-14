@@ -37,6 +37,7 @@ describe('UploadxService', () => {
 
   it('should set default options', () => {
     service.init({});
+    expect(service.options.endpoint).toEqual('/upload');
     expect(service.options.concurrency).toEqual(2);
     expect(service.options.autoUpload).toEqual(true);
   });
