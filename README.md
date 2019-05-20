@@ -48,7 +48,7 @@ import { UploadxOptions, UploadState } from 'ngx-uploadx';
 })
 
 export class AppHomeComponent {
-  options: UploadxOptions = { url: `[URL]`};
+  options: UploadxOptions = { endpoint: `[URL]`};
   onUpload(state: Observable<UploadState>) {
     state
       .subscribe((item: UploadState) => {

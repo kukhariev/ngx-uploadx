@@ -44,8 +44,7 @@ export class UploadxService {
    * @returns Observable that emits a new value on progress or status changes
    */
   init(options: UploadxOptions): Observable<UploadState> {
-    // tslint:disable-next-line: deprecation
-    const endpoint = options.endpoint || options.url || this.options.endpoint;
+    const endpoint = options.endpoint || this.options.endpoint;
     this.options = { ...this.options, ...options, ...{ endpoint } };
     this.uploaderClass = this.options.uploaderClass;
     return this.events;

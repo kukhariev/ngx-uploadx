@@ -13,7 +13,7 @@ export class OnPushComponent implements OnDestroy {
   state: Observable<UploadState>;
   uploads$: Observable<Uploader[]>;
   options: UploadxOptions = {
-    url: `${environment.api}/upload`,
+    endpoint: `${environment.api}/upload`,
     token: this.tokenGetter.bind(this)
   };
   constructor(private uploadService: UploadxService, private auth: AuthService) {

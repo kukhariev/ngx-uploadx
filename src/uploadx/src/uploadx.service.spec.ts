@@ -42,7 +42,7 @@ describe('UploadxService', () => {
     expect(service.options.autoUpload).toEqual(true);
   });
   it('should set endpoint', () => {
-    service.init({ url: ENDPOINT });
+    service.init({ endpoint: ENDPOINT });
     expect(service.options.concurrency).toEqual(2);
     expect(service.options.autoUpload).toEqual(true);
     expect(service.options.endpoint).toEqual(ENDPOINT);
