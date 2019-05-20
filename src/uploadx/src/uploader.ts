@@ -21,7 +21,7 @@ export abstract class Uploader {
       return;
     }
     (s === 'cancelled' || s === 'paused') && this.abort();
-    s === 'cancelled' && this.URI && this.onCancel();
+    s === 'cancelled' && this.url && this.onCancel();
 
     this._status = s;
     this.notifyState();
@@ -87,7 +87,7 @@ export abstract class Uploader {
   /**
    * File URI
    */
-  URI: string;
+  url: string;
   /**
    * Custom headers
    */
@@ -181,7 +181,7 @@ export abstract class Uploader {
     this.status = 'uploading';
     try {
       await this.refreshToken();
-      this.URI = await this.getFileURI();
+      this.url = await this.getFileUrl();
       this.retry.reset();
       this.startTime = new Date().getTime();
       this.start();
@@ -199,7 +199,7 @@ export abstract class Uploader {
   /**
    * Get file URI
    */
-  protected abstract getFileURI(): Promise<string>;
+  protected abstract getFileUrl(): Promise<string>;
   /**
    * Send file content
    */
@@ -225,7 +225,7 @@ export abstract class Uploader {
       speed: this.speed,
       status: this.status,
       uploadId: this.uploadId,
-      URI: this.URI
+      url: this.url
     };
 
     this.stateChange(state);
@@ -329,7 +329,7 @@ export abstract class Uploader {
   }): Promise<number> {
     return new Promise((resolve, reject) => {
       const xhr: XMLHttpRequest = new XMLHttpRequest();
-      xhr.open(method, url || this.URI, true);
+      xhr.open(method, url || this.url, true);
       if (progress && body) {
         xhr.upload.onprogress = this.onProgress((body as any).size);
       }

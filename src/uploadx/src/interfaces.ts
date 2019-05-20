@@ -48,7 +48,7 @@ export interface UploadState {
   speed: number;
   status: UploadStatus;
   uploadId: string;
-  URI: string;
+  url: string;
 }
 
 export interface UploadItem {
@@ -58,12 +58,6 @@ export interface UploadItem {
    * @defaultValue '/upload'
    */
   endpoint?: string;
-  /**
-   * URL to create new uploads.
-   * @defaultValue '/upload'
-   * @deprecated Use {@link UploadItem.endpoint} instead.
-   */
-  url?: string;
   /**
    * Headers to be appended to each HTTP request
    */
