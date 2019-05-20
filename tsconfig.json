@@ -10,9 +10,6 @@
     "experimentalDecorators": true,
     "target": "es5",
     "baseUrl": "./",
-    "paths": {
-      "uploadx": ["dist/uploadx"]
-    },
     "typeRoots": ["node_modules/@types"],
     "lib": ["es2017", "dom"]
   }
