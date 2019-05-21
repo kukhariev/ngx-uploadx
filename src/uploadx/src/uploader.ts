@@ -162,16 +162,10 @@ export abstract class Uploader {
    */
   configure(item = {} as UploadItem): void {
     const { metadata, headers, token, endpoint } = item;
-    this.metadata = {
-      name: this.name,
-      mimeType: this.mimeType,
-      size: this.size,
-      lastModified: this.file.lastModified,
-      ...unfunc(metadata || this.metadata, this.file)
-    };
     this.endpoint = endpoint || this.endpoint;
-    this.headers = { ...this.headers, ...unfunc(headers, this.file) };
     this.token = token || this.token;
+    this.metadata = { ...this.metadata, ...unfunc(metadata, this.file) };
+    this.headers = { ...this.headers, ...unfunc(headers, this.file) };
   }
 
   /**
@@ -339,15 +333,13 @@ export abstract class Uploader {
       if (progress && body) {
         xhr.upload.onprogress = this.onProgress((body as any).size);
       }
+      this.resetResponse();
       this.setupXhr(xhr, headers);
       xhr.onload = () => {
         this.processResponse(xhr);
         this.statusType > 300 ? reject(this.responseStatus) : resolve(this.responseStatus);
       };
-      xhr.onerror = () => {
-        this.resetResponse();
-        reject();
-      };
+      xhr.onerror = () => reject;
       xhr.send(body);
     });
   }
