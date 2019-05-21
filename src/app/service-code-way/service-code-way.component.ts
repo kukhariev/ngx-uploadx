@@ -23,7 +23,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   private ngUnsubscribe: Subject<any> = new Subject();
   numberOfCopies = 0;
 
-  @ViewChild('file', { read: ElementRef }) fileInput: ElementRef;
+  @ViewChild('file', { read: ElementRef, static: true }) fileInput: ElementRef;
 
   constructor(private uploadService: UploadxService) {}
 
