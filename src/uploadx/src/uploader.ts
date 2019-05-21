@@ -44,7 +44,7 @@ export abstract class Uploader {
   /**
    * Minimum chunk size
    */
-  static minChunkSize = 4096; // efault blocksize of most FSs
+  static minChunkSize = 4096; // default blocksize of most FSs
   /**
    * Initial chunk size
    */
@@ -146,6 +146,12 @@ export abstract class Uploader {
     this.name = file.name;
     this.size = file.size;
     this.mimeType = file.type || 'application/octet-stream';
+    this.metadata = {
+      name: this.name,
+      mimeType: this.mimeType,
+      size: this.size,
+      lastModified: this.file.lastModified
+    };
     this.stateChange = options.stateChange || noop;
     this.chunkSize = options.chunkSize ? options.chunkSize : Uploader.startingChunkSize;
     this.configure(options);

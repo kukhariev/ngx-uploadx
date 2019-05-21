@@ -14,7 +14,7 @@ import { UploaderX } from './uploaderx';
 
 @Injectable({ providedIn: 'root' })
 export class UploadxService {
-  private uploaderClass: { new (f: File, options: UploadxOptions): Uploader };
+  private uploaderClass: new (f: File, options: UploadxOptions) => Uploader;
   private readonly eventsStream: Subject<UploadState> = new Subject();
   get events() {
     return this.eventsStream.asObservable();
