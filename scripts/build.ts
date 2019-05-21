@@ -18,7 +18,7 @@ const writeFile = util.promisify(fs.writeFile);
     delete packageJson['lint-staged'];
     delete packageJson.config;
     packageJson.peerDependencies = {
-      '@angular/common': '^6.0.0 || ^7.0.0',
+      '@angular/common': '>=6.0.0 <9.0.0',
       rxjs: '^6.0.0'
     };
     packageJson.ngPackage = {
