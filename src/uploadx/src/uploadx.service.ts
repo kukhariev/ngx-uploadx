@@ -44,8 +44,7 @@ export class UploadxService {
    * @returns Observable that emits a new value on progress or status changes
    */
   init(options: UploadxOptions): Observable<UploadState> {
-    const endpoint = options.endpoint || this.options.endpoint;
-    this.options = { ...this.options, ...options, ...{ endpoint } };
+    this.options = { ...this.options, ...options };
     this.uploaderClass = this.options.uploaderClass;
     return this.events;
   }
