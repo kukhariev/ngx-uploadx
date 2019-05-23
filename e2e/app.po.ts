@@ -10,6 +10,9 @@ export class AppPage {
   getFileInput() {
     return element(by.css('app-root input'));
   }
+  getVideoFileInput() {
+    return element(by.css('app-root  .video'));
+  }
   getUploadButton() {
     return element(by.css('app-root .upload'));
   }

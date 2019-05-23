@@ -9,6 +9,7 @@ import { DirectiveWayComponent } from './directive-way/directive-way.component';
 import { ServiceWayComponent } from './service-way/service-way.component';
 import { ServiceCodeWayComponent } from './service-code-way/service-code-way.component';
 import { OnPushComponent } from './on-push/on-push.component';
+import { MultipleDirectiveComponent } from './multiple-directive/multiple-directive.component';
 
 @NgModule({
   declarations: [
@@ -16,10 +17,12 @@ import { OnPushComponent } from './on-push/on-push.component';
     DirectiveWayComponent,
     ServiceWayComponent,
     ServiceCodeWayComponent,
-    OnPushComponent
+    OnPushComponent,
+    MultipleDirectiveComponent
   ],
   imports: [RouterModule.forRoot(AppRoutes), BrowserModule, UploadxModule],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  exports: []
 })
 export class AppModule {}
