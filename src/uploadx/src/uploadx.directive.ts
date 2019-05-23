@@ -41,7 +41,6 @@ export class UploadxDirective implements OnInit, OnDestroy {
           this.uploadx.allowedTypes
         );
       }
-      this.uploadService.init(this.uploadx);
     }
     this.uploadxState.emit(this.uploadService.events);
     this.listenerFn = this.renderer.listen(
@@ -59,7 +58,7 @@ export class UploadxDirective implements OnInit, OnDestroy {
 
   fileListener = () => {
     if (this.elementRef.nativeElement.files) {
-      this.uploadService.handleFileList(this.elementRef.nativeElement.files);
+      this.uploadService.handleFileList(this.elementRef.nativeElement.files, this.uploadx);
     }
   };
 }

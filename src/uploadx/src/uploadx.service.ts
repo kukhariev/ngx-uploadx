@@ -45,7 +45,6 @@ export class UploadxService {
    */
   init(options: UploadxOptions): Observable<UploadState> {
     this.options = { ...this.options, ...options };
-    this.uploaderClass = this.options.uploaderClass;
     return this.events;
   }
   /**
@@ -71,21 +70,24 @@ export class UploadxService {
   /**
    * Create Uploader and add to the queue
    */
-  handleFileList(fileList: FileList): void {
-    Array.from(fileList).forEach(file => this.addUploaderInstance(file));
+  handleFileList(fileList: FileList, options = {}): void {
+    const instanceOptions = { ...this.options, ...options };
+    Array.from(fileList).forEach(file => this.addUploaderInstance(file, instanceOptions));
     this.autoUploadFiles();
   }
 
   /**
    * Create Uploader for the file and add to the queue
    */
-  handleFile(file: File): void {
-    this.addUploaderInstance(file);
+  handleFile(file: File, options = {}): void {
+    const instanceOptions = { ...this.options, ...options };
+    this.addUploaderInstance(file, instanceOptions);
     this.autoUploadFiles();
   }
 
-  private addUploaderInstance(file: File) {
-    const uploader = new this.uploaderClass(file, this.options as UploaderOptions);
+  private addUploaderInstance(file: File, options) {
+    this.uploaderClass = options.uploaderClass;
+    const uploader = new this.uploaderClass(file, options);
     this.queue.push(uploader);
     uploader.status = 'added';
   }
