@@ -163,11 +163,11 @@ export class AppHomeComponent {
 
   Terminate all uploads and clears the queue
 
-- `handleFile(file: File): void`
+- `handleFile(file: File, options?: UploadxOptions): void`
 
   Create Uploader for the file and add to the queue
 
-- `handleFileList(fileList: FileList): void`
+- `handleFileList(fileList: FileList, options?: UploadxOptions): void`
 
   Add files to the upload queue
 
