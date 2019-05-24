@@ -11,7 +11,7 @@ export class UploaderNginxUploadModule extends Uploader {
     super(file, options);
     this.offset = 0;
   }
-  async getFileURI(): Promise<string> {
+  async getFileUrl(): Promise<string> {
     return this.endpoint;
   }
 
@@ -31,7 +31,7 @@ export class UploaderNginxUploadModule extends Uploader {
     const _ = await this.request({
       method: 'POST',
       body,
-      url: this.URI,
+      url: this.url,
       headers,
       progress: true
     });
