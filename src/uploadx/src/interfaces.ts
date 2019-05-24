@@ -87,7 +87,7 @@ export interface UploadxOptions extends UploaderOptions {
   /**
    * Provide a user-defined class to support another upload protocol or to extend an existing one.
    */
-  uploaderClass?: new (f: File, options: UploadxOptions) => Uploader;
+  uploaderClass?: new (f: File, options: UploaderOptions) => Uploader;
   /**
    * Set the maximum parallel uploads
    */

@@ -14,7 +14,7 @@ import { UploaderX } from './uploaderx';
 
 @Injectable({ providedIn: 'root' })
 export class UploadxService {
-  private uploaderClass: new (f: File, options: UploadxOptions) => Uploader;
+  private uploaderClass: new (f: File, options: UploaderOptions) => Uploader;
   private readonly eventsStream: Subject<UploadState> = new Subject();
   get events() {
     return this.eventsStream.asObservable();
@@ -53,7 +53,7 @@ export class UploadxService {
    * @returns Observable that emits the current array of uploaders
    */
   connect(options?: UploadxOptions): Observable<Uploader[]> {
-    return this.init(options || this.options).pipe(
+    return this.init(options).pipe(
       startWith(0),
       map(() => this.queue)
     );
@@ -85,9 +85,9 @@ export class UploadxService {
     this.autoUploadFiles();
   }
 
-  private addUploaderInstance(file: File, options) {
+  private addUploaderInstance(file: File, options: UploadxOptions) {
     this.uploaderClass = options.uploaderClass;
-    const uploader = new this.uploaderClass(file, options);
+    const uploader = new this.uploaderClass(file, options as UploaderOptions);
     this.queue.push(uploader);
     uploader.status = 'added';
   }
