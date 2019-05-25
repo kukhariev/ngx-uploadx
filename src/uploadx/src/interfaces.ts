@@ -86,15 +86,26 @@ export interface UploaderOptions extends Pick<UploadItem, Exclude<keyof UploadIt
 export interface UploadxOptions extends UploaderOptions {
   /**
    * Provide a user-defined class to support another upload protocol or to extend an existing one.
+   * @defaultValue UploadX
    */
   uploaderClass?: new (f: File, options: UploaderOptions) => Uploader;
   /**
    * Set the maximum parallel uploads
+   * @defaultValue 2
    */
   concurrency?: number;
   /**
    * Automatically start upload when files added
+   * @defaultValue true
    */
   autoUpload?: boolean;
-  allowedTypes?: any;
+  /**
+   * File types the user can pick from the file input
+   */
+  allowedTypes?: string;
+  /**
+   * Add 'multiple' attribute
+   * @defaultValue true
+   */
+  multiple?: boolean;
 }

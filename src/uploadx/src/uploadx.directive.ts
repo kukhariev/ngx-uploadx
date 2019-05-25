@@ -33,14 +33,16 @@ export class UploadxDirective implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    if (this.uploadx) {
-      if (this.uploadx.allowedTypes) {
-        this.renderer.setAttribute(
-          this.elementRef.nativeElement,
-          'accept',
-          this.uploadx.allowedTypes
-        );
-      }
+    if (!this.uploadx || this.uploadx.multiple !== false) {
+      this.renderer.setAttribute(this.elementRef.nativeElement, 'multiple', '');
+    }
+
+    if (this.uploadx && this.uploadx.allowedTypes) {
+      this.renderer.setAttribute(
+        this.elementRef.nativeElement,
+        'accept',
+        this.uploadx.allowedTypes
+      );
     }
     this.uploadxState.emit(this.uploadService.events);
     this.listenerFn = this.renderer.listen(
