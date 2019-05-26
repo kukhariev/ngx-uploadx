@@ -1,14 +1,27 @@
 import { BackoffRetry } from './backoff_retry';
-import { UploaderOptions, UploadItem, UploadState, UploadStatus } from './interfaces';
-import { unfunc } from './utils';
-const noop = () => {};
-
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD';
+import { UploaderOptions, UploadItem, UploadState, UploadStatus, HttpMethod } from './interfaces';
+import { unfunc, noop } from './utils';
 
 /**
  * Uploader Base Class
  */
 export abstract class Uploader {
+  /**
+   * Max 4xx errors
+   */
+  static maxRetryAttempts = 3;
+  /**
+   * Maximum chunk size
+   */
+  static maxChunkSize = Number.MAX_SAFE_INTEGER;
+  /**
+   * Minimum chunk size
+   */
+  static minChunkSize = 4096; // default blocksize of most FSs
+  /**
+   * Initial chunk size
+   */
+  static startingChunkSize = Uploader.minChunkSize * 64;
   /**
    * Upload status
    */
@@ -33,22 +46,7 @@ export abstract class Uploader {
   private get isMaxAttemptsReached(): boolean {
     return this.retry.retryAttempts === Uploader.maxRetryAttempts && this.statusType === 400;
   }
-  /**
-   * Max 4xx errors
-   */
-  static maxRetryAttempts = 3;
-  /**
-   * Maximum chunk size
-   */
-  static maxChunkSize = Number.MAX_SAFE_INTEGER;
-  /**
-   * Minimum chunk size
-   */
-  static minChunkSize = 4096; // default blocksize of most FSs
-  /**
-   * Initial chunk size
-   */
-  static startingChunkSize = Uploader.minChunkSize * 64;
+
   /**
    * Original File name
    */
@@ -175,7 +173,7 @@ export abstract class Uploader {
     if (item) {
       this.configure(item);
     }
-    if (this.status === 'cancelled' || this.status === 'complete' || this.status === 'paused') {
+    if (this.status in ['cancelled', 'complete', 'paused']) {
       return;
     }
     this.status = 'uploading';

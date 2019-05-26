@@ -1,5 +1,7 @@
 import { Uploader } from './uploader';
 
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD';
+
 export type UploadStatus =
   | 'added'
   | 'queue'
