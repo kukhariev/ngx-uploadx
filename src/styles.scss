@@ -43,7 +43,10 @@ body {
     background-color: lighten($red, 5%);
   }
 }
-
+.uploadx-drop-active {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3);
+  background-color: lighten($red, 10%);
+}
 .container {
   margin: 0;
   padding: 0;
