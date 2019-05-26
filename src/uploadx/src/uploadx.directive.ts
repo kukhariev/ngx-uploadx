@@ -2,8 +2,8 @@ import {
   Directive,
   ElementRef,
   EventEmitter,
+  HostListener,
   Input,
-  OnDestroy,
   OnInit,
   Output,
   Renderer2
@@ -14,7 +14,7 @@ import { UploadxService } from './uploadx.service';
 @Directive({
   selector: '[uploadx]'
 })
-export class UploadxDirective implements OnInit, OnDestroy {
+export class UploadxDirective implements OnInit {
   listenerFn: () => void;
   @Output()
   uploadxState = new EventEmitter();
@@ -44,23 +44,14 @@ export class UploadxDirective implements OnInit, OnDestroy {
         this.uploadx.allowedTypes
       );
     }
+
     this.uploadxState.emit(this.uploadService.events);
-    this.listenerFn = this.renderer.listen(
-      this.elementRef.nativeElement,
-      'change',
-      this.fileListener
-    );
   }
 
-  ngOnDestroy() {
-    if (this.listenerFn) {
-      this.listenerFn();
+  @HostListener('change', ['$event.target.files'])
+  fileListener(files: FileList) {
+    if (files && files.item(0)) {
+      this.uploadService.handleFileList(files, this.uploadx);
     }
   }
-
-  fileListener = () => {
-    if (this.elementRef.nativeElement.files) {
-      this.uploadService.handleFileList(this.elementRef.nativeElement.files, this.uploadx);
-    }
-  };
 }
