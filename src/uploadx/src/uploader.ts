@@ -7,6 +7,10 @@ import { unfunc, noop } from './utils';
  */
 export abstract class Uploader {
   /**
+   * HTTP StatusCodes should not be retried
+   */
+  static fatalStatusCodes = [403];
+  /**
    * Max 4xx errors
    */
   static maxRetryAttempts = 3;
@@ -44,7 +48,10 @@ export abstract class Uploader {
   }
 
   private get isMaxAttemptsReached(): boolean {
-    return this.retry.retryAttempts === Uploader.maxRetryAttempts && this.statusType === 400;
+    return (
+      this.responseStatus in Uploader.fatalStatusCodes ||
+      (this.retry.retryAttempts === Uploader.maxRetryAttempts && this.statusType === 400)
+    );
   }
 
   /**
