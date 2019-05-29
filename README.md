@@ -68,6 +68,8 @@ export class AppHomeComponent {
 
 - `allowedTypes`: Allowed file types (directive only)
 
+- `multiple`: Allow to select multiple files. Default value: `true`
+
 - `autoUpload`: Auto start upload when files added. Default value: `true`
 
 - `chunkSize`: Set a fixed chunk size. If not specified, the optimal size will be automatically adjusted based on the network speed.
@@ -84,34 +86,39 @@ export class AppHomeComponent {
 
 - `endpoint`: URL to create new uploads. Default value: `'/upload'`
 
-## Directive
+## Directives
 
 ```html
-<input
-  type="file"
-  [uploadx]="options"
-  [uploadxAction]="control"
-  (uploadxState)="onUpload($event)"
-/>
+<div>
+  <label class="file-drop" uploadxDrop>
+    <input
+      type="file"
+      [uploadx]="options"
+      [uploadxAction]="control"
+      (uploadxState)="onUpload($event)"
+    />
+  </label>
+</div>
 ```
 
-### Selector
+### uploadx
 
-- `uploadx`
-
-### inputs
+File input directive
 
 - `[uploadx]: UploadxOptions`
 
-  Set options
+  Set directive options
 
 - `[uploadxAction]: UploadxControlEvent`
 
-  Control the uploads status
-
-### Output
+  Control the uploads
 
 - `(uploadxState): ($event: <Observable>UploadState)=> void`
+
+### uploadxDrop
+
+File drop directive.
+Activates the `.uploadx-drop-active` class on DnD operations.
 
 ## UploadxService
 
@@ -173,12 +180,15 @@ export class AppHomeComponent {
 
 - `control(event: UploadxControlEvent): void`
 
-  Control the uploads status
+  Uploads control
 
   ```ts
   // @example:
   pause(uploadId: string) {
     this.uploadService.control({ action: 'pause', uploadId });
+  }
+  setToken(token: string) {
+    this.uploadService.control({ token });
   }
   ```
 
