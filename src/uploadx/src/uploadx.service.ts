@@ -1,14 +1,7 @@
 import { Injectable, NgZone } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
-import {
-  UploadEvent,
-  UploadState,
-  UploadStatus,
-  UploadxControlEvent,
-  UploadxOptions,
-  UploaderOptions
-} from './interfaces';
+import { UploaderOptions, UploadxControlEvent, UploadxOptions, UploadState } from './interfaces';
 import { Uploader } from './uploader';
 import { UploaderX } from './uploaderx';
 
@@ -31,7 +24,7 @@ export class UploadxService {
   };
 
   constructor(private ngZone: NgZone) {
-    this.events.subscribe((evt: UploadEvent) => {
+    this.events.subscribe((evt: UploadState) => {
       if (evt.status !== 'uploading' && evt.status !== 'added') {
         this.ngZone.runOutsideAngular(() => this.processQueue());
       }
@@ -101,40 +94,16 @@ export class UploadxService {
       this.queue.filter(f => f.status === 'added').forEach(f => (f.status = 'queue'));
     }
   }
+
   /**
-   * Control the uploads status
+   * Uploads control
    * @example
-   * this.uploadService.control({ action: 'pauseAll' });
+   * this.uploadService.control({ action: 'pause' });
    */
   control(event: UploadxControlEvent): void {
-    switch (event.action) {
-      case 'cancelAll':
-        this.queue.forEach(f => (f.status = 'cancelled'));
-        break;
-      case 'pauseAll':
-        this.queue.forEach(f => (f.status = 'paused'));
-        break;
-      case 'refreshToken':
-        this.queue.forEach(f => f.refreshToken(event.token));
-        break;
-      case 'uploadAll':
-        this.queue.filter(f => f.status !== 'uploading').forEach(f => (f.status = 'queue'));
-        break;
-      case 'upload':
-        const uploadId = event.uploadId || event.itemOptions.uploadId;
-        const upload = this.queue.find(f => f.uploadId === uploadId);
-        upload.configure(event.itemOptions);
-        upload.status = 'queue' as UploadStatus;
-        break;
-      case 'cancel':
-        this.queue.find(f => f.uploadId === event.uploadId).status = 'cancelled';
-        break;
-      case 'pause':
-        this.queue.find(f => f.uploadId === event.uploadId).status = 'paused';
-        break;
-      default:
-        break;
-    }
+    const uploadId = event.uploadId;
+    const target = uploadId ? this.queue.filter(f => f.uploadId === uploadId) : this.queue;
+    target.forEach(f => f.configure(event));
   }
 
   /**

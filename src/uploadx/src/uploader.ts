@@ -1,6 +1,12 @@
 import { BackoffRetry } from './backoff_retry';
-import { UploaderOptions, UploadItem, UploadState, UploadStatus, HttpMethod } from './interfaces';
-import { unfunc, noop } from './utils';
+import {
+  HttpMethod,
+  UploaderOptions,
+  UploadState,
+  UploadStatus,
+  UploadxControlEvent
+} from './interfaces';
+import { actionToStatusMap, noop, unfunc } from './utils';
 
 /**
  * Uploader Base Class
@@ -49,11 +55,10 @@ export abstract class Uploader {
 
   private get isMaxAttemptsReached(): boolean {
     return (
-      this.responseStatus in Uploader.fatalStatusCodes ||
+      Uploader.fatalStatusCodes.includes(this.responseStatus) ||
       (this.retry.retryAttempts === Uploader.maxRetryAttempts && this.statusType === 400)
     );
   }
-
   /**
    * Original File name
    */
@@ -158,31 +163,26 @@ export abstract class Uploader {
       lastModified: this.file.lastModified
     };
     this.stateChange = options.stateChange || noop;
-    this.chunkSize = options.chunkSize ? options.chunkSize : Uploader.startingChunkSize;
+    this.chunkSize = options.chunkSize || Uploader.startingChunkSize;
     this.configure(options);
   }
 
   /**
    * Configure or reconfigure uploader
    */
-  configure(item = {} as UploadItem): void {
-    const { metadata, headers, token, endpoint } = item;
+  configure(config = {} as UploadxControlEvent): void {
+    const { metadata, headers, token, endpoint, action } = config;
     this.endpoint = endpoint || this.endpoint;
     this.token = token || this.token;
     this.metadata = { ...this.metadata, ...unfunc(metadata, this.file) };
     this.headers = { ...this.headers, ...unfunc(headers, this.file) };
+    action && (this.status = actionToStatusMap[action]);
   }
 
   /**
    * Initiate upload
    */
-  async upload(item?: UploadItem): Promise<void> {
-    if (item) {
-      this.configure(item);
-    }
-    if (this.status in ['cancelled', 'complete', 'paused']) {
-      return;
-    }
+  async upload(): Promise<void> {
     this.status = 'uploading';
     try {
       await this.refreshToken();
@@ -222,7 +222,6 @@ export abstract class Uploader {
       file: this.file,
       name: this.name,
       progress: this.progress,
-      percentage: this.progress,
       remaining: this.remaining,
       response: this.response,
       responseStatus: this.responseStatus,
