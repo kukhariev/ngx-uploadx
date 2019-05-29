@@ -11,28 +11,27 @@ import { UploadxDirective } from './uploadx.directive';
     <input type="file" [uploadx]="options" [uploadxAction]="action" />
   `
 })
-class TestuploadxComponent {
+class UploadxTestComponent {
   options = {
     allowedTypes: 'image/*,video/*',
-    url: `http://localhost:3003/upload/?parts=test`
+    endpoint: `http://localhost:3003/upload/?parts=test`
   };
-  action = { action: 'pauseAll' };
-  constructor(private uploadService: UploadxService) {}
+  action = { action: 'pause' };
 }
 
 describe('Directive: UploadxDirective', () => {
-  let component: TestuploadxComponent;
-  let fixture: ComponentFixture<TestuploadxComponent>;
+  let component: UploadxTestComponent;
+  let fixture: ComponentFixture<UploadxTestComponent>;
   let inputEl: DebugElement;
   let uploadService: UploadxService;
   let uploadServiceSpy;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [TestuploadxComponent, UploadxDirective],
+      declarations: [UploadxTestComponent, UploadxDirective],
       providers: [UploadxService]
     }).compileComponents();
-    fixture = TestBed.createComponent(TestuploadxComponent);
+    fixture = TestBed.createComponent(UploadxTestComponent);
     component = fixture.componentInstance;
     inputEl = fixture.debugElement.query(By.css('input'));
     uploadService = fixture.debugElement.injector.get<UploadxService>(UploadxService);
@@ -42,6 +41,10 @@ describe('Directive: UploadxDirective', () => {
   it('has attribute "accept"', () => {
     fixture.detectChanges();
     expect(inputEl.nativeElement.hasAttribute('accept')).toBe(true);
+  });
+  it('has attribute "multiple"', () => {
+    fixture.detectChanges();
+    expect(inputEl.nativeElement.hasAttribute('multiple')).toBe(true);
   });
   it('set uploadxAction', () => {
     fixture.detectChanges();

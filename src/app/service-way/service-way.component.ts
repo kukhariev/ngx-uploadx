@@ -1,12 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-
-import { UploadxOptions, UploadState, UploadxService, UploadItem } from '../../uploadx';
 import { environment } from '../../environments/environment';
-import { Ufile } from '../ufile';
+import { UploadState, UploadxOptions, UploadxService } from '../../uploadx';
 import { AuthService, tokenGetter } from '../auth.service';
+import { Ufile } from '../ufile';
+import { UploaderExt } from './uploader-ext.class';
 
 @Component({
   selector: 'app-service-way',
@@ -16,9 +15,10 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
   state: Observable<UploadState>;
   uploads: Ufile[] = [];
   options: UploadxOptions = {
-    url: `${environment.api}/upload`,
+    endpoint: `${environment.api}/upload`,
     token: tokenGetter,
-    chunkSize: 2_097_152
+    chunkSize: 2_097_152,
+    uploaderClass: UploaderExt
   };
   private ngUnsubscribe: Subject<any> = new Subject();
 

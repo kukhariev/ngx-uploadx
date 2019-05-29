@@ -41,4 +41,11 @@ describe('uploader App', () => {
     expect(page.waitForCompleteTable()).toEqual('complete');
     reset();
   });
+
+  it('should upload a file (Multi)', () => {
+    page.navigateTo('/multi');
+    page.getVideoFileInput().sendKeys(absolutePath);
+    expect(page.waitForCompleteTable()).toEqual('complete');
+    reset();
+  });
 });

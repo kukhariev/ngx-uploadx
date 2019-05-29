@@ -48,7 +48,7 @@ import { UploadxOptions, UploadState } from 'ngx-uploadx';
 })
 
 export class AppHomeComponent {
-  options: UploadxOptions = { url: `[URL]`};
+  options: UploadxOptions = { endpoint: `[URL]`};
   onUpload(state: Observable<UploadState>) {
     state
       .subscribe((item: UploadState) => {
@@ -69,6 +69,8 @@ export class AppHomeComponent {
 
 - `allowedTypes`: Allowed file types (directive only)
 
+- `multiple`: Allow to select multiple files. Default value: `true`
+
 - `autoUpload`: Auto start upload when files added. Default value: `true`
 
 - `chunkSize`: Set a fixed chunk size. If not specified, the optimal size will be automatically adjusted based on the network speed.
@@ -85,34 +87,39 @@ export class AppHomeComponent {
 
 - `endpoint`: URL to create new uploads. Default value: `'/upload'`
 
-## Directive
+## Directives
 
 ```html
-<input
-  type="file"
-  [uploadx]="options"
-  [uploadxAction]="control"
-  (uploadxState)="onUpload($event)"
-/>
+<div>
+  <label class="file-drop" uploadxDrop>
+    <input
+      type="file"
+      [uploadx]="options"
+      [uploadxAction]="control"
+      (uploadxState)="onUpload($event)"
+    />
+  </label>
+</div>
 ```
 
-### Selector
+### uploadx
 
-- `uploadx`
-
-### inputs
+File input directive
 
 - `[uploadx]: UploadxOptions`
 
-  Set options
+  Set directive options
 
 - `[uploadxAction]: UploadxControlEvent`
 
-  Control the uploads status
-
-### Output
+  Control the uploads
 
 - `(uploadxState): ($event: <Observable>UploadState)=> void`
+
+### uploadxDrop
+
+File drop directive.
+Activates the `.uploadx-drop-active` class on DnD operations.
 
 ## UploadxService
 
@@ -164,22 +171,25 @@ export class AppHomeComponent {
 
   Terminate all uploads and clears the queue
 
-- `handleFile(file: File): void`
+- `handleFile(file: File, options?: UploadxOptions): void`
 
   Create Uploader for the file and add to the queue
 
-- `handleFileList(fileList: FileList): void`
+- `handleFileList(fileList: FileList, options?: UploadxOptions): void`
 
   Add files to the upload queue
 
 - `control(event: UploadxControlEvent): void`
 
-  Control the uploads status
+  Uploads control
 
   ```ts
   // @example:
   pause(uploadId: string) {
     this.uploadService.control({ action: 'pause', uploadId });
+  }
+  setToken(token: string) {
+    this.uploadService.control({ token });
   }
   ```
 

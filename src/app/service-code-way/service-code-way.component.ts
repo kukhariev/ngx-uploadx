@@ -15,8 +15,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   state: Observable<UploadState>;
   uploads: Ufile[] = [];
   options: UploadxOptions = {
-    concurrency: 2,
-    url: `${environment.api}/upload?uploadType=uploadx`,
+    endpoint: `${environment.api}/upload?uploadType=uploadx`,
     token: 'someToken',
     autoUpload: true,
     chunkSize: 1024 * 256 * 8
@@ -24,7 +23,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   private ngUnsubscribe: Subject<any> = new Subject();
   numberOfCopies = 0;
 
-  @ViewChild('file', { read: ElementRef }) fileInput: ElementRef;
+  @ViewChild('file', { read: ElementRef, static: true }) fileInput: ElementRef;
 
   constructor(private uploadService: UploadxService) {}
 

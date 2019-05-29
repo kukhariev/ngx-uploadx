@@ -12,7 +12,7 @@ export class UploaderX extends Uploader {
     this.responseType = 'json' as XMLHttpRequestResponseType;
   }
 
-  async getFileURI(): Promise<string> {
+  async getFileUrl(): Promise<string> {
     const headers = {
       'Content-Type': 'application/json; charset=UTF-8',
       'X-Upload-Content-Length': `${this.size}`,
@@ -40,7 +40,7 @@ export class UploaderX extends Uploader {
     const _ = await this.request({
       method: 'PUT',
       body,
-      url: this.URI,
+      url: this.url,
       headers,
       progress: true
     });
@@ -52,7 +52,7 @@ export class UploaderX extends Uploader {
       'Content-Type': 'application/octet-stream',
       'Content-Range': `bytes */${this.size}`
     };
-    const _ = await this.request({ method: 'PUT', url: this.URI, headers });
+    const _ = await this.request({ method: 'PUT', url: this.url, headers });
     return this.getOffsetFromResponse();
   }
 

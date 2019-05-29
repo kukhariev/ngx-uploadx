@@ -1,14 +1,37 @@
 import { BackoffRetry } from './backoff_retry';
-import { UploaderOptions, UploadItem, UploadState, UploadStatus } from './interfaces';
-import { unfunc } from './utils';
-const noop = () => {};
-
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD';
+import {
+  HttpMethod,
+  UploaderOptions,
+  UploadState,
+  UploadStatus,
+  UploadxControlEvent
+} from './interfaces';
+import { actionToStatusMap, noop, unfunc } from './utils';
 
 /**
  * Uploader Base Class
  */
 export abstract class Uploader {
+  /**
+   * HTTP StatusCodes should not be retried
+   */
+  static fatalStatusCodes = [403];
+  /**
+   * Max 4xx errors
+   */
+  static maxRetryAttempts = 3;
+  /**
+   * Maximum chunk size
+   */
+  static maxChunkSize = Number.MAX_SAFE_INTEGER;
+  /**
+   * Minimum chunk size
+   */
+  static minChunkSize = 4096; // default blocksize of most FSs
+  /**
+   * Initial chunk size
+   */
+  static startingChunkSize = Uploader.minChunkSize * 64;
   /**
    * Upload status
    */
@@ -21,7 +44,7 @@ export abstract class Uploader {
       return;
     }
     (s === 'cancelled' || s === 'paused') && this.abort();
-    s === 'cancelled' && this.URI && this.onCancel();
+    s === 'cancelled' && this.url && this.onCancel();
 
     this._status = s;
     this.notifyState();
@@ -31,24 +54,11 @@ export abstract class Uploader {
   }
 
   private get isMaxAttemptsReached(): boolean {
-    return this.retry.retryAttempts === Uploader.maxRetryAttempts && this.statusType === 400;
+    return (
+      Uploader.fatalStatusCodes.includes(this.responseStatus) ||
+      (this.retry.retryAttempts === Uploader.maxRetryAttempts && this.statusType === 400)
+    );
   }
-  /**
-   * Max 4xx errors
-   */
-  static maxRetryAttempts = 3;
-  /**
-   * Maximum chunk size
-   */
-  static maxChunkSize = Number.MAX_SAFE_INTEGER;
-  /**
-   * Minimum chunk size
-   */
-  static minChunkSize = 4096; // efault blocksize of most FSs
-  /**
-   * Initial chunk size
-   */
-  static startingChunkSize = Uploader.minChunkSize * 64;
   /**
    * Original File name
    */
@@ -87,7 +97,7 @@ export abstract class Uploader {
   /**
    * File URI
    */
-  URI: string;
+  url: string;
   /**
    * Custom headers
    */
@@ -146,42 +156,37 @@ export abstract class Uploader {
     this.name = file.name;
     this.size = file.size;
     this.mimeType = file.type || 'application/octet-stream';
+    this.metadata = {
+      name: this.name,
+      mimeType: this.mimeType,
+      size: this.size,
+      lastModified: this.file.lastModified
+    };
     this.stateChange = options.stateChange || noop;
-    this.chunkSize = options.chunkSize ? options.chunkSize : Uploader.startingChunkSize;
+    this.chunkSize = options.chunkSize || Uploader.startingChunkSize;
     this.configure(options);
   }
 
   /**
    * Configure or reconfigure uploader
    */
-  configure(item = {} as UploadItem): void {
-    const { metadata, headers, token, endpoint } = item;
-    this.metadata = {
-      name: this.name,
-      mimeType: this.mimeType,
-      size: this.size,
-      lastModified: this.file.lastModified,
-      ...unfunc(metadata || this.metadata, this.file)
-    };
+  configure(config = {} as UploadxControlEvent): void {
+    const { metadata, headers, token, endpoint, action } = config;
     this.endpoint = endpoint || this.endpoint;
-    this.headers = { ...this.headers, ...unfunc(headers, this.file) };
     this.token = token || this.token;
+    this.metadata = { ...this.metadata, ...unfunc(metadata, this.file) };
+    this.headers = { ...this.headers, ...unfunc(headers, this.file) };
+    action && (this.status = actionToStatusMap[action]);
   }
 
   /**
    * Initiate upload
    */
-  async upload(item?: UploadItem): Promise<void> {
-    if (item) {
-      this.configure(item);
-    }
-    if (this.status === 'cancelled' || this.status === 'complete' || this.status === 'paused') {
-      return;
-    }
+  async upload(): Promise<void> {
     this.status = 'uploading';
     try {
       await this.refreshToken();
-      this.URI = await this.getFileURI();
+      this.url = await this.getFileUrl();
       this.retry.reset();
       this.startTime = new Date().getTime();
       this.start();
@@ -199,7 +204,7 @@ export abstract class Uploader {
   /**
    * Get file URI
    */
-  protected abstract getFileURI(): Promise<string>;
+  protected abstract getFileUrl(): Promise<string>;
   /**
    * Send file content
    */
@@ -217,7 +222,6 @@ export abstract class Uploader {
       file: this.file,
       name: this.name,
       progress: this.progress,
-      percentage: this.progress,
       remaining: this.remaining,
       response: this.response,
       responseStatus: this.responseStatus,
@@ -225,7 +229,7 @@ export abstract class Uploader {
       speed: this.speed,
       status: this.status,
       uploadId: this.uploadId,
-      URI: this.URI
+      url: this.url
     };
 
     this.stateChange(state);
@@ -329,19 +333,17 @@ export abstract class Uploader {
   }): Promise<number> {
     return new Promise((resolve, reject) => {
       const xhr: XMLHttpRequest = new XMLHttpRequest();
-      xhr.open(method, url || this.URI, true);
+      xhr.open(method, url || this.url, true);
       if (progress && body) {
         xhr.upload.onprogress = this.onProgress((body as any).size);
       }
+      this.resetResponse();
       this.setupXhr(xhr, headers);
       xhr.onload = () => {
         this.processResponse(xhr);
         this.statusType > 300 ? reject(this.responseStatus) : resolve(this.responseStatus);
       };
-      xhr.onerror = () => {
-        this.resetResponse();
-        reject();
-      };
+      xhr.onerror = () => reject;
       xhr.send(body);
     });
   }

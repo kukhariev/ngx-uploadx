@@ -1,5 +1,7 @@
 import { Uploader } from './uploader';
 
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD';
+
 export type UploadStatus =
   | 'added'
   | 'queue'
@@ -10,26 +12,7 @@ export type UploadStatus =
   | 'paused'
   | 'retry';
 
-export type UploadAction =
-  | 'create'
-  | 'refreshToken'
-  | 'uploadAll'
-  | 'upload'
-  | 'cancel'
-  | 'cancelAll'
-  | 'pauseAll'
-  | 'pause';
-
-export interface UploadxControlEvent {
-  token?: string | ((httpStatus?: number) => string | Promise<string>);
-  action: UploadAction;
-  /**
-   * override global options
-   */
-  itemOptions?: UploadItem;
-  /** Upload unique identifier */
-  uploadId?: string;
-}
+export type UploadAction = 'uploadAll' | 'upload' | 'cancel' | 'cancelAll' | 'pauseAll' | 'pause';
 
 /**
  *  Read only upload stream events
@@ -40,7 +23,6 @@ export interface UploadState {
   file: File;
   name: string;
   progress: number;
-  percentage: number;
   remaining: number;
   response: any;
   responseStatus: number;
@@ -48,7 +30,7 @@ export interface UploadState {
   speed: number;
   status: UploadStatus;
   uploadId: string;
-  URI: string;
+  url: string;
 }
 
 export interface UploadItem {
@@ -58,12 +40,6 @@ export interface UploadItem {
    * @defaultValue '/upload'
    */
   endpoint?: string;
-  /**
-   * URL to create new uploads.
-   * @defaultValue '/upload'
-   * @deprecated Use {@link UploadItem.endpoint} instead.
-   */
-  url?: string;
   /**
    * Headers to be appended to each HTTP request
    */
@@ -77,14 +53,17 @@ export interface UploadItem {
    */
   token?: string | ((httpStatus?: number) => string | Promise<string>);
 }
-export interface UploaderOptions extends Pick<UploadItem, Exclude<keyof UploadItem, 'uploadId'>> {
+export interface UploadxControlEvent extends UploadItem {
+  action?: UploadAction;
+}
+export interface UploaderOptions extends UploadItem {
   /**
    * Set a fixed chunk size.
    * If not specified, the optimal size will be automatically adjusted based on the network speed.
    */
   chunkSize?: number;
   withCredentials?: boolean;
-  readonly stateChange?: (evt: UploadState) => void;
+  readonly stateChange?: (evt: UploadEvent) => void;
 }
 /**
  * Global Options
@@ -92,15 +71,26 @@ export interface UploaderOptions extends Pick<UploadItem, Exclude<keyof UploadIt
 export interface UploadxOptions extends UploaderOptions {
   /**
    * Provide a user-defined class to support another upload protocol or to extend an existing one.
+   * @defaultValue UploadX
    */
-  uploaderClass?: new (f: File, options: UploadxOptions) => Uploader;
+  uploaderClass?: new (f: File, options: UploaderOptions) => Uploader;
   /**
    * Set the maximum parallel uploads
+   * @defaultValue 2
    */
   concurrency?: number;
   /**
    * Automatically start upload when files added
+   * @defaultValue true
    */
   autoUpload?: boolean;
-  allowedTypes?: any;
+  /**
+   * File types the user can pick from the file input
+   */
+  allowedTypes?: string;
+  /**
+   * Add 'multiple' attribute
+   * @defaultValue true
+   */
+  multiple?: boolean;
 }
