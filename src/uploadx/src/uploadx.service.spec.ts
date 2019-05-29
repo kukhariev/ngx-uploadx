@@ -82,21 +82,19 @@ describe('UploadxService', () => {
     service.connect(options);
     service.handleFile(file);
     const upload = service.queue[0];
-    service.control({ action: 'refreshToken' });
-    service.control({ action: 'pauseAll' });
+    service.control({ action: 'pause' });
     expect(service.queue[0].status).toEqual('paused');
-    service.control({ action: 'uploadAll' });
+    service.control({ action: 'upload' });
     expect(service.queue[0].status).toEqual('queue');
     service.control({ ...upload, action: 'pause' });
     expect(service.queue[0].status).toEqual('paused');
     service.control({ ...upload, action: 'upload' });
-    service.control({ action: 'upload', itemOptions: upload });
     expect(service.queue[0].status).toEqual('queue');
     service.control({ ...upload, action: 'cancel' });
-    service.control({ action: 'cancelAll' });
+    service.control({ action: 'cancel' });
     service.control({ action: '???' as UploadAction });
     expect(service.queue[0].status).toEqual('cancelled');
-    service.control({ action: 'uploadAll' });
+    service.control({ action: 'upload' });
     expect(service.queue[0].status).toEqual('cancelled');
   });
 

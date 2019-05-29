@@ -16,7 +16,7 @@ class UploadxTestComponent {
     allowedTypes: 'image/*,video/*',
     endpoint: `http://localhost:3003/upload/?parts=test`
   };
-  action = { action: 'pauseAll' };
+  action = { action: 'pause' };
 }
 
 describe('Directive: UploadxDirective', () => {

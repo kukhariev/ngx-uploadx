@@ -1,3 +1,5 @@
+import { UploadAction, UploadStatus } from './interfaces';
+
 export function resolveUrl(url: string, baseURI: string) {
   if (url.indexOf('//') * url.indexOf('https://') * url.indexOf('http://') === 0) {
     return url;
@@ -23,3 +25,16 @@ export function unfunc<T, V>(value: T | ((ref: V) => T), ref?: V): T {
 }
 
 export const noop = () => {};
+
+export const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
+  pause: 'paused',
+  pauseAll: 'paused',
+  upload: 'queue',
+  uploadAll: 'queue',
+  cancel: 'cancelled',
+  cancelAll: 'cancelled'
+};
+
+export function createInstance<T>(t: new (...constructorArgs: any[]) => T, ...args: any[]): T {
+  return new t(args);
+}
