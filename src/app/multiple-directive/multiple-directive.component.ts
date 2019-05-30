@@ -10,7 +10,7 @@ import { environment } from '../../environments/environment';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MultipleDirectiveComponent {
-  state: Observable<UploadState>;
+  state$: Observable<UploadState>;
   uploads$: Observable<Uploader[]>;
   options: UploadxOptions = {
     endpoint: `${environment.api}/upload`,
@@ -24,25 +24,17 @@ export class MultipleDirectiveComponent {
   };
   constructor(private uploadService: UploadxService) {
     this.uploads$ = this.uploadService.connect();
-    this.state = this.uploadService.events;
+    this.state$ = this.uploadService.events;
   }
-  cancelAll() {
-    this.uploadService.control({ action: 'cancelAll' });
-  }
-
-  uploadAll() {
-    this.uploadService.control({ action: 'uploadAll' });
+  cancel(id: string) {
+    this.uploadService.control({ action: 'cancel', uploadId: id });
   }
 
-  pauseAll() {
-    this.uploadService.control({ action: 'pauseAll' });
+  pause(id: string) {
+    this.uploadService.control({ action: 'pause', uploadId: id });
   }
 
-  pause(uploadId: string) {
-    this.uploadService.control({ action: 'pause', uploadId });
-  }
-
-  upload(uploadId: string) {
-    this.uploadService.control({ action: 'upload', uploadId });
+  upload(id: string) {
+    this.uploadService.control({ action: 'upload', uploadId: id });
   }
 }

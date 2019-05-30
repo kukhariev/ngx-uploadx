@@ -37,21 +37,21 @@ describe('ServiceCodeWayComponent', () => {
 
   describe('cancelAll', () => {
     it('makes expected calls', () => {
-      comp.cancelAll();
+      comp.cancel();
       expect(uploadService.control).toHaveBeenCalled();
     });
   });
 
   describe('uploadAll', () => {
     it('makes expected calls', () => {
-      comp.uploadAll();
+      comp.upload();
       expect(uploadService.control).toHaveBeenCalled();
     });
   });
 
   describe('pauseAll', () => {
     it('makes expected calls', () => {
-      comp.pauseAll();
+      comp.pause();
       expect(uploadService.control).toHaveBeenCalled();
     });
   });

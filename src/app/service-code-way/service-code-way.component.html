@@ -12,9 +12,9 @@
           style="display:none"
         />
       </label>
-      <button class="btn red raised" (click)="uploadAll()">Upload All</button>
-      <button class="btn red raised" (click)="cancelAll()">Cancel All</button>
-      <button class="btn red raised" (click)="pauseAll()">Pause All</button>
+      <button class="btn red raised" (click)="upload()">Upload All</button>
+      <button class="btn red raised" (click)="cancel()">Cancel All</button>
+      <button class="btn red raised" (click)="pause()">Pause All</button>
     </div>
   </div>
 
@@ -32,5 +32,5 @@
 </div>
 <div class="json">
   <span>{{ numberOfCopies }}/{{ options.concurrency }}</span>
-  <pre>{{ state | async | json }}</pre>
+  <pre>{{ state$ | async | json }}</pre>
 </div>

@@ -10,7 +10,7 @@ import { AuthService } from '../auth.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OnPushComponent implements OnDestroy {
-  state: Observable<UploadState>;
+  state$: Observable<UploadState>;
   uploads$: Observable<Uploader[]>;
   options: UploadxOptions = {
     endpoint: `${environment.api}/upload`,
@@ -18,7 +18,7 @@ export class OnPushComponent implements OnDestroy {
   };
   constructor(private uploadService: UploadxService, private auth: AuthService) {
     this.uploads$ = this.uploadService.connect(this.options);
-    this.state = this.uploadService.events;
+    this.state$ = this.uploadService.events;
   }
 
   ngOnDestroy(): void {
@@ -26,23 +26,15 @@ export class OnPushComponent implements OnDestroy {
   }
 
   cancelAll() {
-    this.uploadService.control({ action: 'cancelAll' });
-  }
-
-  uploadAll() {
-    this.uploadService.control({ action: 'uploadAll' });
+    this.uploadService.control({ action: 'cancel' });
   }
 
   pauseAll() {
-    this.uploadService.control({ action: 'pauseAll' });
+    this.uploadService.control({ action: 'pause' });
   }
 
-  pause(uploadId: string) {
-    this.uploadService.control({ action: 'pause', uploadId });
-  }
-
-  upload(uploadId: string) {
-    this.uploadService.control({ action: 'upload', uploadId });
+  uploadAll(id: string) {
+    this.uploadService.control({ action: 'upload' });
   }
 
   async tokenGetter(httpStatus: number) {

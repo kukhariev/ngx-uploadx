@@ -47,7 +47,7 @@ describe('ServiceWayComponent', () => {
     it('makes expected calls', () => {
       const uploadServiceStub: UploadxService = fixture.debugElement.injector.get(UploadxService);
       spyOn(uploadServiceStub, 'control');
-      comp.cancelAll();
+      comp.cancel();
       expect(uploadServiceStub.control).toHaveBeenCalled();
     });
   });
@@ -56,7 +56,7 @@ describe('ServiceWayComponent', () => {
     it('makes expected calls', () => {
       const uploadServiceStub: UploadxService = fixture.debugElement.injector.get(UploadxService);
       spyOn(uploadServiceStub, 'control');
-      comp.uploadAll();
+      comp.upload();
       expect(uploadServiceStub.control).toHaveBeenCalled();
     });
   });
@@ -65,7 +65,7 @@ describe('ServiceWayComponent', () => {
     it('makes expected calls', () => {
       const uploadServiceStub: UploadxService = fixture.debugElement.injector.get(UploadxService);
       spyOn(uploadServiceStub, 'control');
-      comp.pauseAll();
+      comp.pause();
       expect(uploadServiceStub.control).toHaveBeenCalled();
     });
   });

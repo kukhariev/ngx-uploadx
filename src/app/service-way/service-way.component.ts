@@ -12,7 +12,7 @@ import { UploaderExt } from './uploader-ext.class';
   templateUrl: './service-way.component.html'
 })
 export class ServiceWayComponent implements OnDestroy, OnInit {
-  state: Observable<UploadState>;
+  state$: Observable<UploadState>;
   uploads: Ufile[] = [];
   options: UploadxOptions = {
     endpoint: `${environment.api}/upload`,
@@ -20,7 +20,7 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
     chunkSize: 2_097_152,
     uploaderClass: UploaderExt
   };
-  private ngUnsubscribe: Subject<any> = new Subject();
+  private unsubscribe$ = new Subject();
 
   constructor(private uploadService: UploadxService, private auth: AuthService) {}
 
@@ -30,41 +30,34 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
   }
 
   ngOnDestroy() {
-    this.ngUnsubscribe.next();
-    this.ngUnsubscribe.complete();
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
-  cancelAll() {
-    this.uploadService.control({ action: 'cancelAll' });
+  cancel(id?: string) {
+    this.uploadService.control({ action: 'cancel', uploadId: id });
   }
 
-  uploadAll() {
-    this.uploadService.control({ action: 'uploadAll' });
+  pause(id?: string) {
+    this.uploadService.control({ action: 'pause', uploadId: id });
   }
 
-  pauseAll() {
-    this.uploadService.control({ action: 'pauseAll' });
-  }
-
-  pause(uploadId: string) {
-    this.uploadService.control({ action: 'pause', uploadId });
-  }
-
-  upload(uploadId: string) {
-    this.uploadService.control({ action: 'upload', uploadId });
+  upload(id?: string) {
+    this.uploadService.control({ action: 'upload', uploadId: id });
   }
 
   onUpload(uploadsOutStream: Observable<UploadState>) {
-    this.state = uploadsOutStream;
-    uploadsOutStream.pipe(takeUntil(this.ngUnsubscribe)).subscribe((item: UploadState) => {
-      const index = this.uploads.findIndex(f => f.uploadId === item.uploadId);
-      if (item.status === 'added') {
-        this.uploads.push(new Ufile(item));
-      } else if (item.status === 'retry' && item.responseStatus === 401) {
+    this.state$ = uploadsOutStream;
+    uploadsOutStream.pipe(takeUntil(this.unsubscribe$)).subscribe((evt: UploadState) => {
+      if (evt.status === 'retry' && evt.responseStatus === 401) {
         this.auth.refreshToken().subscribe(token => console.log('refreshed token: ', token));
+      }
+      const target = this.uploads.find(f => f.uploadId === evt.uploadId);
+      if (target) {
+        target.progress = evt.progress;
+        target.status = evt.status;
       } else {
-        this.uploads[index].progress = item.progress;
-        this.uploads[index].status = item.status;
+        this.uploads.push(new Ufile(evt));
       }
     });
   }
