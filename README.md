@@ -46,15 +46,13 @@ import { UploadxOptions, UploadState } from 'ngx-uploadx';
   <input type="file" [uploadx]="options" (uploadxState)="onUpload($event)">
   `
 })
-
 export class AppHomeComponent {
-  options: UploadxOptions = { endpoint: `[URL]`};
+  options: UploadxOptions = { endpoint: `[URL]` };
   onUpload(state: Observable<UploadState>) {
-    state
-      .subscribe((item: UploadState) => {
-         console.log(item);
-         //...
-      });
+    state.subscribe((item: UploadState) => {
+      console.log(item);
+      //...
+    });
   }
 }
 ```

@@ -34,7 +34,3 @@ export const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
   cancel: 'cancelled',
   cancelAll: 'cancelled'
 };
-
-export function createInstance<T>(t: new (...constructorArgs: any[]) => T, ...args: any[]): T {
-  return new t(args);
-}

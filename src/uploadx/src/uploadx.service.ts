@@ -7,7 +7,6 @@ import { UploaderX } from './uploaderx';
 
 @Injectable({ providedIn: 'root' })
 export class UploadxService {
-  private uploaderClass: new (f: File, options: UploaderOptions) => Uploader;
   private readonly eventsStream: Subject<UploadState> = new Subject();
   get events() {
     return this.eventsStream.asObservable();
@@ -40,6 +39,7 @@ export class UploadxService {
     this.options = { ...this.options, ...options };
     return this.events;
   }
+
   /**
    * Initializes service
    * @param options global options
@@ -63,7 +63,7 @@ export class UploadxService {
   /**
    * Create Uploader and add to the queue
    */
-  handleFileList(fileList: FileList, options = {}): void {
+  handleFileList(fileList: FileList, options = {} as UploadxOptions): void {
     const instanceOptions = { ...this.options, ...options };
     Array.from(fileList).forEach(file => this.addUploaderInstance(file, instanceOptions));
     this.autoUploadFiles();
@@ -72,15 +72,14 @@ export class UploadxService {
   /**
    * Create Uploader for the file and add to the queue
    */
-  handleFile(file: File, options = {}): void {
+  handleFile(file: File, options = {} as UploadxOptions): void {
     const instanceOptions = { ...this.options, ...options };
     this.addUploaderInstance(file, instanceOptions);
     this.autoUploadFiles();
   }
 
   private addUploaderInstance(file: File, options: UploadxOptions) {
-    this.uploaderClass = options.uploaderClass;
-    const uploader = new this.uploaderClass(file, options as UploaderOptions);
+    const uploader = new this.options.uploaderClass(file, options as UploaderOptions);
     this.queue.push(uploader);
     uploader.status = 'added';
   }
@@ -98,6 +97,7 @@ export class UploadxService {
   /**
    * Uploads control
    * @example
+   * this.uploadService.control({ action: 'pause' });
    * this.uploadService.control({ action: 'pause' });
    */
   control(event: UploadxControlEvent): void {

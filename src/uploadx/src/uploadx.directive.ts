@@ -15,7 +15,6 @@ import { UploadxService } from './uploadx.service';
   selector: '[uploadx]'
 })
 export class UploadxDirective implements OnInit {
-  listenerFn: () => void;
   @Output()
   uploadxState = new EventEmitter();
   @Input()
