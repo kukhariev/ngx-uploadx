@@ -66,7 +66,7 @@ export interface UploaderOptions extends UploadItem {
   readonly stateChange?: (evt: UploadEvent) => void;
 }
 /**
- * Global Options
+ * Global Module Options
  */
 export interface UploadxOptions extends UploaderOptions {
   /**

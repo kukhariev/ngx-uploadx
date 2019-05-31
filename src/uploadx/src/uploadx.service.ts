@@ -8,9 +8,15 @@ import { UploaderX } from './uploaderx';
 @Injectable({ providedIn: 'root' })
 export class UploadxService {
   private readonly eventsStream: Subject<UploadState> = new Subject();
+  /**
+   * Upload status events
+   */
   get events() {
     return this.eventsStream.asObservable();
   }
+  /**
+   * Array of the upload queue
+   */
   queue: Uploader[] = [];
   options: UploadxOptions = {
     endpoint: '/upload',
@@ -32,7 +38,7 @@ export class UploadxService {
 
   /**
    * Initializes service
-   * @param options global options
+   * @param options global module options
    * @returns Observable that emits a new value on progress or status changes
    */
   init(options: UploadxOptions): Observable<UploadState> {
@@ -42,7 +48,7 @@ export class UploadxService {
 
   /**
    * Initializes service
-   * @param options global options
+   * @param options global module options
    * @returns Observable that emits the current array of uploaders
    */
   connect(options?: UploadxOptions): Observable<Uploader[]> {
@@ -95,10 +101,14 @@ export class UploadxService {
   }
 
   /**
-   * Uploads control
+   * Upload control
    * @example
+   * // pause all
    * this.uploadService.control({ action: 'pause' });
-   * this.uploadService.control({ action: 'pause' });
+   * // pause upload with uploadId
+   * this.uploadService.control({ action: 'pause', uploadId});
+   * // set token
+   * this.uploadService.control({ token: `TOKEN` });
    */
   control(event: UploadxControlEvent): void {
     const uploadId = event.uploadId;
