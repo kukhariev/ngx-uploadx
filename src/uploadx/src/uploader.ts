@@ -399,8 +399,8 @@ export abstract class Uploader {
     };
   }
 
-  private async waitForRetry() {
+  private waitForRetry() {
     this.status = 'retry';
-    await this.retry.wait(this.responseStatus);
+    return this.retry.wait(this.responseStatus);
   }
 }
