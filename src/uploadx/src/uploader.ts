@@ -14,8 +14,14 @@ import { actionToStatusMap, noop, unfunc } from './utils';
 export abstract class Uploader {
   /**
    * HTTP StatusCodes should not be retried
+   * @beta
    */
-  static fatalStatusCodes = [403];
+  static fatalErrors = [400, 403];
+  /**
+   * HTTP StatusCodes should not be retried
+   * @beta
+   */
+  static notFoundErrors = [404, 410];
   /**
    * Max 4xx errors
    */
@@ -32,6 +38,7 @@ export abstract class Uploader {
    * Initial chunk size
    */
   static startingChunkSize = Uploader.minChunkSize * 64;
+
   /**
    * Upload status
    */
@@ -53,11 +60,14 @@ export abstract class Uploader {
     return this._status;
   }
 
+  private get isFatalError() {
+    return Uploader.fatalErrors.includes(this.responseStatus);
+  }
+  private get isNotFoundError() {
+    return Uploader.notFoundErrors.includes(this.responseStatus);
+  }
   private get isMaxAttemptsReached(): boolean {
-    return (
-      Uploader.fatalStatusCodes.includes(this.responseStatus) ||
-      (this.retry.retryAttempts === Uploader.maxRetryAttempts && this.statusType === 400)
-    );
+    return this.retry.retryAttempts === Uploader.maxRetryAttempts && this.statusType === 400;
   }
   /**
    * Original File name
@@ -191,11 +201,10 @@ export abstract class Uploader {
       this.startTime = new Date().getTime();
       this.start();
     } catch (e) {
-      if (this.isMaxAttemptsReached) {
+      if (this.isMaxAttemptsReached || this.isFatalError) {
         this.status = 'error';
       } else {
-        this.status = 'retry';
-        await this.retry.wait(this.responseStatus);
+        await this.waitForRetry();
         this.status = 'queue';
       }
     }
@@ -294,22 +303,21 @@ export abstract class Uploader {
           this.status = 'complete';
         }
       } catch {
+        if (this.isFatalError || this.isMaxAttemptsReached) {
+          this.status = 'error';
+          break;
+        }
+        if (this.isNotFoundError) {
+          this.status = 'queue';
+          break;
+        }
         if (this.responseStatus === 413) {
           this.chunkSize /= 2;
           Uploader.maxChunkSize = this.chunkSize;
         }
-        this.offset = this.responseStatus ? undefined : this.offset;
-        if (this.isMaxAttemptsReached) {
-          this.status = 'error';
-          break;
-        }
-        if (this.responseStatus === 404) {
-          this.status = 'queue';
-          break;
-        }
         await this.refreshToken();
-        this.status = 'retry';
-        const _ = await this.retry.wait(this.responseStatus);
+        await this.waitForRetry();
+        this.offset = this.responseStatus ? undefined : this.offset;
         this.status = 'uploading';
       }
     }
@@ -389,5 +397,10 @@ export abstract class Uploader {
       this.remaining = Math.ceil((this.size - uploaded) / this.speed);
       this.notifyState();
     };
+  }
+
+  private async waitForRetry() {
+    this.status = 'retry';
+    await this.retry.wait(this.responseStatus);
   }
 }
