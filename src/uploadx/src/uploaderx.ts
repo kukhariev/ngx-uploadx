@@ -66,4 +66,7 @@ export class UploaderX extends Uploader {
     }
     return;
   }
+  protected onCancel(): void {
+    this.request({ method: 'DELETE' });
+  }
 }

@@ -263,9 +263,7 @@ export abstract class Uploader {
     this._xhr && this._xhr.abort();
   }
 
-  protected onCancel(): void {
-    this.request({ method: 'DELETE' });
-  }
+  protected onCancel(): void {}
   /**
    * Gets the value from the response
    */
