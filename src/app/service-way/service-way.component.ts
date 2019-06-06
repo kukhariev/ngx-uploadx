@@ -3,7 +3,7 @@ import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { UploadState, UploadxOptions, UploadxService } from '../../uploadx';
-import { AuthService, tokenGetter } from '../auth.service';
+import { AuthService } from '../auth.service';
 import { Ufile } from '../ufile';
 import { UploaderExt } from './uploader-ext.class';
 
@@ -17,8 +17,8 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
   options: UploadxOptions = {
     endpoint: `${environment.api}/upload`,
     token: () => this.auth.accessToken,
-    chunkSize: 2_097_152
-    // uploaderClass: UploaderExt
+    chunkSize: 2_097_152,
+    uploaderClass: UploaderExt
   };
   private unsubscribe$ = new Subject();
 
@@ -50,7 +50,7 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
     this.state$ = uploadsOutStream;
     uploadsOutStream.pipe(takeUntil(this.unsubscribe$)).subscribe((evt: UploadState) => {
       if (evt.status === 'retry' && evt.responseStatus === 401) {
-        this.auth.renewToken().subscribe(token => console.log('refreshed token: ', token));
+        this.auth.renewToken().subscribe(token => console.log('new accessToken: ', token));
       }
       const target = this.uploads.find(f => f.uploadId === evt.uploadId);
       if (target) {

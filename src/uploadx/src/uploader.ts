@@ -249,16 +249,22 @@ export abstract class Uploader implements UploadState {
 
   // Increases the chunkSize if the time of the request
   // is less than 1 second,
-  // and decreases it if more than 10 seconds
-  private setChunkSize() {
-    const t = this.chunkSize / this.speed;
-    if (t < 1 && this.chunkSize < Uploader.maxChunkSize) {
-      this.chunkSize *= 2;
-      Uploader.startingChunkSize = this.chunkSize / 4;
-    }
-    if (t > 10 && this.chunkSize > Uploader.minChunkSize) {
+  // and decreases it if more than 10 seconds.
+  // Decreases on `Payload Too Large` error
+  private adjustChunkSize() {
+    if (this.responseStatus === 413) {
       this.chunkSize /= 2;
-      Uploader.startingChunkSize = this.chunkSize * 2;
+      Uploader.maxChunkSize = this.chunkSize;
+    } else if (!this.options.chunkSize) {
+      const t = this.chunkSize / this.speed;
+      if (t < 1 && this.chunkSize < Uploader.maxChunkSize) {
+        this.chunkSize *= 2;
+        Uploader.startingChunkSize = this.chunkSize / 4;
+      }
+      if (t > 10 && this.chunkSize > Uploader.minChunkSize) {
+        this.chunkSize /= 2;
+        Uploader.startingChunkSize = this.chunkSize * 2;
+      }
     }
   }
 
@@ -267,6 +273,7 @@ export abstract class Uploader implements UploadState {
   }
 
   protected onCancel(): void {}
+
   /**
    * Gets the value from the response
    */
@@ -298,7 +305,6 @@ export abstract class Uploader implements UploadState {
         this.offset =
           typeof this.offset === 'number' ? await this.sendFileContent() : await this.getOffset();
         this.retry.reset();
-        !this.options.chunkSize && this.setChunkSize();
         if (this.offset >= this.size) {
           this.progress = 100;
           this.status = 'complete';
@@ -312,14 +318,13 @@ export abstract class Uploader implements UploadState {
           this.status = 'queue';
           break;
         }
-        if (this.responseStatus === 413) {
-          this.chunkSize /= 2;
-          Uploader.maxChunkSize = this.chunkSize;
-        }
         await this.waitForRetry();
         this.isAuthError && (await this.refreshToken());
+        // Do not reset the offset in case of network errors
         this.offset = this.responseStatus ? undefined : this.offset;
         this.status = 'uploading';
+      } finally {
+        this.adjustChunkSize();
       }
     }
   }
