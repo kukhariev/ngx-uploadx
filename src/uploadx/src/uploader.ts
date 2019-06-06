@@ -11,17 +11,18 @@ import { actionToStatusMap, noop, unfunc } from './utils';
 /**
  * Uploader Base Class
  */
-export abstract class Uploader {
+export abstract class Uploader implements UploadState {
   /**
-   * HTTP StatusCodes should not be retried
+   * Codes should not be retried
    * @beta
    */
   static fatalErrors = [400, 403];
   /**
-   * HTTP StatusCodes should not be retried
+   * Restart codes
    * @beta
    */
   static notFoundErrors = [404, 410];
+  static AuthErrors = [401];
   /**
    * Max 4xx errors
    */
@@ -38,7 +39,6 @@ export abstract class Uploader {
    * Initial chunk size
    */
   static startingChunkSize = Uploader.minChunkSize * 64;
-
   /**
    * Upload status
    */
@@ -60,10 +60,13 @@ export abstract class Uploader {
     return this._status;
   }
 
-  private get isFatalError() {
+  private get isFatalError(): boolean {
     return Uploader.fatalErrors.includes(this.responseStatus);
   }
-  private get isNotFoundError() {
+  private get isAuthError(): boolean {
+    return Uploader.AuthErrors.includes(this.responseStatus);
+  }
+  private get isNotFoundError(): boolean {
     return Uploader.notFoundErrors.includes(this.responseStatus);
   }
   private get isMaxAttemptsReached(): boolean {
@@ -111,7 +114,7 @@ export abstract class Uploader {
   /**
    * Custom headers
    */
-  headers: { [key: string]: string } | null = {};
+  headers: { [key: string]: string } = {};
   /**
    * Metadata Object
    */
@@ -140,7 +143,7 @@ export abstract class Uploader {
   /**
    * Auth Bearer token/tokenGetter
    */
-  token: string | ((status: number) => string | Promise<string>);
+  token?: UploadxControlEvent['token'];
   /**
    * Status of uploader
    */
@@ -313,8 +316,8 @@ export abstract class Uploader {
           this.chunkSize /= 2;
           Uploader.maxChunkSize = this.chunkSize;
         }
-        await this.refreshToken();
         await this.waitForRetry();
+        this.isAuthError && (await this.refreshToken());
         this.offset = this.responseStatus ? undefined : this.offset;
         this.status = 'uploading';
       }
