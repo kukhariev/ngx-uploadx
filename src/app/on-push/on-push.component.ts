@@ -39,9 +39,7 @@ export class OnPushComponent implements OnDestroy {
 
   async tokenGetter(httpStatus: number) {
     const token =
-      httpStatus === 401
-        ? await this.auth.refreshToken().toPromise()
-        : localStorage.getItem('token');
+      httpStatus === 401 ? await this.auth.renewToken().toPromise() : this.auth.accessToken;
     return token;
   }
 }

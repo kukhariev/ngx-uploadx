@@ -16,9 +16,9 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
   uploads: Ufile[] = [];
   options: UploadxOptions = {
     endpoint: `${environment.api}/upload`,
-    token: tokenGetter,
-    chunkSize: 2_097_152,
-    uploaderClass: UploaderExt
+    token: () => this.auth.accessToken,
+    chunkSize: 2_097_152
+    // uploaderClass: UploaderExt
   };
   private unsubscribe$ = new Subject();
 
@@ -50,7 +50,7 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
     this.state$ = uploadsOutStream;
     uploadsOutStream.pipe(takeUntil(this.unsubscribe$)).subscribe((evt: UploadState) => {
       if (evt.status === 'retry' && evt.responseStatus === 401) {
-        this.auth.refreshToken().subscribe(token => console.log('refreshed token: ', token));
+        this.auth.renewToken().subscribe(token => console.log('refreshed token: ', token));
       }
       const target = this.uploads.find(f => f.uploadId === evt.uploadId);
       if (target) {
