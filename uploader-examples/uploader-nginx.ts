@@ -5,7 +5,7 @@ import { UploadxOptions, Uploader } from 'ngx-uploadx';
  * @see
  * https://github.com/fdintino/nginx-upload-module/blob/master/upload-protocol.md
  */
-export class UploaderNginxUploadModule extends Uploader {
+export class NginxUploadModuleUploader extends Uploader {
   ready = 0;
   constructor(readonly file: File, options: UploadxOptions) {
     super(file, options);
@@ -55,8 +55,6 @@ export class UploaderNginxUploadModule extends Uploader {
     return this.ready;
   }
 
-  // abort and delete not supported
+  // abort not supported
   abort() {}
-
-  onCancel() {}
 }
