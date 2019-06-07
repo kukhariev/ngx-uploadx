@@ -94,3 +94,13 @@ export interface UploadxOptions extends UploaderOptions {
    */
   multiple?: boolean;
 }
+
+export interface RequestParams {
+  method: HttpMethod;
+  body?: any;
+  url?: string;
+  headers?: {
+    [key: string]: string;
+  };
+  progress?: boolean;
+}

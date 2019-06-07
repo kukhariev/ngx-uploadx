@@ -1,10 +1,10 @@
 import { BackoffRetry } from './backoff_retry';
 import {
-  HttpMethod,
   UploaderOptions,
   UploadState,
   UploadStatus,
-  UploadxControlEvent
+  UploadxControlEvent,
+  RequestParams
 } from './interfaces';
 import { actionToStatusMap, noop, unfunc } from './utils';
 
@@ -22,7 +22,7 @@ export abstract class Uploader implements UploadState {
    * @beta
    */
   static notFoundErrors = [404, 410];
-  static AuthErrors = [401];
+  static authErrors = [401];
   /**
    * Max 4xx errors
    */
@@ -64,7 +64,7 @@ export abstract class Uploader implements UploadState {
     return Uploader.fatalErrors.includes(this.responseStatus);
   }
   private get isAuthError(): boolean {
-    return Uploader.AuthErrors.includes(this.responseStatus);
+    return Uploader.authErrors.includes(this.responseStatus);
   }
   private get isNotFoundError(): boolean {
     return Uploader.notFoundErrors.includes(this.responseStatus);
@@ -198,7 +198,7 @@ export abstract class Uploader implements UploadState {
   async upload(): Promise<void> {
     this.status = 'uploading';
     try {
-      await this.refreshToken();
+      await this.getToken();
       this.url = await this.getFileUrl();
       this.retry.reset();
       this.startTime = new Date().getTime();
@@ -226,6 +226,8 @@ export abstract class Uploader implements UploadState {
    */
   protected abstract getOffset(): Promise<number>;
 
+  protected abstract setAuth(token: string): void;
+
   /**
    * Emit current state
    */
@@ -252,10 +254,7 @@ export abstract class Uploader implements UploadState {
   // and decreases it if more than 10 seconds.
   // Decreases on `Payload Too Large` error
   private adjustChunkSize() {
-    if (this.responseStatus === 413) {
-      this.chunkSize /= 2;
-      Uploader.maxChunkSize = this.chunkSize;
-    } else if (!this.options.chunkSize) {
+    if (!this.options.chunkSize && this.responseStatus < 400) {
       const t = this.chunkSize / this.speed;
       if (t < 1 && this.chunkSize < Uploader.maxChunkSize) {
         this.chunkSize *= 2;
@@ -265,6 +264,9 @@ export abstract class Uploader implements UploadState {
         this.chunkSize /= 2;
         Uploader.startingChunkSize = this.chunkSize * 2;
       }
+    } else if (this.responseStatus === 413) {
+      this.chunkSize /= 2;
+      Uploader.maxChunkSize = this.chunkSize;
     }
   }
 
@@ -288,12 +290,10 @@ export abstract class Uploader implements UploadState {
   /**
    * Set auth token
    */
-  async refreshToken(token?: any) {
-    this.token = token || this.token;
-    if (this.token) {
-      const _token = await unfunc(this.token, this.responseStatus);
-      this.headers.Authorization = `Bearer ${_token}`;
-    }
+  protected getToken(): Promise<void> {
+    return Promise.resolve(unfunc(this.token, this.responseStatus)).then(
+      token => token && this.setAuth(token)
+    );
   }
 
   /**
@@ -319,7 +319,7 @@ export abstract class Uploader implements UploadState {
           break;
         }
         await this.waitForRetry();
-        this.isAuthError && (await this.refreshToken());
+        this.isAuthError && (await this.getToken());
         // Do not reset the offset in case of network errors
         this.offset = this.responseStatus ? undefined : this.offset;
         this.status = 'uploading';
@@ -338,13 +338,7 @@ export abstract class Uploader implements UploadState {
     url,
     headers = {},
     progress = false
-  }: {
-    method: HttpMethod;
-    body?: any;
-    url?: string;
-    headers?: { [key: string]: string };
-    progress?: boolean;
-  }): Promise<number> {
+  }: RequestParams): Promise<number> {
     return new Promise((resolve, reject) => {
       const xhr: XMLHttpRequest = new XMLHttpRequest();
       xhr.open(method, url || this.url, true);
