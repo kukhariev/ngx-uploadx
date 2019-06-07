@@ -5,7 +5,6 @@ import { environment } from '../../environments/environment';
 import { UploadState, UploadxOptions, UploadxService } from '../../uploadx';
 import { AuthService } from '../auth.service';
 import { Ufile } from '../ufile';
-import { UploaderExt } from './uploader-ext.class';
 
 @Component({
   selector: 'app-service-way',
@@ -17,8 +16,7 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
   options: UploadxOptions = {
     endpoint: `${environment.api}/upload`,
     token: () => this.auth.accessToken,
-    chunkSize: 2_097_152,
-    uploaderClass: UploaderExt
+    chunkSize: 2_097_152
   };
   private unsubscribe$ = new Subject();
 

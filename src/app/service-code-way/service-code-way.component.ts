@@ -4,6 +4,7 @@ import { takeUntil } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { UploadState, UploadxOptions, UploadxService } from '../../uploadx';
 import { Ufile } from '../ufile';
+import { UploaderExt } from './uploader-ext.class';
 
 @Component({
   selector: 'app-service-way',
@@ -14,8 +15,9 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   uploads: Ufile[] = [];
   options: UploadxOptions = {
     endpoint: `${environment.api}/upload?uploadType=uploadx`,
-    token: 'someToken',
-    chunkSize: 1024 * 256 * 8
+    token: btoa('user:pass'),
+    chunkSize: 1024 * 256 * 8,
+    uploaderClass: UploaderExt
   };
   private unsubscribe$ = new Subject();
   numberOfCopies = 0;
@@ -62,12 +64,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
     this.state$ = events$;
     events$.pipe(takeUntil(this.unsubscribe$)).subscribe((ufile: UploadState) => {
       const target = this.uploads.find(f => f.uploadId === ufile.uploadId);
-      if (target) {
-        target.progress = ufile.progress;
-        target.status = ufile.status;
-      } else {
-        this.uploads.push(new Ufile(ufile));
-      }
+      target ? Object.assign(target, ufile) : this.uploads.push(new Ufile(ufile));
     });
   }
 }
