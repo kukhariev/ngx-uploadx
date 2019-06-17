@@ -62,7 +62,7 @@ export class UploadxService {
    * Terminates all uploads and clears the queue
    */
   disconnect(): void {
-    this.queue.forEach(f => (f.status = 'paused'));
+    this.queue.forEach(uploader => (uploader.status = 'paused'));
     this.queue = [];
   }
 
@@ -96,7 +96,9 @@ export class UploadxService {
    */
   private autoUploadFiles(): void {
     if (this.options.autoUpload) {
-      this.queue.filter(f => f.status === 'added').forEach(f => (f.status = 'queue'));
+      this.queue
+        .filter(uploader => uploader.status === 'added')
+        .forEach(uploader => (uploader.status = 'queue'));
     }
   }
 
@@ -112,8 +114,10 @@ export class UploadxService {
    */
   control(event: UploadxControlEvent): void {
     const uploadId = event.uploadId;
-    const target = uploadId ? this.queue.filter(f => f.uploadId === uploadId) : this.queue;
-    target.forEach(f => f.configure(event));
+    const target = uploadId
+      ? this.queue.filter(uploader => uploader.uploadId === uploadId)
+      : this.queue;
+    target.forEach(uploader => uploader.configure(event));
   }
 
   /**
@@ -124,14 +128,10 @@ export class UploadxService {
     // Remove Cancelled Items from local queue
     this.queue = this.queue.filter(f => f.status !== 'cancelled');
 
-    const running = this.runningProcess();
-
     this.queue
-      .filter((uploader: Uploader) => uploader.status === 'queue')
-      .slice(0, Math.max(this.options.concurrency - running, 0))
-      .forEach((uploader: Uploader) => {
-        uploader.upload();
-      });
+      .filter(uploader => uploader.status === 'queue')
+      .slice(0, Math.max(this.options.concurrency - this.runningProcess(), 0))
+      .forEach(uploader => uploader.upload());
   }
 
   /**
@@ -139,7 +139,7 @@ export class UploadxService {
    */
   runningProcess(): number {
     return this.queue.filter(
-      (uploader: Uploader) => uploader.status === 'uploading' || uploader.status === 'retry'
+      uploader => uploader.status === 'uploading' || uploader.status === 'retry'
     ).length;
   }
 }
