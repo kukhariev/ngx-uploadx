@@ -345,18 +345,20 @@ export abstract class Uploader implements UploadState {
       if (progress && body) {
         xhr.upload.onprogress = this.onProgress((body as any).size);
       }
-      this.resetResponse();
       this.setupXhr(xhr, headers);
       xhr.onload = () => {
         this.processResponse(xhr);
         this.statusType > 300 ? reject(this.responseStatus) : resolve(this.responseStatus);
       };
-      xhr.onerror = () => reject;
+      xhr.onerror = reject;
       xhr.send(body);
     });
   }
 
   private setupXhr(xhr: XMLHttpRequest, headers?: any) {
+    this.responseStatus = undefined;
+    this.response = undefined;
+    this.statusType = undefined;
     this._xhr = xhr;
     xhr.responseType = this.responseType;
     xhr.withCredentials = this.options.withCredentials;
@@ -364,13 +366,7 @@ export abstract class Uploader implements UploadState {
     Object.keys(_headers).forEach(key => xhr.setRequestHeader(key, _headers[key]));
   }
 
-  private resetResponse() {
-    this.responseStatus = undefined;
-    this.response = undefined;
-    this.statusType = undefined;
-  }
-
-  private parseXhrResponse(xhr: XMLHttpRequest) {
+  private getResponseBody(xhr: XMLHttpRequest): string | object {
     let body = 'response' in (xhr as any) ? xhr.response : xhr.responseText;
     if (this.responseType === 'json' && body && typeof body === 'string') {
       try {
@@ -381,15 +377,15 @@ export abstract class Uploader implements UploadState {
   }
 
   private processResponse(xhr: XMLHttpRequest): void {
-    this.response = this.parseXhrResponse(xhr);
+    this.response = this.getResponseBody(xhr);
     this.responseStatus = xhr.status === 0 && this.response ? 200 : xhr.status;
     this.statusType = (xhr.status - (this.responseStatus % 100)) as any;
   }
 
   private onProgress(chunkSize: number) {
-    return (pEvent: ProgressEvent) => {
-      const uploaded = pEvent.lengthComputable
-        ? this.offset + chunkSize * (pEvent.loaded / pEvent.total)
+    return (evt: ProgressEvent) => {
+      const uploaded = evt.lengthComputable
+        ? this.offset + chunkSize * (evt.loaded / evt.total)
         : this.offset;
       this.progress = +((uploaded / this.size) * 100).toFixed(2);
       const now = new Date().getTime();
@@ -399,7 +395,7 @@ export abstract class Uploader implements UploadState {
     };
   }
 
-  private waitForRetry() {
+  private waitForRetry(): Promise<number> {
     this.status = 'retry';
     return this.retry.wait(this.responseStatus);
   }
