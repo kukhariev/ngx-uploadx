@@ -1,26 +1,27 @@
 // @ts-check
 
-const args = process.argv.slice(2);
-
-const reset = args.includes('--reset');
-const emitErrors = args.includes('--errors');
-const exit = args.includes('--exit');
-
-const DEV = process.env.NODE_ENV === 'development';
-const PORT = 3003;
 const http = require('http');
 const url = require('url');
 const { unlinkSync } = require('fs');
 const { tmpdir } = require('os');
 const { Uploadx, DiskStorage } = require('node-uploadx');
 
-const maxChunkSize = '8MB';
+const DEV = process.env.NODE_ENV === 'development';
+const PORT = 3003;
+
+const args = process.argv.slice(2);
+const reset = args.includes('--reset');
+const emitErrors = args.includes('--errors');
+const exit = args.includes('--exit');
+
 const storage = new DiskStorage({ dest: (req, file) => `${tmpdir()}/ngx/${file.filename}` });
+
 reset && resetStorageBeforeTest(storage);
 exit && process.exit();
 
-const uploads = new Uploadx({ storage, maxChunkSize });
-uploads.on('error', console.error);
+const uploads = new Uploadx({ storage, maxChunkSize: '8MB' });
+DEV && uploads.on('error', console.error);
+
 const server = http.createServer((req, res) => {
   if (emitErrors && Math.random() < 0.1 && req.method !== 'OPTIONS' && req.method !== 'DELETE') {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -28,7 +29,7 @@ const server = http.createServer((req, res) => {
     res.end();
     return;
   }
-  const pathname = url.parse(req.url).pathname.toLowerCase();
+  const { pathname } = url.parse(req.url);
   if (pathname === '/upload') {
     uploads.handle(req, res);
   } else {
@@ -44,7 +45,9 @@ server.listen(PORT, error => {
   }
   DEV && console.log('listening on port:', PORT);
 });
+
 DEV && process.once('exit', () => console.log('exiting...'));
+
 function resetStorageBeforeTest(storage) {
   const files = storage.metaStore.all;
   for (const id in files) {
