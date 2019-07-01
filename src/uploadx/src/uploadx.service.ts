@@ -71,6 +71,7 @@ export class UploadxService {
    */
   handleFileList(fileList: FileList, options = {} as UploadxOptions): void {
     const instanceOptions = { ...this.options, ...options };
+    this.options.concurrency = instanceOptions.concurrency;
     Array.from(fileList).forEach(file => this.addUploaderInstance(file, instanceOptions));
     this.autoUploadFiles();
   }
