@@ -29,8 +29,8 @@ export class UploadxService {
   };
 
   constructor(private ngZone: NgZone) {
-    this.events.subscribe((evt: UploadState) => {
-      if (evt.status !== 'uploading' && evt.status !== 'added') {
+    this.events.subscribe(({ status }) => {
+      if (status !== 'uploading' && status !== 'added') {
         this.ngZone.runOutsideAngular(() => this.processQueue());
       }
     });
@@ -85,7 +85,7 @@ export class UploadxService {
     this.autoUploadFiles();
   }
 
-  private addUploaderInstance(file: File, options: UploadxOptions) {
+  private addUploaderInstance(file: File, options: UploadxOptions): void {
     const uploader = new this.options.uploaderClass(file, options as UploaderOptions);
     this.queue.push(uploader);
     uploader.status = 'added';
@@ -98,7 +98,7 @@ export class UploadxService {
   private autoUploadFiles(): void {
     if (this.options.autoUpload) {
       this.queue
-        .filter(uploader => uploader.status === 'added')
+        .filter(({ status }) => status === 'added')
         .forEach(uploader => (uploader.status = 'queue'));
     }
   }
@@ -113,12 +113,11 @@ export class UploadxService {
    * // set token
    * this.uploadService.control({ token: `TOKEN` });
    */
-  control(event: UploadxControlEvent): void {
-    const uploadId = event.uploadId;
-    const target = uploadId
-      ? this.queue.filter(uploader => uploader.uploadId === uploadId)
+  control(evt: UploadxControlEvent): void {
+    const target = evt.uploadId
+      ? this.queue.filter(({ uploadId }) => uploadId === evt.uploadId)
       : this.queue;
-    target.forEach(uploader => uploader.configure(event));
+    target.forEach(uploader => uploader.configure(evt));
   }
 
   /**
@@ -127,10 +126,10 @@ export class UploadxService {
    */
   private processQueue(): void {
     // Remove Cancelled Items from local queue
-    this.queue = this.queue.filter(f => f.status !== 'cancelled');
+    this.queue = this.queue.filter(({ status }) => status !== 'cancelled');
 
     this.queue
-      .filter(uploader => uploader.status === 'queue')
+      .filter(({ status }) => status === 'queue')
       .slice(0, Math.max(this.options.concurrency - this.runningProcess(), 0))
       .forEach(uploader => uploader.upload());
   }
@@ -139,8 +138,6 @@ export class UploadxService {
    * @returns number of active uploads
    */
   runningProcess(): number {
-    return this.queue.filter(
-      uploader => uploader.status === 'uploading' || uploader.status === 'retry'
-    ).length;
+    return this.queue.filter(({ status }) => status === 'uploading' || status === 'retry').length;
   }
 }
