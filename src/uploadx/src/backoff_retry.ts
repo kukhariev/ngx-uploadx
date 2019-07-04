@@ -4,13 +4,13 @@
 export class BackoffRetry {
   private delay: number;
   private code = -1;
+  private k = 2;
   retryAttempts = 1;
   /**
    * @param min  Initial retry delay
    * @param max  Max retry delay
-   * @param k    Increase factor
    */
-  constructor(private min = 500, private max = min * 300, private k = 2) {
+  constructor(private min = 500, private max = min * 120) {
     this.delay = this.min;
   }
   /**
@@ -24,8 +24,7 @@ export class BackoffRetry {
         this.retryAttempts++;
         this.delay = Math.min(this.delay * this.k, this.max);
       } else {
-        this.delay = this.min;
-        this.retryAttempts = 1;
+        this.reset();
       }
       this.code = code;
       setTimeout(
