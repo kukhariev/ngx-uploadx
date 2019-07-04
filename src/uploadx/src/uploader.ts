@@ -24,9 +24,9 @@ export abstract class Uploader implements UploadState {
   static notFoundErrors = [404, 410];
   static authErrors = [401];
   /**
-   * Max 4xx errors
+   * Max HTTP errors
    */
-  static maxRetryAttempts = 3;
+  static maxRetryAttempts = 8;
   /**
    * Maximum chunk size
    */
@@ -70,7 +70,7 @@ export abstract class Uploader implements UploadState {
     return Uploader.notFoundErrors.includes(this.responseStatus);
   }
   private get isMaxAttemptsReached(): boolean {
-    return this.retry.retryAttempts === Uploader.maxRetryAttempts && this.statusType === 400;
+    return this.retry.retryAttempts === Uploader.maxRetryAttempts;
   }
   /**
    * Original File name
