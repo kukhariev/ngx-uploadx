@@ -302,9 +302,10 @@ export abstract class Uploader implements UploadState {
   async start() {
     while (this.status === 'uploading' || this.status === 'retry') {
       try {
-        this.offset =
+        const offset =
           typeof this.offset === 'number' ? await this.sendFileContent() : await this.getOffset();
-        this.retry.reset();
+        offset > this.offset && this.retry.reset();
+        this.offset = offset;
         if (this.offset >= this.size) {
           this.progress = 100;
           this.status = 'complete';
