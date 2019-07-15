@@ -58,9 +58,9 @@ export class UploaderX extends Uploader {
 
   protected getOffsetFromResponse() {
     if (this.statusType === 300) {
-      const str = this.getValueFromResponse('Range');
-      const [match] = str && str.match(/(-1|\d+)$/g);
-      return match && +match + 1;
+      const range = this.getValueFromResponse('Range');
+      const end = range.split(/0-/).pop();
+      return end && +end + 1;
     } else if (this.statusType === 200) {
       return this.size;
     }
