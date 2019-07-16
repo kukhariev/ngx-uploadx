@@ -280,11 +280,7 @@ export abstract class Uploader implements UploadState {
    * Gets the value from the response
    */
   protected getValueFromResponse(key: string): string {
-    const value = this._xhr.getResponseHeader(key);
-    if (!value) {
-      throw new Error('Invalid Response');
-    }
-    return value;
+    return this._xhr.getResponseHeader(key);
   }
 
   /**
@@ -302,9 +298,11 @@ export abstract class Uploader implements UploadState {
   async start() {
     while (this.status === 'uploading' || this.status === 'retry') {
       try {
-        const offset =
-          typeof this.offset === 'number' ? await this.sendFileContent() : await this.getOffset();
-        offset > this.offset && this.retry.reset();
+        const offset = this.offset >= 0 ? await this.sendFileContent() : await this.getOffset();
+        if (offset === this.offset) {
+          throw new Error('Content upload failed');
+        }
+        this.retry.reset();
         this.offset = offset;
         if (this.offset >= this.size) {
           this.progress = 100;
@@ -321,8 +319,7 @@ export abstract class Uploader implements UploadState {
         }
         await this.waitForRetry();
         this.isAuthError && (await this.getToken());
-        // Do not reset the offset in case of network errors
-        this.offset = this.responseStatus ? undefined : this.offset;
+        this.offset = this.responseStatus >= 400 ? undefined : this.offset;
         this.status = 'uploading';
       } finally {
         this.adjustChunkSize();
