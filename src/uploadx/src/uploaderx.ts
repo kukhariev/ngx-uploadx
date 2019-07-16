@@ -4,7 +4,7 @@ import { resolveUrl } from './utils';
 /**
  * Implements XHR/CORS Resumable Upload
  * @see
- * https://developers.google.com/drive/v3/web/resumable-upload
+ * https://developers.google.com/drive/api/v3/manage-uploads#resumable
  */
 export class UploaderX extends Uploader {
   constructor(readonly file: File, options: UploadxOptions) {

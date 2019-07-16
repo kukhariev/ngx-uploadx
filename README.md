@@ -217,7 +217,7 @@ Pull requests are welcome!
 
 ## References
 
-- [https://developers.google.com/drive/v3/web/resumable-upload](https://developers.google.com/drive/v3/web/resumable-upload)
+- [https://developers.google.com/drive/api/v3/manage-uploads#resumable](https://developers.google.com/drive/api/v3/manage-uploads#resumable)
 
 ## License
 
