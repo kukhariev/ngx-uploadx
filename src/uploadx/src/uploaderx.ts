@@ -26,6 +26,9 @@ export class UploaderX extends Uploader {
       headers
     });
     const location = this.statusType === 200 && this.getValueFromResponse('location');
+    if (!location) {
+      throw new Error('Invalid or missing Location header');
+    }
     this.offset = this.responseStatus === 201 ? 0 : undefined;
     return resolveUrl(location, this.endpoint);
   }
@@ -56,16 +59,16 @@ export class UploaderX extends Uploader {
     return this.getOffsetFromResponse();
   }
 
-  protected getOffsetFromResponse() {
-    if (this.statusType === 300) {
+  protected getOffsetFromResponse(): number {
+    if (this.responseStatus === 308) {
       const range = this.getValueFromResponse('Range');
-      const end = range.split(/0-/).pop();
-      return end && +end + 1;
-    } else if (this.statusType === 200) {
+      return getRangeEnd(range) + 1;
+    }
+    if (this.statusType === 200) {
       return this.size;
     }
-    return;
   }
+
   protected onCancel(): void {
     this.request({ method: 'DELETE' });
   }
@@ -73,4 +76,9 @@ export class UploaderX extends Uploader {
   protected setAuth(token: string) {
     this.headers.Authorization = `Bearer ${token}`;
   }
+}
+
+export function getRangeEnd(range = ''): number {
+  const end = +range.split(/0-/)[1];
+  return end >= 0 ? end : -1;
 }

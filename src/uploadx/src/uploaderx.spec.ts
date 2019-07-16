@@ -1,4 +1,4 @@
-import { UploaderX } from './uploaderx';
+import { UploaderX, getRangeEnd } from './uploaderx';
 import { UploadxOptions } from './interfaces';
 import { Uploader } from './uploader';
 
@@ -21,6 +21,22 @@ describe('Uploader', () => {
     await uploader.upload();
     expect(uploader.responseStatus).toEqual(404);
     expect(uploader.headers.Authorization).toBeDefined();
+  });
+});
+
+describe('getRangeEnd', () => {
+  it('invalid ranges', () => {
+    expect(getRangeEnd(undefined)).toEqual(-1);
+    expect(getRangeEnd('')).toEqual(-1);
+    expect(getRangeEnd('invalid')).toEqual(-1);
+    expect(getRangeEnd('Range: bytes=-1')).toEqual(-1);
+    expect(getRangeEnd('Range: bytes=-5')).toEqual(-1);
+    expect(getRangeEnd('Range: bytes=0--5')).toEqual(-1);
+  });
+  it('valid ', () => {
+    expect(getRangeEnd('Range: bytes=0-1')).toEqual(1);
+    expect(getRangeEnd('Range: bytes=0-0')).toEqual(0);
+    expect(getRangeEnd('Range: bytes=0--1')).toEqual(-1);
   });
 });
 
