@@ -9,7 +9,7 @@ export class UploadxDropDirective {
   @HostBinding('class.uploadx-drop-active')
   active = false;
 
-  @ContentChild(UploadxDirective, { static: true })
+  @ContentChild(UploadxDirective)
   fileInput: UploadxDirective;
   constructor(private uploadService: UploadxService) {}
 

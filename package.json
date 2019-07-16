@@ -30,22 +30,22 @@
     "ci": "npm run lint && npm run test && npm run e2e"
   },
   "dependencies": {
-    "@angular/common": "~8.0.0",
-    "@angular/compiler": "~8.0.0",
-    "@angular/core": "~8.0.0",
-    "@angular/forms": "~8.0.0",
-    "@angular/platform-browser": "~8.0.0",
-    "@angular/platform-browser-dynamic": "~8.0.0",
-    "@angular/router": "~8.0.0",
+    "@angular/common": "~7.2.0",
+    "@angular/compiler": "~7.2.0",
+    "@angular/core": "~7.2.0",
+    "@angular/forms": "~7.2.0",
+    "@angular/platform-browser": "~7.2.0",
+    "@angular/platform-browser-dynamic": "~7.2.0",
+    "@angular/router": "~7.2.0",
     "core-js": "^2.6.3",
     "rxjs": "~6.5.2",
-    "zone.js": "~0.9.1"
+    "zone.js": "~0.8.26"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~0.800.1",
-    "@angular/cli": "^8.0.1",
-    "@angular/compiler-cli": "~8.0.0",
-    "@angular/language-service": "~8.0.0",
+    "@angular-devkit/build-angular": "~0.13.9",
+    "@angular/cli": "^7.3.9",
+    "@angular/compiler-cli": "~7.2.0",
+    "@angular/language-service": "~7.2.0",
     "@commitlint/cli": "^8.0.0",
     "@commitlint/config-conventional": "^8.0.0",
     "@commitlint/travis-cli": "^8.0.0",
@@ -71,11 +71,11 @@
     "protractor": "^5.4.2",
     "rimraf": "^2.6.3",
     "ts-node": "~7.0.1",
-    "tsickle": ">=0.34.0",
+    "tsickle": "0.34.0",
     "tslib": "^1.9.0",
     "tslint": "~5.16.0",
     "tslint-config-prettier": "1.18.0",
-    "typescript": "~3.4.5"
+    "typescript": "~3.2.4"
   },
   "husky": {
     "hooks": {
