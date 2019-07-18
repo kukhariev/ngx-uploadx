@@ -6,11 +6,11 @@ const { unlinkSync } = require('fs');
 const { tmpdir } = require('os');
 const { Uploadx, DiskStorage } = require('node-uploadx');
 
-const DEV = process.env.NODE_ENV === 'development';
 const PORT = 3003;
 
 const args = process.argv.slice(2);
 const reset = args.includes('--reset');
+const log = args.includes('--log');
 const emitErrors = args.includes('--errors');
 const exit = args.includes('--exit');
 
@@ -20,12 +20,12 @@ reset && resetStorageBeforeTest(storage);
 exit && process.exit();
 
 const uploads = new Uploadx({ storage, maxChunkSize: '8MB' });
-DEV && uploads.on('error', console.error);
+log && uploads.on('error', console.error);
 
 const server = http.createServer((req, res) => {
   if (emitErrors && Math.random() < 0.1 && req.method !== 'OPTIONS' && req.method !== 'DELETE') {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.statusCode = 401;
+    res.statusCode = Math.random() < 0.8 ? 401 : 500;
     res.end();
     return;
   }
@@ -43,10 +43,10 @@ server.listen(PORT, error => {
   if (error) {
     return console.error('something bad happened', error);
   }
-  DEV && console.log('listening on port:', PORT);
+  log && console.log('listening on port:', PORT);
 });
 
-DEV && process.once('exit', () => console.log('exiting...'));
+log && process.once('exit', () => console.log('exiting...'));
 
 function resetStorageBeforeTest(storage) {
   const files = storage.metaStore.all;

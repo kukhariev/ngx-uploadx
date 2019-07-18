@@ -1,7 +1,7 @@
-import * as util from 'util';
-import { build } from 'ng-packagr';
-import * as fs from 'fs';
-import * as rimraf from 'rimraf';
+const util = require('util');
+const { build } = require('ng-packagr');
+const fs = require('fs');
+const rimraf = require('rimraf');
 const copyFile = util.promisify(fs.copyFile);
 const unlink = util.promisify(fs.unlink);
 const writeFile = util.promisify(fs.writeFile);

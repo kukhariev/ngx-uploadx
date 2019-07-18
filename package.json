@@ -24,9 +24,9 @@
     "lint": "ng lint",
     "e2e": "ng e2e -c=ci",
     "server": "node ./server/ --reset",
-    "server:dev": "cross-env NODE_ENV=development node ./server/ --reset --errors",
+    "server:dev": "node ./server/ --reset --errors --log",
     "postversion": "npm run build && git push --follow-tags",
-    "build": "cross-env TS_NODE_COMPILER_OPTIONS={\\\"module\\\":\\\"commonjs\\\"} ts-node ./scripts/build.ts",
+    "build": "node ./scripts/build.js",
     "ci": "npm run lint && npm run test && npm run e2e"
   },
   "dependencies": {
@@ -54,7 +54,6 @@
     "@types/jasminewd2": "^2.0.6",
     "@types/node": "^10.12.18",
     "codelyzer": "^5.0.1",
-    "cross-env": "^5.2.0",
     "cz-conventional-changelog": "^2.1.0",
     "husky": "^2.4.0",
     "jasmine-core": "~3.3.0",
@@ -67,7 +66,7 @@
     "karma-jasmine-html-reporter": "^1.4.0",
     "lint-staged": "8.2.0",
     "ng-packagr": "^5.3.0",
-    "node-uploadx": "^1.2.7",
+    "node-uploadx": "^1.2.9",
     "prettier": "1.17.1",
     "protractor": "^5.4.2",
     "rimraf": "^2.6.3",
