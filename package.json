@@ -19,7 +19,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "prettier": "prettier --write \"**/*.{json,scss,md,ts,html,component.html}\"",
+    "prettier": "prettier --write \"**/*.{json,scss,md,ts,html}\"",
     "start": "ng serve",
     "build:app": "ng build",
     "test": "ng test --watch=false --progress=false",
@@ -88,7 +88,7 @@
     }
   },
   "lint-staged": {
-    "*.{json,scss,md,ts,html,component.html}": [
+    "*.{json,scss,md,ts,html}": [
       "prettier --write",
       "git add"
     ]
