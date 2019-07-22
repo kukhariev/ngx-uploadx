@@ -299,15 +299,16 @@ export abstract class Uploader implements UploadState {
     while (this.status === 'uploading' || this.status === 'retry') {
       try {
         const offset = this.offset >= 0 ? await this.sendFileContent() : await this.getOffset();
-        if (this.size && offset === this.offset) {
+        if (offset >= this.size) {
+          this.offset = offset;
+          this.progress = 100;
+          this.status = 'complete';
+        }
+        if (offset === this.offset) {
           throw new Error('Content upload failed');
         }
         this.retry.reset();
         this.offset = offset;
-        if (this.offset >= this.size) {
-          this.progress = 100;
-          this.status = 'complete';
-        }
       } catch {
         if (this.isFatalError || this.isMaxAttemptsReached) {
           this.status = 'error';
