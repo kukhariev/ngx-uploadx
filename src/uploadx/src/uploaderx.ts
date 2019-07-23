@@ -60,7 +60,7 @@ export class UploaderX extends Uploader {
   }
 
   protected getOffsetFromResponse(): number {
-    if (this.responseStatus === 308) {
+    if (this.responseStatus > 201) {
       const range = this.getValueFromResponse('Range');
       return getRangeEnd(range) + 1;
     }
