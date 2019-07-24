@@ -203,7 +203,7 @@ export abstract class Uploader implements UploadState {
       this.retry.reset();
       this.startTime = new Date().getTime();
       this.start();
-    } catch (e) {
+    } catch {
       if (this.isMaxAttemptsReached || this.isFatalError) {
         this.status = 'error';
       } else {
@@ -337,7 +337,7 @@ export abstract class Uploader implements UploadState {
     url,
     headers = {},
     progress = false
-  }: RequestParams): Promise<number> {
+  }: RequestParams): Promise<ProgressEvent> {
     return new Promise((resolve, reject) => {
       const xhr: XMLHttpRequest = new XMLHttpRequest();
       xhr.open(method, url || this.url, true);
@@ -345,9 +345,9 @@ export abstract class Uploader implements UploadState {
         xhr.upload.onprogress = this.onProgress((body as any).size);
       }
       this.setupXhr(xhr, headers);
-      xhr.onload = () => {
+      xhr.onload = (evt: ProgressEvent) => {
         this.processResponse(xhr);
-        this.statusType > 300 ? reject(this.responseStatus) : resolve(this.responseStatus);
+        this.statusType > 300 ? reject(evt) : resolve(evt);
       };
       xhr.onerror = reject;
       xhr.send(body);
@@ -360,7 +360,7 @@ export abstract class Uploader implements UploadState {
     this.statusType = undefined;
     this._xhr = xhr;
     xhr.responseType = this.responseType;
-    xhr.withCredentials = this.options.withCredentials;
+    this.options.withCredentials && (xhr.withCredentials = true);
     const _headers = { ...this.headers, ...headers };
     Object.keys(_headers).forEach(key => xhr.setRequestHeader(key, _headers[key]));
   }
@@ -378,7 +378,7 @@ export abstract class Uploader implements UploadState {
   private processResponse(xhr: XMLHttpRequest): void {
     this.response = this.getResponseBody(xhr);
     this.responseStatus = xhr.status === 0 && this.response ? 200 : xhr.status;
-    this.statusType = (xhr.status - (this.responseStatus % 100)) as any;
+    this.statusType = (this.responseStatus - (this.responseStatus % 100)) as any;
   }
 
   private onProgress(chunkSize: number) {
