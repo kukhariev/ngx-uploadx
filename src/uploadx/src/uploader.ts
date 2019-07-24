@@ -303,8 +303,7 @@ export abstract class Uploader implements UploadState {
           this.offset = offset;
           this.progress = 100;
           this.status = 'complete';
-        }
-        if (offset === this.offset) {
+        } else if (offset === this.offset) {
           throw new Error('Content upload failed');
         }
         this.retry.reset();

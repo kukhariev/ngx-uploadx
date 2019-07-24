@@ -4,6 +4,9 @@ import { environment } from '../../environments/environment';
 import { Uploader, UploadState, UploadxOptions, UploadxService } from '../../uploadx';
 import { AuthService } from '../auth.service';
 
+// Redefining example:
+Uploader.fatalErrors = [400, 405, 500];
+
 @Component({
   selector: 'app-on-push',
   templateUrl: './on-push.component.html',
