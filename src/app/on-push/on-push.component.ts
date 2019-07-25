@@ -5,7 +5,7 @@ import { Uploader, UploadState, UploadxOptions, UploadxService } from '../../upl
 import { AuthService } from '../auth.service';
 
 // Redefining example:
-Uploader.fatalErrors = [400, 405, 500];
+Uploader.fatalErrors = [400, 405];
 
 @Component({
   selector: 'app-on-push',

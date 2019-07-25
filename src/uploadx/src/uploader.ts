@@ -43,18 +43,16 @@ export abstract class Uploader implements UploadState {
    * Upload status
    */
   set status(s: UploadStatus) {
-    if (
-      s === this._status ||
-      this._status === 'cancelled' ||
-      (this._status === 'complete' && s !== 'cancelled')
-    ) {
+    if (this._status === 'cancelled' || (this._status === 'complete' && s !== 'cancelled')) {
       return;
     }
-    (s === 'cancelled' || s === 'paused') && this.abort();
-    s === 'cancelled' && this.url && this.onCancel();
-
-    this._status = s;
-    this.notifyState();
+    if (s !== this._status) {
+      s === 'paused' && this.abort();
+      s === 'cancelled' && this.abort();
+      s === 'cancelled' && this.onCancel();
+      this._status = s;
+      this.notifyState();
+    }
   }
   get status() {
     return this._status;
@@ -183,8 +181,7 @@ export abstract class Uploader implements UploadState {
   /**
    * Configure or reconfigure uploader
    */
-  configure(config = {} as UploadxControlEvent): void {
-    const { metadata, headers, token, endpoint, action } = config;
+  configure({ metadata, headers, token, endpoint, action }: UploadxControlEvent): void {
     this.endpoint = endpoint || this.endpoint;
     this.token = token || this.token;
     this.metadata = { ...this.metadata, ...unfunc(metadata, this.file) };
@@ -317,6 +314,8 @@ export abstract class Uploader implements UploadState {
           this.status = 'queue';
           break;
         }
+        console.log('rej');
+
         await this.waitForRetry();
         this.isAuthError && (await this.getToken());
         this.offset = this.responseStatus >= 400 ? undefined : this.offset;
@@ -353,7 +352,7 @@ export abstract class Uploader implements UploadState {
     });
   }
 
-  private setupXhr(xhr: XMLHttpRequest, headers?: any) {
+  private setupXhr(xhr: XMLHttpRequest, headers?: { [key: string]: string }): void {
     this.responseStatus = undefined;
     this.response = undefined;
     this.statusType = undefined;

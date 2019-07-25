@@ -34,7 +34,7 @@ describe('getRangeEnd', () => {
     expect(getRangeEnd('Range: bytes=0--5')).toEqual(-1);
     expect(getRangeEnd('Range: bytes=0--1')).toEqual(-1);
   });
-  it('valid ', () => {
+  it('valid ranges', () => {
     expect(getRangeEnd('Range: bytes=0-1')).toEqual(1);
     expect(getRangeEnd('Range: bytes=0-0')).toEqual(0);
     expect(getRangeEnd('Range: bytes=0-100')).toEqual(100);

@@ -70,7 +70,7 @@ export class UploaderX extends Uploader {
   }
 
   protected onCancel(): void {
-    this.request({ method: 'DELETE' });
+    this.url && this.request({ method: 'DELETE' });
   }
 
   protected setAuth(token: string) {
