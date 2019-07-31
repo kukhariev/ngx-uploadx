@@ -314,8 +314,6 @@ export abstract class Uploader implements UploadState {
           this.status = 'queue';
           break;
         }
-        console.log('rej');
-
         await this.waitForRetry();
         this.isAuthError && (await this.getToken());
         this.offset = this.responseStatus >= 400 ? undefined : this.offset;

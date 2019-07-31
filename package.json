@@ -78,7 +78,7 @@
     "typescript": "~3.2.4"
   },
   "peerDependencies": {
-    "@angular/common": ">=6.0.0 <9.0.0",
+    "@angular/core": ">=6.0.0 <9.0.0",
     "rxjs": "^6.0.0"
   },
   "husky": {
