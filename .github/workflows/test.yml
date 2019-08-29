@@ -1,16 +1,15 @@
-name: Node CI
+name: Angular Test CI
 
 on: [push]
 
 jobs:
-  build:
-
-    runs-on: ubuntu-18.04
-
+  test:
+    name: Test on node ${{ matrix.node_version }} and ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node-version: [8.x, 10.x, 12.x]
-
+        node_version: [8, 10, 12]
+        os: [ubuntu-latest, windows-latest, macOS-latest]
     steps:
     - uses: actions/checkout@v1
     - name: Use Node.js ${{ matrix.node-version }}
