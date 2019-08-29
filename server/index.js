@@ -1,26 +1,29 @@
 // @ts-check
 
-const http = require('http');
-const url = require('url');
-const { unlinkSync } = require('fs');
-const { tmpdir } = require('os');
-const { Uploadx, DiskStorage } = require('node-uploadx');
-
-const PORT = 3003;
-
 const args = process.argv.slice(2);
-const reset = args.includes('--reset');
+const dirty = args.includes('--no-reset');
 const log = args.includes('--log');
 const emitErrors = args.includes('--errors');
 const exit = args.includes('--exit');
 
-const storage = new DiskStorage({ dest: (req, file) => `${tmpdir()}/ngx/${file.filename}` });
+const http = require('http');
+const url = require('url');
+const { tmpdir } = require('os');
 
-reset && resetStorageBeforeTest(storage);
+log && (process.env.DEBUG = 'uploadx: * ');
+const { Uploadx, DiskStorage } = require('node-uploadx');
+const PORT = 3003;
+const USER_ID = 'ngx-uploadx-test';
+const UPLOADS_ROOT = `${tmpdir()}/${USER_ID}/`;
+
+const user = { id: USER_ID };
+
+const storage = new DiskStorage({ dest: (req, file) => `${UPLOADS_ROOT}/${file.filename}` });
+
+!dirty && storageCleanup(storage);
 exit && process.exit();
 
-const uploads = new Uploadx({ storage, maxChunkSize: '8MB' });
-log && uploads.on('error', console.error);
+const uploads = new Uploadx({ storage });
 
 const server = http.createServer((req, res) => {
   if (emitErrors && Math.random() < 0.1 && req.method !== 'OPTIONS' && req.method !== 'DELETE') {
@@ -31,6 +34,7 @@ const server = http.createServer((req, res) => {
   }
   const { pathname } = url.parse(req.url);
   if (pathname === '/upload') {
+    req['user'] = user;
     uploads.handle(req, res);
   } else {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -48,14 +52,13 @@ server.listen(PORT, error => {
 
 log && process.once('exit', () => console.log('exiting...'));
 
-function resetStorageBeforeTest(storage) {
-  const files = storage.metaStore.all;
-  for (const id in files) {
-    try {
-      unlinkSync(files[id].path);
-    } catch (err) {}
-  }
-  storage.metaStore.clear();
+/**
+ * @param {DiskStorage} storage
+ */
+function storageCleanup(storage) {
+  storage.delete({ userId: USER_ID }).then(files => {
+   files.length && console.log('node-uploadx: delete existing files:' ,files.map(file => file.path));
+  });
 }
 
-exports.reset = () => resetStorageBeforeTest(storage);
+exports.reset = () => storageCleanup(storage);
