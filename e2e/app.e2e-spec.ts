@@ -5,7 +5,10 @@ import { reset } from '../server/';
 describe('uploader App', () => {
   let page: AppPage;
   page = new AppPage();
-
+  afterEach(() => {
+    // page.sleep(5000);
+    reset();
+  });
   it('should have input type=file', () => {
     page.navigateTo('/directive-way');
     expect(page.getFileInput().isPresent()).toBe(true);
@@ -14,38 +17,33 @@ describe('uploader App', () => {
     expect(page.getTable().isPresent()).toBe(true);
     expect(page.getPreText()).toEqual('null');
   });
+
   it('should upload a file (Directive)', () => {
-    reset();
     page.getFileInput().sendKeys(absolutePath);
     expect(page.waitForComplete()).toEqual('complete');
-    reset();
   });
 
-  it('should upload a file (Mixed)', () => {
+  it('should upload a file (Mixed)', async () => {
     page.navigateTo('/service-way');
     page.getFileInput().sendKeys(absolutePath);
     expect(page.waitForComplete()).toEqual('complete');
-    reset();
   });
 
-  it('should upload a file (Service)', () => {
+  it('should upload a file (Service)', async () => {
     page.navigateTo('/service-code-way');
     page.getFileInput().sendKeys(absolutePath);
     expect(page.waitForComplete()).toEqual('complete');
-    reset();
   });
 
-  it('should upload a file (onPush)', () => {
+  it('should upload a file (onPush)', async () => {
     page.navigateTo('/on-push');
     page.getFileInput().sendKeys(absolutePath);
     expect(page.waitForCompleteTable()).toEqual('complete');
-    reset();
   });
 
   it('should upload a file (Multi)', () => {
     page.navigateTo('/multi');
     page.getVideoFileInput().sendKeys(absolutePath);
     expect(page.waitForCompleteTable()).toEqual('complete');
-    reset();
   });
 });

@@ -20,15 +20,15 @@ const user = { id: USER_ID };
 
 const storage = new DiskStorage({ dest: (req, file) => `${UPLOADS_ROOT}/${file.filename}` });
 
-!dirty && storageCleanup(storage);
 exit && process.exit();
 
 const uploads = new Uploadx({ storage });
 
 const server = http.createServer((req, res) => {
-  if (emitErrors && Math.random() < 0.1 && req.method !== 'OPTIONS' && req.method !== 'DELETE') {
+  if (emitErrors && Math.random() < 0.4 && req.method !== 'OPTIONS' && req.method !== 'DELETE') {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.statusCode = Math.random() < 0.8 ? 401 : 500;
+    // res.setHeader('Cache-Control', 'no-cache, no-store');
+    res.statusCode = Math.random() < 0.5 ? 401 : 500;
     res.end();
     return;
   }
@@ -50,15 +50,8 @@ server.listen(PORT, error => {
   log && console.log('listening on port:', PORT);
 });
 
-log && process.once('exit', () => console.log('exiting...'));
-
-/**
- * @param {DiskStorage} storage
- */
-function storageCleanup(storage) {
-  storage.delete({ userId: USER_ID }).then(files => {
-   files.length && console.log('node-uploadx: delete existing files:' ,files.map(file => file.path));
-  });
+function storageCleanup() {
+  return storage.delete({ userId: USER_ID });
 }
 
-exports.reset = () => storageCleanup(storage);
+exports.reset = storageCleanup;
