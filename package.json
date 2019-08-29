@@ -21,9 +21,8 @@
   "scripts": {
     "prettier": "prettier --write \"**/*.{json,scss,md,ts,html}\"",
     "start": "ng serve",
-    "build:app": "ng build",
-    "test": "ng test --watch=false --progress=false",
     "lint": "ng lint",
+    "test": "ng test --watch=false --progress=false --browsers=ChromeHeadless",
     "e2e": "ng e2e -c=ci",
     "server": "node ./server/ ",
     "server:dev": "node ./server/ --errors --log",
