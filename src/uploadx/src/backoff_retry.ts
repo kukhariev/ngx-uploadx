@@ -3,7 +3,7 @@
  */
 export class BackoffRetry {
   private delay: number;
-  private code = -1;
+  private code: any = -1;
   private k = 2;
   retryAttempts = 1;
   /**

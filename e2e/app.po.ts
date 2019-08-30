@@ -4,7 +4,7 @@ export class AppPage {
   navigateTo(path: string) {
     return browser.get(path);
   }
-  sleep(t) {
+  sleep(t: number) {
     return browser.sleep(t);
   }
   getFileInput() {

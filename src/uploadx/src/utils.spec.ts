@@ -21,12 +21,10 @@ describe('resolveUrl', () => {
 });
 describe('resolveUrl:polyfill', function() {
   it('relative', () => {
-    window.URL = undefined;
     const resolved = resolveUrl(rel, base);
     expect(resolved).toBe('http://www.example.com/upload?upload_id=12345');
   });
   it('path', () => {
-    window.URL = undefined;
     const resolved = resolveUrl(path, base);
     expect(resolved).toBe('http://www.example.com/files?upload_id=12345');
   });

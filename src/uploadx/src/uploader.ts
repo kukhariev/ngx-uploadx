@@ -6,7 +6,7 @@ import {
   UploadStatus,
   UploadxControlEvent
 } from './interfaces';
-import { actionToStatusMap, noop, unfunc } from './utils';
+import { actionToStatusMap, isNumber, noop, unfunc } from './utils';
 
 /**
  * Uploader Base Class
@@ -59,13 +59,13 @@ export abstract class Uploader implements UploadState {
   }
 
   private get isFatalError(): boolean {
-    return Uploader.fatalErrors.includes(this.responseStatus);
+    return Uploader.fatalErrors.includes(this.responseStatus || 0);
   }
   private get isAuthError(): boolean {
-    return Uploader.authErrors.includes(this.responseStatus);
+    return Uploader.authErrors.includes(this.responseStatus || 0);
   }
   private get isNotFoundError(): boolean {
-    return Uploader.notFoundErrors.includes(this.responseStatus);
+    return Uploader.notFoundErrors.includes(this.responseStatus || 0);
   }
   private get isMaxAttemptsReached(): boolean {
     return this.retry.retryAttempts === Uploader.maxRetryAttempts;
@@ -133,7 +133,7 @@ export abstract class Uploader implements UploadState {
   /**
    * HTTP response status category
    */
-  protected statusType: 200 | 300 | 400 | 500;
+  protected statusType: 0 | 200 | 300 | 400 | 500;
   /**
    * Chunk size in bytes
    */
@@ -141,7 +141,7 @@ export abstract class Uploader implements UploadState {
   /**
    * Auth Bearer token/tokenGetter
    */
-  token?: UploadxControlEvent['token'];
+  token: UploadxControlEvent['token'];
   /**
    * Status of uploader
    */
@@ -161,7 +161,7 @@ export abstract class Uploader implements UploadState {
   /**
    * byte offset within the whole file
    */
-  protected offset = 0;
+  protected offset? = 0;
 
   constructor(readonly file: File, public options: UploaderOptions) {
     this.name = file.name;
@@ -181,7 +181,7 @@ export abstract class Uploader implements UploadState {
   /**
    * Configure or reconfigure uploader
    */
-  configure({ metadata, headers, token, endpoint, action }: UploadxControlEvent): void {
+  configure({ metadata = {}, headers = {}, token, endpoint, action }: UploadxControlEvent): void {
     this.endpoint = endpoint || this.endpoint;
     this.token = token || this.token;
     this.metadata = { ...this.metadata, ...unfunc(metadata, this.file) };
@@ -217,11 +217,11 @@ export abstract class Uploader implements UploadState {
   /**
    * Send file content
    */
-  protected abstract sendFileContent(): Promise<number>;
+  protected abstract sendFileContent(): Promise<number | undefined>;
   /**
    * Get an offset for the next request
    */
-  protected abstract getOffset(): Promise<number>;
+  protected abstract getOffset(): Promise<number | undefined>;
 
   protected abstract setAuth(token: string): void;
 
@@ -276,15 +276,15 @@ export abstract class Uploader implements UploadState {
   /**
    * Gets the value from the response
    */
-  protected getValueFromResponse(key: string): string {
+  protected getValueFromResponse(key: string): string | null {
     return this._xhr.getResponseHeader(key);
   }
 
   /**
    * Set auth token
    */
-  protected getToken(): Promise<void> {
-    return Promise.resolve(unfunc(this.token, this.responseStatus)).then(
+  protected getToken(): Promise<any> {
+    return Promise.resolve(unfunc(this.token || '', this.responseStatus)).then(
       token => token && this.setAuth(token)
     );
   }
@@ -295,8 +295,10 @@ export abstract class Uploader implements UploadState {
   async start() {
     while (this.status === 'uploading' || this.status === 'retry') {
       try {
-        const offset = this.offset >= 0 ? await this.sendFileContent() : await this.getOffset();
-        if (offset >= this.size) {
+        const offset = isNumber(this.offset)
+          ? await this.sendFileContent()
+          : await this.getOffset();
+        if (isNumber(offset) && offset >= this.size) {
           this.offset = offset;
           this.progress = 100;
           this.status = 'complete';
@@ -350,10 +352,10 @@ export abstract class Uploader implements UploadState {
     });
   }
 
-  private setupXhr(xhr: XMLHttpRequest, headers?: { [key: string]: string }): void {
-    this.responseStatus = undefined;
+  private setupXhr(xhr: XMLHttpRequest, headers: Record<string, any> = {}): void {
+    this.responseStatus = 0;
     this.response = undefined;
-    this.statusType = undefined;
+    this.statusType = 0;
     this._xhr = xhr;
     xhr.responseType = this.responseType;
     this.options.withCredentials && (xhr.withCredentials = true);
@@ -379,14 +381,16 @@ export abstract class Uploader implements UploadState {
 
   private onProgress(chunkSize: number) {
     return (evt: ProgressEvent) => {
-      const uploaded = evt.lengthComputable
-        ? this.offset + chunkSize * (evt.loaded / evt.total)
-        : this.offset;
-      this.progress = +((uploaded / this.size) * 100).toFixed(2);
-      const now = new Date().getTime();
-      this.speed = Math.round((uploaded / (now - this.startTime)) * 1000);
-      this.remaining = Math.ceil((this.size - uploaded) / this.speed);
-      this.notifyState();
+      if (this.offset !== undefined) {
+        const uploaded = evt.lengthComputable
+          ? this.offset + chunkSize * (evt.loaded / evt.total)
+          : this.offset;
+        this.progress = +((uploaded / this.size) * 100).toFixed(2);
+        const now = new Date().getTime();
+        this.speed = Math.round((uploaded / (now - this.startTime)) * 1000);
+        this.remaining = Math.ceil((this.size - uploaded) / this.speed);
+        this.notifyState();
+      }
     };
   }
 
