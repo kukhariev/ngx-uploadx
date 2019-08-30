@@ -1,10 +1,10 @@
 import { BackoffRetry } from './backoff_retry';
 import {
+  RequestParams,
   UploaderOptions,
   UploadState,
   UploadStatus,
-  UploadxControlEvent,
-  RequestParams
+  UploadxControlEvent
 } from './interfaces';
 import { actionToStatusMap, noop, unfunc } from './utils';
 
@@ -112,11 +112,11 @@ export abstract class Uploader implements UploadState {
   /**
    * Custom headers
    */
-  headers: { [key: string]: string } = {};
+  headers: Record<string, any> = {};
   /**
    * Metadata Object
    */
-  metadata: { [key: string]: any };
+  metadata: Record<string, any>;
   /**
    * Upload endpoint
    */

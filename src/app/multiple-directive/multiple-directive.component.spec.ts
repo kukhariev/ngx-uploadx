@@ -1,7 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { MultipleDirectiveComponent } from './multiple-directive.component';
 import { UploadxDirective } from '../../uploadx/src/uploadx.directive';
+import { MultipleDirectiveComponent } from './multiple-directive.component';
 
 describe('MultipleDirectiveComponent', () => {
   let component: MultipleDirectiveComponent;

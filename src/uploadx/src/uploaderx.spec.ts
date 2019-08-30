@@ -1,6 +1,6 @@
-import { UploaderX, getRangeEnd } from './uploaderx';
 import { UploadxOptions } from './interfaces';
 import { Uploader } from './uploader';
+import { getRangeEnd, UploaderX } from './uploaderx';
 
 describe('Uploader', () => {
   it('should set to adaptive chunkSize if no options are specified', async function() {

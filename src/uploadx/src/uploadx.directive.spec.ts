@@ -1,10 +1,9 @@
 /* tslint:disable:no-unused-variable */
-import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { Component, DebugElement } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-
-import { UploadxService } from './uploadx.service';
 import { UploadxDirective } from './uploadx.directive';
+import { UploadxService } from './uploadx.service';
 
 @Component({
   template: `

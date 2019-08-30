@@ -1,7 +1,7 @@
 import { Injectable, NgZone } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
-import { UploaderOptions, UploadxControlEvent, UploadxOptions, UploadState } from './interfaces';
+import { UploaderOptions, UploadState, UploadxControlEvent, UploadxOptions } from './interfaces';
 import { Uploader } from './uploader';
 import { UploaderX } from './uploaderx';
 
