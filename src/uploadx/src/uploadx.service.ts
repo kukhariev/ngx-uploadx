@@ -4,9 +4,23 @@ import { map, startWith } from 'rxjs/operators';
 import { UploaderOptions, UploadState, UploadxControlEvent, UploadxOptions } from './interfaces';
 import { Uploader } from './uploader';
 import { UploaderX } from './uploaderx';
+import { pick } from './utils';
 
 @Injectable({ providedIn: 'root' })
 export class UploadxService {
+  static stateKeys: (keyof UploadState)[] = [
+    'file',
+    'name',
+    'progress',
+    'remaining',
+    'response',
+    'responseStatus',
+    'size',
+    'speed',
+    'status',
+    'uploadId',
+    'url'
+  ];
   private readonly eventsStream: Subject<UploadState> = new Subject();
   /**
    * Upload status events
@@ -23,8 +37,10 @@ export class UploadxService {
     autoUpload: true,
     concurrency: 2,
     uploaderClass: UploaderX,
-    stateChange: (evt: UploadState) => {
-      setTimeout(() => this.ngZone.run(() => this.eventsStream.next(evt)));
+    stateChange: (evt: Uploader) => {
+      setTimeout(() =>
+        this.ngZone.run(() => this.eventsStream.next(pick(evt, UploadxService.stateKeys)))
+      );
     }
   };
 

@@ -25,7 +25,7 @@ export class UploaderX extends Uploader {
       url: this.endpoint,
       headers
     });
-    const location = this.statusType === 200 && this.getValueFromResponse('location');
+    const location = this.getValueFromResponse('location');
     if (!location) {
       throw new Error('Invalid or missing Location header');
     }
@@ -45,8 +45,7 @@ export class UploaderX extends Uploader {
         method: 'PUT',
         body,
         url: this.url,
-        headers,
-        progress: true
+        headers
       });
       return this.getOffsetFromResponse();
     }
@@ -67,7 +66,7 @@ export class UploaderX extends Uploader {
       const range = this.getValueFromResponse('Range');
       return isString(range) ? getRangeEnd(range) + 1 : undefined;
     }
-    if (this.statusType === 200) {
+    if (this.responseStatus <= 201) {
       return this.size;
     }
   }
