@@ -233,11 +233,11 @@ export abstract class Uploader implements UploadState {
   private adjustChunkSize(): void {
     if (!this.options.chunkSize && this.responseStatus < 400) {
       const elapsedTime = this.chunkSize / this.speed;
-      if (elapsedTime < 1 && this.chunkSize <= Uploader.maxChunkSize / 2) {
-        this.chunkSize *= 2;
+      if (elapsedTime < 1) {
+        this.chunkSize = Math.min(Uploader.maxChunkSize, this.chunkSize * 2);
       }
-      if (elapsedTime > 10 && this.chunkSize >= Uploader.minChunkSize * 2) {
-        this.chunkSize /= 2;
+      if (elapsedTime > 10) {
+        this.chunkSize = Math.max(Uploader.maxChunkSize, this.chunkSize / 2);
       }
     } else if (this.responseStatus === 413) {
       this.chunkSize /= 2;
