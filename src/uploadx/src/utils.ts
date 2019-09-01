@@ -25,11 +25,13 @@ export function unfunc<T, V>(value: T | ((ref: V) => T), ref: V): T {
 }
 
 export const noop = () => {};
+
 export const pick = <T, K extends keyof T>(obj: T, whitelist: K[]): Pick<T, K> => {
   const result: any = {};
   whitelist.forEach(key => (result[key] = obj[key]));
   return result;
 };
+
 export function isNumber(x: any): x is number {
   return typeof x === 'number';
 }
@@ -37,6 +39,7 @@ export function isNumber(x: any): x is number {
 export function isString(x: any): x is string {
   return typeof x === 'string';
 }
+
 export const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
   pause: 'paused',
   pauseAll: 'paused',
