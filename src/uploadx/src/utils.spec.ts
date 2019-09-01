@@ -19,18 +19,19 @@ describe('resolveUrl', () => {
     expect(resolved).toBe('http://www.example.com/files?upload_id=12345');
   });
 });
-describe('resolveUrl:polyfill', function() {
+describe('resolveUrl:polyfill', () => {
+  beforeAll(() => {
+    window.URL = undefined as any;
+  });
   it('relative', () => {
-    window.URL = undefined;
     const resolved = resolveUrl(rel, base);
     expect(resolved).toBe('http://www.example.com/upload?upload_id=12345');
   });
   it('path', () => {
-    window.URL = undefined;
     const resolved = resolveUrl(path, base);
     expect(resolved).toBe('http://www.example.com/files?upload_id=12345');
   });
-  afterEach(() => {
+  afterAll(() => {
     window.URL = _URL;
   });
 });

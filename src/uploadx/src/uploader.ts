@@ -6,7 +6,7 @@ import {
   UploadStatus,
   UploadxControlEvent
 } from './interfaces';
-import { actionToStatusMap, noop, unfunc } from './utils';
+import { actionToStatusMap, isNumber, noop, unfunc } from './utils';
 
 /**
  * Uploader Base Class
@@ -37,6 +37,7 @@ export abstract class Uploader implements UploadState {
   static minChunkSize = 4096; // default blocksize of most FSs
   /**
    * Initial chunk size
+   * 32kB
    */
   static startingChunkSize = Uploader.minChunkSize * 64;
   /**
@@ -51,25 +52,13 @@ export abstract class Uploader implements UploadState {
       s === 'cancelled' && this.abort();
       s === 'cancelled' && this.onCancel();
       this._status = s;
-      this.notifyState();
+      this.stateChange(this);
     }
   }
   get status() {
     return this._status;
   }
 
-  private get isFatalError(): boolean {
-    return Uploader.fatalErrors.includes(this.responseStatus);
-  }
-  private get isAuthError(): boolean {
-    return Uploader.authErrors.includes(this.responseStatus);
-  }
-  private get isNotFoundError(): boolean {
-    return Uploader.notFoundErrors.includes(this.responseStatus);
-  }
-  private get isMaxAttemptsReached(): boolean {
-    return this.retry.retryAttempts === Uploader.maxRetryAttempts;
-  }
   /**
    * Original File name
    */
@@ -89,10 +78,7 @@ export abstract class Uploader implements UploadState {
    * HTTP response status code
    */
   responseStatus: number;
-  /**
-   * Upload start time
-   */
-  private startTime: number;
+
   /**
    * Progress percentage
    */
@@ -123,17 +109,9 @@ export abstract class Uploader implements UploadState {
   endpoint = '/upload';
 
   /**
-   * Retries handler
-   */
-  protected retry = new BackoffRetry();
-  /**
    * HTTP response body
    */
   response: any;
-  /**
-   * HTTP response status category
-   */
-  protected statusType: 200 | 300 | 400 | 500;
   /**
    * Chunk size in bytes
    */
@@ -141,19 +119,12 @@ export abstract class Uploader implements UploadState {
   /**
    * Auth Bearer token/tokenGetter
    */
-  token?: UploadxControlEvent['token'];
+  token: UploadxControlEvent['token'];
+
   /**
-   * Status of uploader
+   * Retries handler
    */
-  private _status: UploadStatus;
-  /**
-   * Set HttpRequest responseType
-   */
-  protected responseType: XMLHttpRequestResponseType = '';
-  /**
-   * UploadState emitter
-   */
-  private stateChange: (evt: UploadState) => void;
+  protected retry = new BackoffRetry();
   /**
    * Active HttpRequest
    */
@@ -161,7 +132,37 @@ export abstract class Uploader implements UploadState {
   /**
    * byte offset within the whole file
    */
-  protected offset = 0;
+  protected offset? = 0;
+  /**
+   * Set HttpRequest responseType
+   */
+  protected responseType: XMLHttpRequestResponseType = '';
+
+  /**
+   * Upload start time
+   */
+  private startTime: number;
+  /**
+   * Status of uploader
+   */
+  private _status: UploadStatus;
+  private get isFatalError(): boolean {
+    return Uploader.fatalErrors.includes(this.responseStatus);
+  }
+  private get isAuthError(): boolean {
+    return Uploader.authErrors.includes(this.responseStatus);
+  }
+  private get isNotFoundError(): boolean {
+    return Uploader.notFoundErrors.includes(this.responseStatus);
+  }
+  private get isMaxAttemptsReached(): boolean {
+    return this.retry.retryAttempts === Uploader.maxRetryAttempts;
+  }
+
+  /**
+   * UploadState emitter
+   */
+  private stateChange: (evt: UploadState) => void;
 
   constructor(readonly file: File, public options: UploaderOptions) {
     this.name = file.name;
@@ -181,7 +182,7 @@ export abstract class Uploader implements UploadState {
   /**
    * Configure or reconfigure uploader
    */
-  configure({ metadata, headers, token, endpoint, action }: UploadxControlEvent): void {
+  configure({ metadata = {}, headers = {}, token, endpoint, action }: UploadxControlEvent): void {
     this.endpoint = endpoint || this.endpoint;
     this.token = token || this.token;
     this.metadata = { ...this.metadata, ...unfunc(metadata, this.file) };
@@ -215,56 +216,34 @@ export abstract class Uploader implements UploadState {
    */
   protected abstract getFileUrl(): Promise<string>;
   /**
-   * Send file content
+   * Send file content and return an offset for the next request
    */
-  protected abstract sendFileContent(): Promise<number>;
+  protected abstract sendFileContent(): Promise<number | undefined>;
   /**
    * Get an offset for the next request
    */
-  protected abstract getOffset(): Promise<number>;
+  protected abstract getOffset(): Promise<number | undefined>;
 
   protected abstract setAuth(token: string): void;
-
-  /**
-   * Emit current state
-   */
-  private notifyState(): void {
-    const state: UploadState = {
-      file: this.file,
-      name: this.name,
-      progress: this.progress,
-      remaining: this.remaining,
-      response: this.response,
-      responseStatus: this.responseStatus,
-      size: this.size,
-      speed: this.speed,
-      status: this.status,
-      uploadId: this.uploadId,
-      url: this.url
-    };
-
-    this.stateChange(state);
-  }
 
   // Increases the chunkSize if the time of the request
   // is less than 1 second,
   // and decreases it if more than 10 seconds.
   // Decreases on `Payload Too Large` error
-  private adjustChunkSize() {
+  private adjustChunkSize(): void {
     if (!this.options.chunkSize && this.responseStatus < 400) {
-      const t = this.chunkSize / this.speed;
-      if (t < 1 && this.chunkSize < Uploader.maxChunkSize) {
-        this.chunkSize *= 2;
-        Uploader.startingChunkSize = this.chunkSize / 4;
+      const elapsedTime = this.chunkSize / this.speed;
+      if (elapsedTime < 2) {
+        this.chunkSize = Math.min(Uploader.maxChunkSize, this.chunkSize * 2);
       }
-      if (t > 10 && this.chunkSize > Uploader.minChunkSize) {
-        this.chunkSize /= 2;
-        Uploader.startingChunkSize = this.chunkSize * 2;
+      if (elapsedTime > 8) {
+        this.chunkSize = Math.max(Uploader.maxChunkSize, this.chunkSize / 2);
       }
     } else if (this.responseStatus === 413) {
       this.chunkSize /= 2;
       Uploader.maxChunkSize = this.chunkSize;
     }
+    Uploader.startingChunkSize = this.chunkSize;
   }
 
   protected abort(): void {
@@ -276,15 +255,15 @@ export abstract class Uploader implements UploadState {
   /**
    * Gets the value from the response
    */
-  protected getValueFromResponse(key: string): string {
+  protected getValueFromResponse(key: string): string | null {
     return this._xhr.getResponseHeader(key);
   }
 
   /**
    * Set auth token
    */
-  protected getToken(): Promise<void> {
-    return Promise.resolve(unfunc(this.token, this.responseStatus)).then(
+  protected getToken(): Promise<any> {
+    return Promise.resolve(unfunc(this.token || '', this.responseStatus)).then(
       token => token && this.setAuth(token)
     );
   }
@@ -295,8 +274,10 @@ export abstract class Uploader implements UploadState {
   async start() {
     while (this.status === 'uploading' || this.status === 'retry') {
       try {
-        const offset = this.offset >= 0 ? await this.sendFileContent() : await this.getOffset();
-        if (offset >= this.size) {
+        const offset = isNumber(this.offset)
+          ? await this.sendFileContent()
+          : await this.getOffset();
+        if (isNumber(offset) && offset >= this.size) {
           this.offset = offset;
           this.progress = 100;
           this.status = 'complete';
@@ -331,39 +312,31 @@ export abstract class Uploader implements UploadState {
     method,
     body = null,
     url,
-    headers = {},
-    progress = false
+    headers = {}
   }: RequestParams): Promise<ProgressEvent> {
     return new Promise((resolve, reject) => {
-      const xhr: XMLHttpRequest = new XMLHttpRequest();
+      this._xhr = new XMLHttpRequest();
+      const xhr = this._xhr;
       xhr.open(method, url || this.url, true);
-      if (progress && body) {
-        xhr.upload.onprogress = this.onProgress((body as any).size);
+      if (body instanceof Blob) {
+        xhr.upload.onprogress = this.onProgress(body.size);
       }
-      this.setupXhr(xhr, headers);
+      this.responseType && (xhr.responseType = this.responseType);
+      this.options.withCredentials && (xhr.withCredentials = true);
+      const _headers = { ...this.headers, ...headers };
+      Object.keys(_headers).forEach(key => xhr.setRequestHeader(key, _headers[key]));
       xhr.onload = (evt: ProgressEvent) => {
         this.processResponse(xhr);
-        this.statusType > 300 ? reject(evt) : resolve(evt);
+        this.responseStatus >= 400 ? reject(evt) : resolve(evt);
       };
       xhr.onerror = reject;
       xhr.send(body);
     });
   }
 
-  private setupXhr(xhr: XMLHttpRequest, headers?: { [key: string]: string }): void {
-    this.responseStatus = undefined;
-    this.response = undefined;
-    this.statusType = undefined;
-    this._xhr = xhr;
-    xhr.responseType = this.responseType;
-    this.options.withCredentials && (xhr.withCredentials = true);
-    const _headers = { ...this.headers, ...headers };
-    Object.keys(_headers).forEach(key => xhr.setRequestHeader(key, _headers[key]));
-  }
-
-  private getResponseBody(xhr: XMLHttpRequest): string | object {
+  private getResponseBody(xhr: XMLHttpRequest): any {
     let body = 'response' in (xhr as any) ? xhr.response : xhr.responseText;
-    if (this.responseType === 'json' && body && typeof body === 'string') {
+    if (body && this.responseType === 'json' && typeof body === 'string') {
       try {
         body = JSON.parse(body);
       } catch {}
@@ -374,19 +347,21 @@ export abstract class Uploader implements UploadState {
   private processResponse(xhr: XMLHttpRequest): void {
     this.response = this.getResponseBody(xhr);
     this.responseStatus = xhr.status === 0 && this.response ? 200 : xhr.status;
-    this.statusType = (this.responseStatus - (this.responseStatus % 100)) as any;
   }
 
-  private onProgress(chunkSize: number) {
-    return (evt: ProgressEvent) => {
-      const uploaded = evt.lengthComputable
-        ? this.offset + chunkSize * (evt.loaded / evt.total)
-        : this.offset;
-      this.progress = +((uploaded / this.size) * 100).toFixed(2);
-      const now = new Date().getTime();
-      this.speed = Math.round((uploaded / (now - this.startTime)) * 1000);
-      this.remaining = Math.ceil((this.size - uploaded) / this.speed);
-      this.notifyState();
+  private onProgress(chunkSize: number): (evt: ProgressEvent) => void {
+    let throttle = 0;
+    return ({ loaded }: ProgressEvent) => {
+      if (!throttle) {
+        throttle = window.setTimeout(() => (throttle = 0), 500);
+        const now = new Date().getTime();
+        const uploaded = (this.offset as number) + chunkSize * (loaded / chunkSize);
+        this.progress = +((uploaded / this.size) * 100).toFixed(2);
+        const elapsedTime = (now - this.startTime) / 1000;
+        this.speed = Math.round(uploaded / elapsedTime);
+        this.remaining = Math.ceil((this.size - uploaded) / this.speed);
+        this.stateChange(this);
+      }
     };
   }
 

@@ -15,13 +15,15 @@ export class UploadxDropDirective {
 
   @HostListener('drop', ['$event'])
   dropHandler(event: DragEvent) {
-    event.stopPropagation();
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'copy';
-    this.active = false;
-    const files = event.dataTransfer.files;
-    if (files && files.item(0)) {
-      this.uploadService.handleFileList(files, this.fileInput.uploadx);
+    if (event.dataTransfer) {
+      event.stopPropagation();
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'copy';
+      this.active = false;
+      const files = event.dataTransfer.files;
+      if (files && files.item(0)) {
+        this.uploadService.handleFileList(files, this.fileInput.uploadx);
+      }
     }
   }
   @HostListener('dragover', ['$event'])

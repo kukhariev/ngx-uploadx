@@ -1,4 +1,3 @@
-/* tslint:disable:no-unused-variable */
 import { Component, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
@@ -19,11 +18,11 @@ class UploadxTestComponent {
 }
 
 describe('Directive: UploadxDirective', () => {
-  let component: UploadxTestComponent;
+  // let component: UploadxTestComponent;
   let fixture: ComponentFixture<UploadxTestComponent>;
   let inputEl: DebugElement;
   let uploadService: UploadxService;
-  let uploadServiceSpy;
+  let uploadServiceSpy: jasmine.Spy;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -31,7 +30,7 @@ describe('Directive: UploadxDirective', () => {
       providers: [UploadxService]
     }).compileComponents();
     fixture = TestBed.createComponent(UploadxTestComponent);
-    component = fixture.componentInstance;
+    // component = fixture.componentInstance;
     inputEl = fixture.debugElement.query(By.css('input'));
     uploadService = fixture.debugElement.injector.get<UploadxService>(UploadxService);
     uploadServiceSpy = spyOn(uploadService, 'control').and.callThrough();

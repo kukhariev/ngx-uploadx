@@ -4,9 +4,23 @@ import { map, startWith } from 'rxjs/operators';
 import { UploaderOptions, UploadState, UploadxControlEvent, UploadxOptions } from './interfaces';
 import { Uploader } from './uploader';
 import { UploaderX } from './uploaderx';
+import { pick } from './utils';
 
 @Injectable({ providedIn: 'root' })
 export class UploadxService {
+  static stateKeys: (keyof UploadState)[] = [
+    'file',
+    'name',
+    'progress',
+    'remaining',
+    'response',
+    'responseStatus',
+    'size',
+    'speed',
+    'status',
+    'uploadId',
+    'url'
+  ];
   private readonly eventsStream: Subject<UploadState> = new Subject();
   /**
    * Upload status events
@@ -23,8 +37,10 @@ export class UploadxService {
     autoUpload: true,
     concurrency: 2,
     uploaderClass: UploaderX,
-    stateChange: (evt: UploadState) => {
-      setTimeout(() => this.ngZone.run(() => this.eventsStream.next(evt)));
+    stateChange: (evt: Uploader) => {
+      setTimeout(() =>
+        this.ngZone.run(() => this.eventsStream.next(pick(evt, UploadxService.stateKeys)))
+      );
     }
   };
 
@@ -41,8 +57,8 @@ export class UploadxService {
    * @param options global module options
    * @returns Observable that emits a new value on progress or status changes
    */
-  init(options: UploadxOptions): Observable<UploadState> {
-    this.options = { ...this.options, ...options };
+  init(options: UploadxOptions = {}): Observable<UploadState> {
+    Object.assign(this.options, options);
     return this.events;
   }
 
@@ -86,9 +102,11 @@ export class UploadxService {
   }
 
   private addUploaderInstance(file: File, options: UploadxOptions): void {
-    const uploader = new this.options.uploaderClass(file, options as UploaderOptions);
-    this.queue.push(uploader);
-    uploader.status = 'added';
+    if (this.options.uploaderClass) {
+      const uploader = new this.options.uploaderClass(file, options as UploaderOptions);
+      this.queue.push(uploader);
+      uploader.status = 'added';
+    }
   }
 
   /**
@@ -130,7 +148,7 @@ export class UploadxService {
 
     this.queue
       .filter(({ status }) => status === 'queue')
-      .slice(0, Math.max(this.options.concurrency - this.runningProcess(), 0))
+      .slice(0, Math.max((this.options.concurrency || 2) - this.runningProcess(), 0))
       .forEach(uploader => uploader.upload());
   }
 

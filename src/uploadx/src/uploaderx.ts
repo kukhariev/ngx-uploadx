@@ -1,6 +1,6 @@
 import { UploadxOptions } from './interfaces';
 import { Uploader } from './uploader';
-import { resolveUrl } from './utils';
+import { isNumber, isString, resolveUrl } from './utils';
 /**
  * Implements XHR/CORS Resumable Upload
  * @see
@@ -19,13 +19,13 @@ export class UploaderX extends Uploader {
       'X-Upload-Content-Type': `${this.mimeType}`
     };
     const body = JSON.stringify(this.metadata);
-    const _ = await this.request({
+    await this.request({
       method: 'POST',
       body,
       url: this.endpoint,
       headers
     });
-    const location = this.statusType === 200 && this.getValueFromResponse('location');
+    const location = this.getValueFromResponse('location');
     if (!location) {
       throw new Error('Invalid or missing Location header');
     }
@@ -33,38 +33,40 @@ export class UploaderX extends Uploader {
     return resolveUrl(location, this.endpoint);
   }
 
-  async sendFileContent(): Promise<number> {
-    const end = this.chunkSize ? Math.min(this.offset + this.chunkSize, this.size) : this.size;
-    const body = this.file.slice(this.offset, end);
-    const headers = {
-      'Content-Type': 'application/octet-stream',
-      'Content-Range': `bytes ${this.offset}-${end - 1}/${this.size}`
-    };
-    const _ = await this.request({
-      method: 'PUT',
-      body,
-      url: this.url,
-      headers,
-      progress: true
-    });
-    return this.getOffsetFromResponse();
+  async sendFileContent(): Promise<number | undefined> {
+    if (isNumber(this.offset)) {
+      const end = this.chunkSize ? Math.min(this.offset + this.chunkSize, this.size) : this.size;
+      const body = this.file.slice(this.offset, end);
+      const headers = {
+        'Content-Type': 'application/octet-stream',
+        'Content-Range': `bytes ${this.offset}-${end - 1}/${this.size}`
+      };
+      await this.request({
+        method: 'PUT',
+        body,
+        url: this.url,
+        headers
+      });
+      return this.getOffsetFromResponse();
+    }
+    return;
   }
 
-  async getOffset(): Promise<number> {
+  async getOffset(): Promise<number | undefined> {
     const headers = {
       'Content-Type': 'application/octet-stream',
       'Content-Range': `bytes */${this.size}`
     };
-    const _ = await this.request({ method: 'PUT', url: this.url, headers });
+    await this.request({ method: 'PUT', url: this.url, headers });
     return this.getOffsetFromResponse();
   }
 
-  protected getOffsetFromResponse(): number {
+  protected getOffsetFromResponse(): number | undefined {
     if (this.responseStatus > 201) {
       const range = this.getValueFromResponse('Range');
-      return getRangeEnd(range) + 1;
+      return isString(range) ? getRangeEnd(range) + 1 : undefined;
     }
-    if (this.statusType === 200) {
+    if (this.responseStatus <= 201) {
       return this.size;
     }
   }

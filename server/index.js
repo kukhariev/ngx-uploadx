@@ -1,5 +1,3 @@
-// @ts-check
-
 const args = process.argv.slice(2);
 const dirty = args.includes('--no-reset');
 const log = args.includes('--log');
