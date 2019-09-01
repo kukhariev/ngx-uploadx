@@ -233,10 +233,10 @@ export abstract class Uploader implements UploadState {
   private adjustChunkSize(): void {
     if (!this.options.chunkSize && this.responseStatus < 400) {
       const elapsedTime = this.chunkSize / this.speed;
-      if (elapsedTime < 1) {
+      if (elapsedTime < 2) {
         this.chunkSize = Math.min(Uploader.maxChunkSize, this.chunkSize * 2);
       }
-      if (elapsedTime > 10) {
+      if (elapsedTime > 8) {
         this.chunkSize = Math.max(Uploader.maxChunkSize, this.chunkSize / 2);
       }
     } else if (this.responseStatus === 413) {
@@ -350,13 +350,13 @@ export abstract class Uploader implements UploadState {
   }
 
   private onProgress(chunkSize: number): (evt: ProgressEvent) => void {
-    return (evt: ProgressEvent) => {
-      if (isNumber(this.offset)) {
-        const uploaded = evt.lengthComputable
-          ? this.offset + chunkSize * (evt.loaded / evt.total)
-          : this.offset;
-        this.progress = +((uploaded / this.size) * 100).toFixed(2);
+    let throttle = 0;
+    return ({ loaded }: ProgressEvent) => {
+      if (!throttle) {
+        throttle = window.setTimeout(() => (throttle = 0), 500);
         const now = new Date().getTime();
+        const uploaded = (this.offset as number) + chunkSize * (loaded / chunkSize);
+        this.progress = +((uploaded / this.size) * 100).toFixed(2);
         const elapsedTime = (now - this.startTime) / 1000;
         this.speed = Math.round(uploaded / elapsedTime);
         this.remaining = Math.ceil((this.size - uploaded) / this.speed);
