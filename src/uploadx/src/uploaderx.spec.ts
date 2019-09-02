@@ -6,7 +6,7 @@ describe('Uploader', () => {
   it('should set to adaptive chunkSize if no options are specified', async function() {
     const file = getFile();
     const uploader: Uploader = new UploaderX(file, {} as UploadxOptions);
-    expect(uploader.chunkSize).toEqual(4096 * 64);
+    expect(uploader.chunkSize).toEqual(4096 * 256);
   });
   it('should set fixed chunkSize', async function() {
     const file = getFile();
