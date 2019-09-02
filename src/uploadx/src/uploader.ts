@@ -16,7 +16,7 @@ export abstract class Uploader implements UploadState {
    * Codes should not be retried
    * @beta
    */
-  static fatalErrors = [400, 403];
+  static fatalErrors = [400, 403, 405, 406];
   /**
    * Restart codes
    * @beta
@@ -28,18 +28,17 @@ export abstract class Uploader implements UploadState {
    */
   static maxRetryAttempts = 8;
   /**
-   * Maximum chunk size
+   * Maximum chunk size in bytes
    */
   static maxChunkSize = Number.MAX_SAFE_INTEGER;
   /**
-   * Minimum chunk size
+   * Minimum chunk size in bytes
    */
   static minChunkSize = 4096; // default blocksize of most FSs
   /**
-   * Initial chunk size
-   * 32kB
+   * Initial chunk size in bytes
    */
-  static startingChunkSize = Uploader.minChunkSize * 64;
+  static startingChunkSize = 4096 * 256;
   /**
    * Upload status
    */
@@ -226,10 +225,6 @@ export abstract class Uploader implements UploadState {
 
   protected abstract setAuth(token: string): void;
 
-  // Increases the chunkSize if the time of the request
-  // is less than 1 second,
-  // and decreases it if more than 10 seconds.
-  // Decreases on `Payload Too Large` error
   private adjustChunkSize(): void {
     if (!this.options.chunkSize && this.responseStatus < 400) {
       const elapsedTime = this.chunkSize / this.speed;
@@ -237,7 +232,7 @@ export abstract class Uploader implements UploadState {
         this.chunkSize = Math.min(Uploader.maxChunkSize, this.chunkSize * 2);
       }
       if (elapsedTime > 8) {
-        this.chunkSize = Math.max(Uploader.maxChunkSize, this.chunkSize / 2);
+        this.chunkSize = Math.max(Uploader.minChunkSize, this.chunkSize / 2);
       }
     } else if (this.responseStatus === 413) {
       this.chunkSize /= 2;
