@@ -225,10 +225,6 @@ export abstract class Uploader implements UploadState {
 
   protected abstract setAuth(token: string): void;
 
-  // Increases the chunkSize if the time of the request
-  // is less than 1 second,
-  // and decreases it if more than 10 seconds.
-  // Decreases on `Payload Too Large` error
   private adjustChunkSize(): void {
     if (!this.options.chunkSize && this.responseStatus < 400) {
       const elapsedTime = this.chunkSize / this.speed;
