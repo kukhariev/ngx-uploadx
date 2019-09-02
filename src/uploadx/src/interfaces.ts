@@ -43,11 +43,11 @@ export interface UploadItem {
   /**
    * Headers to be appended to each HTTP request
    */
-  headers?: { [key: string]: string } | ((file?: File) => { [key: string]: string });
+  headers?: Record<string, string> | ((file?: File) => Record<string, string>);
   /**
    * Custom uploads metadata
    */
-  metadata?: { [key: string]: any } | ((file?: File) => { [key: string]: any });
+  metadata?: Record<string, any> | ((file?: File) => Record<string, any>);
   /**
    * Authorization  token as a `string` or function returning a `string` or `Promise<string>`
    */
@@ -97,10 +97,7 @@ export interface UploadxOptions extends UploaderOptions {
 
 export interface RequestParams {
   method: HttpMethod;
-  body?: any;
+  body?: string | Blob | null;
   url?: string;
-  headers?: {
-    [key: string]: string;
-  };
-  progress?: boolean;
+  headers?: Record<string, string>;
 }
