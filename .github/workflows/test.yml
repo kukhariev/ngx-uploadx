@@ -4,21 +4,16 @@ on: [push]
 
 jobs:
   test:
-    name: Test on node ${{ matrix.node_version }}
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node_version: [8.x, 10.x, 12.x]
     steps:
       - uses: actions/checkout@v1
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@master
+      - uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node-version }}
-      - name: npm install, lint, and test
+          node-version: 12
+      - name: npm install and test
         run: |
-          node -v
           npm install
-          npm run ci
+          npm run ci 
           npm run build
+        env:
           CI: true
