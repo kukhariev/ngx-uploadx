@@ -36,7 +36,6 @@ export class UploadxService {
     endpoint: '/upload',
     autoUpload: true,
     concurrency: 2,
-    uploaderClass: UploaderX,
     stateChange: (evt: Uploader) => {
       setTimeout(() =>
         this.ngZone.run(() => this.eventsStream.next(pick(evt, UploadxService.stateKeys)))
@@ -102,11 +101,9 @@ export class UploadxService {
   }
 
   private addUploaderInstance(file: File, options: UploadxOptions): void {
-    if (this.options.uploaderClass) {
-      const uploader = new this.options.uploaderClass(file, options as UploaderOptions);
-      this.queue.push(uploader);
-      uploader.status = 'added';
-    }
+    const uploader = new (options.uploaderClass || UploaderX)(file, options as UploaderOptions);
+    this.queue.push(uploader);
+    uploader.status = 'added';
   }
 
   /**

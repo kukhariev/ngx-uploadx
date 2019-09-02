@@ -242,6 +242,7 @@ export abstract class Uploader implements UploadState {
   }
 
   protected abort(): void {
+    this.offset = undefined;
     this._xhr && this._xhr.abort();
   }
 
