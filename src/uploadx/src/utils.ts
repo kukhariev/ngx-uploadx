@@ -1,3 +1,4 @@
+// tslint:disable: no-bitwise
 import { UploadAction, UploadStatus } from './interfaces';
 
 export function resolveUrl(url: string, baseURI: string) {
@@ -48,3 +49,27 @@ export const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
   cancel: 'cancelled',
   cancelAll: 'cancelled'
 };
+
+/**
+ * 32-bit FNV-1a hash function
+ */
+export function createHash(str: string): number {
+  let hash = 2166136261;
+  const len = str.length;
+  for (let i = 0; i < len; i++) {
+    hash ^= str.charCodeAt(i);
+    hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+  }
+  return hash;
+}
+export function b64Encode(str: string) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+export function b64Decode(str: string) {
+  return decodeURIComponent(escape(window.atob(str)));
+}
+export function objectToB64String(obj: Record<string, any>) {
+  return Object.entries(obj)
+    .map(([key, value]) => `${key} ${b64Encode(String(value))}`)
+    .toString();
+}
