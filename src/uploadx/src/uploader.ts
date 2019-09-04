@@ -6,7 +6,7 @@ import {
   UploadStatus,
   UploadxControlEvent
 } from './interfaces';
-import { actionToStatusMap, isNumber, noop, unfunc } from './utils';
+import { actionToStatusMap, createHash, isNumber, noop, unfunc } from './utils';
 
 /**
  * Uploader Base Class
@@ -70,9 +70,7 @@ export abstract class Uploader implements UploadState {
    * File MIME type
    */
   readonly mimeType: string;
-  readonly uploadId = Math.random()
-    .toString(36)
-    .substring(2, 15);
+  readonly uploadId: string;
   /**
    * HTTP response status code
    */
@@ -173,6 +171,7 @@ export abstract class Uploader implements UploadState {
       size: this.size,
       lastModified: this.file.lastModified
     };
+    this.uploadId = createHash(JSON.stringify(this.metadata)).toString(16);
     this.stateChange = options.stateChange || noop;
     this.chunkSize = options.chunkSize || Uploader.startingChunkSize;
     this.configure(options);
