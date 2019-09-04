@@ -1,6 +1,6 @@
 import { UploadxOptions } from './interfaces';
 import { Uploader } from './uploader';
-import { isNumber, isString, resolveUrl } from './utils';
+import { isString, resolveUrl } from './utils';
 /**
  * Implements XHR/CORS Resumable Upload
  * @see
@@ -13,15 +13,18 @@ export class UploaderX extends Uploader {
   }
 
   async getFileUrl(): Promise<string> {
+    if (this.url) {
+      this.offset = undefined;
+      return this.url;
+    }
     const headers = {
-      'Content-Type': 'application/json; charset=UTF-8',
+      'Content-Type': 'application/json; charset=utf-8',
       'X-Upload-Content-Length': `${this.size}`,
       'X-Upload-Content-Type': `${this.mimeType}`
     };
-    const body = JSON.stringify(this.metadata);
     await this.request({
       method: 'POST',
-      body,
+      body: JSON.stringify(this.metadata),
       url: this.endpoint,
       headers
     });
@@ -34,22 +37,17 @@ export class UploaderX extends Uploader {
   }
 
   async sendFileContent(): Promise<number | undefined> {
-    if (isNumber(this.offset)) {
-      const end = this.chunkSize ? Math.min(this.offset + this.chunkSize, this.size) : this.size;
-      const body = this.file.slice(this.offset, end);
-      const headers = {
-        'Content-Type': 'application/octet-stream',
-        'Content-Range': `bytes ${this.offset}-${end - 1}/${this.size}`
-      };
-      await this.request({
-        method: 'PUT',
-        body,
-        url: this.url,
-        headers
-      });
-      return this.getOffsetFromResponse();
-    }
-    return;
+    const { end, body } = this.getChunk();
+    const headers = {
+      'Content-Type': 'application/octet-stream',
+      'Content-Range': `bytes ${this.offset}-${end - 1}/${this.size}`
+    };
+    await this.request({
+      method: 'PUT',
+      body,
+      headers
+    });
+    return this.getOffsetFromResponse();
   }
 
   async getOffset(): Promise<number | undefined> {
@@ -57,7 +55,7 @@ export class UploaderX extends Uploader {
       'Content-Type': 'application/octet-stream',
       'Content-Range': `bytes */${this.size}`
     };
-    await this.request({ method: 'PUT', url: this.url, headers });
+    await this.request({ method: 'PUT', headers });
     return this.getOffsetFromResponse();
   }
 

@@ -338,10 +338,16 @@ export abstract class Uploader implements UploadState {
     }
     return body;
   }
+  protected getChunk() {
+    const start = this.offset as number;
+    const end = this.chunkSize ? Math.min(start + this.chunkSize, this.size) : this.size;
+    const body = this.file.slice(this.offset, end);
+    return { start, end, body };
+  }
 
   private processResponse(xhr: XMLHttpRequest): void {
-    this.response = this.getResponseBody(xhr);
-    this.responseStatus = xhr.status === 0 && this.response ? 200 : xhr.status;
+    this.responseStatus = xhr.status;
+    this.response = this.responseStatus !== 204 ? this.getResponseBody(xhr) : '';
   }
 
   private onProgress(chunkSize: number): (evt: ProgressEvent) => void {
