@@ -6,6 +6,7 @@ import {
   UploadStatus,
   UploadxControlEvent
 } from './interfaces';
+import { store } from './store';
 import { actionToStatusMap, createHash, isNumber, noop, unfunc } from './utils';
 
 /**
@@ -48,12 +49,13 @@ export abstract class Uploader implements UploadState {
     }
     if (s !== this._status) {
       s === 'paused' && this.abort();
-      s === 'cancelled' && this.abort();
       s === 'cancelled' && this.onCancel();
+      ['cancel', 'complete', 'error'].includes(s) && this.cleanup();
       this._status = s;
       this.stateChange(this);
     }
   }
+
   get status() {
     return this._status;
   }
@@ -91,7 +93,15 @@ export abstract class Uploader implements UploadState {
   /**
    * File URI
    */
-  url: string;
+  protected _url = '';
+  public get url(): string {
+    return this._url || store.get(this.uploadId);
+  }
+  public set url(value: string) {
+    this._url !== value && store.set(this.uploadId, value);
+    this._url = value;
+  }
+
   /**
    * Custom headers
    */
@@ -160,7 +170,7 @@ export abstract class Uploader implements UploadState {
    * UploadState emitter
    */
   private stateChange: (evt: UploadState) => void;
-
+  private cleanup = () => store.remove(this.uploadId);
   constructor(readonly file: File, public options: UploaderOptions) {
     this.name = file.name;
     this.size = file.size;
@@ -171,7 +181,12 @@ export abstract class Uploader implements UploadState {
       size: this.size,
       lastModified: this.file.lastModified
     };
-    this.uploadId = createHash(JSON.stringify(this.metadata)).toString(16);
+    const print = JSON.stringify({
+      ...this.metadata,
+      type: this.constructor.name,
+      endpoint: options.endpoint
+    });
+    this.uploadId = createHash(print).toString(16);
     this.stateChange = options.stateChange || noop;
     this.chunkSize = options.chunkSize || Uploader.startingChunkSize;
     this.configure(options);
@@ -195,7 +210,8 @@ export abstract class Uploader implements UploadState {
     this.status = 'uploading';
     try {
       await this.getToken();
-      this.url = await this.getFileUrl();
+      this.offset = undefined;
+      this.url = this.url || (await this.getFileUrl());
       this.retry.reset();
       this.startTime = new Date().getTime();
       this.start();
@@ -245,7 +261,10 @@ export abstract class Uploader implements UploadState {
     this._xhr && this._xhr.abort();
   }
 
-  protected onCancel(): void {}
+  protected onCancel(): void {
+    this.abort();
+    this.url && this.request({ method: 'DELETE' });
+  }
 
   /**
    * Gets the value from the response
@@ -287,6 +306,7 @@ export abstract class Uploader implements UploadState {
           break;
         }
         if (this.isNotFoundError) {
+          this.url = '';
           this.status = 'queue';
           break;
         }
@@ -338,6 +358,7 @@ export abstract class Uploader implements UploadState {
     }
     return body;
   }
+
   protected getChunk() {
     const start = this.offset as number;
     const end = this.chunkSize ? Math.min(start + this.chunkSize, this.size) : this.size;

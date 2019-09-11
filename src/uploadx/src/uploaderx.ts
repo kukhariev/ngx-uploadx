@@ -69,10 +69,6 @@ export class UploaderX extends Uploader {
     }
   }
 
-  protected onCancel(): void {
-    this.url && this.request({ method: 'DELETE' });
-  }
-
   protected setAuth(token: string) {
     this.headers.Authorization = `Bearer ${token}`;
   }
