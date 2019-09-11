@@ -294,6 +294,7 @@ export abstract class Uploader implements UploadState {
         if (isNumber(offset) && offset >= this.size) {
           this.offset = offset;
           this.progress = 100;
+          this.remaining = 0;
           this.status = 'complete';
         } else if (offset === this.offset) {
           throw new Error('Content upload failed');
