@@ -5,7 +5,8 @@
   "keywords": [
     "angular",
     "upload",
-    "chunk"
+    "chunk",
+    "tus"
   ],
   "author": {
     "name": "kukhariev",

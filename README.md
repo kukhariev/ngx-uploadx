@@ -62,6 +62,8 @@ export class AppHomeComponent {
 ## Server-side setup
 
 - [node-uploadx](https://github.com/kukhariev/node-uploadx)
+- [tus-node-server](https://github.com/tus/tus-node-server)
+- [tusd](https://github.com/tus/tusd)
 
 ## Options
 
@@ -79,7 +81,7 @@ export class AppHomeComponent {
 
 - `metadata`: Custom uploads metadata
 
-- `uploaderClass`: provide a user-defined class to support another upload protocol or to extend an existing one. Examples : [internal](src/uploadx/src/uploaderx.ts) and [uploader-examples](uploader-examples)
+- `uploaderClass`: provide a user-defined class to support another upload protocol or to extend an existing one.
 
 - `token`: Authorization token as a `string` or function returning a `string` or `Promise<string>`
 
@@ -218,6 +220,7 @@ Pull requests are welcome!
 ## References
 
 - [https://developers.google.com/drive/api/v3/manage-uploads#resumable](https://developers.google.com/drive/api/v3/manage-uploads#resumable)
+- [https://github.com/tus/tus-resumable-upload-protocol/blob/master/protocol.md](https://github.com/tus/tus-resumable-upload-protocol/blob/master/protocol.md)
 
 ## License
 
