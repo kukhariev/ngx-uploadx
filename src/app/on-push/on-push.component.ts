@@ -10,8 +10,8 @@ const { deviceMemory } = navigator as any;
 Uploader.fatalErrors = [400, 403, 405];
 
 Uploader.maxChunkSize = (deviceMemory || 0.25) * 256 * 1024 * 1024;
-console.log(`Device memory at least: ${deviceMemory}GiB`);
-console.log(`maxChunkSize: ${Uploader.maxChunkSize / 1024 / 1024}MiB`);
+// console.log(`Device memory at least: ${deviceMemory}GiB`);
+// console.log(`maxChunkSize: ${Uploader.maxChunkSize / 1024 / 1024}MiB`);
 
 @Component({
   selector: 'app-on-push',
@@ -42,7 +42,7 @@ export class OnPushComponent implements OnDestroy {
     this.uploadService.control({ action: 'pause' });
   }
 
-  uploadAll(id: string) {
+  uploadAll() {
     this.uploadService.control({ action: 'upload' });
   }
 

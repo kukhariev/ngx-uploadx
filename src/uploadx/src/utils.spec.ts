@@ -36,7 +36,7 @@ describe('resolveUrl:polyfill', () => {
   });
 });
 
-fdescribe('b64', () => {
+describe('b64', () => {
   const data = {
     name: 'спутник.mp4',
     lastModified: '1437390138231'

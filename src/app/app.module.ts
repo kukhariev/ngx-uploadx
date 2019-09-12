@@ -9,6 +9,7 @@ import { MultipleDirectiveComponent } from './multiple-directive/multiple-direct
 import { OnPushComponent } from './on-push/on-push.component';
 import { ServiceCodeWayComponent } from './service-code-way/service-code-way.component';
 import { ServiceWayComponent } from './service-way/service-way.component';
+import { TusComponent } from './tus/tus.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { ServiceWayComponent } from './service-way/service-way.component';
     ServiceWayComponent,
     ServiceCodeWayComponent,
     OnPushComponent,
-    MultipleDirectiveComponent
+    MultipleDirectiveComponent,
+    TusComponent
   ],
   imports: [RouterModule.forRoot(AppRoutes), BrowserModule, UploadxModule],
   providers: [],

@@ -50,7 +50,7 @@ export abstract class Uploader implements UploadState {
     if (s !== this._status) {
       s === 'paused' && this.abort();
       s === 'cancelled' && this.onCancel();
-      ['cancel', 'complete', 'error'].includes(s) && this.cleanup();
+      this.isFinalEvent(s) && this.cleanup();
       this._status = s;
       this.stateChange(this);
     }
@@ -94,10 +94,10 @@ export abstract class Uploader implements UploadState {
    * File URI
    */
   protected _url = '';
-  public get url(): string {
+  get url(): string {
     return this._url || store.get(this.uploadId);
   }
-  public set url(value: string) {
+  set url(value: string) {
     this._url !== value && store.set(this.uploadId, value);
     this._url = value;
   }
@@ -171,6 +171,10 @@ export abstract class Uploader implements UploadState {
    */
   private stateChange: (evt: UploadState) => void;
   private cleanup = () => store.remove(this.uploadId);
+
+  private isFinalEvent = (event: UploadStatus): boolean =>
+    ['cancelled', 'complete', 'error'].includes(event);
+
   constructor(readonly file: File, public options: UploaderOptions) {
     this.name = file.name;
     this.size = file.size;
