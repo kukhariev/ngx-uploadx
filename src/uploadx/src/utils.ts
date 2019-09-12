@@ -60,16 +60,33 @@ export function createHash(str: string): number {
     hash ^= str.charCodeAt(i);
     hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
   }
-  return hash;
+  return hash >>> 0;
 }
-export function b64Encode(str: string) {
-  return btoa(unescape(encodeURIComponent(str)));
-}
-export function b64Decode(str: string) {
-  return decodeURIComponent(escape(window.atob(str)));
-}
-export function objectToB64String(obj: Record<string, any>) {
-  return Object.entries(obj)
-    .map(([key, value]) => `${key} ${b64Encode(String(value))}`)
-    .toString();
-}
+export const b64 = {
+  encode: (str: string) =>
+    btoa(
+      encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_match, p1) =>
+        String.fromCharCode(Number.parseInt(p1, 16))
+      )
+    ),
+  decode: (str: string) =>
+    decodeURIComponent(
+      atob(str)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    ),
+  serialize: (obj: Record<string, any>) => {
+    return Object.entries(obj)
+      .map(([key, value]) => `${key} ${b64.encode(String(value))}`)
+      .toString();
+  },
+  parse: (encoded: string) => {
+    const kvPairs = encoded.split(',').map(kv => kv.split(' '));
+    const decoded = Object.create(null);
+    for (const [key, value] of kvPairs) {
+      decoded[key] = b64.decode(value);
+    }
+    return decoded;
+  }
+};

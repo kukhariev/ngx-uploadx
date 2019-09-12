@@ -47,4 +47,9 @@ describe('uploader App', () => {
     page.getVideoFileInput().sendKeys(absolutePath);
     expect(page.waitForCompleteTable()).toEqual('complete');
   });
+  it('should upload a file (Tus)', () => {
+    page.navigateTo('/tus');
+    page.getFileInput().sendKeys(absolutePath);
+    expect(page.waitForCompleteTable()).toEqual('complete');
+  });
 });

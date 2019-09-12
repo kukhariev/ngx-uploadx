@@ -9,7 +9,7 @@ const url = require('url');
 const { tmpdir } = require('os');
 
 log && (process.env.DEBUG = 'uploadx: * ');
-const { Uploadx, DiskStorage } = require('node-uploadx');
+const { Uploadx, Tus, DiskStorage } = require('node-uploadx');
 const PORT = 3003;
 const USER_ID = 'ngx-uploadx-test';
 const UPLOADS_ROOT = `${tmpdir()}/${USER_ID}/`;
@@ -20,20 +20,22 @@ const storage = new DiskStorage({ dest: (req, file) => `${UPLOADS_ROOT}/${file.f
 
 exit && process.exit();
 
-const uploads = new Uploadx({ storage });
+const uploadx = new Uploadx({ storage });
+const tus = new Tus({ storage });
 
 const server = http.createServer((req, res) => {
   if (emitErrors && Math.random() < 0.4 && req.method !== 'OPTIONS' && req.method !== 'DELETE') {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    // res.setHeader('Cache-Control', 'no-cache, no-store');
     res.statusCode = Math.random() < 0.5 ? 401 : 500;
     res.end();
     return;
   }
+  req['user'] = user;
   const { pathname } = url.parse(req.url);
   if (pathname === '/upload') {
-    req['user'] = user;
-    uploads.handle(req, res);
+    uploadx.handle(req, res);
+  } else if (/^\/tus(\/.*|$)/.test(pathname)) {
+    tus.handle(req, res);
   } else {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.statusCode = 404;

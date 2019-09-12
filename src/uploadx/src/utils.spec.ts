@@ -1,4 +1,4 @@
-import { resolveUrl } from './utils';
+import { b64, resolveUrl } from './utils';
 const _URL = window.URL;
 const base = 'http://www.example.com/upload';
 const rel = '/upload?upload_id=12345';
@@ -33,5 +33,19 @@ describe('resolveUrl:polyfill', () => {
   });
   afterAll(() => {
     window.URL = _URL;
+  });
+});
+
+describe('b64', () => {
+  const data = {
+    name: 'спутник.mp4',
+    lastModified: '1437390138231'
+  };
+  const encoded = 'name 0YHQv9GD0YLQvdC40LoubXA0,lastModified MTQzNzM5MDEzODIzMQ==';
+  it('serialize', async () => {
+    expect(b64.serialize(data)).toBe(encoded);
+  });
+  it('parse', async () => {
+    expect(b64.parse(encoded)).toEqual(data);
   });
 });
