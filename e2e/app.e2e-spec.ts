@@ -49,7 +49,7 @@ describe('uploader App', () => {
   });
   it('should upload a file (Tus)', () => {
     page.navigateTo('/tus');
-    page.getVideoFileInput().sendKeys(absolutePath);
+    page.getFileInput().sendKeys(absolutePath);
     expect(page.waitForCompleteTable()).toEqual('complete');
   });
 });
