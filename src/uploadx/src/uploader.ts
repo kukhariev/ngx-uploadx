@@ -55,11 +55,9 @@ export abstract class Uploader implements UploadState {
       this.stateChange(this);
     }
   }
-
   get status() {
     return this._status;
   }
-
   /**
    * Original File name
    */
@@ -101,7 +99,6 @@ export abstract class Uploader implements UploadState {
     this._url !== value && store.set(this.uploadId, value);
     this._url = value;
   }
-
   /**
    * Custom headers
    */
@@ -114,7 +111,6 @@ export abstract class Uploader implements UploadState {
    * Upload endpoint
    */
   endpoint = '/upload';
-
   /**
    * HTTP response body
    */
@@ -127,7 +123,6 @@ export abstract class Uploader implements UploadState {
    * Auth Bearer token/tokenGetter
    */
   token: UploadxControlEvent['token'];
-
   /**
    * Retries handler
    */
@@ -144,14 +139,10 @@ export abstract class Uploader implements UploadState {
    * Set HttpRequest responseType
    */
   protected responseType: XMLHttpRequestResponseType = '';
-
   /**
    * Upload start time
    */
   private startTime: number;
-  /**
-   * Status of uploader
-   */
   private _status: UploadStatus;
   private get isFatalError(): boolean {
     return Uploader.fatalErrors.includes(this.responseStatus);
@@ -165,13 +156,12 @@ export abstract class Uploader implements UploadState {
   private get isMaxAttemptsReached(): boolean {
     return this.retry.retryAttempts === Uploader.maxRetryAttempts;
   }
-
   /**
    * UploadState emitter
    */
   private stateChange: (evt: UploadState) => void;
-  private cleanup = () => store.remove(this.uploadId);
 
+  private cleanup = () => store.remove(this.uploadId);
   private isFinalEvent = (event: UploadStatus): boolean =>
     ['cancelled', 'complete', 'error'].includes(event);
 
@@ -362,12 +352,6 @@ export abstract class Uploader implements UploadState {
       } catch {}
     }
     return body;
-  }
-  protected getChunk() {
-    const start = this.offset as number;
-    const end = this.chunkSize ? Math.min(start + this.chunkSize, this.size) : this.size;
-    const body = this.file.slice(this.offset, end);
-    return { start, end, body };
   }
 
   protected getChunk() {
