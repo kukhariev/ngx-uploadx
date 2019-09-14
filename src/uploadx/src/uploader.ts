@@ -28,21 +28,16 @@ export abstract class Uploader implements UploadState {
    * Max HTTP errors
    */
   static maxRetryAttempts = 8;
-  /**
-   * Maximum chunk size in bytes
-   */
+
+  /** Maximum chunk size in bytes */
   static maxChunkSize = Number.MAX_SAFE_INTEGER;
-  /**
-   * Minimum chunk size in bytes
-   */
+
+  /** Minimum chunk size in bytes */
   static minChunkSize = 4096; // default blocksize of most FSs
-  /**
-   * Initial chunk size in bytes
-   */
+
+  /** Initial chunk size in bytes */
   static startingChunkSize = 4096 * 256;
-  /**
-   * Upload status
-   */
+
   set status(s: UploadStatus) {
     if (this._status === 'cancelled' || (this._status === 'complete' && s !== 'cancelled')) {
       return;
@@ -58,40 +53,15 @@ export abstract class Uploader implements UploadState {
   get status() {
     return this._status;
   }
-  /**
-   * Original File name
-   */
+  private _status: UploadStatus;
   readonly name: string;
-  /**
-   * File size in bytes
-   */
   readonly size: number;
-  /**
-   * File MIME type
-   */
-  readonly mimeType: string;
   readonly uploadId: string;
-  /**
-   * HTTP response status code
-   */
+  response: any;
   responseStatus: number;
-
-  /**
-   * Progress percentage
-   */
   progress: number;
-  /**
-   * ETA
-   */
   remaining: number;
-  /**
-   * Upload speed bytes/sec
-   */
   speed: number;
-  /**
-   * File URI
-   */
-  protected _url = '';
   get url(): string {
     return this._url || store.get(this.uploadId);
   }
@@ -99,22 +69,17 @@ export abstract class Uploader implements UploadState {
     this._url !== value && store.set(this.uploadId, value);
     this._url = value;
   }
-  /**
-   * Custom headers
-   */
+  protected _url = '';
+
+  /** Custom headers */
   headers: Record<string, any> = {};
-  /**
-   * Metadata Object
-   */
+
+  /** Metadata Object */
   metadata: Record<string, any>;
-  /**
-   * Upload endpoint
-   */
+
+  /** Upload endpoint */
   endpoint = '/upload';
-  /**
-   * HTTP response body
-   */
-  response: any;
+
   /**
    * Chunk size in bytes
    */
@@ -139,11 +104,8 @@ export abstract class Uploader implements UploadState {
    * Set HttpRequest responseType
    */
   protected responseType: XMLHttpRequestResponseType = '';
-  /**
-   * Upload start time
-   */
   private startTime: number;
-  private _status: UploadStatus;
+
   private get isFatalError(): boolean {
     return Uploader.fatalErrors.includes(this.responseStatus);
   }
@@ -156,9 +118,7 @@ export abstract class Uploader implements UploadState {
   private get isMaxAttemptsReached(): boolean {
     return this.retry.retryAttempts === Uploader.maxRetryAttempts;
   }
-  /**
-   * UploadState emitter
-   */
+
   private stateChange: (evt: UploadState) => void;
 
   private cleanup = () => store.remove(this.uploadId);
@@ -168,12 +128,11 @@ export abstract class Uploader implements UploadState {
   constructor(readonly file: File, public options: UploaderOptions) {
     this.name = file.name;
     this.size = file.size;
-    this.mimeType = file.type || 'application/octet-stream';
     this.metadata = {
-      name: this.name,
-      mimeType: this.mimeType,
-      size: this.size,
-      lastModified: this.file.lastModified
+      name: file.name,
+      mimeType: file.type,
+      size: file.size,
+      lastModified: file.lastModified
     };
     const print = JSON.stringify({
       ...this.metadata,
@@ -223,10 +182,12 @@ export abstract class Uploader implements UploadState {
    * Get file URI
    */
   protected abstract getFileUrl(): Promise<string>;
+
   /**
    * Send file content and return an offset for the next request
    */
   protected abstract sendFileContent(): Promise<number | undefined>;
+
   /**
    * Get an offset for the next request
    */
