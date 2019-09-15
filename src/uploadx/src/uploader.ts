@@ -116,7 +116,7 @@ export abstract class Uploader implements UploadState {
     return Uploader.notFoundErrors.includes(this.responseStatus);
   }
   private get isMaxAttemptsReached(): boolean {
-    return this.retry.retryAttempts === Uploader.maxRetryAttempts;
+    return this.retry.retryAttempts >= Uploader.maxRetryAttempts;
   }
 
   private stateChange: (evt: UploadState) => void;
@@ -193,7 +193,9 @@ export abstract class Uploader implements UploadState {
    */
   protected abstract getOffset(): Promise<number | undefined>;
 
-  protected abstract setAuth(token: string): void;
+  protected setAuth(token: string) {
+    this.headers.Authorization = `Bearer ${token}`;
+  }
 
   private adjustChunkSize(): void {
     if (!this.options.chunkSize && this.responseStatus < 400) {

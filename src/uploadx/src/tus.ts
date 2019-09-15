@@ -51,8 +51,4 @@ export class Tus extends Uploader {
     const offsetStr = this.getValueFromResponse('Upload-Offset');
     return offsetStr ? parseInt(offsetStr, 10) : undefined;
   }
-
-  protected setAuth(token: string) {
-    this.headers.Authorization = `Bearer ${token}`;
-  }
 }
