@@ -3,9 +3,9 @@
  */
 export class BackoffRetry {
   private delay: number;
-  private code: any = -1;
-  private k = 2;
-  retryAttempts = 1;
+  private code? = -1;
+  private factor = 2;
+  attempts = 1;
   /**
    * @param min  Initial retry delay
    * @param max  Max retry delay
@@ -21,16 +21,13 @@ export class BackoffRetry {
   wait(code?: number): Promise<number> {
     return new Promise(resolve => {
       if (code === this.code) {
-        this.retryAttempts++;
-        this.delay = Math.min(this.delay * this.k, this.max);
+        this.attempts++;
+        this.delay = Math.min(this.delay * this.factor, this.max);
       } else {
         this.reset();
       }
       this.code = code;
-      setTimeout(
-        () => resolve(this.retryAttempts),
-        this.delay + Math.floor(Math.random() * this.min)
-      );
+      setTimeout(() => resolve(this.attempts), this.delay + Math.floor(Math.random() * this.min));
     });
   }
   /**
@@ -38,7 +35,7 @@ export class BackoffRetry {
    */
   reset(): void {
     this.delay = this.min;
-    this.retryAttempts = 1;
+    this.attempts = 1;
     this.code = -1;
   }
 }

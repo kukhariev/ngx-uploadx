@@ -4,13 +4,13 @@ describe('BackoffRetry', function() {
   describe('constructor', function() {
     it('should set to defaults if no parameters are specified', async function() {
       const bf: any = new BackoffRetry();
-      expect(bf.retryAttempts).toBe(1);
+      expect(bf.attempts).toBe(1);
       expect(bf.min).toBe(500);
       expect(bf.max).toBe(60_000);
     });
     it('should set custom params', async () => {
       const bf: any = new BackoffRetry(100, 10_000);
-      expect(bf.retryAttempts).toBe(1);
+      expect(bf.attempts).toBe(1);
       expect(bf.min).toBe(100);
       expect(bf.max).toBe(10_000);
     });
@@ -25,7 +25,7 @@ describe('BackoffRetry', function() {
     });
     it('should reset retryAttempts', async function() {
       bf.reset();
-      expect(bf.retryAttempts).toBe(1);
+      expect(bf.attempts).toBe(1);
     });
   });
 });
