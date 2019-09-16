@@ -116,7 +116,7 @@ export abstract class Uploader implements UploadState {
     return Uploader.notFoundErrors.includes(this.responseStatus);
   }
   private get isMaxAttemptsReached(): boolean {
-    return this.retry.retryAttempts >= Uploader.maxRetryAttempts;
+    return this.retry.attempts >= Uploader.maxRetryAttempts;
   }
 
   private stateChange: (evt: UploadState) => void;
