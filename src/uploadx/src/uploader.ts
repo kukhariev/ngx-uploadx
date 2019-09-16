@@ -63,7 +63,7 @@ export abstract class Uploader implements UploadState {
   remaining: number;
   speed: number;
   get url(): string {
-    return this._url || store.get(this.uploadId);
+    return this._url || store.get(this.uploadId) || '';
   }
   set url(value: string) {
     this._url !== value && store.set(this.uploadId, value);
@@ -121,7 +121,7 @@ export abstract class Uploader implements UploadState {
 
   private stateChange: (evt: UploadState) => void;
 
-  private cleanup = () => store.remove(this.uploadId);
+  private cleanup = () => store.delete(this.uploadId);
   private isFinalEvent = (event: UploadStatus): boolean =>
     ['cancelled', 'complete', 'error'].includes(event);
 
