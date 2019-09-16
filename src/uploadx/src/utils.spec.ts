@@ -1,4 +1,4 @@
-import { b64, resolveUrl } from './utils';
+import { b64, isNumber, resolveUrl } from './utils';
 const _URL = window.URL;
 const base = 'http://www.example.com/upload';
 const rel = '/upload?upload_id=12345';
@@ -47,5 +47,18 @@ describe('b64', () => {
   });
   it('parse', async () => {
     expect(b64.parse(encoded)).toEqual(data);
+  });
+});
+
+describe('primitive', () => {
+  it('isNumber', () => {
+    expect(isNumber(NaN)).toBe(false);
+    expect(isNumber(null)).toBe(false);
+    expect(isNumber(false)).toBe(false);
+    expect(isNumber(true)).toBe(false);
+    expect(isNumber('NaN')).toBe(false);
+    expect(isNumber('')).toBe(false);
+    expect(isNumber(undefined)).toBe(false);
+    expect(isNumber(0)).toBe(true);
   });
 });

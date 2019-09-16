@@ -33,11 +33,11 @@ export const pick = <T, K extends keyof T>(obj: T, whitelist: K[]): Pick<T, K> =
   return result;
 };
 
-export function isNumber(x: any): x is number {
-  return typeof x === 'number';
+export function isNumber(x: unknown): x is number {
+  return x === Number(x);
 }
 
-export function isString(x: any): x is string {
+export function isString(x: unknown): x is string {
   return typeof x === 'string';
 }
 

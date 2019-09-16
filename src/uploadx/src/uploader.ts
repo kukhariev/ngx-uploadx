@@ -248,7 +248,7 @@ export abstract class Uploader implements UploadState {
         const offset = isNumber(this.offset)
           ? await this.sendFileContent()
           : await this.getOffset();
-        if (isNumber(offset) && offset >= this.size) {
+        if (offset === this.size) {
           this.offset = offset;
           this.progress = 100;
           this.remaining = 0;
@@ -288,12 +288,13 @@ export abstract class Uploader implements UploadState {
     headers = {}
   }: RequestParams): Promise<ProgressEvent> {
     return new Promise((resolve, reject) => {
-      this._xhr = new XMLHttpRequest();
-      const xhr = this._xhr;
+      const xhr = (this._xhr = new XMLHttpRequest());
       xhr.open(method, url || this.url, true);
       if (body instanceof Blob) {
         xhr.upload.onprogress = this.onProgress(body.size);
       }
+      this.responseStatus = 0;
+      this.response = undefined;
       this.responseType && (xhr.responseType = this.responseType);
       this.options.withCredentials && (xhr.withCredentials = true);
       const _headers = { ...this.headers, ...headers };

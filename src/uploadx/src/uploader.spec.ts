@@ -1,4 +1,3 @@
-// import { UploadxOptions } from './interfaces';
 import { Uploader } from './uploader';
 
 function getFile(): File {
@@ -43,18 +42,20 @@ describe('configure', () => {
   beforeEach(() => {
     uploader = new MockUploader(file, {});
   });
-  it('should abort on pause ', () => {
+  it('should abort on pause', () => {
     const abort = spyOn<any>(uploader, 'abort').and.callThrough();
     const stateChange = spyOn<any>(uploader, 'stateChange').and.callThrough();
     uploader.configure({ action: 'pause' });
     expect(abort).toHaveBeenCalled();
     expect(stateChange).toHaveBeenCalled();
   });
-  it('should onCancel on cancel ', () => {
+  it('should onCancel on cancel', () => {
     const abort = spyOn<any>(uploader, 'abort').and.callThrough();
     const onCancel = spyOn<any>(uploader, 'onCancel').and.callThrough();
+    const cleanup = spyOn<any>(uploader, 'cleanup').and.callThrough();
     uploader.configure({ action: 'cancel' });
     expect(abort).toHaveBeenCalled();
+    expect(cleanup).toHaveBeenCalled();
     expect(onCancel).toHaveBeenCalled();
   });
 });
@@ -90,6 +91,17 @@ describe('upload()', () => {
   });
   it('should complete on 200', async () => {
     code = 200;
+    const start = spyOn(uploader, 'start').and.callThrough();
+    const getOffset = spyOn(uploader, 'getOffset').and.callThrough();
+    const cleanup = spyOn<any>(uploader, 'cleanup').and.callThrough();
+    await uploader.upload();
+    expect(start).toHaveBeenCalledTimes(1);
+    expect(getOffset).toHaveBeenCalledTimes(1);
+    expect(cleanup).toHaveBeenCalled();
+    expect(uploader.status).toEqual('complete');
+  });
+  it('should complete on 201', async () => {
+    code = 201;
     const start = spyOn(uploader, 'start').and.callThrough();
     const cleanup = spyOn<any>(uploader, 'cleanup').and.callThrough();
     await uploader.upload();
