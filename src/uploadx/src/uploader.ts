@@ -232,7 +232,9 @@ export abstract class Uploader implements UploadState {
    */
   protected abstract getOffset(): Promise<number | undefined>;
 
-  protected abstract setAuth(token: string): void;
+  protected setAuth(token: string) {
+    this.headers.Authorization = `Bearer ${token}`;
+  }
 
   private adjustChunkSize(): void {
     if (!this.options.chunkSize && this.responseStatus < 400) {

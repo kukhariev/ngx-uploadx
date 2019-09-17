@@ -68,10 +68,6 @@ export class UploaderX extends Uploader {
       return this.size;
     }
   }
-
-  protected setAuth(token: string) {
-    this.headers.Authorization = `Bearer ${token}`;
-  }
 }
 
 export function getRangeEnd(range = ''): number {
