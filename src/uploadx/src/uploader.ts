@@ -1,4 +1,4 @@
-import { BackoffRetry } from './backoff_retry';
+import { ErrorHandler, ErrorType } from './error_handler';
 import {
   RequestParams,
   UploaderOptions,
@@ -13,36 +13,15 @@ import { actionToStatusMap, createHash, isNumber, noop, unfunc } from './utils';
  * Uploader Base Class
  */
 export abstract class Uploader implements UploadState {
-  /**
-   * Codes should not be retried
-   * @beta
-   */
-  static fatalErrors = [400, 403, 405, 406];
-  /**
-   * Restart codes
-   * @beta
-   */
-  static notFoundErrors = [404, 410];
-  static authErrors = [401];
-  /**
-   * Max HTTP errors
-   */
-  static maxRetryAttempts = 8;
-  /**
-   * Maximum chunk size in bytes
-   */
+  /** Maximum chunk size in bytes */
   static maxChunkSize = Number.MAX_SAFE_INTEGER;
-  /**
-   * Minimum chunk size in bytes
-   */
+
+  /** Minimum chunk size in bytes */
   static minChunkSize = 4096; // default blocksize of most FSs
-  /**
-   * Initial chunk size in bytes
-   */
+
+  /** Initial chunk size in bytes */
   static startingChunkSize = 4096 * 256;
-  /**
-   * Upload status
-   */
+
   set status(s: UploadStatus) {
     if (this._status === 'cancelled' || (this._status === 'complete' && s !== 'cancelled')) {
       return;
@@ -50,7 +29,7 @@ export abstract class Uploader implements UploadState {
     if (s !== this._status) {
       s === 'paused' && this.abort();
       s === 'cancelled' && this.onCancel();
-      this.isFinalEvent(s) && this.cleanup();
+      ['cancelled', 'complete', 'error'].includes(s) && this.cleanup();
       this._status = s;
       this.stateChange(this);
     }
@@ -58,63 +37,33 @@ export abstract class Uploader implements UploadState {
   get status() {
     return this._status;
   }
-  /**
-   * Original File name
-   */
+  private _status: UploadStatus;
   readonly name: string;
-  /**
-   * File size in bytes
-   */
   readonly size: number;
-  /**
-   * File MIME type
-   */
-  readonly mimeType: string;
   readonly uploadId: string;
-  /**
-   * HTTP response status code
-   */
+  response: any;
   responseStatus: number;
-
-  /**
-   * Progress percentage
-   */
   progress: number;
-  /**
-   * ETA
-   */
   remaining: number;
-  /**
-   * Upload speed bytes/sec
-   */
   speed: number;
-  /**
-   * File URI
-   */
-  protected _url = '';
   get url(): string {
-    return this._url || store.get(this.uploadId);
+    return this._url || store.get(this.uploadId) || '';
   }
   set url(value: string) {
     this._url !== value && store.set(this.uploadId, value);
     this._url = value;
   }
-  /**
-   * Custom headers
-   */
+  protected _url = '';
+
+  /** Custom headers */
   headers: Record<string, any> = {};
-  /**
-   * Metadata Object
-   */
+
+  /** Metadata Object */
   metadata: Record<string, any>;
-  /**
-   * Upload endpoint
-   */
+
+  /** Upload endpoint */
   endpoint = '/upload';
-  /**
-   * HTTP response body
-   */
-  response: any;
+
   /**
    * Chunk size in bytes
    */
@@ -126,7 +75,7 @@ export abstract class Uploader implements UploadState {
   /**
    * Retries handler
    */
-  protected retry = new BackoffRetry();
+  protected errorHandler = new ErrorHandler();
   /**
    * Active HttpRequest
    */
@@ -139,41 +88,20 @@ export abstract class Uploader implements UploadState {
    * Set HttpRequest responseType
    */
   protected responseType: XMLHttpRequestResponseType = '';
-  /**
-   * Upload start time
-   */
   private startTime: number;
-  private _status: UploadStatus;
-  private get isFatalError(): boolean {
-    return Uploader.fatalErrors.includes(this.responseStatus);
-  }
-  private get isAuthError(): boolean {
-    return Uploader.authErrors.includes(this.responseStatus);
-  }
-  private get isNotFoundError(): boolean {
-    return Uploader.notFoundErrors.includes(this.responseStatus);
-  }
-  private get isMaxAttemptsReached(): boolean {
-    return this.retry.retryAttempts === Uploader.maxRetryAttempts;
-  }
-  /**
-   * UploadState emitter
-   */
+
   private stateChange: (evt: UploadState) => void;
 
-  private cleanup = () => store.remove(this.uploadId);
-  private isFinalEvent = (event: UploadStatus): boolean =>
-    ['cancelled', 'complete', 'error'].includes(event);
+  private cleanup = () => store.delete(this.uploadId);
 
   constructor(readonly file: File, public options: UploaderOptions) {
     this.name = file.name;
     this.size = file.size;
-    this.mimeType = file.type || 'application/octet-stream';
     this.metadata = {
-      name: this.name,
-      mimeType: this.mimeType,
-      size: this.size,
-      lastModified: this.file.lastModified
+      name: file.name,
+      mimeType: file.type,
+      size: file.size,
+      lastModified: file.lastModified
     };
     const print = JSON.stringify({
       ...this.metadata,
@@ -206,15 +134,16 @@ export abstract class Uploader implements UploadState {
       await this.getToken();
       this.offset = undefined;
       this.url = this.url || (await this.getFileUrl());
-      this.retry.reset();
+      this.errorHandler.reset();
       this.startTime = new Date().getTime();
       this.start();
     } catch {
-      if (this.isMaxAttemptsReached || this.isFatalError) {
-        this.status = 'error';
-      } else {
-        await this.waitForRetry();
+      if (this.errorHandler.kind(this.responseStatus) !== ErrorType.FatalError) {
+        this.status = 'retry';
+        await this.errorHandler.wait();
         this.status = 'queue';
+      } else {
+        this.status = 'error';
       }
     }
   }
@@ -223,10 +152,12 @@ export abstract class Uploader implements UploadState {
    * Get file URI
    */
   protected abstract getFileUrl(): Promise<string>;
+
   /**
    * Send file content and return an offset for the next request
    */
   protected abstract sendFileContent(): Promise<number | undefined>;
+
   /**
    * Get an offset for the next request
    */
@@ -287,7 +218,7 @@ export abstract class Uploader implements UploadState {
         const offset = isNumber(this.offset)
           ? await this.sendFileContent()
           : await this.getOffset();
-        if (isNumber(offset) && offset >= this.size) {
+        if (offset === this.size) {
           this.offset = offset;
           this.progress = 100;
           this.remaining = 0;
@@ -295,22 +226,23 @@ export abstract class Uploader implements UploadState {
         } else if (offset === this.offset) {
           throw new Error('Content upload failed');
         }
-        this.retry.reset();
+        this.errorHandler.reset();
         this.offset = offset;
       } catch {
-        if (this.isFatalError || this.isMaxAttemptsReached) {
+        const errType = this.errorHandler.kind(this.responseStatus);
+        if (errType === ErrorType.FatalError) {
           this.status = 'error';
-          break;
-        }
-        if (this.isNotFoundError) {
+        } else if (errType === ErrorType.Restart) {
           this.url = '';
           this.status = 'queue';
-          break;
+        } else if (errType === ErrorType.Auth) {
+          await this.getToken();
+        } else {
+          this.status = 'retry';
+          await this.errorHandler.wait();
+          this.offset = this.responseStatus >= 400 ? undefined : this.offset;
+          this.status = 'uploading';
         }
-        await this.waitForRetry();
-        this.isAuthError && (await this.getToken());
-        this.offset = this.responseStatus >= 400 ? undefined : this.offset;
-        this.status = 'uploading';
       } finally {
         this.adjustChunkSize();
       }
@@ -327,12 +259,13 @@ export abstract class Uploader implements UploadState {
     headers = {}
   }: RequestParams): Promise<ProgressEvent> {
     return new Promise((resolve, reject) => {
-      this._xhr = new XMLHttpRequest();
-      const xhr = this._xhr;
+      const xhr = (this._xhr = new XMLHttpRequest());
       xhr.open(method, url || this.url, true);
       if (body instanceof Blob) {
         xhr.upload.onprogress = this.onProgress(body.size);
       }
+      this.responseStatus = 0;
+      this.response = undefined;
       this.responseType && (xhr.responseType = this.responseType);
       this.options.withCredentials && (xhr.withCredentials = true);
       const _headers = { ...this.headers, ...headers };
@@ -382,10 +315,5 @@ export abstract class Uploader implements UploadState {
         this.stateChange(this);
       }
     };
-  }
-
-  private waitForRetry(): Promise<number> {
-    this.status = 'retry';
-    return this.retry.wait(this.responseStatus);
   }
 }

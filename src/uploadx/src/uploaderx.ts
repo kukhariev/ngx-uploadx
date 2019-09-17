@@ -19,8 +19,8 @@ export class UploaderX extends Uploader {
     }
     const headers = {
       'Content-Type': 'application/json; charset=utf-8',
-      'X-Upload-Content-Length': `${this.size}`,
-      'X-Upload-Content-Type': `${this.mimeType}`
+      'X-Upload-Content-Length': `${this.file.size}`,
+      'X-Upload-Content-Type': `${this.file.type}`
     };
     await this.request({
       method: 'POST',
