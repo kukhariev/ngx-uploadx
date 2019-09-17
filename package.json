@@ -24,11 +24,13 @@
     "start": "ng serve",
     "lint": "ng lint",
     "test": "ng test --watch=false --progress=false --browsers=ChromeHeadless",
-    "e2e": "ng e2e -c=ci",
+    "e2e": "ng e2e -c=ci --webdriver-update=false",
     "server": "node ./server/ ",
     "server:dev": "node ./server/ --errors --log",
     "build": "ts-node --skip-project ./scripts/build.ts",
-    "ci": "npm run lint && npm run test && npm run e2e"
+    "ci": "npm run lint && npm run test && npm run webdriver-update-ci && npm run e2e",
+    "webdriver-update-ci": "webdriver-manager update --standalone false --gecko false --versions.chrome 76.0.3809.68"
+
   },
   "dependencies": {
     "@angular/common": "~7.2.0",
