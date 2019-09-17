@@ -138,8 +138,9 @@ export abstract class Uploader implements UploadState {
       this.startTime = new Date().getTime();
       this.start();
     } catch {
-      if (this.errorHandler.kind(this.responseStatus) !== ErrorType.Fatal) {
-        await this.waitForRetry();
+      if (this.errorHandler.kind(this.responseStatus) !== ErrorType.FatalError) {
+        this.status = 'retry';
+        await this.errorHandler.wait();
         this.status = 'queue';
       } else {
         this.status = 'error';
@@ -229,22 +230,19 @@ export abstract class Uploader implements UploadState {
         this.offset = offset;
       } catch {
         const errType = this.errorHandler.kind(this.responseStatus);
-        if (errType === ErrorType.Fatal) {
+        if (errType === ErrorType.FatalError) {
           this.status = 'error';
-          break;
-        }
-        if (errType === ErrorType.Restart) {
+        } else if (errType === ErrorType.Restart) {
           this.url = '';
           this.status = 'queue';
-          break;
-        }
-        if (errType === ErrorType.Auth) {
+        } else if (errType === ErrorType.Auth) {
           await this.getToken();
-          continue;
+        } else {
+          this.status = 'retry';
+          await this.errorHandler.wait();
+          this.offset = this.responseStatus >= 400 ? undefined : this.offset;
+          this.status = 'uploading';
         }
-        await this.waitForRetry();
-        this.offset = this.responseStatus >= 400 ? undefined : this.offset;
-        this.status = 'uploading';
       } finally {
         this.adjustChunkSize();
       }
@@ -317,10 +315,5 @@ export abstract class Uploader implements UploadState {
         this.stateChange(this);
       }
     };
-  }
-
-  private waitForRetry(): Promise<number> {
-    this.status = 'retry';
-    return this.errorHandler.wait(this.responseStatus);
   }
 }

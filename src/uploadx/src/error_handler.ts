@@ -2,13 +2,13 @@ export enum ErrorType {
   Restart,
   Auth,
   Retryable,
-  Fatal
+  FatalError
 }
 export class ErrorHandler {
   static maxRetryAttempts = 8;
-  static restartCodes = [404, 410];
-  static authErrors = [401];
-  static retryErrors = [423, 429];
+  static shouldRestartCodes = [404, 410];
+  static authErrorCodes = [401];
+  static shouldRetryCodes = [423, 429];
   private delay: number;
   private code? = -1;
   private factor = 2;
@@ -24,26 +24,26 @@ export class ErrorHandler {
     if (code === this.code) {
       this.attempts++;
       if (this.attempts > ErrorHandler.maxRetryAttempts) {
-        return ErrorType.Fatal;
+        return ErrorType.FatalError;
       }
     } else {
       this.reset();
     }
     this.code = code;
 
-    if (ErrorHandler.authErrors.includes(code)) {
+    if (ErrorHandler.authErrorCodes.includes(code)) {
       return ErrorType.Auth;
     }
-    if (ErrorHandler.restartCodes.includes(code)) {
+    if (ErrorHandler.shouldRestartCodes.includes(code)) {
       return ErrorType.Restart;
     }
-    if (code < 400 || code >= 500 || ErrorHandler.retryErrors.includes(code)) {
-      return { isRetryable: true };
+    if (code < 400 || code >= 500 || ErrorHandler.shouldRetryCodes.includes(code)) {
+      return ErrorType.Retryable;
     }
-    return ErrorType.Fatal;
+    return ErrorType.FatalError;
   }
 
-  wait(code?: number): Promise<number> {
+  wait(): Promise<number> {
     return new Promise(resolve => {
       this.delay = Math.min(this.delay * this.factor, this.max);
       setTimeout(() => resolve(this.attempts), this.delay + Math.floor(Math.random() * this.min));
