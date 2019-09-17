@@ -1,15 +1,15 @@
-const UPLOADX_KEY = 'UPLOADX_V3.0';
-class Store<T> {
-  private hasStorage = 'localStorage' in window;
-  constructor(public key: string) {}
-  set(id: string, data: T) {
-    this.hasStorage && localStorage.setItem(this.key + id, JSON.stringify(data));
+const PREFIX = 'UPLOADX-V3.0-';
+
+class Store {
+  constructor(public prefix = '') {}
+  set(key: string, value: string) {
+    localStorage.setItem(this.prefix + key, value);
   }
-  get(id: string): T | null {
-    return this.hasStorage && JSON.parse(localStorage.getItem(this.key + id) || 'null');
+  get(key: string): string | null | false {
+    return localStorage.getItem(this.prefix + key);
   }
-  delete(id: string) {
-    this.hasStorage && localStorage.removeItem(this.key + id);
+  delete(key: string) {
+    localStorage.removeItem(this.prefix + key);
   }
 }
-export const store = new Store<string>(UPLOADX_KEY + '_');
+export const store = 'localStorage' in window ? new Store(PREFIX) : new Map<string, string>();
