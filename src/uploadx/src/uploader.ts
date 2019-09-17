@@ -1,4 +1,4 @@
-import { BackoffRetry } from './backoff_retry';
+import { ErrorHandler, ErrorType } from './error_handler';
 import {
   RequestParams,
   UploaderOptions,
@@ -13,22 +13,6 @@ import { actionToStatusMap, createHash, isNumber, noop, unfunc } from './utils';
  * Uploader Base Class
  */
 export abstract class Uploader implements UploadState {
-  /**
-   * Codes should not be retried
-   * @beta
-   */
-  static fatalErrors = [400, 403, 405, 406];
-  /**
-   * Restart codes
-   * @beta
-   */
-  static notFoundErrors = [404, 410];
-  static authErrors = [401];
-  /**
-   * Max HTTP errors
-   */
-  static maxRetryAttempts = 8;
-
   /** Maximum chunk size in bytes */
   static maxChunkSize = Number.MAX_SAFE_INTEGER;
 
@@ -45,7 +29,7 @@ export abstract class Uploader implements UploadState {
     if (s !== this._status) {
       s === 'paused' && this.abort();
       s === 'cancelled' && this.onCancel();
-      this.isFinalEvent(s) && this.cleanup();
+      ['cancelled', 'complete', 'error'].includes(s) && this.cleanup();
       this._status = s;
       this.stateChange(this);
     }
@@ -91,7 +75,7 @@ export abstract class Uploader implements UploadState {
   /**
    * Retries handler
    */
-  protected retry = new BackoffRetry();
+  protected errorHandler = new ErrorHandler();
   /**
    * Active HttpRequest
    */
@@ -106,24 +90,9 @@ export abstract class Uploader implements UploadState {
   protected responseType: XMLHttpRequestResponseType = '';
   private startTime: number;
 
-  private get isFatalError(): boolean {
-    return Uploader.fatalErrors.includes(this.responseStatus);
-  }
-  private get isAuthError(): boolean {
-    return Uploader.authErrors.includes(this.responseStatus);
-  }
-  private get isNotFoundError(): boolean {
-    return Uploader.notFoundErrors.includes(this.responseStatus);
-  }
-  private get isMaxAttemptsReached(): boolean {
-    return this.retry.attempts >= Uploader.maxRetryAttempts;
-  }
-
   private stateChange: (evt: UploadState) => void;
 
   private cleanup = () => store.delete(this.uploadId);
-  private isFinalEvent = (event: UploadStatus): boolean =>
-    ['cancelled', 'complete', 'error'].includes(event);
 
   constructor(readonly file: File, public options: UploaderOptions) {
     this.name = file.name;
@@ -165,15 +134,15 @@ export abstract class Uploader implements UploadState {
       await this.getToken();
       this.offset = undefined;
       this.url = this.url || (await this.getFileUrl());
-      this.retry.reset();
+      this.errorHandler.reset();
       this.startTime = new Date().getTime();
       this.start();
     } catch {
-      if (this.isMaxAttemptsReached || this.isFatalError) {
-        this.status = 'error';
-      } else {
+      if (this.errorHandler.kind(this.responseStatus) !== ErrorType.Fatal) {
         await this.waitForRetry();
         this.status = 'queue';
+      } else {
+        this.status = 'error';
       }
     }
   }
@@ -256,20 +225,24 @@ export abstract class Uploader implements UploadState {
         } else if (offset === this.offset) {
           throw new Error('Content upload failed');
         }
-        this.retry.reset();
+        this.errorHandler.reset();
         this.offset = offset;
       } catch {
-        if (this.isFatalError || this.isMaxAttemptsReached) {
+        const errType = this.errorHandler.kind(this.responseStatus);
+        if (errType === ErrorType.Fatal) {
           this.status = 'error';
           break;
         }
-        if (this.isNotFoundError) {
+        if (errType === ErrorType.Restart) {
           this.url = '';
           this.status = 'queue';
           break;
         }
+        if (errType === ErrorType.Auth) {
+          await this.getToken();
+          continue;
+        }
         await this.waitForRetry();
-        this.isAuthError && (await this.getToken());
         this.offset = this.responseStatus >= 400 ? undefined : this.offset;
         this.status = 'uploading';
       } finally {
@@ -348,6 +321,6 @@ export abstract class Uploader implements UploadState {
 
   private waitForRetry(): Promise<number> {
     this.status = 'retry';
-    return this.retry.wait(this.responseStatus);
+    return this.errorHandler.wait(this.responseStatus);
   }
 }

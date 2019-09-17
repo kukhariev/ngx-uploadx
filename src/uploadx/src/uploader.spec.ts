@@ -1,3 +1,4 @@
+import { ErrorHandler } from './error_handler';
 import { Uploader } from './uploader';
 
 function getFile(): File {
@@ -13,7 +14,7 @@ function shouldReject() {
   return code >= 400 || !code;
 }
 
-Uploader.maxRetryAttempts = 2;
+ErrorHandler.maxRetryAttempts = 2;
 
 export class MockUploader extends Uploader {
   async getFileUrl(): Promise<string> {
