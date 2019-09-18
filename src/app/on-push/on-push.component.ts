@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Uploader, UploadState, UploadxOptions, UploadxService } from '../../uploadx';
+import { ErrorHandler, Uploader, UploadState, UploadxOptions, UploadxService } from '../../uploadx';
 import { AuthService } from '../auth.service';
 
 // Redefining example:
 const { deviceMemory } = navigator as any;
 
-Uploader.fatalErrors = [400, 403, 405];
+ErrorHandler.maxRetryAttempts = 3;
 
 Uploader.maxChunkSize = (deviceMemory || 0.25) * 256 * 1024 * 1024;
 // console.log(`Device memory at least: ${deviceMemory}GiB`);

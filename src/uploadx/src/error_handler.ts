@@ -1,3 +1,6 @@
+/**
+ * @internal
+ */
 export enum ErrorType {
   Restart,
   Auth,
@@ -9,11 +12,11 @@ export class ErrorHandler {
   static shouldRestartCodes = [404, 410];
   static authErrorCodes = [401];
   static shouldRetryCodes = [423, 429];
+  min = 500;
+  max = this.min * 120;
+  factor = 2;
   private delay: number;
   private code? = -1;
-  private factor = 2;
-  private min = 500;
-  private max = this.min * 120;
   attempts = 1;
 
   constructor() {

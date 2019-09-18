@@ -1,5 +1,5 @@
 import { Uploader } from './uploader';
-
+/** @internal */
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
 
 export type UploadStatus =
@@ -116,6 +116,7 @@ export interface UploadxOptions extends UploaderOptions {
   multiple?: boolean;
 }
 
+/** @internal */
 export interface RequestParams {
   method: HttpMethod;
   body?: string | Blob | null;
