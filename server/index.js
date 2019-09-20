@@ -1,5 +1,4 @@
 const args = process.argv.slice(2);
-const dirty = args.includes('--no-reset');
 const log = args.includes('--log');
 const emitErrors = args.includes('--errors');
 const exit = args.includes('--exit');
@@ -8,7 +7,7 @@ const http = require('http');
 const url = require('url');
 const { tmpdir } = require('os');
 
-log && (process.env.DEBUG = 'uploadx: * ');
+log && (process.env.DEBUG = 'uploadx:*');
 const { Uploadx, Tus, DiskStorage } = require('node-uploadx');
 const PORT = 3003;
 const USER_ID = 'ngx-uploadx-test';

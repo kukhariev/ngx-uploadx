@@ -133,6 +133,7 @@ Activates the `.uploadx-drop-active` class on DnD operations.
     concurrency: 4,
     endpoint: `${environment.api}/upload`,
     token:  () => localStorage.getItem('access_token'),
+    uploaderClass: Tus
   };
   ngOnInit() {
     this.uploadService.init(this.uploadxOptions)
