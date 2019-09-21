@@ -1,38 +1,20 @@
 import { b64, isNumber, resolveUrl } from './utils';
-const _URL = window.URL;
-const base = 'http://www.example.com/upload';
-const rel = '/upload?upload_id=12345';
-const abs = 'http://www.example.com/upload?upload_id=12345';
-const path = 'files?upload_id=12345';
-
+const urlTestData = [
+  ['https://a/b/c', 'https://d/e/f?g=1', 'https://d/e/f?g=1'],
+  ['http://a/b/c', 'https://d/e/f?g=2', 'https://d/e/f?g=2'],
+  ['https://a/b/c', '//d/e/f?g=3', 'https://d/e/f?g=3'],
+  ['http://a/b/c', '//d/e/f?g=4', 'http://d/e/f?g=4'],
+  ['https://a/b/c', '/d/e?f=5', 'https://a/d/e?f=5'],
+  ['https://a/b/c', 'd/e?f=6', 'https://a/b/d/e?f=6'],
+  ['/b/c', '//d/e/f?g=7', '//d/e/f?g=7'],
+  ['/b/c', '/d/e?f=8', '/d/e?f=8'],
+  ['/b/c', 'd/e?f=9', '/b/d/e?f=9']
+];
 describe('resolveUrl', () => {
-  it('absolute', () => {
-    const resolved = resolveUrl(abs, base);
-    expect(resolved).toBe('http://www.example.com/upload?upload_id=12345');
-  });
-  it('relative', () => {
-    const resolved = resolveUrl(rel, base);
-    expect(resolved).toBe('http://www.example.com/upload?upload_id=12345');
-  });
-  it('path', () => {
-    const resolved = resolveUrl(path, base);
-    expect(resolved).toBe('http://www.example.com/files?upload_id=12345');
-  });
-});
-describe('resolveUrl:polyfill', () => {
-  beforeAll(() => {
-    window.URL = undefined as any;
-  });
-  it('relative', () => {
-    const resolved = resolveUrl(rel, base);
-    expect(resolved).toBe('http://www.example.com/upload?upload_id=12345');
-  });
-  it('path', () => {
-    const resolved = resolveUrl(path, base);
-    expect(resolved).toBe('http://www.example.com/files?upload_id=12345');
-  });
-  afterAll(() => {
-    window.URL = _URL;
+  it('resolveUrl', () => {
+    urlTestData.forEach(([base, url, expected]) => {
+      expect(resolveUrl(url, base)).toBe(expected);
+    });
   });
 });
 
