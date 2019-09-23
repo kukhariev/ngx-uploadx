@@ -16,7 +16,7 @@ export class TusComponent implements OnDestroy {
   private unsubscribe$ = new Subject();
   options: UploadxOptions = {
     allowedTypes: 'image/*,video/*',
-    endpoint: `${environment.api}/tus`,
+    endpoint: `${environment.api}/upload`,
     // endpoint: `https://master.tus.io/files/`,
     uploaderClass: Tus
   };

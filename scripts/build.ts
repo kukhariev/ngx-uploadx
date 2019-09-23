@@ -1,6 +1,6 @@
-import * as util from 'util';
-import { build } from 'ng-packagr';
 import * as fs from 'fs';
+import { build } from 'ng-packagr';
+import * as util from 'util';
 const copyFile = util.promisify(fs.copyFile);
 const unlink = util.promisify(fs.unlink);
 const writeFile = util.promisify(fs.writeFile);
