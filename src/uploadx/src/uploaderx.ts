@@ -18,10 +18,14 @@ export class UploaderX extends Uploader {
       return this.url;
     }
     const headers = {
-      'Content-Type': 'application/json; charset=utf-8',
-      'X-Upload-Content-Length': `${this.file.size}`,
-      'X-Upload-Content-Type': `${this.file.type}`
-    };
+      'Content-Type': 'application/json; charset=utf-8'
+    } as any;
+    if (this.file.size) {
+      headers['X-Upload-Content-Length'] = this.file.size;
+    }
+    if (this.file.type) {
+      headers['X-Upload-Content-Type'] = this.file.type;
+    }
     await this.request({
       method: 'POST',
       body: JSON.stringify(this.metadata),
