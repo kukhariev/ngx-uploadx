@@ -1,14 +1,14 @@
 import { ErrorHandler, ErrorType } from './error_handler';
-import {
-  RequestParams,
-  UploaderOptions,
-  UploadState,
-  UploadStatus,
-  UploadxControlEvent
-} from './interfaces';
+import { UploaderOptions, UploadState, UploadStatus, UploadxControlEvent } from './interfaces';
 import { store } from './store';
 import { actionToStatusMap, createHash, isNumber, noop, unfunc } from './utils';
 
+interface RequestParams {
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
+  body?: string | Blob | null;
+  url?: string;
+  headers?: Record<string, string>;
+}
 /**
  * Uploader Base Class
  */

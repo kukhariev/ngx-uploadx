@@ -1,7 +1,4 @@
 import { Uploader } from './uploader';
-/** @internal */
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
-
 export type UploadStatus =
   | 'added'
   | 'queue'
@@ -114,12 +111,4 @@ export interface UploadxOptions extends UploaderOptions {
    * @defaultValue true
    */
   multiple?: boolean;
-}
-
-/** @internal */
-export interface RequestParams {
-  method: HttpMethod;
-  body?: string | Blob | null;
-  url?: string;
-  headers?: Record<string, string>;
 }
