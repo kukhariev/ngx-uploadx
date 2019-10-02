@@ -86,3 +86,25 @@ export const b64 = {
     return decoded;
   }
 };
+
+export const chunk = new (class {
+  /** Maximum chunk size in bytes */
+  maxSize = Number.MAX_SAFE_INTEGER;
+
+  /** Minimum chunk size in bytes */
+  minSize = 4096; // default blocksize of most FSs
+
+  /** Initial chunk size in bytes */
+  size = 4096 * 256;
+
+  scale(speed: number): number {
+    const elapsedTime = this.size / speed;
+    if (elapsedTime < 2) {
+      this.size = Math.min(this.maxSize, this.size * 2);
+    }
+    if (elapsedTime > 8) {
+      this.size = Math.max(this.minSize, this.size / 2);
+    }
+    return this.size;
+  }
+})();

@@ -5,3 +5,4 @@ export * from './uploader';
 export { UploaderX } from './uploaderx';
 export * from './uploadx.module';
 export * from './uploadx.service';
+export { chunk } from './utils';

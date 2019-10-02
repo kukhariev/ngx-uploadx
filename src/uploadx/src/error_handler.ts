@@ -23,7 +23,7 @@ export class ErrorHandler {
     this.delay = this.min;
   }
 
-  kind(code: number) {
+  kind(code: number): ErrorType {
     if (code === this.code) {
       this.attempts++;
       if (this.attempts > ErrorHandler.maxRetryAttempts) {
