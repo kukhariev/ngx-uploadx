@@ -1,5 +1,5 @@
-import { Injectable, NgZone } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Injectable, NgZone, OnDestroy } from '@angular/core';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { UploaderOptions, UploadState, UploadxControlEvent, UploadxOptions } from './interfaces';
 import { OnlineStatusListeners } from './online_status_listeners';
@@ -8,7 +8,7 @@ import { UploaderX } from './uploaderx';
 import { pick } from './utils';
 
 @Injectable({ providedIn: 'root' })
-export class UploadxService {
+export class UploadxService implements OnDestroy {
   static stateKeys: (keyof UploadState)[] = [
     'file',
     'name',
@@ -23,6 +23,8 @@ export class UploadxService {
     'url'
   ];
   private readonly eventsStream: Subject<UploadState> = new Subject();
+  private sub: Subscription;
+
   /**
    * Upload status events
    */
@@ -50,7 +52,7 @@ export class UploadxService {
   );
 
   constructor(private ngZone: NgZone) {
-    this.events.subscribe(({ status }) => {
+    this.sub = this.events.subscribe(({ status }) => {
       if (status !== 'uploading' && status !== 'added') {
         this.ngZone.runOutsideAngular(() => this.processQueue());
       }
@@ -86,7 +88,11 @@ export class UploadxService {
     this.queue.forEach(uploader => (uploader.status = 'paused'));
     this.queue = [];
   }
-
+  ngOnDestroy(): void {
+    this.disconnect();
+    this.onlineStatusListeners.unregister();
+    this.sub && this.sub.unsubscribe();
+  }
   /**
    * Create Uploader and add to the queue
    */
