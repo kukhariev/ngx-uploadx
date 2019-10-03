@@ -11,10 +11,9 @@ import {
 } from '../../uploadx';
 import { AuthService } from '../auth.service';
 
-// Redefining example:
 const { deviceMemory } = navigator as any;
 
-ErrorHandler.maxRetryAttempts = 3;
+ErrorHandler.maxAttempts = 3;
 
 chunk.maxSize = (deviceMemory || 0.25) * 256 * 1024 * 1024;
 // console.log(`Device memory at least: ${deviceMemory}GiB`);

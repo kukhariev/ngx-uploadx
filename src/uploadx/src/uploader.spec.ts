@@ -14,7 +14,7 @@ function shouldReject() {
   return code >= 400 || !code;
 }
 
-ErrorHandler.maxRetryAttempts = 2;
+ErrorHandler.maxAttempts = 2;
 
 export class MockUploader extends Uploader {
   async getFileUrl(): Promise<string> {

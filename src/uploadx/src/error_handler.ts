@@ -8,7 +8,7 @@ export enum ErrorType {
   FatalError
 }
 export class ErrorHandler {
-  static maxRetryAttempts = 8;
+  static maxAttempts = 8;
   static shouldRestartCodes = [404, 410];
   static authErrorCodes = [401];
   static shouldRetryCodes = [423, 429];
@@ -26,7 +26,7 @@ export class ErrorHandler {
   kind(code: number): ErrorType {
     if (code === this.code) {
       this.attempts++;
-      if (this.attempts > ErrorHandler.maxRetryAttempts) {
+      if (this.attempts > ErrorHandler.maxAttempts) {
         return ErrorType.FatalError;
       }
     } else {
