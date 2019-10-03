@@ -1,7 +1,7 @@
 import { ErrorHandler, ErrorType } from './error_handler';
 import { UploaderOptions, UploadState, UploadStatus, UploadxControlEvent } from './interfaces';
 import { store } from './store';
-import { actionToStatusMap, chunk, createHash, isNumber, noop, unfunc } from './utils';
+import { actionToStatusMap, createHash, dynamicChunk, isNumber, noop, unfunc } from './utils';
 
 interface RequestParams {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
@@ -52,7 +52,7 @@ export abstract class Uploader implements UploadState {
     });
     this.uploadId = createHash(print).toString(16);
     this.stateChange = options.stateChange || noop;
-    this.chunkSize = options.chunkSize || chunk.size;
+    this.chunkSize = options.chunkSize || dynamicChunk.size;
     this.configure(options);
   }
   private _status: UploadStatus;
@@ -80,7 +80,7 @@ export abstract class Uploader implements UploadState {
    */
   chunkSize: number;
   /**
-   * Auth Bearer token/tokenGetter
+   * Auth token/tokenGetter
    */
   token: UploadxControlEvent['token'];
   /**
@@ -99,10 +99,9 @@ export abstract class Uploader implements UploadState {
    * Set HttpRequest responseType
    */
   protected responseType: XMLHttpRequestResponseType = '';
+
   private startTime: number;
-
   private stateChange: (evt: UploadState) => void;
-
   private cleanup = () => store.delete(this.uploadId);
 
   /**
@@ -202,14 +201,13 @@ export abstract class Uploader implements UploadState {
           throw new Error('Content upload failed');
         }
         this.errorHandler.reset();
-        this.chunkSize = this.options.chunkSize ? this.chunkSize : chunk.scale(this.speed);
+        this.chunkSize = this.options.chunkSize ? this.chunkSize : dynamicChunk.scale(this.speed);
         this.offset = offset;
       } catch {
         const errType = this.errorHandler.kind(this.responseStatus);
         if (this.responseStatus === 413) {
-          chunk.maxSize = this.chunkSize /= 2;
-        }
-        if (errType === ErrorType.FatalError) {
+          dynamicChunk.maxSize = this.chunkSize /= 2;
+        } else if (errType === ErrorType.FatalError) {
           this.status = 'error';
         } else if (errType === ErrorType.Restart) {
           this.url = '';

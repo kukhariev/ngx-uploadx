@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
-  chunk,
+  dynamicChunk,
   ErrorHandler,
   Uploader,
   UploadState,
@@ -15,7 +15,7 @@ const { deviceMemory } = navigator as any;
 
 ErrorHandler.maxAttempts = 3;
 
-chunk.maxSize = (deviceMemory || 0.25) * 256 * 1024 * 1024;
+dynamicChunk.maxSize = (deviceMemory || 0.25) * 256 * 1024 * 1024;
 // console.log(`Device memory at least: ${deviceMemory}GiB`);
 // console.log(`maxChunkSize: ${Uploader.maxChunkSize / 1024 / 1024}MiB`);
 
