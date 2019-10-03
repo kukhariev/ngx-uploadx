@@ -2,6 +2,7 @@ import { Injectable, NgZone } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { UploaderOptions, UploadState, UploadxControlEvent, UploadxOptions } from './interfaces';
+import { OnlineStatusListeners } from './online_status_listeners';
 import { Uploader } from './uploader';
 import { UploaderX } from './uploaderx';
 import { pick } from './utils';
@@ -42,6 +43,11 @@ export class UploadxService {
       );
     }
   };
+
+  private onlineStatusListeners = new OnlineStatusListeners(
+    () => this.control({ action: 'upload' }),
+    () => this.control({ action: 'pause' })
+  );
 
   constructor(private ngZone: NgZone) {
     this.events.subscribe(({ status }) => {
@@ -111,7 +117,7 @@ export class UploadxService {
    * @internal
    */
   private autoUploadFiles(): void {
-    if (this.options.autoUpload) {
+    if (this.options.autoUpload && window.navigator.onLine) {
       this.queue
         .filter(({ status }) => status === 'added')
         .forEach(uploader => (uploader.status = 'queue'));
