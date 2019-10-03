@@ -1,8 +1,7 @@
 import { Injectable, NgZone, OnDestroy } from '@angular/core';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { UploaderOptions, UploadState, UploadxControlEvent, UploadxOptions } from './interfaces';
-import { OnlineStatusListeners } from './online_status_listeners';
 import { Uploader } from './uploader';
 import { UploaderX } from './uploaderx';
 import { pick } from './utils';
@@ -23,7 +22,7 @@ export class UploadxService implements OnDestroy {
     'url'
   ];
   private readonly eventsStream: Subject<UploadState> = new Subject();
-  private sub: Subscription;
+  private subs: Subscription[] = [];
 
   /**
    * Upload status events
@@ -46,17 +45,16 @@ export class UploadxService implements OnDestroy {
     }
   };
 
-  private onlineStatusListeners = new OnlineStatusListeners(
-    () => this.control({ action: 'upload' }),
-    () => this.control({ action: 'pause' })
-  );
-
   constructor(private ngZone: NgZone) {
-    this.sub = this.events.subscribe(({ status }) => {
-      if (status !== 'uploading' && status !== 'added') {
-        this.ngZone.runOutsideAngular(() => this.processQueue());
-      }
-    });
+    this.subs.push(
+      fromEvent(window, 'online').subscribe(() => this.control({ action: 'upload' })),
+      fromEvent(window, 'offline').subscribe(() => this.control({ action: 'pause' })),
+      this.events.subscribe(({ status }) => {
+        if (status !== 'uploading' && status !== 'added') {
+          this.ngZone.runOutsideAngular(() => this.processQueue());
+        }
+      })
+    );
   }
 
   /**
@@ -90,8 +88,7 @@ export class UploadxService implements OnDestroy {
   }
   ngOnDestroy(): void {
     this.disconnect();
-    this.onlineStatusListeners.unregister();
-    this.sub && this.sub.unsubscribe();
+    this.subs.forEach(sub => sub.unsubscribe());
   }
   /**
    * Create Uploader and add to the queue
