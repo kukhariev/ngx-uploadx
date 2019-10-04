@@ -6,7 +6,7 @@ import { UploadxOptions, Uploader } from 'ngx-uploadx';
  * https://github.com/fdintino/nginx-upload-module/blob/master/upload-protocol.md
  */
 export class NginxUploadModuleUploader extends Uploader {
-  ready = 0;
+  offset: number;
   constructor(readonly file: File, options: UploadxOptions) {
     super(file, options);
     this.offset = 0;
@@ -16,43 +16,42 @@ export class NginxUploadModuleUploader extends Uploader {
   }
 
   async getOffset(): Promise<number> {
-    return this.ready;
+    return this.offset;
   }
 
   async sendFileContent(): Promise<number> {
-    const end = this.chunkSize ? Math.min(this.offset + this.chunkSize, this.size) : this.size;
-    const body = this.file.slice(this.offset, end);
+    const { body, end } = this.getChunk();
     const headers = {
-      'Content-Type': this.mimeType,
+      'Content-Type': this.file.type,
       'Session-ID': `${this.uploadId}`,
       'Content-Disposition': `attachment; filename="${encodeURIComponent(this.name)}"`,
       'Content-Range': `bytes ${this.offset}-${end - 1}/${this.size}`
     };
-    const _ = await this.request({
+    await this.request({
       method: 'POST',
       body,
       url: this.url,
-      headers,
-      progress: true
+      headers
     });
     return this.getOffsetFromResponse();
   }
-  private getOffsetFromResponse() {
+  private getOffsetFromResponse(): number {
     if (this.responseStatus === 201) {
       const [total, end, start] = this.response
         .split(/\D+/)
         .filter((v: string) => v.length)
-        .map((s: string) => +s)
+        .map(Number)
         .reverse();
+
       if (isNaN(end)) {
         throw new Error('Range is missing!');
       }
-      this.ready = end + 1;
-      return this.ready;
+      this.offset = end + 1;
+      return this.offset;
     } else if (this.responseStatus === 200) {
       return this.size;
     }
-    return this.ready;
+    return this.offset;
   }
 
   // abort not supported

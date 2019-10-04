@@ -20,7 +20,7 @@ const writeFile = util.promisify(fs.writeFile);
     newPackage.peerDependencies = oldPackage.peerDependencies;
     newPackage.ngPackage = {
       lib: {
-        entryFile: 'src/public_api.ts'
+        entryFile: 'src/public-api.ts'
       },
       dest: '../../dist/uploadx',
       deleteDestPath: true
