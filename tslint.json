@@ -47,6 +47,8 @@
     "directive-class-suffix": true,
     "only-arrow-functions": false,
     "variable-name": false,
-    "no-unused-expression": false
+    "no-unused-expression": false,
+    "no-unnecessary-callback-wrapper": true,
+    "file-name-casing": [true, "kebab-case"]
   }
 }

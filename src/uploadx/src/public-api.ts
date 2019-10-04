@@ -1,4 +1,4 @@
-export { ErrorHandler } from './error_handler';
+export { ErrorHandler } from './error-handler';
 export * from './interfaces';
 export { Tus } from './tus';
 export * from './uploader';
