@@ -1,4 +1,4 @@
-import { ErrorHandler, ErrorType } from './error_handler';
+import { ErrorHandler, ErrorType } from './error-handler';
 import { UploaderOptions, UploadState, UploadStatus, UploadxControlEvent } from './interfaces';
 import { store } from './store';
 import { actionToStatusMap, createHash, dynamicChunk, isNumber, noop, unfunc } from './utils';

@@ -1,4 +1,4 @@
-import { ErrorHandler } from './error_handler';
+import { ErrorHandler } from './error-handler';
 import { Uploader } from './uploader';
 
 function getFile(): File {
