@@ -123,9 +123,9 @@ export abstract class Uploader implements UploadState {
     try {
       await this.getToken();
       this.offset = undefined;
+      this.startTime = new Date().getTime();
       this.url = this.url || (await this.getFileUrl());
       this.errorHandler.reset();
-      this.startTime = new Date().getTime();
       this.start();
     } catch {
       if (this.errorHandler.kind(this.responseStatus) !== ErrorType.FatalError) {
@@ -188,38 +188,39 @@ export abstract class Uploader implements UploadState {
    */
   async start() {
     while (this.status === 'uploading' || this.status === 'retry') {
-      try {
-        const offset = isNumber(this.offset)
-          ? await this.sendFileContent()
-          : await this.getOffset();
-        if (offset === this.size) {
+      if (this.offset !== this.size) {
+        try {
+          const offset = isNumber(this.offset)
+            ? await this.sendFileContent()
+            : await this.getOffset();
+          if (offset === this.offset) {
+            throw new Error('Content upload failed');
+          }
+          this.errorHandler.reset();
+          this.chunkSize = this.options.chunkSize ? this.chunkSize : dynamicChunk.scale(this.speed);
           this.offset = offset;
-          this.progress = 100;
-          this.remaining = 0;
-          this.status = 'complete';
-        } else if (offset === this.offset) {
-          throw new Error('Content upload failed');
+        } catch {
+          const errType = this.errorHandler.kind(this.responseStatus);
+          if (this.responseStatus === 413) {
+            dynamicChunk.maxSize = this.chunkSize /= 2;
+          } else if (errType === ErrorType.FatalError) {
+            this.status = 'error';
+          } else if (errType === ErrorType.Restart) {
+            this.url = '';
+            this.status = 'queue';
+          } else if (errType === ErrorType.Auth) {
+            await this.getToken();
+          } else {
+            this.status = 'retry';
+            await this.errorHandler.wait();
+            this.offset = this.responseStatus >= 400 ? undefined : this.offset;
+            this.status = 'uploading';
+          }
         }
-        this.errorHandler.reset();
-        this.chunkSize = this.options.chunkSize ? this.chunkSize : dynamicChunk.scale(this.speed);
-        this.offset = offset;
-      } catch {
-        const errType = this.errorHandler.kind(this.responseStatus);
-        if (this.responseStatus === 413) {
-          dynamicChunk.maxSize = this.chunkSize /= 2;
-        } else if (errType === ErrorType.FatalError) {
-          this.status = 'error';
-        } else if (errType === ErrorType.Restart) {
-          this.url = '';
-          this.status = 'queue';
-        } else if (errType === ErrorType.Auth) {
-          await this.getToken();
-        } else {
-          this.status = 'retry';
-          await this.errorHandler.wait();
-          this.offset = this.responseStatus >= 400 ? undefined : this.offset;
-          this.status = 'uploading';
-        }
+      } else {
+        this.progress = 100;
+        this.remaining = 0;
+        this.status = 'complete';
       }
     }
   }
