@@ -51,7 +51,6 @@
     "@commitlint/cli": "^8.0.0",
     "@commitlint/config-conventional": "^8.0.0",
     "@commitlint/travis-cli": "^8.0.0",
-    "@schuchard/prettier": "^3.1.0",
     "@types/jasmine": "^3.3.8",
     "@types/jasminewd2": "^2.0.6",
     "@types/node": "^10.12.18",
@@ -76,6 +75,7 @@
     "tslib": "^1.9.0",
     "tslint": "~5.16.0",
     "tslint-config-prettier": "1.18.0",
+    "tslint-plugin-prettier": "^2.0.1",
     "typescript": "~3.2.4"
   },
   "peerDependencies": {
