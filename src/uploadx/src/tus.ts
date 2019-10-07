@@ -2,6 +2,11 @@ import { UploadxOptions } from './interfaces';
 import { Uploader } from './uploader';
 import { b64, resolveUrl } from './utils';
 
+/**
+ * Implements tus resumable upload protocol
+ * @see
+ * https://github.com/tus/tus-resumable-upload-protocol/blob/master/protocol.md
+ */
 export class Tus extends Uploader {
   constructor(readonly file: File, options: UploadxOptions) {
     super(file, options);
