@@ -1,4 +1,4 @@
-import { UploaderX } from '../../uploadx';
+import { UploaderX } from 'ngx-uploadx';
 
 export class UploaderExt extends UploaderX {
   // Disable delete files on cancel

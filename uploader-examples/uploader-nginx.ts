@@ -1,4 +1,4 @@
-import { UploadxOptions, Uploader } from 'ngx-uploadx';
+import { Uploader, UploadxOptions } from 'ngx-uploadx';
 
 /**
  * Implements nginx-upload-module resumable uploads protocol.

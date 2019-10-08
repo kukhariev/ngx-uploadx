@@ -1,8 +1,8 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { UploadState, UploadxOptions, UploadxService } from '../../uploadx';
 import { Ufile } from '../ufile';
 import { UploaderExt } from './uploader-ext.class';
 

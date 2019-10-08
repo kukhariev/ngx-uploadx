@@ -1,4 +1,4 @@
-import { b64, resolveUrl, Tus } from '../dist/uploadx/ngx-uploadx';
+import { b64, resolveUrl, Tus } from 'ngx-uploadx';
 
 /**
  * Implements tus resumable upload protocol

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
-import { UploadxModule } from '../uploadx';
+import { UploadxModule } from 'ngx-uploadx';
 import { AppComponent } from './app.component';
 import { AppRoutes } from './app.routes';
 import { DirectiveWayComponent } from './directive-way/directive-way.component';
