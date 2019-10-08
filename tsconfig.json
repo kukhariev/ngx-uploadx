@@ -10,7 +10,10 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es2015",
-    "baseUrl": "./",
+    "baseUrl": ".",
+    "paths": {
+      "ngx-uploadx": ["src/uploadx/"]
+    },
     "noImplicitAny": true,
     "noImplicitThis": true,
     "alwaysStrict": true,

@@ -1,6 +1,4 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
-import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
 import {
   dynamicChunk,
   ErrorHandler,
@@ -8,7 +6,9 @@ import {
   UploadState,
   UploadxOptions,
   UploadxService
-} from '../../uploadx';
+} from 'ngx-uploadx';
+import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { AuthService } from '../auth.service';
 
 const { deviceMemory } = navigator as any;

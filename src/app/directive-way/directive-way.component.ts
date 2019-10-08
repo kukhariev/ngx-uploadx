@@ -1,8 +1,8 @@
 import { Component, OnDestroy } from '@angular/core';
+import { UploadState, UploadxControlEvent, UploadxOptions } from 'ngx-uploadx';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { UploadState, UploadxControlEvent, UploadxOptions } from '../../uploadx';
 import { Ufile } from '../ufile';
 
 @Component({

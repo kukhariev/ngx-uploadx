@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Uploader, UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Uploader, UploadState, UploadxOptions, UploadxService } from '../../uploadx';
 
 @Component({
   selector: 'app-multiple-directive',
