@@ -1,7 +1,7 @@
-import { Uploader } from 'ngx-uploadx';
+import { resolveUrl, Uploader } from 'ngx-uploadx';
 
 /**
- * multipart/form-data upload example
+ * multipart/form-data uploader example
  */
 export class MultiPart extends Uploader {
   async getFileUrl(): Promise<string> {
@@ -15,7 +15,8 @@ export class MultiPart extends Uploader {
       url: this.endpoint
     });
     this.offset = this.size;
-    return this.endpoint;
+    const location = this.getValueFromResponse('location');
+    return location ? resolveUrl(location, this.endpoint) : '';
   }
 
   async sendFileContent(): Promise<number | undefined> {

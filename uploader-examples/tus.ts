@@ -30,7 +30,7 @@ export class TusExt extends Tus {
     if (!location) {
       throw new Error('Invalid or missing Location header');
     }
-    this.offset = this.getOffsetFromResponse() || (this.responseStatus === 201 ? 0 : undefined);
+    this.offset = this.getOffsetFromResponse() || this.size;
     return resolveUrl(location, this.endpoint);
   }
 }
