@@ -5,7 +5,7 @@ import { actionToStatusMap, createHash, dynamicChunk, isNumber, noop, unfunc } f
 
 interface RequestParams {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
-  body?: string | Blob | null;
+  body?: string | Blob | FormData | null;
   url?: string;
   headers?: Record<string, string>;
 }
@@ -237,7 +237,7 @@ export abstract class Uploader implements UploadState {
     return new Promise((resolve, reject) => {
       const xhr = (this._xhr = new XMLHttpRequest());
       xhr.open(method, url || this.url, true);
-      if (body instanceof Blob) {
+      if (body instanceof Blob || body instanceof FormData) {
         xhr.upload.onprogress = this.onProgress();
       }
       this.responseStatus = 0;
