@@ -81,7 +81,7 @@ export class AppHomeComponent {
 
 - `metadata`: Custom uploads metadata
 
-- `uploaderClass`: provide a user-defined class to support another upload protocol or to extend an existing one.
+- `uploaderClass`: Upload API implementation. Built-in: `Uploaderx`(default), `Tus`. More [examples](uploader-examples).
 
 - `token`: Authorization token as a `string` or function returning a `string` or `Promise<string>`
 

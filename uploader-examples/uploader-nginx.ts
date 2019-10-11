@@ -4,6 +4,13 @@ import { Uploader, UploadxOptions } from 'ngx-uploadx';
  * Implements nginx-upload-module resumable uploads protocol.
  * @see
  * https://github.com/fdintino/nginx-upload-module/blob/master/upload-protocol.md
+ *
+ *  @example
+ *
+ *   options: UploadxOptions = {
+ *     endpoint: '/files'
+ *     uploaderClass: NginxUploadModuleUploader
+ *   };
  */
 export class NginxUploadModuleUploader extends Uploader {
   offset: number;
@@ -37,7 +44,7 @@ export class NginxUploadModuleUploader extends Uploader {
   }
   private getOffsetFromResponse(): number {
     if (this.responseStatus === 201) {
-      const [total, end, start] = this.response
+      const [, end] = this.response
         .split(/\D+/)
         .filter((v: string) => v.length)
         .map(Number)

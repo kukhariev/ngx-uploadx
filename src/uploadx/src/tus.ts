@@ -19,7 +19,6 @@ export class Tus extends Uploader {
       'Upload-Length': `${this.size}`,
       'Upload-Metadata': `${encodedMetaData}`
     };
-
     await this.request({
       method: 'POST',
       url: this.endpoint,

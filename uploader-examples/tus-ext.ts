@@ -5,7 +5,15 @@ import { b64, resolveUrl, Tus } from 'ngx-uploadx';
  * @see
  * https://github.com/tus/tus-resumable-upload-protocol/blob/master/protocol.md
  *
- * Creation With Upload extension
+ * `Creation With Upload` extension
+ *
+ * @example
+ *
+ *   options: UploadxOptions = {
+ *     allowedTypes: 'image/*,video/*',
+ *     endpoint: `https://master.tus.io/files/`,
+ *     uploaderClass: TusExt
+ *   };
  */
 export class TusExt extends Tus {
   async getFileUrl(): Promise<string> {
@@ -19,7 +27,6 @@ export class TusExt extends Tus {
       'Content-Type': 'application/offset+octet-stream',
       'Upload-Offset': `${this.offset}`
     };
-
     await this.request({
       method: 'POST',
       url: this.endpoint,
@@ -30,7 +37,7 @@ export class TusExt extends Tus {
     if (!location) {
       throw new Error('Invalid or missing Location header');
     }
-    this.offset = this.getOffsetFromResponse() || (this.responseStatus === 201 ? 0 : undefined);
+    this.offset = this.getOffsetFromResponse() || this.size;
     return resolveUrl(location, this.endpoint);
   }
 }
