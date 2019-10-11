@@ -8,6 +8,7 @@ interface RequestParams {
   body?: BodyInit | null;
   url?: string;
   headers?: Record<string, string>;
+  progress?: boolean;
 }
 /**
  * Uploader Base Class
@@ -229,15 +230,16 @@ export abstract class Uploader implements UploadState {
    * Request method
    */
   protected request({
-    method,
+    method = 'GET',
     body = null,
     url,
-    headers = {}
+    headers = {},
+    progress
   }: RequestParams): Promise<ProgressEvent> {
     return new Promise((resolve, reject) => {
       const xhr = (this._xhr = new XMLHttpRequest());
       xhr.open(method, url || this.url, true);
-      if (body instanceof Blob) {
+      if (body instanceof Blob || (body && progress)) {
         xhr.upload.onprogress = this.onProgress();
       }
       this.responseStatus = 0;
