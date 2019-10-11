@@ -5,7 +5,7 @@ import { actionToStatusMap, createHash, dynamicChunk, isNumber, noop, unfunc } f
 
 interface RequestParams {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
-  body?: string | Blob | null;
+  body?: BodyInit | null;
   url?: string;
   headers?: Record<string, string>;
 }
