@@ -61,6 +61,25 @@ describe('configure', () => {
   });
 });
 
+describe('chunkSize', () => {
+  let uploader: MockUploader;
+  it('should use adaptive chunkSize if not specified', async function() {
+    uploader = new MockUploader(getFile(), {});
+    (uploader as any).getChunk();
+    expect(uploader.chunkSize).toEqual(4096 * 256);
+  });
+  it('should set fixed chunkSize', async function() {
+    uploader = new MockUploader(file, { chunkSize: 4_194_304 });
+    (uploader as any).getChunk();
+    expect(uploader.chunkSize).toEqual(4_194_304);
+  });
+  it('should disable chunks', async function() {
+    uploader = new MockUploader(file, { chunkSize: 0 });
+    (uploader as any).getChunk();
+    expect(uploader.chunkSize).toEqual(1);
+  });
+});
+
 describe('upload()', () => {
   let uploader: MockUploader;
   beforeEach(() => {

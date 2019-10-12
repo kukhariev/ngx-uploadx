@@ -1,7 +1,7 @@
 import { ErrorHandler, ErrorType } from './error-handler';
 import { UploaderOptions, UploadState, UploadStatus, UploadxControlEvent } from './interfaces';
 import { store } from './store';
-import { actionToStatusMap, createHash, dynamicChunk, isNumber, noop, unfunc } from './utils';
+import { actionToStatusMap, createHash, DynamicChunk, isNumber, noop, unfunc } from './utils';
 
 interface RequestParams {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
@@ -53,7 +53,7 @@ export abstract class Uploader implements UploadState {
     });
     this.uploadId = createHash(print).toString(16);
     this.stateChange = options.stateChange || noop;
-    this.chunkSize = options.chunkSize || dynamicChunk.size;
+    this.chunkSize = options.chunkSize || this.size;
     this.configure(options);
   }
   private _status: UploadStatus;
@@ -106,7 +106,7 @@ export abstract class Uploader implements UploadState {
   private cleanup = () => store.delete(this.uploadId);
 
   /**
-   * Configure or reconfigure uploader
+   * Configure uploader
    */
   configure({ metadata = {}, headers = {}, token, endpoint, action }: UploadxControlEvent): void {
     this.endpoint = endpoint || this.endpoint;
@@ -117,7 +117,7 @@ export abstract class Uploader implements UploadState {
   }
 
   /**
-   * Initiate upload
+   * Starts uploading
    */
   async upload(): Promise<void> {
     this.status = 'uploading';
@@ -185,7 +185,7 @@ export abstract class Uploader implements UploadState {
   }
 
   /**
-   * Starts the actual uploading
+   * Starts chunk upload
    */
   async start() {
     while (this.status === 'uploading' || this.status === 'retry') {
@@ -198,12 +198,11 @@ export abstract class Uploader implements UploadState {
             throw new Error('Content upload failed');
           }
           this.errorHandler.reset();
-          this.chunkSize = this.options.chunkSize ? this.chunkSize : dynamicChunk.scale(this.speed);
           this.offset = offset;
         } catch {
           const errType = this.errorHandler.kind(this.responseStatus);
           if (this.responseStatus === 413) {
-            dynamicChunk.maxSize = this.chunkSize /= 2;
+            DynamicChunk.maxSize = this.chunkSize /= 2;
           } else if (errType === ErrorType.FatalError) {
             this.status = 'error';
           } else if (errType === ErrorType.Restart) {
@@ -227,7 +226,7 @@ export abstract class Uploader implements UploadState {
   }
 
   /**
-   * Request method
+   * Performs http requests
    */
   protected request({
     method = 'GET',
@@ -249,8 +248,9 @@ export abstract class Uploader implements UploadState {
       const _headers = { ...this.headers, ...headers };
       Object.keys(_headers).forEach(key => xhr.setRequestHeader(key, _headers[key]));
       xhr.onload = (evt: ProgressEvent) => {
-        this.processResponse(xhr);
-        this.responseStatus >= 400 ? reject(evt) : resolve(evt);
+        this.responseStatus = xhr.status;
+        this.response = this.responseStatus !== 204 ? this.getResponseBody(xhr) : '';
+        xhr.status >= 400 ? reject(evt) : resolve(evt);
       };
       xhr.onerror = reject;
       xhr.send(body);
@@ -268,15 +268,13 @@ export abstract class Uploader implements UploadState {
   }
 
   protected getChunk() {
-    const start = this.offset as number;
+    this.chunkSize = isNumber(this.options.chunkSize)
+      ? this.chunkSize
+      : DynamicChunk.scale(this.speed);
+    const start = this.offset || 0;
     const end = this.chunkSize ? Math.min(start + this.chunkSize, this.size) : this.size;
     const body = this.file.slice(this.offset, end);
     return { start, end, body };
-  }
-
-  private processResponse(xhr: XMLHttpRequest): void {
-    this.responseStatus = xhr.status;
-    this.response = this.responseStatus !== 204 ? this.getResponseBody(xhr) : '';
   }
 
   private onProgress(): (evt: ProgressEvent) => void {

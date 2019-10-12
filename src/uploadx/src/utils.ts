@@ -88,26 +88,26 @@ export const b64 = {
 };
 
 /**
- * Dynamic chunk size adjuster
+ * Adaptive chunk size
  */
-export const dynamicChunk = {
+export class DynamicChunk {
   /** Maximum chunk size in bytes */
-  maxSize: Number.MAX_SAFE_INTEGER,
-
+  static maxSize = Number.MAX_SAFE_INTEGER;
   /** Minimum chunk size in bytes */
-  minSize: 4096, // default blocksize of most FSs
-
+  static minSize = 4096;
   /** Initial chunk size in bytes */
-  size: 4096 * 256,
+  static size = 4096 * 256;
 
-  scale: (speed: number) => {
-    const elapsedTime = dynamicChunk.size / speed;
-    if (elapsedTime < 2) {
-      dynamicChunk.size = Math.min(dynamicChunk.maxSize, dynamicChunk.size * 2);
+  static scale(throughput?: number) {
+    if (throughput) {
+      const elapsedTime = DynamicChunk.size / throughput;
+      if (elapsedTime < 2) {
+        DynamicChunk.size = Math.min(DynamicChunk.maxSize, DynamicChunk.size * 2);
+      }
+      if (elapsedTime > 8) {
+        DynamicChunk.size = Math.max(DynamicChunk.minSize, DynamicChunk.size / 2);
+      }
     }
-    if (elapsedTime > 8) {
-      dynamicChunk.size = Math.max(dynamicChunk.minSize, dynamicChunk.size / 2);
-    }
-    return dynamicChunk.size;
+    return DynamicChunk.size;
   }
-};
+}
