@@ -6,6 +6,13 @@ import { Uploader } from './uploader';
 import { UploaderX } from './uploaderx';
 import { pick } from './utils';
 
+interface DefaultOptions {
+  endpoint: string;
+  autoUpload: boolean;
+  concurrency: number;
+  stateChange: (evt: Uploader) => void;
+}
+
 @Injectable({ providedIn: 'root' })
 export class UploadxService implements OnDestroy {
   static stateKeys: (keyof UploadState)[] = [
@@ -24,17 +31,13 @@ export class UploadxService implements OnDestroy {
   private readonly eventsStream: Subject<UploadState> = new Subject();
   private subs: Subscription[] = [];
 
-  /**
-   * Upload status events
-   */
+  /** Upload status events */
   get events() {
     return this.eventsStream.asObservable();
   }
-  /**
-   * Array of the upload queue
-   */
+  /** Upload Queue */
   queue: Uploader[] = [];
-  options: UploadxOptions = {
+  options: UploadxOptions & DefaultOptions = {
     endpoint: '/upload',
     autoUpload: true,
     concurrency: 2,
@@ -86,6 +89,7 @@ export class UploadxService implements OnDestroy {
     this.queue.forEach(uploader => (uploader.status = 'paused'));
     this.queue = [];
   }
+
   ngOnDestroy(): void {
     this.disconnect();
     this.subs.forEach(sub => sub.unsubscribe());
@@ -115,10 +119,6 @@ export class UploadxService implements OnDestroy {
     uploader.status = 'added';
   }
 
-  /**
-   * Auto upload the files if the flag is true
-   * @internal
-   */
   private autoUploadFiles(): void {
     if (this.options.autoUpload && window.navigator.onLine) {
       this.queue
@@ -144,22 +144,17 @@ export class UploadxService implements OnDestroy {
     target.forEach(uploader => uploader.configure(evt));
   }
 
-  /**
-   * Queue management
-   * @internal
-   */
   private processQueue(): void {
-    // Remove Cancelled Items from local queue
     this.queue = this.queue.filter(({ status }) => status !== 'cancelled');
 
     this.queue
       .filter(({ status }) => status === 'queue')
-      .slice(0, Math.max((this.options.concurrency || 2) - this.runningProcess(), 0))
+      .slice(0, Math.max(this.options.concurrency - this.runningProcess(), 0))
       .forEach(uploader => uploader.upload());
   }
 
   /**
-   * @returns number of active uploads
+   * Returns number of active uploads
    */
   runningProcess(): number {
     return this.queue.filter(({ status }) => status === 'uploading' || status === 'retry').length;
