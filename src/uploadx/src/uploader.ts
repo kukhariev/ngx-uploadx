@@ -252,9 +252,7 @@ export abstract class Uploader implements UploadState {
   }
 
   protected getChunk() {
-    this.chunkSize = isNumber(this.options.chunkSize)
-      ? this.chunkSize
-      : DynamicChunk.scale(this.speed);
+    this.chunkSize = isNumber(this.options.chunkSize) ? this.chunkSize : DynamicChunk.size;
     const start = this.offset || 0;
     const end = Math.min(start + this.chunkSize, this.size);
     const body = this.file.slice(this.offset, end);
@@ -264,13 +262,14 @@ export abstract class Uploader implements UploadState {
   private onProgress(): (evt: ProgressEvent) => void {
     let throttle = 0;
     return ({ loaded }: ProgressEvent) => {
+      const now = new Date().getTime();
+      const uploaded = (this.offset as number) + loaded;
+      const elapsedTime = (now - this.startTime) / 1000;
+      this.speed = Math.round(uploaded / elapsedTime);
+      DynamicChunk.scale(this.speed);
       if (!throttle) {
         throttle = window.setTimeout(() => (throttle = 0), 500);
-        const now = new Date().getTime();
-        const uploaded = (this.offset as number) + loaded;
         this.progress = +((uploaded / this.size) * 100).toFixed(2);
-        const elapsedTime = (now - this.startTime) / 1000;
-        this.speed = Math.round(uploaded / elapsedTime);
         this.remaining = Math.ceil((this.size - uploaded) / this.speed);
         this.stateChange(this);
       }
