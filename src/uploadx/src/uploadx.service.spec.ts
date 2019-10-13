@@ -114,4 +114,11 @@ describe('UploadxService', () => {
     expect(service.queue[3].status).toEqual('queue');
     service.disconnect();
   });
+
+  it('should listen offline/online events', () => {
+    const control = spyOn(service, 'control');
+    window.dispatchEvent(new Event('offline'));
+    window.dispatchEvent(new Event('online'));
+    expect(control).toHaveBeenCalledTimes(2);
+  });
 });
