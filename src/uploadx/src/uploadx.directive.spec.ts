@@ -17,23 +17,30 @@ class UploadxTestComponent {
   action = { action: 'pause' };
 }
 
+const file = new File([''], 'filename.mp4');
+const files: FileList = {
+  0: file,
+  length: 1,
+  item: () => file
+};
+
 describe('Directive: UploadxDirective', () => {
-  // let component: UploadxTestComponent;
   let fixture: ComponentFixture<UploadxTestComponent>;
   let inputEl: DebugElement;
-  let uploadService: UploadxService;
-  let uploadServiceSpy: jasmine.Spy;
-
+  let service: UploadxService;
+  let serviceControlSpy: jasmine.Spy;
+  let serviceHandleFileListSpy: jasmine.Spy;
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [UploadxTestComponent, UploadxDirective],
       providers: [UploadxService]
     }).compileComponents();
     fixture = TestBed.createComponent(UploadxTestComponent);
-    // component = fixture.componentInstance;
+
     inputEl = fixture.debugElement.query(By.css('input'));
-    uploadService = fixture.debugElement.injector.get<UploadxService>(UploadxService);
-    uploadServiceSpy = spyOn(uploadService, 'control').and.callThrough();
+    service = fixture.debugElement.injector.get<UploadxService>(UploadxService);
+    serviceControlSpy = spyOn(service, 'control');
+    serviceHandleFileListSpy = spyOn(service, 'handleFileList');
   });
 
   it('has attribute "accept"', () => {
@@ -46,6 +53,11 @@ describe('Directive: UploadxDirective', () => {
   });
   it('set uploadxAction', () => {
     fixture.detectChanges();
-    expect(uploadServiceSpy).toHaveBeenCalled();
+    expect(serviceControlSpy).toHaveBeenCalled();
+  });
+  it('fileListener', () => {
+    inputEl.triggerEventHandler('change', { target: { files } });
+    fixture.detectChanges();
+    expect(serviceHandleFileListSpy).toHaveBeenCalled();
   });
 });

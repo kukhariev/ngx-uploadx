@@ -10,6 +10,7 @@ interface RequestParams {
   headers?: Record<string, string>;
   progress?: boolean;
 }
+
 /**
  * Uploader Base Class
  */
@@ -66,41 +67,24 @@ export abstract class Uploader implements UploadState {
   remaining: number;
   speed: number;
   protected _url = '';
-
   /** Custom headers */
   headers: Record<string, any> = {};
-
   /** Metadata Object */
   metadata: Record<string, any>;
-
   /** Upload endpoint */
   endpoint = '/upload';
-
-  /**
-   * Chunk size in bytes
-   */
+  /** Chunk size in bytes */
   chunkSize: number;
-  /**
-   * Auth token/tokenGetter
-   */
+  /** Auth token/tokenGetter */
   token: UploadxControlEvent['token'];
-  /**
-   * Retries handler
-   */
+  /** Retries handler */
   protected errorHandler = new ErrorHandler();
-  /**
-   * Active HttpRequest
-   */
+  /** Active HttpRequest */
   protected _xhr: XMLHttpRequest;
-  /**
-   * byte offset within the whole file
-   */
+  /** byte offset within the whole file */
   protected offset? = 0;
-  /**
-   * Set HttpRequest responseType
-   */
+  /** Set HttpRequest responseType */
   protected responseType: XMLHttpRequestResponseType = '';
-
   private startTime: number;
   private stateChange: (evt: UploadState) => void;
   private cleanup = () => store.delete(this.uploadId);
@@ -250,7 +234,7 @@ export abstract class Uploader implements UploadState {
       xhr.onload = (evt: ProgressEvent) => {
         this.responseStatus = xhr.status;
         this.response = this.responseStatus !== 204 ? this.getResponseBody(xhr) : '';
-        xhr.status >= 400 ? reject(evt) : resolve(evt);
+        this.responseStatus >= 400 ? reject(evt) : resolve(evt);
       };
       xhr.onerror = reject;
       xhr.send(body);
@@ -272,7 +256,7 @@ export abstract class Uploader implements UploadState {
       ? this.chunkSize
       : DynamicChunk.scale(this.speed);
     const start = this.offset || 0;
-    const end = this.chunkSize ? Math.min(start + this.chunkSize, this.size) : this.size;
+    const end = Math.min(start + this.chunkSize, this.size);
     const body = this.file.slice(this.offset, end);
     return { start, end, body };
   }
