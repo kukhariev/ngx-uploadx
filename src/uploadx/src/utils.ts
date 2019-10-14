@@ -1,5 +1,4 @@
 // tslint:disable: no-bitwise
-import { UploadAction, UploadStatus } from './interfaces';
 
 function safeMatch(base: string, re: RegExp) {
   return (base.match(re) || [])[0] || '';
@@ -36,15 +35,6 @@ export function isNumber(x: unknown): x is number {
 export function isString(x: unknown): x is string {
   return typeof x === 'string';
 }
-
-export const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
-  pause: 'paused',
-  pauseAll: 'paused',
-  upload: 'queue',
-  uploadAll: 'queue',
-  cancel: 'cancelled',
-  cancelAll: 'cancelled'
-};
 
 /**
  * 32-bit FNV-1a hash function
@@ -97,16 +87,16 @@ export class DynamicChunk {
   static minSize = 4096;
   /** Initial chunk size in bytes */
   static size = 4096 * 256;
+  static minChunkTime = 2;
+  static maxChunkTime = 8;
 
-  static scale(throughput?: number) {
-    if (throughput) {
-      const elapsedTime = DynamicChunk.size / throughput;
-      if (elapsedTime < 2) {
-        DynamicChunk.size = Math.min(DynamicChunk.maxSize, DynamicChunk.size * 2);
-      }
-      if (elapsedTime > 8) {
-        DynamicChunk.size = Math.max(DynamicChunk.minSize, DynamicChunk.size / 2);
-      }
+  static scale(throughput: number) {
+    const elapsedTime = DynamicChunk.size / throughput;
+    if (elapsedTime < DynamicChunk.minChunkTime) {
+      DynamicChunk.size = Math.min(DynamicChunk.maxSize, DynamicChunk.size * 2);
+    }
+    if (elapsedTime > DynamicChunk.maxChunkTime) {
+      DynamicChunk.size = Math.max(DynamicChunk.minSize, DynamicChunk.size / 2);
     }
     return DynamicChunk.size;
   }

@@ -1,8 +1,22 @@
 import { ErrorHandler, ErrorType } from './error-handler';
-import { UploaderOptions, UploadState, UploadStatus, UploadxControlEvent } from './interfaces';
+import {
+  UploadAction,
+  UploaderOptions,
+  UploadState,
+  UploadStatus,
+  UploadxControlEvent
+} from './interfaces';
 import { store } from './store';
-import { actionToStatusMap, createHash, DynamicChunk, isNumber, noop, unfunc } from './utils';
+import { createHash, DynamicChunk, isNumber, noop, unfunc } from './utils';
 
+const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
+  pause: 'paused',
+  upload: 'queue',
+  cancel: 'cancelled',
+  uploadAll: 'queue',
+  pauseAll: 'paused',
+  cancelAll: 'cancelled'
+};
 interface RequestParams {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
   body?: BodyInit | null;
@@ -21,10 +35,9 @@ export abstract class Uploader implements UploadState {
     }
     if (s !== this._status) {
       s === 'paused' && this.abort();
-      s === 'cancelled' && this.onCancel();
-      ['cancelled', 'complete', 'error'].includes(s) && this.cleanup();
       this._status = s;
-      this.stateChange(this);
+      ['cancelled', 'complete', 'error'].includes(s) && this.cleanup();
+      s === 'cancelled' ? this.onCancel() : this.stateChange(this);
     }
   }
   get status() {
@@ -149,7 +162,10 @@ export abstract class Uploader implements UploadState {
 
   protected onCancel(): void {
     this.abort();
-    this.url && this.request({ method: 'DELETE' }).catch(err => {});
+    this.url &&
+      this.request({ method: 'DELETE' })
+        .catch(err => {})
+        .then(() => this.stateChange(this));
   }
 
   /**
