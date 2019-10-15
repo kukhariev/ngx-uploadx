@@ -1,4 +1,3 @@
-import { UploadxOptions } from './interfaces';
 import { Uploader } from './uploader';
 import { b64, resolveUrl } from './utils';
 
@@ -8,10 +7,7 @@ import { b64, resolveUrl } from './utils';
  * https://github.com/tus/tus-resumable-upload-protocol/blob/master/protocol.md
  */
 export class Tus extends Uploader {
-  constructor(readonly file: File, options: UploadxOptions) {
-    super(file, options);
-    this.headers['Tus-Resumable'] = '1.0.0';
-  }
+  headers = { 'Tus-Resumable': '1.0.0' };
 
   async getFileUrl(): Promise<string> {
     const encodedMetaData = b64.serialize(this.metadata);

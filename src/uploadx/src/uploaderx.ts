@@ -1,4 +1,3 @@
-import { UploadxOptions } from './interfaces';
 import { Uploader } from './uploader';
 import { isString, resolveUrl } from './utils';
 /**
@@ -7,11 +6,7 @@ import { isString, resolveUrl } from './utils';
  * https://developers.google.com/drive/api/v3/manage-uploads#resumable
  */
 export class UploaderX extends Uploader {
-  constructor(readonly file: File, options: UploadxOptions) {
-    super(file, options);
-    this.responseType = 'json' as XMLHttpRequestResponseType;
-  }
-
+  responseType = 'json' as XMLHttpRequestResponseType;
   async getFileUrl(): Promise<string> {
     if (this.url) {
       this.offset = undefined;

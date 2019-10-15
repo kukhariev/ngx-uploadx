@@ -1,4 +1,4 @@
-import { Uploader, UploadxOptions } from 'ngx-uploadx';
+import { Uploader } from 'ngx-uploadx';
 
 /**
  * Implements nginx-upload-module resumable uploads protocol.
@@ -13,11 +13,8 @@ import { Uploader, UploadxOptions } from 'ngx-uploadx';
  *   };
  */
 export class NginxUploadModuleUploader extends Uploader {
-  offset: number;
-  constructor(readonly file: File, options: UploadxOptions) {
-    super(file, options);
-    this.offset = 0;
-  }
+  offset = 0;
+
   async getFileUrl(): Promise<string> {
     return this.endpoint;
   }
