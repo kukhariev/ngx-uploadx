@@ -56,7 +56,7 @@ export abstract class Uploader implements UploadState {
     this.size = file.size;
     this.metadata = {
       name: file.name,
-      mimeType: file.type,
+      mimeType: file.type || 'application/octet-stream',
       size: file.size,
       lastModified: file.lastModified
     };
