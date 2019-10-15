@@ -32,17 +32,12 @@ export class UploadxDirective implements OnInit {
   ) {}
 
   ngOnInit() {
-    if (!this.uploadx || this.uploadx.multiple !== false) {
-      this.renderer.setAttribute(this.elementRef.nativeElement, 'multiple', '');
-    }
+    const { multiple, allowedTypes } = this.uploadx;
 
-    if (this.uploadx && this.uploadx.allowedTypes) {
-      this.renderer.setAttribute(
-        this.elementRef.nativeElement,
-        'accept',
-        this.uploadx.allowedTypes
-      );
-    }
+    multiple !== false && this.renderer.setAttribute(this.elementRef.nativeElement, 'multiple', '');
+
+    allowedTypes &&
+      this.renderer.setAttribute(this.elementRef.nativeElement, 'accept', allowedTypes);
 
     this.uploadxState.emit(this.uploadService.events);
   }
