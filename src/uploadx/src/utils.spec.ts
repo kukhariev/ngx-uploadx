@@ -1,4 +1,4 @@
-import { b64, isNumber, resolveUrl } from './utils';
+import { b64, DynamicChunk, isNumber, isString, resolveUrl, unfunc } from './utils';
 const urlTestData = [
   ['https://a/b/c', 'https://d/e/f?g=1', 'https://d/e/f?g=1'],
   ['http://a/b/c', 'https://d/e/f?g=2', 'https://d/e/f?g=2'],
@@ -42,5 +42,29 @@ describe('primitives', () => {
     expect(isNumber('')).toBe(false);
     expect(isNumber(undefined)).toBe(false);
     expect(isNumber(0)).toBe(true);
+  });
+  it('isString', () => {
+    expect(isString(undefined)).toBe(false);
+    expect(isString(1)).toBe(false);
+    expect(isString('1')).toBe(true);
+  });
+  it('unfunc', () => {
+    expect(unfunc(10, 2)).toBe(10);
+    expect(unfunc((x: number) => 10 * x, 2)).toBe(20);
+  });
+});
+
+describe('DynamicChunk', () => {
+  const init = DynamicChunk.size;
+  it('scale', () => {
+    expect(DynamicChunk.scale(0)).toEqual(init / 2);
+    expect(DynamicChunk.scale(0)).toEqual(init / 4);
+    expect(DynamicChunk.scale(Number.MAX_SAFE_INTEGER)).toEqual(init / 2);
+    expect(DynamicChunk.scale(Number.MAX_SAFE_INTEGER)).toEqual(init);
+    expect(DynamicChunk.scale(Number.MAX_SAFE_INTEGER)).toEqual(init * 2);
+    expect(DynamicChunk.scale(undefined as any)).toEqual(init * 2);
+  });
+  afterEach(() => {
+    DynamicChunk.size = init;
   });
 });
