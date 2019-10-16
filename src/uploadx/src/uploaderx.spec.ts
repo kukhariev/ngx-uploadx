@@ -1,23 +1,52 @@
 import { getRangeEnd, UploaderX } from './uploaderx';
 
-const file = new File([''], 'filename.mp4');
+const file_txt = new File(['123456'], 'filename.txt', { type: 'text/plain' });
+const file_no_type = new File([''], 'filename');
 describe('getFileUrl', () => {
   let upx: UploaderX;
   let req: jasmine.Spy;
   let getValueFromResponse: jasmine.Spy;
-  beforeEach(() => {
-    upx = new UploaderX(file, {});
-  });
   it('should set headers', async () => {
-    req = spyOn<any>(upx, 'request').and.callFake(function() {
-      expect(arguments[0].headers['X-Upload-Content-Type']).toEqual('application/octet-stream');
+    upx = new UploaderX(file_txt, {});
+    req = spyOn<any>(upx, 'request').and.callFake(({ headers }: any) => {
+      expect(headers['X-Upload-Content-Type']).toEqual('text/plain');
+      expect(headers['X-Upload-Content-Length']).toEqual('6');
     });
     getValueFromResponse = spyOn<any>(upx, 'getValueFromResponse').and.returnValue('/12345678');
-    expect(upx.name).toEqual('filename.mp4');
+    expect(upx.name).toEqual('filename.txt');
+    expect(upx.size).toEqual(6);
+    expect(await upx.getFileUrl()).toEqual('/12345678');
+    expect(req).toHaveBeenCalled();
+    expect(getValueFromResponse).toHaveBeenCalled();
+  });
+  it('should set default type header', async () => {
+    upx = new UploaderX(file_no_type, {});
+    req = spyOn<any>(upx, 'request').and.callFake(({ headers }: any) => {
+      expect(headers['X-Upload-Content-Type']).toEqual('application/octet-stream');
+      expect(headers['X-Upload-Content-Length']).toEqual('0');
+    });
+    getValueFromResponse = spyOn<any>(upx, 'getValueFromResponse').and.returnValue('/12345678');
+    expect(upx.name).toEqual('filename');
     expect(upx.size).toEqual(0);
     await upx.getFileUrl();
     expect(req).toHaveBeenCalled();
     expect(getValueFromResponse).toHaveBeenCalled();
+  });
+});
+describe('sendFileContent', () => {
+  let upx: UploaderX;
+  let req: jasmine.Spy;
+  let getOffsetFromResponse: jasmine.Spy;
+  it('should set Content-Range header', async () => {
+    upx = new UploaderX(file_txt, {});
+    req = spyOn<any>(upx, 'request').and.callFake(({ headers }: any) => {
+      expect(headers['Content-Type']).toEqual('application/octet-stream');
+      expect(headers['Content-Range']).toEqual('bytes 0-5/6');
+    });
+    getOffsetFromResponse = spyOn<any>(upx, 'getOffsetFromResponse').and.returnValue(6);
+    expect(await upx.sendFileContent()).toEqual(6);
+    expect(req).toHaveBeenCalled();
+    expect(getOffsetFromResponse).toHaveBeenCalled();
   });
 });
 describe('getRangeEnd', () => {
