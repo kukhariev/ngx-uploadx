@@ -8,10 +8,6 @@ import { isString, resolveUrl } from './utils';
 export class UploaderX extends Uploader {
   responseType = 'json' as XMLHttpRequestResponseType;
   async getFileUrl(): Promise<string> {
-    if (this.url) {
-      this.offset = undefined;
-      return this.url;
-    }
     const headers = {
       'Content-Type': 'application/json; charset=utf-8',
       'X-Upload-Content-Length': this.size.toString(),
