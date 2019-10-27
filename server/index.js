@@ -6,16 +6,19 @@ debug && (process.env.DEBUG = 'uploadx:*');
 const http = require('http');
 const url = require('url');
 const { tmpdir } = require('os');
-const { Uploadx, Tus, DiskStorage } = require('node-uploadx');
+const { Uploadx, Tus, DiskStorage, Multipart } = require('node-uploadx');
 
 const PORT = 3003;
 const USER_ID = 'ngx-uploadx-test';
 const UPLOADS_ROOT = `${tmpdir()}/${USER_ID}/`;
-const storage = new DiskStorage({ dest: (req, file) => `${UPLOADS_ROOT}/${file.filename}` });
-
+const storage = new DiskStorage({
+  dest: (req, file) => `${UPLOADS_ROOT}/${file.filename}`,
+  allowMIME: ['video/*', 'image/*']
+});
 
 const upx = new Uploadx({ storage });
 const tus = new Tus({ storage });
+const mpt = new Multipart({ storage });
 
 const server = http.createServer((req, res) => {
   if (emitErrors && Math.random() < 0.4 && req.method !== 'OPTIONS' && req.method !== 'DELETE') {
@@ -23,10 +26,16 @@ const server = http.createServer((req, res) => {
     res.statusCode = Math.random() < 0.5 ? 401 : 500;
     return res.end();
   }
-  const { pathname } = url.parse(req.url);
+  const { pathname, query = {} } = url.parse(req.url, true);
   if (/^\/upload\W?/.test(pathname)) {
     req['user'] = { id: USER_ID };
-    req.headers['tus-resumable'] ? tus.handle(req, res) : upx.handle(req, res);
+    if (query.uploadType === 'multipart') {
+      mpt.handle(req, res);
+    } else if (query.uploadType === 'tus') {
+      tus.handle(req, res);
+    } else {
+      upx.handle(req, res);
+    }
   } else {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.statusCode = 404;

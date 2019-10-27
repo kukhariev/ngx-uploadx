@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Uploader, UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable } from 'rxjs';
+import { MultiPartFormData } from '../../../uploader-examples/multipart-form-data';
 import { environment } from '../../environments/environment';
 
 @Component({
@@ -13,14 +14,13 @@ export class MultipleDirectiveComponent {
   state$: Observable<UploadState>;
   uploads$: Observable<Uploader[]>;
   options: UploadxOptions = {
-    endpoint: `${environment.api}/upload`,
+    endpoint: `${environment.api}/upload?uploadType=multipart`,
     allowedTypes: 'image/*',
-    token: 'token'
+    uploaderClass: MultiPartFormData
   };
   options2: UploadxOptions = {
-    endpoint: `${environment.api}/upload?endpoint=second`,
-    allowedTypes: 'video/*',
-    token: 'token2'
+    endpoint: `${environment.api}/upload?uploadType=uploadx`,
+    allowedTypes: 'video/*'
   };
   constructor(private uploadService: UploadxService) {
     this.uploads$ = this.uploadService.connect();
