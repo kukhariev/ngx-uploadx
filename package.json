@@ -70,6 +70,7 @@
     "node-uploadx": "^3.3.0",
     "prettier": "1.17.1",
     "protractor": "^5.4.2",
+    "rollup": "~1.25",
     "ts-node": "~7.0.1",
     "tsickle": "0.34.0",
     "tslib": "^1.9.0",
