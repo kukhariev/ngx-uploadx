@@ -1,7 +1,5 @@
-const PREFIX = 'UPLOADX-V3.0-';
-
 class Store {
-  constructor(public prefix = '') {}
+  constructor(public prefix = 'UPLOADX-V3.0-') {}
   set(key: string, value: string) {
     localStorage.setItem(this.prefix + key, value);
   }
@@ -12,4 +10,4 @@ class Store {
     localStorage.removeItem(this.prefix + key);
   }
 }
-export const store = 'localStorage' in window ? new Store(PREFIX) : new Map<string, string>();
+export const store = 'localStorage' in window ? new Store() : new Map<string, string>();
