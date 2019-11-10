@@ -6,6 +6,7 @@
     "angular",
     "upload",
     "chunk",
+    "resumable",
     "tus"
   ],
   "author": {
@@ -48,38 +49,36 @@
     "@angular/cli": "^7.3.9",
     "@angular/compiler-cli": "~7.2.0",
     "@angular/language-service": "~7.2.0",
-    "@commitlint/cli": "^8.0.0",
-    "@commitlint/config-conventional": "^8.0.0",
-    "@commitlint/travis-cli": "^8.0.0",
+    "@commitlint/cli": "^8.2.0",
+    "@commitlint/config-conventional": "^8.2.0",
+    "@commitlint/travis-cli": "^8.2.0",
     "@types/jasmine": "^3.3.8",
     "@types/jasminewd2": "^2.0.6",
     "@types/node": "^10.12.18",
     "codelyzer": "^5.0.1",
-    "cz-conventional-changelog": "^2.1.0",
     "husky": "^2.4.0",
     "jasmine-core": "~3.3.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~4.0.0",
     "karma-chrome-launcher": "~2.2.0",
-    "karma-cli": "~1.0.1",
     "karma-coverage-istanbul-reporter": "^2.1.0",
     "karma-jasmine": "~2.0.1",
     "karma-jasmine-html-reporter": "^1.4.0",
-    "lint-staged": "8.2.0",
+    "lint-staged": "9.2.0",
     "ng-packagr": "^5.7.1",
     "node-uploadx": "^3.3.0",
-    "prettier": "1.17.1",
-    "protractor": "^5.4.2",
-    "ts-node": "~7.0.1",
+    "prettier": "^1.19.1",
+    "protractor": "~5.4.0",
+    "ts-node": "~8.4.1",
     "tsickle": "0.34.0",
     "tslib": "^1.9.0",
     "tslint": "~5.16.0",
-    "tslint-config-prettier": "1.18.0",
+    "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.0.1",
     "typescript": "~3.2.4"
   },
   "peerDependencies": {
-    "@angular/core": ">=6.0.0 <9.0.0",
+    "@angular/core": ">=6.0.0 <10.0.0",
     "rxjs": "^6.0.0"
   },
   "husky": {
@@ -93,10 +92,5 @@
       "prettier --write",
       "git add"
     ]
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
   }
 }
