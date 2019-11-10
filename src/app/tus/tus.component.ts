@@ -18,7 +18,8 @@ export class TusComponent implements OnDestroy {
     allowedTypes: 'image/*,video/*',
     endpoint: `${environment.api}/upload?uploadType=tus`,
     // endpoint: `https://master.tus.io/files/`,
-    uploaderClass: Tus
+    uploaderClass: Tus,
+    chunkSize: 0
   };
   ngOnDestroy() {
     this.unsubscribe$.next();
