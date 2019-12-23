@@ -1,5 +1,5 @@
 import { Uploader } from './uploader';
-import { isString, resolveUrl } from './utils';
+import { resolveUrl } from './utils';
 /**
  * Implements XHR/CORS Resumable Upload
  * @see
@@ -53,7 +53,7 @@ export class UploaderX extends Uploader {
   protected getOffsetFromResponse(): number | undefined {
     if (this.responseStatus > 201) {
       const range = this.getValueFromResponse('Range');
-      return isString(range) ? getRangeEnd(range) + 1 : undefined;
+      return range ? getRangeEnd(range) + 1 : undefined;
     }
     if (this.responseStatus <= 201) {
       return this.size;

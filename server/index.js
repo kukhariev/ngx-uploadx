@@ -1,3 +1,5 @@
+// @ts-check
+
 const args = process.argv.slice(2);
 const debug = args.includes('--debug');
 const emitErrors = args.includes('--errors');
@@ -6,14 +8,15 @@ debug && (process.env.DEBUG = 'uploadx:*');
 const http = require('http');
 const url = require('url');
 const { tmpdir } = require('os');
-const { Uploadx, Tus, DiskStorage, Multipart } = require('node-uploadx');
+const { DiskStorage, Multipart, Tus, Uploadx } = require('node-uploadx');
 
 const PORT = 3003;
-const USER_ID = 'ngx-uploadx-test';
-const UPLOADS_ROOT = `${tmpdir()}/${USER_ID}/`;
+const USER_PREFIX = 'tester';
+
 const storage = new DiskStorage({
-  dest: (req, file) => `${UPLOADS_ROOT}/${file.filename}`,
-  allowMIME: ['video/*', 'image/*']
+  directory: `${tmpdir()}/ngx-uploadx/`,
+  allowMIME: ['video/*', 'image/*'],
+  path: '/files'
 });
 
 const upx = new Uploadx({ storage });
@@ -26,9 +29,10 @@ const server = http.createServer((req, res) => {
     res.statusCode = Math.random() < 0.5 ? 401 : 500;
     return res.end();
   }
+
   const { pathname, query = {} } = url.parse(req.url, true);
-  if (/^\/upload\W?/.test(pathname)) {
-    req['user'] = { id: USER_ID };
+  if (/^\/files\W?/.test(pathname)) {
+    req['user'] = { id: USER_PREFIX };
     if (query.uploadType === 'multipart') {
       mpt.handle(req, res);
     } else if (query.uploadType === 'tus') {
@@ -46,7 +50,7 @@ const server = http.createServer((req, res) => {
 server.listen(PORT);
 
 function storageCleanup() {
-  return storage.delete({ userId: USER_ID });
+  return storage.delete(USER_PREFIX);
 }
 
 exports.reset = storageCleanup;

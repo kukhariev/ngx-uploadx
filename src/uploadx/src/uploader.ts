@@ -226,7 +226,7 @@ export abstract class Uploader implements UploadState {
   /**
    * Performs http requests
    */
-  protected request({
+  request({
     method = 'GET',
     body = null,
     url,

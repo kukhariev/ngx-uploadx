@@ -14,12 +14,12 @@ export class MultipleDirectiveComponent {
   state$: Observable<UploadState>;
   uploads$: Observable<Uploader[]>;
   options: UploadxOptions = {
-    endpoint: `${environment.api}/upload?uploadType=multipart`,
+    endpoint: `${environment.api}/files?uploadType=multipart`,
     allowedTypes: 'image/*',
     uploaderClass: MultiPartFormData
   };
   options2: UploadxOptions = {
-    endpoint: `${environment.api}/upload?uploadType=uploadx`,
+    endpoint: `${environment.api}/files?uploadType=uploadx`,
     allowedTypes: 'video/*'
   };
   constructor(private uploadService: UploadxService) {

@@ -84,7 +84,7 @@ export class DynamicChunk {
   /** Maximum chunk size in bytes */
   static maxSize = Number.MAX_SAFE_INTEGER;
   /** Minimum chunk size in bytes */
-  static minSize = 4096;
+  static minSize = 1024 * 256;
   /** Initial chunk size in bytes */
   static size = 4096 * 256;
   static minChunkTime = 2;
