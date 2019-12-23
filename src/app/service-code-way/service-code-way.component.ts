@@ -14,7 +14,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   state$: Observable<UploadState>;
   uploads: Ufile[] = [];
   options: UploadxOptions = {
-    endpoint: `${environment.api}/upload?uploadType=uploadx`,
+    endpoint: `${environment.api}/files?uploadType=uploadx`,
     token: btoa('user:pass'),
     chunkSize: 1024 * 256 * 8,
     uploaderClass: UploaderExt

@@ -30,7 +30,7 @@
     "server:dev": "node ./server/ --errors --debug",
     "build": "ts-node --skip-project ./scripts/build.ts",
     "ci": "npm run lint && npm run test && npm run webdriver-update-ci && npm run e2e",
-    "webdriver-update-ci": "webdriver-manager update --standalone false --gecko false --versions.chrome 77.0.3865.90"
+    "webdriver-update-ci": "webdriver-manager update --standalone false --gecko false --versions.chrome 78.0.3904.105"
   },
   "dependencies": {
     "@angular/common": "~7.2.0",
@@ -66,7 +66,7 @@
     "karma-jasmine-html-reporter": "^1.4.0",
     "lint-staged": "9.2.0",
     "ng-packagr": "^5.7.1",
-    "node-uploadx": "^3.3.0",
+    "node-uploadx": "^4.0.0",
     "prettier": "^1.19.1",
     "protractor": "~5.4.0",
     "ts-node": "~8.4.1",

@@ -14,7 +14,7 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
   state$: Observable<UploadState>;
   uploads: Ufile[] = [];
   options: UploadxOptions = {
-    endpoint: `${environment.api}/upload`,
+    endpoint: `${environment.api}/files?uploadType=uploadx`,
     token: () => this.auth.accessToken,
     chunkSize: 2_097_152
   };
