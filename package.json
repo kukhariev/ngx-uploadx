@@ -33,13 +33,13 @@
     "webdriver-update-ci": "webdriver-manager update --standalone false --gecko false --versions.chrome 78.0.3904.105"
   },
   "dependencies": {
-    "@angular/common": "7.2.15",
-    "@angular/compiler": "7.2.15",
-    "@angular/core": "7.2.15",
-    "@angular/forms": "7.2.15",
-    "@angular/platform-browser": "7.2.15",
-    "@angular/platform-browser-dynamic": "7.2.15",
-    "@angular/router": "7.2.15",
+    "@angular/common": "8.2.14",
+    "@angular/compiler": "8.2.14",
+    "@angular/core": "8.2.14",
+    "@angular/forms": "8.2.14",
+    "@angular/platform-browser": "8.2.14",
+    "@angular/platform-browser-dynamic": "8.2.14",
+    "@angular/router": "8.2.14",
     "core-js": "2.6.11",
     "rxjs": "6.5.3",
     "zone.js": "0.8.29"
@@ -47,8 +47,8 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "0.13.9",
     "@angular/cli": "7.3.9",
-    "@angular/compiler-cli": "7.2.15",
-    "@angular/language-service": "7.2.15",
+    "@angular/compiler-cli": "8.2.14",
+    "@angular/language-service": "8.2.14",
     "@commitlint/cli": "8.2.0",
     "@commitlint/config-conventional": "8.2.0",
     "@commitlint/travis-cli": "8.2.0",
