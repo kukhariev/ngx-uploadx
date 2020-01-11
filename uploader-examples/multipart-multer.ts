@@ -1,9 +1,9 @@
-import { resolveUrl, Uploader } from 'ngx-uploadx';
+import { Uploader } from 'ngx-uploadx';
 
 /**
  *
- * Extended multipart/form-data uploader example
- * fo use with node-uploadx
+ * Basic multipart/form-data uploader example
+ * fo use with multer
  * @example
  *
  *   options: UploadxOptions = {
@@ -16,7 +16,6 @@ export class MultiPartFormData extends Uploader {
   async getFileUrl(): Promise<string> {
     this.offset = 0;
     const formData: FormData = new FormData();
-    formData.set('metadata', JSON.stringify(this.metadata));
     formData.append('file', this.file, this.file.name);
     await this.request({
       method: 'POST',
@@ -25,8 +24,7 @@ export class MultiPartFormData extends Uploader {
       progress: true
     });
     this.offset = this.size;
-    const location = this.getValueFromResponse('location');
-    return location ? resolveUrl(location, this.endpoint) : '';
+    return '';
   }
 
   async sendFileContent(): Promise<number | undefined> {
