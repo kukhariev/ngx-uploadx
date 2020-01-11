@@ -1,7 +1,7 @@
 {
   "$schema": "http://json.schemastore.org/renovate",
   "extends": ["config:base"],
-  "baseBranches": ["dev", "next"],
+  "baseBranches": ["next"],
   "ignoreDeps": ["@types/node"],
   "semanticCommitType": "build"
 }
