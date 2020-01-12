@@ -2,8 +2,9 @@ import { Uploader } from 'ngx-uploadx';
 
 /**
  *
- * Basic multipart/form-data uploader example
- * fo use with multer
+ * Basic multipart/form-data uploader
+ * for use with multer
+ *
  * @example
  *
  *   options: UploadxOptions = {
