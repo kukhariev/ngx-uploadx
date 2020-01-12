@@ -1,5 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { UploadxDirective } from '../../uploadx/src/uploadx.directive';
+import { UploadxDirective } from 'ngx-uploadx';
 import { MultipleDirectiveComponent } from './multiple-directive.component';
 
 describe('MultipleDirectiveComponent', () => {

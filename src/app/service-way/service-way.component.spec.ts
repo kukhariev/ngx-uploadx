@@ -1,7 +1,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { UploadxService } from 'ngx-uploadx';
 import { Observable } from 'rxjs';
-import { UploadxService } from '../../uploadx';
 import { ServiceWayComponent } from './service-way.component';
 
 describe('ServiceWayComponent', () => {
