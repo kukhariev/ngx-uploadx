@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { UploadxModule } from 'ngx-uploadx';
 import { AppComponent } from './app.component';
-import { AppRoutes } from './app.routes';
+import { appRoutes } from './app.routes';
 import { DirectiveWayComponent } from './directive-way/directive-way.component';
 import { MultipleDirectiveComponent } from './multiple-directive/multiple-directive.component';
 import { OnPushComponent } from './on-push/on-push.component';
@@ -21,7 +21,7 @@ import { TusComponent } from './tus/tus.component';
     MultipleDirectiveComponent,
     TusComponent
   ],
-  imports: [RouterModule.forRoot(AppRoutes), BrowserModule, UploadxModule],
+  imports: [RouterModule.forRoot(appRoutes), BrowserModule, UploadxModule],
   providers: [],
   bootstrap: [AppComponent],
   exports: []
