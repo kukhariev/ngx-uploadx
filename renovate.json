@@ -1,7 +1,6 @@
 {
   "$schema": "http://json.schemastore.org/renovate",
-  "extends": ["config:base"],
   "baseBranches": ["next"],
-  "ignoreDeps": ["@types/node"],
-  "semanticCommitType": "build"
+  "extends": ["config:base", ":preserveSemverRanges", "schedule:weekly"],
+  "semanticCommitType": "chore"
 }
