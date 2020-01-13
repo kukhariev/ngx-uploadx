@@ -1,12 +1,12 @@
 import { ErrorHandler } from './error-handler';
 
-describe('ErrorHandler', function() {
-  describe('constructor', function() {
-    it('should set to defaults if no parameters are specified', async function() {
-      const bf: any = new ErrorHandler();
-      expect(bf.attempts).toBe(1);
-      expect(bf.min).toBe(500);
-      expect(bf.max).toBe(60_000);
+describe('ErrorHandler', () => {
+  describe('constructor', () => {
+    it('should set to defaults if no parameters are specified', () => {
+      const errorHandler = new ErrorHandler();
+      expect(errorHandler.attempts).toBe(1);
+      expect(errorHandler.min).toBe(500);
+      expect(errorHandler.max).toBe(60_000);
     });
   });
 });

@@ -1,12 +1,12 @@
 import { Tus } from './tus';
 
-const file_txt = new File(['123456'], 'filename.txt', { type: 'text/plain' });
+const fileWithType = new File(['123456'], 'filename.txt', { type: 'text/plain' });
 describe('getFileUrl', () => {
   let upx: Tus;
   let req: jasmine.Spy;
   let getValueFromResponse: jasmine.Spy;
   it('should set headers', async () => {
-    upx = new Tus(file_txt, {});
+    upx = new Tus(fileWithType, {});
     req = spyOn<any>(upx, 'request').and.callFake(({ headers }: any) => {
       expect(headers['Upload-Metadata']).toContain('name');
       expect(headers['Upload-Length']).toEqual('6');
@@ -24,7 +24,7 @@ describe('sendFileContent', () => {
   let req: jasmine.Spy;
   let getOffsetFromResponse: jasmine.Spy;
   it('should set Upload-Offset header', async () => {
-    upx = new Tus(file_txt, {});
+    upx = new Tus(fileWithType, {});
     req = spyOn<any>(upx, 'request').and.callFake(({ headers }: any) => {
       expect(headers['Content-Type']).toEqual('application/offset+octet-stream');
       expect(headers['Upload-Offset']).toEqual('0');
