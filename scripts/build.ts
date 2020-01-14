@@ -1,35 +1,31 @@
-import * as fs from 'fs';
+import { promises as fsp } from 'fs';
 import { build } from 'ng-packagr';
-import * as util from 'util';
-const copyFile = util.promisify(fs.copyFile);
-const unlink = util.promisify(fs.unlink);
-const writeFile = util.promisify(fs.writeFile);
 
 (async () => {
   try {
-    const oldPackage = JSON.parse(fs.readFileSync('package.json', { encoding: 'utf8' }));
-    const newPackage: any = {};
-    newPackage.name = oldPackage.name;
-    newPackage.version = oldPackage.version;
-    newPackage.description = oldPackage.description;
-    newPackage.keywords = oldPackage.keywords;
-    newPackage.author = oldPackage.author;
-    newPackage.repository = oldPackage.repository;
-    newPackage.homepage = oldPackage.homepage;
-    newPackage.license = oldPackage.license;
-    newPackage.peerDependencies = oldPackage.peerDependencies;
-    newPackage.ngPackage = {
+    const rootPackage = JSON.parse(await fsp.readFile('package.json', 'utf8'));
+    const libPackage: any = {};
+    libPackage.name = rootPackage.name;
+    libPackage.version = rootPackage.version;
+    libPackage.description = rootPackage.description;
+    libPackage.keywords = rootPackage.keywords;
+    libPackage.author = rootPackage.author;
+    libPackage.repository = rootPackage.repository;
+    libPackage.homepage = rootPackage.homepage;
+    libPackage.license = rootPackage.license;
+    libPackage.peerDependencies = rootPackage.peerDependencies;
+    libPackage.ngPackage = {
       lib: {
         entryFile: 'public-api.ts'
       },
       dest: '../../dist/uploadx',
       deleteDestPath: true
     };
-    await writeFile('src/uploadx/package.json', JSON.stringify(newPackage, undefined, 2));
+    await fsp.writeFile('src/uploadx/package.json', JSON.stringify(libPackage, undefined, 2));
     await build({ project: 'src/uploadx/package.json' });
-    await copyFile('LICENSE', 'dist/uploadx/LICENSE');
-    await copyFile('README.md', 'dist/uploadx/README.md');
-    await unlink('src/uploadx/package.json');
+    await fsp.copyFile('LICENSE', 'dist/uploadx/LICENSE');
+    await fsp.copyFile('README.md', 'dist/uploadx/README.md');
+    await fsp.unlink('src/uploadx/package.json');
   } catch (error) {
     console.error(error);
     process.exit(1);

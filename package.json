@@ -20,6 +20,9 @@
   "homepage": "https://github.com/kukhariev/ngx-uploadx#readme",
   "license": "MIT",
   "private": true,
+  "engines": {
+    "node": ">=10.10.0"
+  },
   "scripts": {
     "prettier": "prettier --write \"**/*.{json,scss,md,ts,html}\"",
     "start": "ng serve",
