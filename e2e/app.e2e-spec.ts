@@ -1,7 +1,7 @@
 /* tslint: disable */
 import { AppPage } from './app.po';
 const absolutePath = require('path').resolve('./e2e/test.mp4');
-const { reset } = require('../server/index.js');
+const { reset } = require('../server');
 
 describe('uploader App', () => {
   let page: AppPage;
