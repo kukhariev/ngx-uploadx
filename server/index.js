@@ -7,21 +7,23 @@ debug && (process.env.DEBUG = 'uploadx:*');
 
 const http = require('http');
 const url = require('url');
+const rimraf = require('rimraf');
 const { tmpdir } = require('os');
-const { DiskStorage, Multipart, Tus, Uploadx } = require('node-uploadx');
+const { Multipart, Tus, Uploadx } = require('node-uploadx');
 
 const PORT = 3003;
 const USER_PREFIX = 'tester';
+const UPLOAD_DIR = `${tmpdir()}/ngx-uploadx/`;
 
-const storage = new DiskStorage({
-  directory: `${tmpdir()}/ngx-uploadx/`,
+const opts = {
+  directory: UPLOAD_DIR,
   allowMIME: ['video/*', 'image/*'],
   path: '/files'
-});
+};
 
-const upx = new Uploadx({ storage });
-const tus = new Tus({ storage });
-const mpt = new Multipart({ storage });
+const upx = new Uploadx(opts);
+const tus = new Tus(opts);
+const mpt = new Multipart(opts);
 
 const server = http.createServer((req, res) => {
   if (emitErrors && Math.random() < 0.4 && req.method !== 'OPTIONS' && req.method !== 'DELETE') {
@@ -32,7 +34,7 @@ const server = http.createServer((req, res) => {
 
   const { pathname, query = {} } = url.parse(req.url, true);
   if (/^\/files\W?/.test(pathname)) {
-    req['user'] = { id: USER_PREFIX };
+    req['user'] = { id: query.uploadType };
     if (query.uploadType === 'multipart') {
       mpt.handle(req, res);
     } else if (query.uploadType === 'tus') {
@@ -50,7 +52,7 @@ const server = http.createServer((req, res) => {
 server.listen(PORT);
 
 function storageCleanup() {
-  return storage.delete(USER_PREFIX);
+  // rimraf.sync(UPLOAD_DIR);
 }
 
 exports.reset = storageCleanup;
