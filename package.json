@@ -24,7 +24,7 @@
     "node": ">=10.10.0"
   },
   "scripts": {
-    "prettier": "prettier --write \"**/*.{json,scss,md,ts,html}\"",
+    "prettier": "prettier --write \"**/*.{js,json,scss,md,ts,html}\"",
     "start": "ng serve",
     "lint": "ng lint",
     "test": "ng test --watch=false --progress=false --browsers=ChromeHeadless",
@@ -91,7 +91,7 @@
     }
   },
   "lint-staged": {
-    "*.{json,scss,md,ts,html}": [
+    "*.{js,json,scss,md,ts,html}": [
       "prettier --write"
     ]
   }
