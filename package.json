@@ -70,7 +70,7 @@
     "ng-packagr": "5.7.1",
     "node-uploadx": "^4.0.3",
     "prettier": "1.19.1",
-    "protractor": "5.4.2",
+    "protractor": "5.4.3",
     "rimraf": "^3.0.1",
     "ts-node": "8.6.1",
     "tsickle": "0.34.0",
