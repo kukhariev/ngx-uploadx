@@ -35,13 +35,13 @@
     "ci": "npm run lint && npm run test && npm run e2e"
   },
   "dependencies": {
-    "@angular/common": "7.2.16",
-    "@angular/compiler": "7.2.16",
-    "@angular/core": "7.2.16",
-    "@angular/forms": "7.2.16",
-    "@angular/platform-browser": "7.2.16",
-    "@angular/platform-browser-dynamic": "7.2.16",
-    "@angular/router": "7.2.16",
+    "@angular/common": "9.0.1",
+    "@angular/compiler": "9.0.1",
+    "@angular/core": "9.0.1",
+    "@angular/forms": "9.0.1",
+    "@angular/platform-browser": "9.0.1",
+    "@angular/platform-browser-dynamic": "9.0.1",
+    "@angular/router": "9.0.1",
     "core-js": "2.6.11",
     "rxjs": "6.5.3",
     "zone.js": "0.8.26"
@@ -49,8 +49,8 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "0.13.9",
     "@angular/cli": "7.3.9",
-    "@angular/compiler-cli": "7.2.16",
-    "@angular/language-service": "7.2.16",
+    "@angular/compiler-cli": "9.0.1",
+    "@angular/language-service": "9.0.1",
     "@commitlint/cli": "8.3.5",
     "@commitlint/config-conventional": "8.3.4",
     "@commitlint/travis-cli": "8.3.5",
