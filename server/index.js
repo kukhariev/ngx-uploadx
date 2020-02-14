@@ -52,7 +52,7 @@ const server = http.createServer((req, res) => {
 server.listen(PORT);
 
 function storageCleanup() {
-  // rimraf.sync(UPLOAD_DIR);
+  rimraf.sync(UPLOAD_DIR);
 }
 
 exports.reset = storageCleanup;
