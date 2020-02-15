@@ -19,11 +19,10 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
     chunkSize: 1024 * 256 * 8,
     uploaderClass: UploaderExt
   };
-  private unsubscribe$ = new Subject();
   numberOfCopies = 0;
-
   @ViewChild('file', { read: ElementRef }) fileInput: ElementRef;
 
+  private unsubscribe$ = new Subject();
   constructor(private uploadService: UploadxService) {}
 
   ngOnInit() {

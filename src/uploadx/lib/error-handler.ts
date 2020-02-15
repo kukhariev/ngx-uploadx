@@ -15,9 +15,9 @@ export class ErrorHandler {
   min = 500;
   max = this.min * 120;
   factor = 2;
+  attempts = 1;
   private delay: number;
   private code? = -1;
-  attempts = 1;
 
   constructor() {
     this.delay = this.min;

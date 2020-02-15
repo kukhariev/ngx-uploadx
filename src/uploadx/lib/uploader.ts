@@ -50,6 +50,36 @@ export abstract class Uploader implements UploadState {
     this._url !== value && store.set(this.uploadId, value);
     this._url = value;
   }
+  readonly name: string;
+  readonly size: number;
+  readonly uploadId: string;
+  response: any;
+  responseStatus: number;
+  progress: number;
+  remaining: number;
+  speed: number;
+  /** Custom headers */
+  headers: Record<string, any> = {};
+  /** Metadata Object */
+  metadata: Record<string, any>;
+  /** Upload endpoint */
+  endpoint = '/upload';
+  /** Chunk size in bytes */
+  chunkSize: number;
+  /** Auth token/tokenGetter */
+  token: UploadxControlEvent['token'];
+  protected _url = '';
+  /** Retries handler */
+  protected errorHandler = new ErrorHandler();
+  /** Active HttpRequest */
+  protected _xhr: XMLHttpRequest;
+  /** byte offset within the whole file */
+  protected offset? = 0;
+  /** Set HttpRequest responseType */
+  protected responseType: XMLHttpRequestResponseType = '';
+  private _status: UploadStatus;
+  private startTime: number;
+  private stateChange: (evt: UploadState) => void;
 
   constructor(readonly file: File, readonly options: UploaderOptions) {
     this.name = file.name;
@@ -70,37 +100,6 @@ export abstract class Uploader implements UploadState {
     this.chunkSize = options.chunkSize || this.size;
     this.configure(options);
   }
-  private _status: UploadStatus;
-  readonly name: string;
-  readonly size: number;
-  readonly uploadId: string;
-  response: any;
-  responseStatus: number;
-  progress: number;
-  remaining: number;
-  speed: number;
-  protected _url = '';
-  /** Custom headers */
-  headers: Record<string, any> = {};
-  /** Metadata Object */
-  metadata: Record<string, any>;
-  /** Upload endpoint */
-  endpoint = '/upload';
-  /** Chunk size in bytes */
-  chunkSize: number;
-  /** Auth token/tokenGetter */
-  token: UploadxControlEvent['token'];
-  /** Retries handler */
-  protected errorHandler = new ErrorHandler();
-  /** Active HttpRequest */
-  protected _xhr: XMLHttpRequest;
-  /** byte offset within the whole file */
-  protected offset? = 0;
-  /** Set HttpRequest responseType */
-  protected responseType: XMLHttpRequestResponseType = '';
-  private startTime: number;
-  private stateChange: (evt: UploadState) => void;
-  private cleanup = () => store.delete(this.uploadId);
 
   /**
    * Configure uploader
@@ -134,52 +133,6 @@ export abstract class Uploader implements UploadState {
         this.status = 'error';
       }
     }
-  }
-
-  /**
-   * Get file URI
-   */
-  protected abstract getFileUrl(): Promise<string>;
-
-  /**
-   * Send file content and return an offset for the next request
-   */
-  protected abstract sendFileContent(): Promise<number | undefined>;
-
-  /**
-   * Get an offset for the next request
-   */
-  protected abstract getOffset(): Promise<number | undefined>;
-
-  protected setAuth(token: string) {
-    this.headers.Authorization = `Bearer ${token}`;
-  }
-
-  protected abort(): void {
-    this.offset = undefined;
-    this._xhr && this._xhr.abort();
-  }
-
-  protected onCancel(): void {
-    this.abort();
-    const stateChange = () => this.stateChange(this);
-    this.url && this.request({ method: 'DELETE' }).then(stateChange, stateChange);
-  }
-
-  /**
-   * Gets the value from the response
-   */
-  protected getValueFromResponse(key: string): string | null {
-    return this._xhr.getResponseHeader(key);
-  }
-
-  /**
-   * Set auth token
-   */
-  protected getToken(): Promise<any> {
-    return Promise.resolve(unfunc(this.token || '', this.responseStatus)).then(
-      token => token && this.setAuth(token)
-    );
   }
 
   /**
@@ -255,14 +208,50 @@ export abstract class Uploader implements UploadState {
     });
   }
 
-  private getResponseBody(xhr: XMLHttpRequest): any {
-    let body = 'response' in (xhr as any) ? xhr.response : xhr.responseText;
-    if (body && this.responseType === 'json' && typeof body === 'string') {
-      try {
-        body = JSON.parse(body);
-      } catch {}
-    }
-    return body;
+  /**
+   * Get file URI
+   */
+  protected abstract getFileUrl(): Promise<string>;
+
+  /**
+   * Send file content and return an offset for the next request
+   */
+  protected abstract sendFileContent(): Promise<number | undefined>;
+
+  /**
+   * Get an offset for the next request
+   */
+  protected abstract getOffset(): Promise<number | undefined>;
+
+  protected setAuth(token: string) {
+    this.headers.Authorization = `Bearer ${token}`;
+  }
+
+  protected abort(): void {
+    this.offset = undefined;
+    this._xhr && this._xhr.abort();
+  }
+
+  protected onCancel(): void {
+    this.abort();
+    const stateChange = () => this.stateChange(this);
+    this.url && this.request({ method: 'DELETE' }).then(stateChange, stateChange);
+  }
+
+  /**
+   * Gets the value from the response
+   */
+  protected getValueFromResponse(key: string): string | null {
+    return this._xhr.getResponseHeader(key);
+  }
+
+  /**
+   * Set auth token
+   */
+  protected getToken(): Promise<any> {
+    return Promise.resolve(unfunc(this.token || '', this.responseStatus)).then(
+      token => token && this.setAuth(token)
+    );
   }
 
   protected getChunk() {
@@ -271,6 +260,17 @@ export abstract class Uploader implements UploadState {
     const end = Math.min(start + this.chunkSize, this.size);
     const body = this.file.slice(this.offset, end);
     return { start, end, body };
+  }
+  private cleanup = () => store.delete(this.uploadId);
+
+  private getResponseBody(xhr: XMLHttpRequest): any {
+    let body = 'response' in (xhr as any) ? xhr.response : xhr.responseText;
+    if (body && this.responseType === 'json' && typeof body === 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch {}
+    }
+    return body;
   }
 
   private onProgress(): (evt: ProgressEvent) => void {

@@ -48,6 +48,7 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
     this.state$ = uploadsOutStream;
     uploadsOutStream.pipe(takeUntil(this.unsubscribe$)).subscribe((evt: UploadState) => {
       if (evt.status === 'retry' && evt.responseStatus === 401) {
+        // tslint:disable-next-line: no-console
         this.auth.renewToken().subscribe(token => console.log('new accessToken: ', token));
       }
       const target = this.uploads.find(f => f.uploadId === evt.uploadId);
