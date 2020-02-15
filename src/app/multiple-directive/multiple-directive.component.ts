@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Uploader, UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable } from 'rxjs';
 import { MultiPartFormData } from '../../../uploader-examples/multipart-form-data';
+import { TusExt } from '../../../uploader-examples/tus-ext';
 import { environment } from '../../environments/environment';
 
 @Component({
@@ -19,13 +20,15 @@ export class MultipleDirectiveComponent {
     uploaderClass: MultiPartFormData
   };
   options2: UploadxOptions = {
-    endpoint: `${environment.api}/files?uploadType=uploadx`,
-    allowedTypes: 'video/*'
+    endpoint: `${environment.api}/files?uploadType=tus`,
+    allowedTypes: 'video/*',
+    uploaderClass: TusExt
   };
   constructor(private uploadService: UploadxService) {
     this.uploads$ = this.uploadService.connect();
     this.state$ = this.uploadService.events;
   }
+
   cancel(id?: string) {
     this.uploadService.control({ action: 'cancel', uploadId: id });
   }
