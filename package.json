@@ -24,7 +24,6 @@
     "node": ">=10.10.0"
   },
   "scripts": {
-    "prettier": "prettier --write \"**/*.{js,json,scss,md,ts,html}\"",
     "start": "ng serve",
     "lint": "ng lint",
     "test": "ng test --watch=false --progress=false --browsers=ChromeHeadless",
@@ -32,7 +31,8 @@
     "server": "node ./server/ --debug",
     "server:dev": "node ./server/ --errors --debug",
     "build": "ts-node --skip-project ./scripts/build.ts",
-    "ci": "npm run lint && npm run test && npm run e2e"
+    "ci": "npm run lint && npm run test && npm run e2e",
+    "prettier": "prettier --write \"**/*.{js,json,scss,md,ts,html}\""
   },
   "dependencies": {
     "@angular/common": "7.2.16",
@@ -68,7 +68,7 @@
     "karma-jasmine-html-reporter": "1.5.1",
     "lint-staged": "10.0.7",
     "ng-packagr": "5.7.1",
-    "node-uploadx": "4.1.0",
+    "node-uploadx": "4.1.1",
     "prettier": "1.19.1",
     "protractor": "5.4.3",
     "rimraf": "^3.0.1",
