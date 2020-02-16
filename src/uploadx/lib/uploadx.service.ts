@@ -15,7 +15,7 @@ interface DefaultOptions {
 
 @Injectable({ providedIn: 'root' })
 export class UploadxService implements OnDestroy {
-  static stateKeys: (keyof UploadState)[] = [
+  static stateKeys: Array<keyof UploadState> = [
     'file',
     'name',
     'progress',
@@ -28,9 +28,6 @@ export class UploadxService implements OnDestroy {
     'uploadId',
     'url'
   ];
-  private readonly eventsStream: Subject<UploadState> = new Subject();
-  private subs: Subscription[] = [];
-
   /** Upload status events */
   get events() {
     return this.eventsStream.asObservable();
@@ -48,6 +45,8 @@ export class UploadxService implements OnDestroy {
     }
   };
 
+  private readonly eventsStream: Subject<UploadState> = new Subject();
+  private subs: Subscription[] = [];
   constructor(private ngZone: NgZone) {
     this.subs.push(
       fromEvent(window, 'online').subscribe(() => this.control({ action: 'upload' })),
@@ -113,20 +112,6 @@ export class UploadxService implements OnDestroy {
     this.autoUploadFiles();
   }
 
-  private addUploaderInstance(file: File, options: UploadxOptions): void {
-    const uploader = new (options.uploaderClass || UploaderX)(file, options as UploaderOptions);
-    this.queue.push(uploader);
-    uploader.status = 'added';
-  }
-
-  private autoUploadFiles(): void {
-    if (this.options.autoUpload && window.navigator.onLine) {
-      this.queue
-        .filter(({ status }) => status === 'added')
-        .forEach(uploader => (uploader.status = 'queue'));
-    }
-  }
-
   /**
    * Upload control
    * @example
@@ -144,6 +129,27 @@ export class UploadxService implements OnDestroy {
     target.forEach(uploader => uploader.configure(evt));
   }
 
+  /**
+   * Returns number of active uploads
+   */
+  runningProcess(): number {
+    return this.queue.filter(({ status }) => status === 'uploading' || status === 'retry').length;
+  }
+
+  private addUploaderInstance(file: File, options: UploadxOptions): void {
+    const uploader = new (options.uploaderClass || UploaderX)(file, options as UploaderOptions);
+    this.queue.push(uploader);
+    uploader.status = 'added';
+  }
+
+  private autoUploadFiles(): void {
+    if (this.options.autoUpload && window.navigator.onLine) {
+      this.queue
+        .filter(({ status }) => status === 'added')
+        .forEach(uploader => (uploader.status = 'queue'));
+    }
+  }
+
   private processQueue(): void {
     this.queue = this.queue.filter(({ status }) => status !== 'cancelled');
 
@@ -151,12 +157,5 @@ export class UploadxService implements OnDestroy {
       .filter(({ status }) => status === 'queue')
       .slice(0, Math.max(this.options.concurrency - this.runningProcess(), 0))
       .forEach(uploader => uploader.upload());
-  }
-
-  /**
-   * Returns number of active uploads
-   */
-  runningProcess(): number {
-    return this.queue.filter(({ status }) => status === 'uploading' || status === 'retry').length;
   }
 }

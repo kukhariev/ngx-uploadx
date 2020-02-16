@@ -13,7 +13,7 @@ export class TusComponent implements OnDestroy {
   control: UploadxControlEvent;
   state$: Observable<UploadState>;
   uploads: Ufile[] = [];
-  private unsubscribe$ = new Subject();
+
   options: UploadxOptions = {
     allowedTypes: 'image/*,video/*',
     endpoint: `${environment.api}/files?uploadType=tus`,
@@ -21,6 +21,8 @@ export class TusComponent implements OnDestroy {
     uploaderClass: Tus,
     chunkSize: 0
   };
+  private unsubscribe$ = new Subject();
+
   ngOnDestroy() {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();

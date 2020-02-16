@@ -1,5 +1,6 @@
 import { Uploader } from './uploader';
 import { resolveUrl } from './utils';
+
 /**
  * Implements XHR/CORS Resumable Upload
  * @see
@@ -33,11 +34,7 @@ export class UploaderX extends Uploader {
       'Content-Type': 'application/octet-stream',
       'Content-Range': `bytes ${this.offset}-${end - 1}/${this.size}`
     };
-    await this.request({
-      method: 'PUT',
-      body,
-      headers
-    });
+    await this.request({ method: 'PUT', body, headers });
     return this.getOffsetFromResponse();
   }
 

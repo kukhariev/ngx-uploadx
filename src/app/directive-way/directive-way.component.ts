@@ -13,12 +13,12 @@ export class DirectiveWayComponent implements OnDestroy {
   control: UploadxControlEvent;
   state$: Observable<UploadState>;
   uploads: Ufile[] = [];
-  private unsubscribe$ = new Subject();
   options: UploadxOptions = {
     allowedTypes: 'image/*,video/*',
     endpoint: `${environment.api}/files?uploadType=uploadx`,
     token: 'token'
   };
+  private unsubscribe$ = new Subject();
   ngOnDestroy() {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
