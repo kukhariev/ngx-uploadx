@@ -43,14 +43,12 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "app-uploadx:build"
+            "browserTarget": "app-uploadx:build",
+            "progress": false
           },
           "configurations": {
             "production": {
               "browserTarget": "app-uploadx:build:production"
-            },
-            "ci": {
-              "progress": false
             }
           }
         },
@@ -93,8 +91,8 @@
             "devServerTarget": "app-uploadx:serve"
           },
           "configurations": {
-            "ci": {
-              "devServerTarget": "app-uploadx:serve:ci"
+            "production": {
+              "devServerTarget": "app-uploadx:serve:production"
             }
           }
         },

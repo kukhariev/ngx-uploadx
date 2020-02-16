@@ -27,7 +27,7 @@
     "start": "ng serve",
     "lint": "ng lint",
     "test": "ng test --watch=false --progress=false --browsers=ChromeHeadless",
-    "e2e": "ng e2e -c=ci",
+    "e2e": "ng e2e",
     "server": "node ./server/ --debug",
     "server:dev": "node ./server/ --errors --debug",
     "build": "ts-node --skip-project ./scripts/build.ts",
