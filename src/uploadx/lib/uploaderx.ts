@@ -1,5 +1,6 @@
 import { Uploader } from './uploader';
 import { resolveUrl } from './utils';
+
 /**
  * Implements XHR/CORS Resumable Upload
  * @see

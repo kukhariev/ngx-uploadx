@@ -68,7 +68,6 @@ export abstract class Uploader implements UploadState {
   chunkSize: number;
   /** Auth token/tokenGetter */
   token: UploadxControlEvent['token'];
-  protected _url = '';
   /** Retries handler */
   protected errorHandler = new ErrorHandler();
   /** Active HttpRequest */
@@ -77,6 +76,7 @@ export abstract class Uploader implements UploadState {
   protected offset? = 0;
   /** Set HttpRequest responseType */
   protected responseType: XMLHttpRequestResponseType = '';
+  private _url = '';
   private _status: UploadStatus;
   private startTime: number;
   private stateChange: (evt: UploadState) => void;

@@ -11,9 +11,7 @@ import {
 import { UploadxControlEvent, UploadxOptions } from './interfaces';
 import { UploadxService } from './uploadx.service';
 
-@Directive({
-  selector: '[uploadx]'
-})
+@Directive({ selector: '[uploadx]' })
 export class UploadxDirective implements OnInit {
   @Output()
   uploadxState = new EventEmitter();
