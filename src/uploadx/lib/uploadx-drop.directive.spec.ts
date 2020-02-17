@@ -41,6 +41,7 @@ describe('Directive: UploadxDropDirective', () => {
 
   it('should set class on dragover', () => {
     const dragoverEvent = jasmine.createSpyObj('event', ['preventDefault', 'stopPropagation']);
+    dragoverEvent.dataTransfer = { files };
     dropEl.triggerEventHandler('dragover', dragoverEvent);
     expect(dragoverEvent.stopPropagation).toHaveBeenCalledTimes(1);
     expect(dragoverEvent.preventDefault).toHaveBeenCalledTimes(1);
@@ -49,6 +50,7 @@ describe('Directive: UploadxDropDirective', () => {
   });
   it('should remove class on dragleave', () => {
     const dragoverEvent = jasmine.createSpyObj('event', ['preventDefault', 'stopPropagation']);
+    dragoverEvent.dataTransfer = { files };
     dropEl.triggerEventHandler('dragover', dragoverEvent);
     fixture.detectChanges();
     expect(dropEl.nativeElement.classList.contains('uploadx-drop-active')).toBe(true);
