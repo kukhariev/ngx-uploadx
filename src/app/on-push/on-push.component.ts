@@ -1,23 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
-import {
-  DynamicChunk,
-  ErrorHandler,
-  Uploader,
-  UploadState,
-  UploadxOptions,
-  UploadxService
-} from 'ngx-uploadx';
+import { Uploader, UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../auth.service';
-
-const { deviceMemory } = navigator as any;
-
-ErrorHandler.maxAttempts = 3;
-
-DynamicChunk.maxSize = (deviceMemory || 0.25) * 256 * 1024 * 1024;
-// console.log(`Device memory at least: ${deviceMemory}GiB`);
-// console.log(`maxChunkSize: ${Uploader.maxChunkSize / 1024 / 1024}MiB`);
 
 @Component({
   selector: 'app-on-push',
