@@ -39,6 +39,15 @@ describe('Directive: UploadxDropDirective', () => {
     serviceHandleFileListSpy = spyOn(service, 'handleFileList');
   });
 
+  it('should ignore non files dragover', () => {
+    const dragoverEvent = jasmine.createSpyObj('event', ['preventDefault', 'stopPropagation']);
+    dragoverEvent.dataTransfer = {};
+    dropEl.triggerEventHandler('dragover', dragoverEvent);
+    expect(dragoverEvent.stopPropagation).toHaveBeenCalledTimes(0);
+    fixture.detectChanges();
+    expect(dropEl.nativeElement.classList.contains('uploadx-drop-active')).toBe(false);
+  });
+
   it('should set class on dragover', () => {
     const dragoverEvent = jasmine.createSpyObj('event', ['preventDefault', 'stopPropagation']);
     dragoverEvent.dataTransfer = { files };
@@ -48,6 +57,7 @@ describe('Directive: UploadxDropDirective', () => {
     fixture.detectChanges();
     expect(dropEl.nativeElement.classList.contains('uploadx-drop-active')).toBe(true);
   });
+
   it('should remove class on dragleave', () => {
     const dragoverEvent = jasmine.createSpyObj('event', ['preventDefault', 'stopPropagation']);
     dragoverEvent.dataTransfer = { files };
@@ -59,6 +69,7 @@ describe('Directive: UploadxDropDirective', () => {
     fixture.detectChanges();
     expect(dropEl.nativeElement.classList.contains('uploadx-drop-active')).toBe(false);
   });
+
   it('should call HandleFileList', () => {
     const dropEvent = jasmine.createSpyObj('event', ['preventDefault', 'stopPropagation']);
     dropEvent.dataTransfer = { files };
