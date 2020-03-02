@@ -15,11 +15,7 @@ export class Tus extends Uploader {
       'Upload-Length': `${this.size}`,
       'Upload-Metadata': `${encodedMetaData}`
     };
-    await this.request({
-      method: 'POST',
-      url: this.endpoint,
-      headers
-    });
+    await this.request({ method: 'POST', url: this.endpoint, headers });
     const location = this.getValueFromResponse('location');
     if (!location) {
       throw new Error('Invalid or missing Location header');
@@ -34,11 +30,7 @@ export class Tus extends Uploader {
       'Content-Type': 'application/offset+octet-stream',
       'Upload-Offset': `${this.offset}`
     };
-    await this.request({
-      method: 'PATCH',
-      body,
-      headers
-    });
+    await this.request({ method: 'PATCH', body, headers });
     return this.getOffsetFromResponse();
   }
 

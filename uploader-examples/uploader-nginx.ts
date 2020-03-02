@@ -35,10 +35,15 @@ export class NginxUploadModuleUploader extends Uploader {
       method: 'POST',
       body,
       url: this.url,
-      headers
+      headers,
+      progress: true
     });
     return this.getOffsetFromResponse();
   }
+
+  // abort not supported
+  abort() {}
+
   private getOffsetFromResponse(): number {
     if (this.responseStatus === 201) {
       const [, end] = this.response
@@ -57,7 +62,4 @@ export class NginxUploadModuleUploader extends Uploader {
     }
     return this.offset;
   }
-
-  // abort not supported
-  abort() {}
 }
