@@ -235,7 +235,11 @@ export abstract class Uploader implements UploadState {
   protected onCancel(): void {
     this.abort();
     const stateChange = () => this.stateChange(this);
-    this.url && this.request({ method: 'DELETE' }).then(stateChange, stateChange);
+    if (this.url) {
+      this.request({ method: 'DELETE' }).then(stateChange, stateChange);
+    } else {
+      stateChange();
+    }
   }
 
   /**
