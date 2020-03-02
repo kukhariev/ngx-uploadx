@@ -6,17 +6,16 @@ import { delay } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthService {
+  accessToken: string;
   constructor() {
-    localStorage.setItem('token', `token-${new Date().getSeconds()}`);
+    this.accessToken = `token-${new Date().getTime()}`;
   }
-  refresh() {
-    const token = `token-${new Date().getSeconds()}`;
-    localStorage.setItem('token', token);
-    return of(token).pipe(delay(100));
+  renewToken() {
+    this.accessToken = `token-${new Date().getTime()}`;
+    return of(this.accessToken).pipe(delay(400));
   }
 }
 
 export function tokenGetter() {
-  // return localStorage.getItem('token');
-  return `token-${new Date().getSeconds()}`;
+  return `token-${new Date().getTime()}`;
 }

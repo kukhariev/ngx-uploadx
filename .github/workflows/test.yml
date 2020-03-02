@@ -1,0 +1,19 @@
+name: Angular Test CI
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: npm install and test
+        run: |
+          npm install
+          npm run ci 
+          npm run build
+        env:
+          CI: true

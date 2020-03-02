@@ -2,17 +2,23 @@
   "compileOnSave": false,
   "compilerOptions": {
     "importHelpers": true,
+    "module": "esnext",
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es5",
-    "baseUrl": "./",
+    "target": "es2015",
+    "baseUrl": ".",
     "paths": {
-      "uploadx": ["dist/uploadx"]
+      "ngx-uploadx": ["src/uploadx/"]
     },
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
     "typeRoots": ["node_modules/@types"],
     "lib": ["es2017", "dom"]
   }

@@ -1,7 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
-@import url( 'https://fonts.googleapis.com/css?family=Roboto');
+@import url('https://fonts.googleapis.com/css?family=Roboto');
 $dark: rgb(48, 48, 48);
-$red: rgb(233, 30, 99);
+$red: rgb(187, 65, 106);
 $light: rgb(255, 255, 255);
 
 $background: $dark;
@@ -40,10 +40,13 @@ body {
 
   &:hover {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3);
-    // transform: scale(1.01);
+    background-color: lighten($red, 5%);
   }
 }
-
+.uploadx-drop-active {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3);
+  background-color: lighten($red, 10%);
+}
 .container {
   margin: 0;
   padding: 0;
@@ -52,21 +55,53 @@ body {
   flex-flow: row;
 }
 
-.header {
-  display: flex;
+header {
+  color: $light;
+  .active {
+    font-weight: bold;
+  }
   margin-bottom: 5px;
-  z-index: 2;
-  height: 50px;
-  line-height: 50px;
   background-color: $red;
   @extend .shadow;
 
-  a,
-  h4,
-  h5 {
-    // font-weight: 600;
-    color: $main;
-    margin-left: 32px;
+  nav {
+    display: flex;
+    flex-direction: row;
+    .logo {
+      height: 100%;
+      text-decoration: none;
+      text-align: center;
+      color: $light;
+      width: 115px;
+      margin: auto 0;
+      font-weight: bold;
+    }
+    ul {
+      display: flex;
+      width: 80wv;
+    }
+    li {
+      flex: 0 1 auto;
+      min-width: 0;
+      display: flex;
+      overflow: hidden;
+      &:hover {
+        background-color: lighten($red, 5%);
+      }
+      a {
+        text-align: center;
+        width: 10vw;
+        flex: 0 1 auto;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: $light;
+        text-transform: lowercase;
+        text-decoration: none;
+        padding: 20px 1vw;
+        font-size: 90%;
+      }
+    }
   }
 }
 
@@ -90,6 +125,7 @@ body {
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
+  min-width: 10vw;
 }
 
 .btn {
@@ -105,6 +141,8 @@ body {
   border-radius: 2px;
   cursor: pointer;
   transition: all 150ms;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.1);
@@ -159,6 +197,8 @@ body {
     .col-2 {
       flex: 3 1 8%;
       padding-right: 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .col-3 {
@@ -169,8 +209,6 @@ body {
 
 .json {
   display: block;
-  // margin: 4px;
-  // padding: 5px;
   min-height: 200px;
   background-color: $background;
 
@@ -179,5 +217,6 @@ body {
     padding: 5px;
     margin: auto;
     overflow: hidden;
+    text-overflow: ellipsis;
   }
 }

@@ -2,17 +2,19 @@
 // https://github.com/angular/protractor/blob/master/lib/config.ts
 
 const { SpecReporter } = require('jasmine-spec-reporter');
-
+const chromeArgs = process.env.CI ? ['--headless'] : [];
 exports.config = {
   allScriptsTimeout: 11000,
-  specs: [
-    './e2e/**/*.e2e-spec.ts'
-  ],
+  specs: ['./e2e/**/*.e2e-spec.ts'],
   capabilities: {
-    'browserName': 'chrome'
+    browserName: 'chrome',
+    chromeOptions: {
+      args: chromeArgs
+    }
   },
   directConnect: true,
   baseUrl: 'http://localhost:4200/',
+  // chromeDriver: '/usr/bin/chromedriver',
   framework: 'jasmine',
   jasmineNodeOpts: {
     showColors: true,

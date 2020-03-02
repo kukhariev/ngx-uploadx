@@ -1,9 +1,7 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { UploadxService } from 'ngx-uploadx';
 import { Observable } from 'rxjs';
-
-import { UploadxService } from '../../uploadx';
 import { ServiceWayComponent } from './service-way.component';
 
 describe('ServiceWayComponent', () => {
@@ -47,7 +45,7 @@ describe('ServiceWayComponent', () => {
     it('makes expected calls', () => {
       const uploadServiceStub: UploadxService = fixture.debugElement.injector.get(UploadxService);
       spyOn(uploadServiceStub, 'control');
-      comp.cancelAll();
+      comp.cancel();
       expect(uploadServiceStub.control).toHaveBeenCalled();
     });
   });
@@ -56,7 +54,7 @@ describe('ServiceWayComponent', () => {
     it('makes expected calls', () => {
       const uploadServiceStub: UploadxService = fixture.debugElement.injector.get(UploadxService);
       spyOn(uploadServiceStub, 'control');
-      comp.uploadAll();
+      comp.upload();
       expect(uploadServiceStub.control).toHaveBeenCalled();
     });
   });
@@ -65,7 +63,7 @@ describe('ServiceWayComponent', () => {
     it('makes expected calls', () => {
       const uploadServiceStub: UploadxService = fixture.debugElement.injector.get(UploadxService);
       spyOn(uploadServiceStub, 'control');
-      comp.pauseAll();
+      comp.pause();
       expect(uploadServiceStub.control).toHaveBeenCalled();
     });
   });

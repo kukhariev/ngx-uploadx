@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
+import { Uploader, UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Uploader, UploadState, UploadxOptions, UploadxService } from '../../uploadx';
 import { AuthService } from '../auth.service';
 
 @Component({
@@ -10,16 +10,15 @@ import { AuthService } from '../auth.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OnPushComponent implements OnDestroy {
-  state: Observable<UploadState>;
+  state$: Observable<UploadState>;
   uploads$: Observable<Uploader[]>;
   options: UploadxOptions = {
-    url: `${environment.api}/upload?uploadType=uploadx`,
-    token: 'token',
-    chunkSize: 1024 * 256 * 8
+    endpoint: `${environment.api}/files?uploadType=uploadx`,
+    token: this.tokenGetter.bind(this)
   };
   constructor(private uploadService: UploadxService, private auth: AuthService) {
     this.uploads$ = this.uploadService.connect(this.options);
-    this.state = this.uploadService.events;
+    this.state$ = this.uploadService.events;
   }
 
   ngOnDestroy(): void {
@@ -27,22 +26,20 @@ export class OnPushComponent implements OnDestroy {
   }
 
   cancelAll() {
-    this.uploadService.control({ action: 'cancelAll' });
-  }
-
-  uploadAll() {
-    this.uploadService.control({ action: 'uploadAll' });
+    this.uploadService.control({ action: 'cancel' });
   }
 
   pauseAll() {
-    this.uploadService.control({ action: 'pauseAll' });
+    this.uploadService.control({ action: 'pause' });
   }
 
-  pause(uploadId: string) {
-    this.uploadService.control({ action: 'pause', uploadId });
+  uploadAll() {
+    this.uploadService.control({ action: 'upload' });
   }
 
-  upload(uploadId: string) {
-    this.uploadService.control({ action: 'upload', uploadId });
+  async tokenGetter(httpStatus: number) {
+    const token =
+      httpStatus === 401 ? await this.auth.renewToken().toPromise() : this.auth.accessToken;
+    return token;
   }
 }

@@ -1,31 +1,28 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-
+import { UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-
-import { UploadxOptions, UploadState, UploadxService, UploadItem } from '../../uploadx';
 import { environment } from '../../environments/environment';
 import { Ufile } from '../ufile';
+import { UploaderExt } from './uploader-ext.class';
 
 @Component({
   selector: 'app-service-way',
   templateUrl: './service-code-way.component.html'
 })
 export class ServiceCodeWayComponent implements OnDestroy, OnInit {
-  state: Observable<UploadState>;
+  state$: Observable<UploadState>;
   uploads: Ufile[] = [];
   options: UploadxOptions = {
-    concurrency: 2,
-    url: `${environment.api}/upload?uploadType=uploadx`,
-    token: 'someToken',
-    autoUpload: true,
-    chunkSize: 1024 * 256 * 8
+    endpoint: `${environment.api}/files?uploadType=uploadx`,
+    token: btoa('user:pass'),
+    chunkSize: 1024 * 256 * 8,
+    uploaderClass: UploaderExt
   };
-  private ngUnsubscribe: Subject<any> = new Subject();
   numberOfCopies = 0;
-
   @ViewChild('file', { read: ElementRef }) fileInput: ElementRef;
 
+  private unsubscribe$ = new Subject();
   constructor(private uploadService: UploadxService) {}
 
   ngOnInit() {
@@ -34,52 +31,39 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   }
 
   ngOnDestroy() {
-    this.ngUnsubscribe.next();
-    this.ngUnsubscribe.complete();
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
-  cancelAll() {
-    this.uploadService.control({ action: 'cancelAll' });
+  cancel(id?: string) {
+    this.uploadService.control({ action: 'cancel', uploadId: id });
   }
 
-  uploadAll() {
-    this.uploadService.control({ action: 'uploadAll' });
+  pause(id?: string) {
+    this.uploadService.control({ action: 'pause', uploadId: id });
   }
 
-  pauseAll() {
-    this.uploadService.control({ action: 'pauseAll' });
-  }
-
-  pause(uploadId: string) {
-    this.uploadService.control({ action: 'pause', uploadId });
-  }
-
-  upload(uploadId: string) {
-    this.uploadService.control({ action: 'upload', uploadId });
+  upload(id?: string) {
+    this.uploadService.control({ action: 'upload', uploadId: id });
   }
 
   onChange() {
     const files = this.getFiles();
+    // tslint:disable-next-line: prefer-for-of
     for (let i = 0; i < files.length; i++) {
       this.uploadService.handleFile(files[i]);
     }
   }
-
+  // this.numberOfCopies = this.uploadService.runningProcess();
   getFiles(): FileList {
     return this.fileInput.nativeElement.files;
   }
 
-  onUpload(uploadsOutStream: Observable<UploadState>) {
-    this.state = uploadsOutStream;
-    uploadsOutStream.pipe(takeUntil(this.ngUnsubscribe)).subscribe((item: UploadState) => {
-      this.numberOfCopies = this.uploadService.runningProcess();
-      const index = this.uploads.findIndex(f => f.uploadId === item.uploadId);
-      if (item.status === 'added') {
-        this.uploads.push(new Ufile(item));
-      } else {
-        this.uploads[index].progress = item.progress;
-        this.uploads[index].status = item.status;
-      }
+  onUpload(events$: Observable<UploadState>) {
+    this.state$ = events$;
+    events$.pipe(takeUntil(this.unsubscribe$)).subscribe((ufile: UploadState) => {
+      const target = this.uploads.find(f => f.uploadId === ufile.uploadId);
+      target ? Object.assign(target, ufile) : this.uploads.push(new Ufile(ufile));
     });
   }
 }

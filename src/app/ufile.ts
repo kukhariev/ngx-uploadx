@@ -1,4 +1,4 @@
-import { UploadState } from '../uploadx';
+import { UploadState } from 'ngx-uploadx';
 
 export class Ufile {
   name: string;

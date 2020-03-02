@@ -1,9 +1,7 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { UploadxService } from 'ngx-uploadx';
 import { Observable } from 'rxjs';
-
-import { UploadxService } from '../../uploadx';
 import { ServiceCodeWayComponent } from './service-code-way.component';
 
 describe('ServiceCodeWayComponent', () => {
@@ -37,21 +35,21 @@ describe('ServiceCodeWayComponent', () => {
 
   describe('cancelAll', () => {
     it('makes expected calls', () => {
-      comp.cancelAll();
+      comp.cancel();
       expect(uploadService.control).toHaveBeenCalled();
     });
   });
 
   describe('uploadAll', () => {
     it('makes expected calls', () => {
-      comp.uploadAll();
+      comp.upload();
       expect(uploadService.control).toHaveBeenCalled();
     });
   });
 
   describe('pauseAll', () => {
     it('makes expected calls', () => {
-      comp.pauseAll();
+      comp.pause();
       expect(uploadService.control).toHaveBeenCalled();
     });
   });

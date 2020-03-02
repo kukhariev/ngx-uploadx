@@ -1,44 +1,58 @@
 // @ts-check
-const DEV = process.env.NODE_ENV === 'development';
+
+const args = process.argv.slice(2);
+const debug = args.includes('--debug');
+const emitErrors = args.includes('--errors');
+debug && (process.env.DEBUG = 'uploadx:*');
+
 const http = require('http');
 const url = require('url');
-const { unlinkSync } = require('fs');
+const rimraf = require('rimraf');
 const { tmpdir } = require('os');
-const { Uploadx, DiskStorage } = require('node-uploadx');
+const { Multipart, Tus, Uploadx } = require('node-uploadx');
 
-const storage = new DiskStorage({ dest: (req, file) => `${tmpdir()}/ngx/${file.filename}` });
-DEV && resetStorageBeforeTest(storage);
+const PORT = 3003;
+const USER_PREFIX = 'tester';
+const UPLOAD_DIR = `${tmpdir()}/ngx-uploadx/`;
 
-const uploads = new Uploadx({ storage });
-uploads.on('error', console.error);
+const opts = {
+  directory: UPLOAD_DIR,
+  allowMIME: ['video/*', 'image/*'],
+  path: '/files'
+};
+
+const upx = new Uploadx(opts);
+const tus = new Tus(opts);
+const mpt = new Multipart(opts);
+
 const server = http.createServer((req, res) => {
-  if (DEV && Math.random() < 0.1) {
-    res.writeHead(401, { 'Content-Type': 'text/plan', 'Access-Control-Allow-Origin': '*' });
-    res.end('Unauthorized');
-    return;
+  if (emitErrors && Math.random() < 0.4 && req.method !== 'OPTIONS' && req.method !== 'DELETE') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.statusCode = Math.random() < 0.5 ? 401 : 500;
+    return res.end();
   }
-  const pathname = url.parse(req.url).pathname.toLowerCase();
-  if (pathname === '/upload') {
-    uploads.handle(req, res);
+
+  const { pathname, query = {} } = url.parse(req.url, true);
+  if (/^\/files\W?/.test(pathname)) {
+    req['user'] = { id: query.uploadType };
+    if (query.uploadType === 'multipart') {
+      mpt.handle(req, res);
+    } else if (query.uploadType === 'tus') {
+      tus.handle(req, res);
+    } else {
+      upx.handle(req, res);
+    }
   } else {
-    res.writeHead(404, { 'Content-Type': 'text/plan' });
-    res.end('Not Found');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.statusCode = 404;
+    res.end();
   }
 });
 
-server.listen(3003, error => {
-  if (error) {
-    return console.error('something bad happened', error);
-  }
-  console.log('listening on port:', server.address()['port']);
-});
+server.listen(PORT);
 
-function resetStorageBeforeTest(storage) {
-  const files = storage.metaStore.all;
-  for (const id in files) {
-    try {
-      unlinkSync(files[id].path);
-    } catch (err) {}
-  }
-  storage.metaStore.clear();
+function storageCleanup() {
+  rimraf.sync(UPLOAD_DIR);
 }
+
+exports.reset = storageCleanup;

@@ -1,2 +1,8 @@
-package.json
+/.github
+coverage
 dist
+package-lock.json
+temp
+tmp
+/.vscode
+

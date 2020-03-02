@@ -11,7 +11,7 @@
 - Retries using exponential back-off strategy
 - Chunking
 
-## Setups
+## Setup
 
 - Add ngx-uploadx module as dependency :
 
@@ -46,189 +46,161 @@ import { UploadxOptions, UploadState } from 'ngx-uploadx';
   <input type="file" [uploadx]="options" (uploadxState)="onUpload($event)">
   `
 })
-
 export class AppHomeComponent {
-  options: UploadxOptions = { url: `[URL]`};
+  options: UploadxOptions = { endpoint: `[URL]` };
   onUpload(state: Observable<UploadState>) {
-    state
-      .subscribe((item: UploadState) => {
-         console.log(item);
-         //...
-      }
- }
+    state.subscribe((item: UploadState) => {
+      console.log(item);
+      //...
+    });
+  }
+}
 ```
+
+> Please navigate to the [src/app sub-folder](src/app) for more detailed examples
 
 ## Server-side setup
 
 - [node-uploadx](https://github.com/kukhariev/node-uploadx)
+- [tus-node-server](https://github.com/tus/tus-node-server)
+- [tusd](https://github.com/tus/tusd)
 
-## Directive
+## Options
+
+- `allowedTypes`: Allowed file types (directive only)
+
+- `multiple`: Allow to select multiple files. Default value: `true`
+
+- `autoUpload`: Auto start upload when files added. Default value: `true`
+
+- `chunkSize`: Set a fixed chunk size. If not specified, the optimal size will be automatically adjusted based on the network speed.
+
+- `concurrency`: Set the maximum parallel uploads. Default value: `2`
+
+- `headers`: Headers to be appended to each HTTP request
+
+- `metadata`: Custom uploads metadata
+
+- `uploaderClass`: Upload API implementation. Built-in: `Uploaderx`(default), `Tus`. More [examples](uploader-examples).
+
+- `token`: Authorization token as a `string` or function returning a `string` or `Promise<string>`
+
+- `endpoint`: URL to create new uploads. Default value: `'/upload'`
+
+## Directives
 
 ```html
-<input
-  type="file"
-  [uploadx]="options"
-  [uploadxAction]="control"
-  (uploadxState)="onUpload($event)"
-/>
+<div>
+  <label class="file-drop" uploadxDrop>
+    <input
+      type="file"
+      [uploadx]="options"
+      [uploadxAction]="control"
+      (uploadxState)="onUpload($event)"
+    />
+  </label>
+</div>
 ```
 
-### Selector
+### uploadx
 
-#### \[uploadx\]
+File input directive
 
-### inputs
+- `[uploadx]: UploadxOptions`
 
-#### \[uploadx\]: _UploadxOptions_
+  Set directive options
 
-#### \[uploadxAction\]: _UploadxControlEvent_
+- `[uploadxAction]: UploadxControlEvent`
 
-### Output
+  Control the uploads
 
-#### (uploadxState): \$event _\<Observable\>UploadState_
+- `(uploadxState): ($event: <Observable>UploadState)=> void`
 
-## Service
+### uploadxDrop
 
-### UploadxService
+File drop directive.
+Activates the `.uploadx-drop-active` class on DnD operations.
 
-### Public Methods
+## UploadxService
 
-#### init(options: _UploadxOptions_): _Observable\<UploadState\>_
+- `init(options?: UploadxOptions): Observable<UploadState>`
 
-> Set global module options
+  Initializes service. Returns Observable that emits a new value on progress or status changes
 
-```ts
-// example:
-uploadxOptions: UploadxOptions = {
-  concurrency: 2,
-  endpoint: `${environment.api}/upload?uploadType=uploadx`,
-  token:  () => {
-    return localStorage.getItem('access_token');
-  },
-  autoUpload: true,
-  chunkSize: 1024 * 256 * 8
-};
-ngOnInit() {
-  this.uploadService.init(this.uploadxOptions)
-    .subscribe((item: UploadState) => {
-      console.log(item);
-      //...
-    }
-}
-```
-
-#### connect(options: _UploadxOptions_): _Observable\<Uploader[]\>_
-
-> Set global module options
-
-```ts
-// example:
-@Component({
-  template: `
-    <input type="file" uploadx">
-    <div *ngFor="let item of uploads$ | async">{{item.name}}</div>
-  `,
-  changeDetection: ChangeDetectionStrategy.OnPush
-})
-export class UploadsComponent {
-  uploads$: Observable<Uploader[]>;
-  options: UploadxOptions = {
-    endpoint: `${environment.api}/upload?uploadType=uploadx`,
+  ```ts
+  //  @example:
+  uploadxOptions: UploadxOptions = {
+    concurrency: 4,
+    endpoint: `${environment.api}/upload`,
     token:  () => localStorage.getItem('access_token'),
+    uploaderClass: Tus
+  };
+  ngOnInit() {
+    this.uploadService.init(this.uploadxOptions)
+      .subscribe((item: UploadState) => {
+        console.log(item);
+        //...
+      }
   }
-  constructor(private uploadService: UploadxService) {
-    this.uploads$ = this.uploadService.connect(this.options);
+  ```
+
+- `connect(options?: UploadxOptions): Observable<Uploader[]>`
+
+  Initializes service. Returns Observable that emits the current queue
+
+  ```ts
+  // @example:
+  @Component({
+    template: `
+      <input type="file" uploadx">
+      <div *ngFor="let item of uploads$ | async">{{item.name}}</div>
+    `,
+    changeDetection: ChangeDetectionStrategy.OnPush
+  })
+  export class UploadsComponent {
+    uploads$: Observable<Uploader[]>;
+    options: UploadxOptions = {
+      endpoint: `${environment.api}/upload?uploadType=uploadx`,
+      token:  () => localStorage.getItem('access_token'),
+    }
+    constructor(private uploadService: UploadxService) {
+      this.uploads$ = this.uploadService.connect(this.options);
+    }
+  ```
+
+- `disconnect(): void`
+
+  Terminate all uploads and clears the queue
+
+- `handleFile(file: File, options?: UploadxOptions): void`
+
+  Create Uploader for the file and add to the queue
+
+- `handleFileList(fileList: FileList, options?: UploadxOptions): void`
+
+  Add files to the upload queue
+
+- `control(event: UploadxControlEvent): void`
+
+  Uploads control
+
+  ```ts
+  // @example:
+  pause(uploadId: string) {
+    this.uploadService.control({ action: 'pause', uploadId });
   }
-```
+  setToken(token: string) {
+    this.uploadService.control({ token });
+  }
+  ```
 
-#### disconnect(): _\<void\>_
+- `queue: Uploader[]`
 
-> Abort all uploads
+  Uploaders array
 
-#### handleFile(file: File): _\<void\>_
+- `events: Observable<UploadState>`
 
-> Create Uploader for the file and add to the queue
-
-#### handleFileList(fileList: _FileList_): _\<void\>_
-
-> Add files to the upload queue
-
-#### control(event: _UploadxControlEvent_): _void_
-
-> Send event
-
-```ts
-// example:
-
-pause(uploadId: string) {
-  this.uploadService.control({ action: 'pause', uploadId });
-}
-```
-
-### Public props
-
-#### queue: Uploader[]
-
-> Uploaders array
-
-#### events: _Observable\<UploadState\>_
-
-> Uploadx Events
-
-## Interfaces
-
-### UploadxOptions
-
-| Name                   | Defaults? | Description                              |
-| ---------------------- | :-------: | ---------------------------------------- |
-| **[allowedTypes]**     |     -     | _Set "accept" attribute_                 |
-| **[autoUpload]**       |   true    | _Auto upload with global options_        |
-| **[chunkSize]**        |   1MiB    | _If set to > 0 use chunked upload_       |
-| **[concurrency]**      |     2     | _Limit the number of concurrent uploads_ |
-| **[headers]**          |     -     | _Custom headers_                         |
-| **[method]**           |  "POST"   | _Upload API initial method_              |
-| **[token]**            |     -     | _Auth Bearer token \/ token Getter_      |
-| **[endpoint]**         | "/upload" | _API URL_                                |
-| **[maxRetryAttempts]** |     3     | _Maximum number of retries to allow_     |
-
-### _\<Observable\>_ UploadState
-
-| Name               |       Type       | Description                                                                         |
-| ------------------ | :--------------: | ----------------------------------------------------------------------------------- |
-| **file**           |      _File_      | _FileAPI File_                                                                      |
-| **name**           |     _string_     | _file name_                                                                         |  |
-| **percentage**     |     _number_     | _progress percentage_                                                               |
-| **remaining**      |     _number_     | _ETA_                                                                               |
-| **response**       | _Object \| null_ | _response body_                                                                     |
-| **responseStatus** |     _number_     | _response’s status_                                                                 |
-| **size**           |     _number_     | _file size_                                                                         |
-| **speed**          |     _number_     | _upload speed bytes/sec_                                                            |
-| **status**         |  _UploadStatus_  | _'added', 'queue', 'uploading', 'complete','retry', 'error', 'cancelled', 'paused'_ |
-| **uploadId**       |     _string_     | _upload id_                                                                         |
-| **URI**            |     _string_     | _file URI_                                                                          |
-
-### UploadItem
-
-> Item custom options, override globals
-
-| Name           |            Type             | Description                         |
-| -------------- | :-------------------------: | ----------------------------------- |
-| **[method]**   |          _string_           | _API initial method_                |
-| **[uploadId]** |          _string_           | _internal upload id \( ReadOnly \)_ |
-| **[URI]**      |          _string_           | _Item URL_                          |
-| **[headers]**  | _{ [key: string]: string }_ | _Add custom headers_                |
-| **[metadata]** |            _any_            | _Add custom data_                   |
-| **[endpoint]** |           string            | _Custom url_                        |
-
-### UploadxControlEvent
-
->
-
-| Name              |      Type      | Description                                                                        |
-| ----------------- | :------------: | ---------------------------------------------------------------------------------- |
-| **action**        | _UploadAction_ | _'uploadAll', 'upload', 'cancel', 'cancelAll', 'pauseAll, 'pause', 'refreshToken'_ |
-| **[uploadId]**    |    _string_    | _upload id \( ReadOnly \)_                                                         |
-| **[itemOptions]** |  _UploadItem_  | _custom options_                                                                   |
+  Unloads status events
 
 ## Run demo
 
@@ -246,15 +218,10 @@ Run `npm run build` to build the lib.
 
 Pull requests are welcome!
 
-## Collaborators
+## References
 
-<table><tbody><tr><th align="left">wil92</th><td><a href="https://github.com/wil92">GitHub/wil92</a></td></tr>
-<tr><th align="left">kukhariev</th><td><a href="https://github.com/kukhariev">GitHub/kukhariev</a></td></tr>
-</tbody></table>
-
-## Links
-
-- [https://developers.google.com/drive/v3/web/resumable-upload](https://developers.google.com/drive/v3/web/resumable-upload)
+- [https://developers.google.com/drive/api/v3/manage-uploads#resumable](https://developers.google.com/drive/api/v3/manage-uploads#resumable)
+- [https://github.com/tus/tus-resumable-upload-protocol/blob/master/protocol.md](https://github.com/tus/tus-resumable-upload-protocol/blob/master/protocol.md)
 
 ## License
 
