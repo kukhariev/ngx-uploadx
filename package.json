@@ -44,7 +44,7 @@
     "@angular/router": "7.2.16",
     "core-js": "2.6.11",
     "rxjs": "6.5.3",
-    "zone.js": "0.8.26"
+    "zone.js": "0.10.3"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "0.13.9",
