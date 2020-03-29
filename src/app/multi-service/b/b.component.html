@@ -1,0 +1,25 @@
+<div class="container">
+  <div class="btns">
+    <div class="btn-col">
+      <label class="upload-btn" uploadxDrop
+        >B
+        <input type="file" uploadx accept="image/*" style="display:none" />
+      </label>
+      <button class="btn red raised" (click)="uploadAll()">Upload All</button>
+      <button class="btn red raised" (click)="cancelAll()">Cancel All</button>
+      <button class="btn red raised" (click)="pauseAll()">Pause All</button>
+    </div>
+  </div>
+
+  <div class="uploads-table">
+    <div class="row" *ngFor="let item of uploads$ | async">
+      <span class="col-1">{{ item.name }}</span>
+      <span class="col-2">{{ item.progress }}%</span>
+      <span class="col-2">{{ item.status }}</span>
+      <span class="col-3 btn-row">
+        <button class="btn red raised" (click)="item.status = 'paused'">pause</button>
+        <button class="btn red raised" (click)="item.status = 'queue'">upload</button>
+      </span>
+    </div>
+  </div>
+</div>

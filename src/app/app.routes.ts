@@ -1,3 +1,4 @@
+import { MultiServiceComponent } from 'src/app/multi-service/multi-service.component';
 import { DirectiveWayComponent } from './directive-way/directive-way.component';
 import { MultipleDirectiveComponent } from './multiple-directive/multiple-directive.component';
 import { OnPushComponent } from './on-push/on-push.component';
@@ -11,5 +12,6 @@ export const appRoutes = [
   { path: 'service-code-way', component: ServiceCodeWayComponent },
   { path: 'on-push', component: OnPushComponent },
   { path: 'multi', component: MultipleDirectiveComponent },
+  { path: 'multi2', component: MultiServiceComponent },
   { path: 'tus', component: TusComponent }
 ];
