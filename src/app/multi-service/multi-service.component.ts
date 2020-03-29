@@ -1,12 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-multi-service',
-  templateUrl: './multi-service.component.html',
-  styleUrls: ['./multi-service.component.scss']
+  templateUrl: './multi-service.component.html'
 })
-export class MultiServiceComponent implements OnInit {
-  constructor() {}
-
-  ngOnInit() {}
-}
+export class MultiServiceComponent {}
