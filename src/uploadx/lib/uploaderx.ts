@@ -59,6 +59,6 @@ export class UploaderX extends Uploader {
 }
 
 export function getRangeEnd(range = ''): number {
-  const end = +range.split(/0-/)[1];
+  const end = parseInt(range.split(/-/)[1], 10);
   return end >= 0 ? end : -1;
 }
