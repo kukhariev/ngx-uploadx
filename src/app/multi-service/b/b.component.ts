@@ -19,7 +19,7 @@ export class BComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.uploadService.disconnect();
+    // UploadxService disconnect() method will be called !!!
   }
 
   cancelAll() {
