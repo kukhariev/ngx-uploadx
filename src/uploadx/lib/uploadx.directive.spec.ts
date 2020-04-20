@@ -5,9 +5,7 @@ import { UploadxDirective } from './uploadx.directive';
 import { UploadxService } from './uploadx.service';
 
 @Component({
-  template: `
-    <input type="file" [uploadx]="options" [uploadxAction]="action" />
-  `
+  template: ` <input type="file" [uploadx]="options" [uploadxAction]="action" /> `
 })
 class UploadxTestComponent {
   options = {
