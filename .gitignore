@@ -50,3 +50,4 @@ update-cli.sh
 
 src/uploadx/package.json
 
+debug.log
