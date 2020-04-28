@@ -6,9 +6,6 @@ node_js:
 addons:
   chrome: stable
 
-branches:
-  only:
-    - master
 script:
   - 'commitlint-travis'
   - 'npm run ci'
