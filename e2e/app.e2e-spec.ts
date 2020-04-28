@@ -24,18 +24,18 @@ describe('uploader App', () => {
     expect(page.getPreText()).toEqual('null');
   });
 
-  it('should upload (Directive)', () => {
+  it('should upload (directive)', () => {
     page.getFileInput().sendKeys(absolutePath);
     expect(page.waitForCompleteTable()).toEqual('complete');
   });
 
-  it('should upload (Mixed)', async () => {
+  it('should upload (mixed)', async () => {
     page.navigateTo('/service-way');
     page.getFileInput().sendKeys(absolutePath);
     expect(page.waitForCompleteTable()).toEqual('complete');
   });
 
-  it('should upload (Service)', async () => {
+  it('should upload (service)', async () => {
     page.navigateTo('/service-code-way');
     page.getFileInput().sendKeys(absolutePath);
     expect(page.waitForCompleteTable()).toEqual('complete');
@@ -47,12 +47,19 @@ describe('uploader App', () => {
     expect(page.waitForCompleteTable()).toEqual('complete');
   });
 
-  it('should upload (Multi)', () => {
+  it('should upload (multi-options)', () => {
     page.navigateTo('/multi');
     page.getVideoFileInput().sendKeys(absolutePath);
     expect(page.waitForCompleteTable()).toEqual('complete');
   });
-  it('should upload (Tus)', () => {
+
+  it('should upload (multi-service)', () => {
+    page.navigateTo('/multi2');
+    page.getVideoFileInput().sendKeys(absolutePath);
+    expect(page.waitForCompleteTable()).toEqual('complete');
+  });
+
+  it('should upload (tus)', () => {
     page.navigateTo('/tus');
     page.getFileInput().sendKeys(absolutePath);
     expect(page.waitForCompleteTable()).toEqual('complete');
