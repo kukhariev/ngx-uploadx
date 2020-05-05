@@ -1,5 +1,6 @@
 {
   "$schema": "http://json.schemastore.org/renovate",
   "extends": ["config:base", ":preserveSemverRanges", "schedule:weekly"],
-  "semanticCommitType": "chore"
+  "semanticCommitType": "chore",
+  "ignoreDeps": ["@angular-devkit/build-angular"]
 }
