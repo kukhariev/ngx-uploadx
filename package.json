@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "0.13.10",
-    "@angular/cli": "7.3.10",
+    "@angular/cli": "10.0.1",
     "@angular/compiler-cli": "7.2.16",
     "@angular/language-service": "7.2.16",
     "@commitlint/cli": "9.0.1",
