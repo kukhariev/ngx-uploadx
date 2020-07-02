@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  api: 'http://example.com/api_v1'
+  api: `${window.location.protocol}//${window.location.hostname}:3003`
 };
