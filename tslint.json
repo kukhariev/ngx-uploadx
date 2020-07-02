@@ -29,6 +29,7 @@
     "ordered-imports": true,
     "prettier": true,
     "trailing-comma": false,
+    "typedef": [true, "call-signature"],
     "use-lifecycle-interface": true,
     "use-pipe-transform-interface": true,
     "variable-name": {

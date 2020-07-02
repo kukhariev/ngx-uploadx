@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 
 @Injectable({
@@ -10,12 +10,12 @@ export class AuthService {
   constructor() {
     this.accessToken = `token-${new Date().getTime()}`;
   }
-  renewToken() {
+  renewToken(): Observable<string> {
     this.accessToken = `token-${new Date().getTime()}`;
     return of(this.accessToken).pipe(delay(400));
   }
 }
 
-export function tokenGetter() {
+export function tokenGetter(): string {
   return `token-${new Date().getTime()}`;
 }

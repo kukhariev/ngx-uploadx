@@ -10,7 +10,7 @@ const snip = { file, size: 1, name: 'filename.mp4' };
 
 let code = 0;
 
-function shouldReject() {
+function shouldReject(): boolean {
   return code >= 400 || !code;
 }
 

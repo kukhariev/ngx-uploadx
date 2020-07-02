@@ -1,10 +1,11 @@
-import { MultiServiceComponent } from 'src/app/multi-service/multi-service.component';
 import { DirectiveWayComponent } from './directive-way/directive-way.component';
+import { MultiServiceComponent } from './multi-service/multi-service.component';
 import { MultipleDirectiveComponent } from './multiple-directive/multiple-directive.component';
 import { OnPushComponent } from './on-push/on-push.component';
 import { ServiceCodeWayComponent } from './service-code-way/service-code-way.component';
 import { ServiceWayComponent } from './service-way/service-way.component';
 import { TusComponent } from './tus/tus.component';
+
 export const appRoutes = [
   { path: '', redirectTo: 'directive-way', pathMatch: 'full' },
   { path: 'directive-way', component: DirectiveWayComponent },

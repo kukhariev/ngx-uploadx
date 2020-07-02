@@ -22,15 +22,15 @@ export class BComponent implements OnDestroy {
     // UploadxService disconnect() method will be called !!!
   }
 
-  cancelAll() {
+  cancelAll(): void {
     this.uploadService.control({ action: 'cancel' });
   }
 
-  pauseAll() {
+  pauseAll(): void {
     this.uploadService.control({ action: 'pause' });
   }
 
-  uploadAll() {
+  uploadAll(): void {
     this.uploadService.control({ action: 'upload' });
   }
 }

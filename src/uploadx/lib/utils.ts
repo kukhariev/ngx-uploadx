@@ -1,6 +1,6 @@
 // tslint:disable: no-bitwise
 
-function safeMatch(base: string, re: RegExp) {
+function safeMatch(base: string, re: RegExp): string {
   return (base.match(re) || [])[0] || '';
 }
 export function resolveUrl(url: string, base: string): string {
@@ -90,7 +90,7 @@ export class DynamicChunk {
   static minChunkTime = 2;
   static maxChunkTime = 8;
 
-  static scale(throughput: number) {
+  static scale(throughput: number): number {
     const elapsedTime = DynamicChunk.size / throughput;
     if (elapsedTime < DynamicChunk.minChunkTime) {
       DynamicChunk.size = Math.min(DynamicChunk.maxSize, DynamicChunk.size * 2);

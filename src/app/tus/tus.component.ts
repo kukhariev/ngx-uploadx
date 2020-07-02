@@ -23,20 +23,20 @@ export class TusComponent implements OnDestroy {
   };
   private unsubscribe$ = new Subject();
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
-  cancel(id?: string) {
+  cancel(id?: string): void {
     this.control = { action: 'cancel', uploadId: id };
   }
-  pause(id?: string) {
+  pause(id?: string): void {
     this.control = { action: 'pause', uploadId: id };
   }
-  upload(id?: string) {
+  upload(id?: string): void {
     this.control = { action: 'upload', uploadId: id };
   }
-  onUpload(events$: Observable<UploadState>) {
+  onUpload(events$: Observable<UploadState>): void {
     this.state$ = events$;
     events$.pipe(takeUntil(this.unsubscribe$)).subscribe((evt: UploadState) => {
       const target = this.uploads.find(f => f.uploadId === evt.uploadId);

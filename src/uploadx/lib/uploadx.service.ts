@@ -29,7 +29,7 @@ export class UploadxService implements OnDestroy {
     'url'
   ];
   /** Upload status events */
-  get events() {
+  get events(): Observable<UploadState> {
     return this.eventsStream.asObservable();
   }
   /** Upload Queue */

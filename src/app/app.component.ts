@@ -8,7 +8,7 @@ export class AppComponent {
   @HostListener('dragenter', ['$event'])
   @HostListener('dragover', ['$event'])
   @HostListener('drop', ['$event'])
-  disable(event: any) {
+  disable(event: any): void {
     event.preventDefault();
     event.dataTransfer.effectAllowed = 'none';
     event.dataTransfer.dropEffect = 'none';

@@ -25,19 +25,19 @@ export class OnPushComponent implements OnDestroy {
     this.uploadService.disconnect();
   }
 
-  cancelAll() {
+  cancelAll(): void {
     this.uploadService.control({ action: 'cancel' });
   }
 
-  pauseAll() {
+  pauseAll(): void {
     this.uploadService.control({ action: 'pause' });
   }
 
-  uploadAll() {
+  uploadAll(): void {
     this.uploadService.control({ action: 'upload' });
   }
 
-  async tokenGetter(httpStatus: number) {
+  async tokenGetter(httpStatus: number): Promise<string> {
     const token =
       httpStatus === 401 ? await this.auth.renewToken().toPromise() : this.auth.accessToken;
     return token;

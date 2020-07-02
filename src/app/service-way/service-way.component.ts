@@ -22,29 +22,29 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
 
   constructor(private uploadService: UploadxService, private auth: AuthService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     const uploadsProgress = this.uploadService.init(this.options);
     this.onUpload(uploadsProgress);
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
 
-  cancel(id?: string) {
+  cancel(id?: string): void {
     this.uploadService.control({ action: 'cancel', uploadId: id });
   }
 
-  pause(id?: string) {
+  pause(id?: string): void {
     this.uploadService.control({ action: 'pause', uploadId: id });
   }
 
-  upload(id?: string) {
+  upload(id?: string): void {
     this.uploadService.control({ action: 'upload', uploadId: id });
   }
 
-  onUpload(uploadsOutStream: Observable<UploadState>) {
+  onUpload(uploadsOutStream: Observable<UploadState>): void {
     this.state$ = uploadsOutStream;
     uploadsOutStream.pipe(takeUntil(this.unsubscribe$)).subscribe((evt: UploadState) => {
       if (evt.status === 'retry' && evt.responseStatus === 401) {
