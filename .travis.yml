@@ -10,4 +10,4 @@ script:
   - 'commitlint-travis'
   - 'npm run ci'
   - 'npm run build'
-  - 'npm run integration:v10'
+  - 'npm run test:integration:v10'

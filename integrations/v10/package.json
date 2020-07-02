@@ -4,9 +4,9 @@
   "scripts": {
     "ng": "ng --version",
     "start": "ng serve",
-    "build": "ng build",
-    "test-v10": "ng test",
+    "test:spec": "ng test",
     "test": "ng build --prod",
+    "build": "ng build",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "pretest": "npm install",
