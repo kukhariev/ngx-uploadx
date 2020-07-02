@@ -258,7 +258,7 @@ export abstract class Uploader implements UploadState {
     );
   }
 
-  protected getChunk(): { start?: number; end?: number; body?: Blob } {
+  protected getChunk(): { start: number; end: number; body: Blob } {
     this.chunkSize = isNumber(this.options.chunkSize) ? this.chunkSize : DynamicChunk.size;
     const start = this.offset || 0;
     const end = Math.min(start + this.chunkSize, this.size);
