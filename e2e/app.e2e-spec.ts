@@ -1,4 +1,5 @@
 /* tslint: disable */
+import { browser, logging } from 'protractor';
 import { AppPage } from './app.po';
 const absolutePath = require('path').resolve('./e2e/test.mp4');
 const { reset } = require('../server');
@@ -9,9 +10,15 @@ describe('uploader App', () => {
   beforeEach(() => {
     page = new AppPage();
   });
-
   afterEach(async () => {
     await reset();
+    // Assert that there are no errors emitted from the browser
+    const logs = await browser.manage().logs().get(logging.Type.BROWSER);
+    expect(logs).not.toContain(
+      jasmine.objectContaining({
+        level: logging.Level.SEVERE
+      } as logging.Entry)
+    );
   });
 
   it('should have input type=file', () => {

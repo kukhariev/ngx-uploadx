@@ -40,7 +40,7 @@ export abstract class Uploader implements UploadState {
       s === 'cancelled' ? this.onCancel() : this.stateChange(this);
     }
   }
-  get status() {
+  get status(): UploadStatus {
     return this._status;
   }
   get url(): string {
@@ -138,7 +138,7 @@ export abstract class Uploader implements UploadState {
   /**
    * Starts chunk upload
    */
-  async start() {
+  async start(): Promise<void> {
     while (this.status === 'uploading' || this.status === 'retry') {
       if (this.offset !== this.size) {
         try {
@@ -223,7 +223,7 @@ export abstract class Uploader implements UploadState {
    */
   protected abstract getOffset(): Promise<number | undefined>;
 
-  protected setAuth(token: string) {
+  protected setAuth(token: string): void {
     this.headers.Authorization = `Bearer ${token}`;
   }
 
@@ -258,7 +258,7 @@ export abstract class Uploader implements UploadState {
     );
   }
 
-  protected getChunk() {
+  protected getChunk(): { start: number; end: number; body: Blob } {
     this.chunkSize = isNumber(this.options.chunkSize) ? this.chunkSize : DynamicChunk.size;
     const start = this.offset || 0;
     const end = Math.min(start + this.chunkSize, this.size);

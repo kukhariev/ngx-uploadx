@@ -1,22 +1,22 @@
-import { browser, by, element } from 'protractor';
+import { browser, by, element, ElementFinder } from 'protractor';
 
 export class AppPage {
-  navigateTo(path: string) {
-    return browser.get(path);
+  navigateTo(path: string): Promise<unknown> {
+    return browser.get(path) as Promise<unknown>;
   }
-  getFileInput() {
+  getFileInput(): ElementFinder {
     return element(by.css('app-root input'));
   }
-  getVideoFileInput() {
+  getVideoFileInput(): ElementFinder {
     return element(by.css('app-root  .video'));
   }
-  getTable() {
+  getTable(): ElementFinder {
     return element(by.css('app-root .uploads-table'));
   }
-  getPreText() {
-    return element(by.css('app-root pre')).getText();
+  getPreText(): Promise<string> {
+    return element(by.css('app-root pre')).getText() as Promise<string>;
   }
-  waitForCompleteTable() {
+  waitForCompleteTable(): string {
     browser.wait(
       () =>
         element(by.css('.uploads-table'))

@@ -29,7 +29,7 @@ export class UploadxDirective implements OnInit {
     private uploadService: UploadxService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     const { multiple, allowedTypes } = this.uploadx;
 
     multiple !== false && this.renderer.setAttribute(this.elementRef.nativeElement, 'multiple', '');
@@ -41,7 +41,7 @@ export class UploadxDirective implements OnInit {
   }
 
   @HostListener('change', ['$event.target.files'])
-  fileListener(files: FileList) {
+  fileListener(files: FileList): void {
     if (files && files.item(0)) {
       this.uploadService.handleFileList(files, this.uploadx);
     }

@@ -12,7 +12,7 @@ export class UploadxDropDirective {
   constructor(private uploadService: UploadxService) {}
 
   @HostListener('drop', ['$event'])
-  dropHandler(event: DragEvent) {
+  dropHandler(event: DragEvent): void {
     if (event.dataTransfer && event.dataTransfer.files) {
       event.stopPropagation();
       event.preventDefault();
@@ -24,7 +24,7 @@ export class UploadxDropDirective {
   }
 
   @HostListener('dragover', ['$event'])
-  onDragOver(event: DragEvent) {
+  onDragOver(event: DragEvent): void {
     if (event.dataTransfer && event.dataTransfer.files) {
       event.dataTransfer.dropEffect = 'copy';
       event.stopPropagation();
@@ -34,7 +34,7 @@ export class UploadxDropDirective {
   }
 
   @HostListener('dragleave', ['$event'])
-  onDragLeave(event: DragEvent) {
+  onDragLeave(event: DragEvent): void {
     this.active = false;
   }
 }

@@ -9,10 +9,10 @@ import { Uploader } from 'ngx-uploadx';
  *
  *   options: UploadxOptions = {
  *     allowedTypes: 'image/*',
- *     uploaderClass: MultiPartFormData
+ *     uploaderClass: Multer
  *   };
  */
-export class MultiPartFormData extends Uploader {
+export class Multer extends Uploader {
   responseType = 'json' as XMLHttpRequestResponseType;
   async getFileUrl(): Promise<string> {
     this.offset = 0;
