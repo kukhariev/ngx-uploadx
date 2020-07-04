@@ -29,12 +29,13 @@
     "test": "ng test --watch=false --progress=false --browsers=ChromeHeadless",
     "e2e": "ng e2e",
     "server": "node ./server/ --debug",
-    "server:dev": "node ./server/ --errors --debug",
     "build": "ts-node --skip-project ./scripts/build.ts",
-    "ci": "npm run lint && npm run test && npm run e2e",
     "prettier": "prettier --write \"**/*.{js,json,scss,md,ts,html}\"",
-    "test:integration:v10": "cd integrations/v10 && npm run test",
-    "serve:static:integration:v10": "angular-http-server --path integrations/v10/dist/v10"
+    "test:integrations": "npm run test:ng7 && npm run test:ng10",
+    "test:ng7": "ng build --prod",
+    "test:ng10": "cd integrations/ng10 && npm run test",
+    "serve:static:ng7": "angular-http-server --path dist/app",
+    "serve:static:ng10": "angular-http-server --path integrations/ng10/dist/ng10"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "0.13.10",
