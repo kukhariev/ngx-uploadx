@@ -1,5 +1,5 @@
 {
-  "name": "v10",
+  "name": "ng10",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng --version",
