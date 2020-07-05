@@ -12,11 +12,11 @@ Install dependencies:
 
 Make sure the tests pass:
 
-    npm run test && npm run e2e
+    npm test && npm run e2e
 
 Make your change. Add tests for your change. Make the tests pass:
 
-    npm run lint && npm run test && npm run e2e
+    npm run ci
 
 👉 Please follow our [commit message conventions][commit] even if you're making a small change!
 
