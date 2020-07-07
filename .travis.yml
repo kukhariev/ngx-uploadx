@@ -8,6 +8,8 @@ addons:
 
 script:
   - 'commitlint-travis'
-  - 'npm run ci'
+  - 'npm run lint'
+  - 'npm test'
+  - 'npm run e2e'
   - 'npm run build'
-  - 'npm run test:integration:v10'
+  - 'npm run test:integration'
