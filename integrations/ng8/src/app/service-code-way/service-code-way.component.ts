@@ -20,7 +20,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
     uploaderClass: UploaderExt
   };
   numberOfCopies = 0;
-  @ViewChild('file', { read: ElementRef, static: true }) fileInput: ElementRef;
+  @ViewChild('file', { read: ElementRef, static: false }) fileInput: ElementRef;
 
   private unsubscribe$ = new Subject();
   constructor(private uploadService: UploadxService) {}
