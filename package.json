@@ -31,11 +31,13 @@
     "server": "node ./server/ --debug",
     "build": "ts-node --skip-project ./scripts/build.ts",
     "prettier": "prettier --write \"**/*.{js,json,scss,md,ts,html}\"",
-    "test:integration": "npm run test:ng7 && npm run test:ng10",
+    "test:integration": "npm run test:ng7 && npm run test:ng8 && npm run test:ng10",
     "test:ng7": "ng build --prod",
+    "test:ng8": "cd integrations/ng8 && npm run test",
     "test:ng10": "cd integrations/ng10 && npm run test",
     "ci": "npm run lint && npm test && npm run e2e && npm run build && npm run test:integration",
     "serve:static:ng7": "angular-http-server --path dist/app",
+    "serve:static:ng8": "angular-http-server --path integrations/ng8/dist/ng8",
     "serve:static:ng10": "angular-http-server --path integrations/ng10/dist/ng10"
   },
   "devDependencies": {
