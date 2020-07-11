@@ -1,8 +1,7 @@
 import { resolveUrl, Uploader } from 'ngx-uploadx';
 
 /**
- *
- * multipart/form-data extended uploader for use with node-uploadx
+ * Multipart/form-data extended uploader for use with node-uploadx
  *
  * @example
  *

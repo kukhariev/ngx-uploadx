@@ -3,8 +3,8 @@ import { b64, resolveUrl } from './utils';
 
 /**
  * Implements tus resumable upload protocol
- * @see
- * https://github.com/tus/tus-resumable-upload-protocol/blob/master/protocol.md
+ *
+ * {@link https://github.com/tus/tus-resumable-upload-protocol/blob/master/protocol.md|Github}
  */
 export class Tus extends Uploader {
   headers = { 'Tus-Resumable': '1.0.0' };

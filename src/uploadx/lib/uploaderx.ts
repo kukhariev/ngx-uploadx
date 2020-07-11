@@ -3,8 +3,9 @@ import { resolveUrl } from './utils';
 
 /**
  * Implements XHR/CORS Resumable Upload
- * @see
- * https://developers.google.com/drive/api/v3/manage-uploads#resumable
+ *
+ * {@link https://github.com/kukhariev/node-uploadx/blob/master/proto.md|Github}
+ * @see {@link https://developers.google.com/drive/api/v3/manage-uploads#resumable|Google Drive API documentation}
  */
 export class UploaderX extends Uploader {
   responseType = 'json' as XMLHttpRequestResponseType;
