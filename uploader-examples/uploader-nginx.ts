@@ -2,10 +2,10 @@ import { Uploader } from 'ngx-uploadx';
 
 /**
  * Implements nginx-upload-module resumable uploads protocol.
- * @see
- * https://github.com/fdintino/nginx-upload-module/blob/master/upload-protocol.md
  *
- *  @example
+ * {@link https://github.com/fdintino/nginx-upload-module/blob/master/upload-protocol.md|nginx-upload-module}
+ *
+ * @example
  *
  *   options: UploadxOptions = {
  *     endpoint: '/files'
@@ -42,7 +42,7 @@ export class NginxUploadModuleUploader extends Uploader {
   }
 
   // abort not supported
-  abort() {}
+  abort(): void {}
 
   private getOffsetFromResponse(): number {
     if (this.responseStatus === 201) {
