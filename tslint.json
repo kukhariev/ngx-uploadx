@@ -12,6 +12,7 @@
     "interface-name": false,
     "member-access": false,
     "no-empty": false,
+    "no-console": [true, "debug", "info", "time", "timeEnd", "trace"],
     "no-host-metadata-property": true,
     "no-inferrable-types": [true, "ignore-params"],
     "no-input-rename": true,

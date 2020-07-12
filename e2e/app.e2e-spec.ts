@@ -1,4 +1,3 @@
-/* tslint: disable */
 import { browser, logging } from 'protractor';
 import { AppPage } from './app.po';
 const absolutePath = require('path').resolve('./e2e/test.mp4');

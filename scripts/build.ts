@@ -27,7 +27,6 @@ import { build } from 'ng-packagr';
     await fsp.copyFile('README.md', 'dist/uploadx/README.md');
     await fsp.unlink('src/uploadx/package.json');
   } catch (error) {
-    // tslint:disable-next-line: no-console
     console.error(error);
     process.exit(1);
   }
