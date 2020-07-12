@@ -6,27 +6,27 @@
         <input
           #files
           (click)="files.value = ''"
-          type="file"
-          [uploadx]="options"
-          [uploadxAction]="control"
           (uploadxState)="onUpload($event)"
+          [uploadxAction]="control"
+          [uploadx]="options"
           style="display: none;"
+          type="file"
         />
       </label>
-      <button class="btn red raised" (click)="upload()">Upload All</button>
-      <button class="btn red raised" (click)="cancel()">Cancel All</button>
-      <button class="btn red raised" (click)="pause()">Pause All</button>
+      <button (click)="upload()" class="btn red raised">Upload All</button>
+      <button (click)="cancel()" class="btn red raised">Cancel All</button>
+      <button (click)="pause()" class="btn red raised">Pause All</button>
     </div>
   </div>
 
   <div class="uploads-table">
-    <div class="row" *ngFor="let item of uploads">
+    <div *ngFor="let item of uploads" class="row">
       <span class="col-1">{{ item.name }}</span>
       <span class="col-2">{{ item.progress }}%</span>
       <span class="col-2">{{ item.status }}</span>
       <span class="col-3 btn-row">
-        <button class="btn red raised" (click)="pause(item.uploadId)">pause</button>
-        <button class="btn red raised" (click)="upload(item.uploadId)">upload</button>
+        <button (click)="pause(item.uploadId)" class="btn red raised">pause</button>
+        <button (click)="upload(item.uploadId)" class="btn red raised">upload</button>
       </span>
     </div>
   </div>

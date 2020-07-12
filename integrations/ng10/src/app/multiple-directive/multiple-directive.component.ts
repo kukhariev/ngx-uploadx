@@ -21,6 +21,7 @@ export class MultipleDirectiveComponent {
     allowedTypes: 'video/*',
     uploaderClass: Tus
   };
+
   constructor(private uploadService: UploadxService) {
     this.uploads$ = this.uploadService.connect();
     this.state$ = this.uploadService.events;

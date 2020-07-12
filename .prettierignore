@@ -4,5 +4,6 @@ dist
 package-lock.json
 temp
 tmp
+out-tsc
 /.vscode
 

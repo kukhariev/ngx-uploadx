@@ -4,6 +4,7 @@ import { Uploader } from './uploader';
 function getFile(): File {
   return new File(['-'], 'filename.mp4', { type: 'video/mp4', lastModified: Date.now() });
 }
+
 const file = getFile();
 
 const snip = { file, size: 1, name: 'filename.mp4' };
@@ -21,10 +22,12 @@ export class MockUploader extends Uploader {
     this.responseStatus = code;
     return shouldReject() ? Promise.reject() : Promise.resolve('');
   }
+
   async getOffset(): Promise<number> {
     this.responseStatus = code;
     return shouldReject() ? Promise.reject() : Promise.resolve(1);
   }
+
   async sendFileContent(): Promise<number> {
     this.responseStatus = code;
     return shouldReject() ? Promise.reject() : Promise.resolve(1);

@@ -27,15 +27,19 @@ export class TusComponent implements OnDestroy {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
+
   cancel(id?: string): void {
     this.control = { action: 'cancel', uploadId: id };
   }
+
   pause(id?: string): void {
     this.control = { action: 'pause', uploadId: id };
   }
+
   upload(id?: string): void {
     this.control = { action: 'upload', uploadId: id };
   }
+
   onUpload(events$: Observable<UploadState>): void {
     this.state$ = events$;
     events$.pipe(takeUntil(this.unsubscribe$)).subscribe((evt: UploadState) => {

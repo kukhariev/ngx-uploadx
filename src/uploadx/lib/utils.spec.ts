@@ -1,4 +1,5 @@
 import { b64, DynamicChunk, isNumber, isString, resolveUrl, unfunc } from './utils';
+
 const urlTestData = [
   ['https://a/b/c', 'https://d/e/f?g=1', 'https://d/e/f?g=1'],
   ['http://a/b/c', 'https://d/e/f?g=2', 'https://d/e/f?g=2'],

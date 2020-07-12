@@ -11,6 +11,12 @@
     "import-blacklist": [true, "rxjs/Rx"],
     "interface-name": false,
     "member-access": false,
+    "member-ordering": [
+      true,
+      {
+        "order": ["static-field", "instance-field", "static-method", "instance-method"]
+      }
+    ],
     "no-empty": false,
     "no-console": [true, "debug", "info", "time", "timeEnd", "trace"],
     "no-host-metadata-property": true,

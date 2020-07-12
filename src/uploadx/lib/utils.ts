@@ -3,6 +3,7 @@
 function safeMatch(base: string, re: RegExp): string {
   return (base.match(re) || [])[0] || '';
 }
+
 export function resolveUrl(url: string, base: string): string {
   if (url.indexOf('https://') * url.indexOf('http://') === 0) {
     return url;
@@ -48,6 +49,7 @@ export function createHash(str: string): number {
   }
   return hash >>> 0;
 }
+
 export const b64 = {
   encode: (str: string) =>
     btoa(

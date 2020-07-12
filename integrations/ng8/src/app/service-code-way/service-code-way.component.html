@@ -5,27 +5,27 @@
         >+
         <input
           #file
-          type="file"
           (change)="onChange()"
           accept="image/*,video/*"
           multiple
           style="display: none;"
+          type="file"
         />
       </label>
-      <button class="btn red raised" (click)="upload()">Upload All</button>
-      <button class="btn red raised" (click)="cancel()">Cancel All</button>
-      <button class="btn red raised" (click)="pause()">Pause All</button>
+      <button (click)="upload()" class="btn red raised">Upload All</button>
+      <button (click)="cancel()" class="btn red raised">Cancel All</button>
+      <button (click)="pause()" class="btn red raised">Pause All</button>
     </div>
   </div>
 
   <div class="uploads-table">
-    <div class="row" *ngFor="let ufile of uploads">
+    <div *ngFor="let ufile of uploads" class="row">
       <span class="col-1">{{ ufile.name }}</span>
       <span class="col-2">{{ ufile.progress }}%</span>
       <span class="col-2">{{ ufile.status }}</span>
       <span class="col-3 btn-row">
-        <button class="btn red raised" (click)="pause(ufile.uploadId)">pause</button>
-        <button class="btn red raised" (click)="upload(ufile.uploadId)">upload</button>
+        <button (click)="pause(ufile.uploadId)" class="btn red raised">pause</button>
+        <button (click)="upload(ufile.uploadId)" class="btn red raised">upload</button>
       </span>
     </div>
   </div>

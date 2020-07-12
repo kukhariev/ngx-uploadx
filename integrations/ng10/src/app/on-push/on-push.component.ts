@@ -16,6 +16,7 @@ export class OnPushComponent implements OnDestroy {
     endpoint: `${environment.api}/files?uploadType=uploadx`,
     token: this.tokenGetter.bind(this)
   };
+
   constructor(private uploadService: UploadxService, private auth: AuthService) {
     this.uploads$ = this.uploadService.connect(this.options);
     this.state$ = this.uploadService.events;
@@ -38,8 +39,6 @@ export class OnPushComponent implements OnDestroy {
   }
 
   async tokenGetter(httpStatus: number): Promise<string> {
-    const token =
-      httpStatus === 401 ? await this.auth.renewToken().toPromise() : this.auth.accessToken;
-    return token;
+    return httpStatus === 401 ? await this.auth.renewToken().toPromise() : this.auth.accessToken;
   }
 }

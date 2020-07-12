@@ -14,6 +14,7 @@ export class AComponent implements OnDestroy {
   options: UploadxOptions = {
     endpoint: `${environment.api}/files?uploadType=uploadx`
   };
+
   constructor(private uploadService: UploadxService) {
     this.uploads$ = this.uploadService.connect(this.options);
   }

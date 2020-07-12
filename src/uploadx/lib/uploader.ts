@@ -17,6 +17,7 @@ const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
   pauseAll: 'paused',
   cancelAll: 'cancelled'
 };
+
 interface RequestParams {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
   body?: BodyInit | null;
@@ -29,6 +30,19 @@ interface RequestParams {
  * Uploader Base Class
  */
 export abstract class Uploader implements UploadState {
+  get url(): string {
+    return this._url || store.get(this.uploadId) || '';
+  }
+
+  set url(value: string) {
+    this._url !== value && store.set(this.uploadId, value);
+    this._url = value;
+  }
+
+  get status(): UploadStatus {
+    return this._status;
+  }
+
   set status(s: UploadStatus) {
     if (this._status === 'cancelled' || (this._status === 'complete' && s !== 'cancelled')) {
       return;
@@ -39,16 +53,6 @@ export abstract class Uploader implements UploadState {
       ['cancelled', 'complete', 'error'].includes(s) && this.cleanup();
       s === 'cancelled' ? this.onCancel() : this.stateChange(this);
     }
-  }
-  get status(): UploadStatus {
-    return this._status;
-  }
-  get url(): string {
-    return this._url || store.get(this.uploadId) || '';
-  }
-  set url(value: string) {
-    this._url !== value && store.set(this.uploadId, value);
-    this._url = value;
   }
   readonly name: string;
   readonly size: number;
@@ -76,10 +80,12 @@ export abstract class Uploader implements UploadState {
   protected offset? = 0;
   /** Set HttpRequest responseType */
   protected responseType: XMLHttpRequestResponseType = '';
-  private _url = '';
-  private _status: UploadStatus;
   private startTime: number;
-  private stateChange: (evt: UploadState) => void;
+  private readonly stateChange: (evt: UploadState) => void;
+
+  private _url = '';
+
+  private _status: UploadStatus;
 
   constructor(readonly file: File, readonly options: UploaderOptions) {
     this.name = file.name;
@@ -123,7 +129,7 @@ export abstract class Uploader implements UploadState {
       this.startTime = new Date().getTime();
       this.url = this.url || (await this.getFileUrl());
       this.errorHandler.reset();
-      this.start();
+      await this.start();
     } catch {
       if (this.errorHandler.kind(this.responseStatus) !== ErrorType.FatalError) {
         this.status = 'retry';
@@ -146,6 +152,7 @@ export abstract class Uploader implements UploadState {
             ? await this.sendFileContent()
             : await this.getOffset();
           if (offset === this.offset) {
+            // noinspection ExceptionCaughtLocallyJS
             throw new Error('Content upload failed');
           }
           this.errorHandler.reset();
@@ -265,6 +272,7 @@ export abstract class Uploader implements UploadState {
     const body = this.file.slice(this.offset, end);
     return { start, end, body };
   }
+
   private cleanup = () => store.delete(this.uploadId);
 
   private getResponseBody(xhr: XMLHttpRequest): any {

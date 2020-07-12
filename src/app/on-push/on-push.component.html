@@ -3,22 +3,22 @@
     <div class="btn-col">
       <label class="upload-btn" uploadxDrop
         >+
-        <input type="file" uploadx accept="image/*,video/*" style="display: none;" />
+        <input accept="image/*,video/*" style="display: none;" type="file" uploadx />
       </label>
-      <button class="btn red raised" (click)="uploadAll()">Upload All</button>
-      <button class="btn red raised" (click)="cancelAll()">Cancel All</button>
-      <button class="btn red raised" (click)="pauseAll()">Pause All</button>
+      <button (click)="uploadAll()" class="btn red raised">Upload All</button>
+      <button (click)="cancelAll()" class="btn red raised">Cancel All</button>
+      <button (click)="pauseAll()" class="btn red raised">Pause All</button>
     </div>
   </div>
 
   <div class="uploads-table">
-    <div class="row" *ngFor="let item of uploads$ | async">
+    <div *ngFor="let item of uploads$ | async" class="row">
       <span class="col-1">{{ item.name }}</span>
       <span class="col-2">{{ item.progress }}%</span>
       <span class="col-2">{{ item.status }}</span>
       <span class="col-3 btn-row">
-        <button class="btn red raised" (click)="item.status = 'paused'">pause</button>
-        <button class="btn red raised" (click)="item.status = 'queue'">upload</button>
+        <button (click)="item.status = 'paused'" class="btn red raised">pause</button>
+        <button (click)="item.status = 'queue'" class="btn red raised">upload</button>
       </span>
     </div>
   </div>
