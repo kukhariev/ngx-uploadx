@@ -23,6 +23,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   @ViewChild('file', { read: ElementRef }) fileInput: ElementRef;
 
   private unsubscribe$ = new Subject();
+
   constructor(private uploadService: UploadxService) {}
 
   ngOnInit(): void {
@@ -54,6 +55,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
       this.uploadService.handleFile(files[i]);
     }
   }
+
   // this.numberOfCopies = this.uploadService.runningProcess();
   getFiles(): FileList {
     return this.fileInput.nativeElement.files;

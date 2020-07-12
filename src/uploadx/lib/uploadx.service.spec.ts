@@ -1,6 +1,7 @@
 import { NgZone } from '@angular/core';
 import { UploadAction } from './interfaces';
 import { UploadxService } from './uploadx.service';
+
 const ENDPOINT = `http://localhost:3003/upload?user_id=test`;
 const options = {
   concurrency: 3,

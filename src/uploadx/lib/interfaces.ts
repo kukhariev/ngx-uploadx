@@ -1,4 +1,5 @@
 import { Uploader } from './uploader';
+
 export type UploadStatus =
   | 'added'
   | 'queue'
@@ -71,9 +72,11 @@ export interface UploadItem {
    */
   token?: string | ((httpStatus?: number) => string | Promise<string>);
 }
+
 export interface UploadxControlEvent extends UploadItem {
   action?: UploadAction;
 }
+
 export interface UploaderOptions extends UploadItem {
   /**
    * Set a fixed chunk size.
@@ -83,6 +86,7 @@ export interface UploaderOptions extends UploadItem {
   withCredentials?: boolean;
   readonly stateChange?: (evt: UploadEvent) => void;
 }
+
 /**
  * Global Module Options
  */

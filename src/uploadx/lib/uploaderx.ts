@@ -9,6 +9,7 @@ import { resolveUrl } from './utils';
  */
 export class UploaderX extends Uploader {
   responseType = 'json' as XMLHttpRequestResponseType;
+
   async getFileUrl(): Promise<string> {
     const headers = {
       'Content-Type': 'application/json; charset=utf-8',

@@ -23,6 +23,7 @@ export class UploadxDirective implements OnInit {
       this.uploadService.control(ctrlEvent);
     }
   }
+
   constructor(
     private elementRef: ElementRef,
     private renderer: Renderer2,

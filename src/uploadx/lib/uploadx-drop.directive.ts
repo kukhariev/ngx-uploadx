@@ -9,6 +9,7 @@ export class UploadxDropDirective {
 
   @ContentChild(UploadxDirective)
   fileInput: UploadxDirective;
+
   constructor(private uploadService: UploadxService) {}
 
   @HostListener('drop', ['$event'])

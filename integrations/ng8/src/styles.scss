@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @import url('https://fonts.googleapis.com/css?family=Roboto');
+
 $dark: rgb(48, 48, 48);
 $red: rgb(187, 65, 106);
 $light: rgb(255, 255, 255);
@@ -43,10 +44,12 @@ body {
     background-color: lighten($red, 5%);
   }
 }
+
 .uploadx-drop-active {
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3);
   background-color: lighten($red, 10%);
 }
+
 .container {
   margin: 0;
   padding: 0;
@@ -57,9 +60,11 @@ body {
 
 header {
   color: $light;
+
   .active {
     font-weight: bold;
   }
+
   margin-bottom: 5px;
   background-color: $red;
   @extend .shadow;
@@ -67,6 +72,7 @@ header {
   nav {
     display: flex;
     flex-direction: row;
+
     .logo {
       height: 100%;
       text-decoration: none;
@@ -76,18 +82,21 @@ header {
       margin: auto 0;
       font-weight: bold;
     }
+
     ul {
       display: flex;
-      width: 80wv;
     }
+
     li {
       flex: 0 1 auto;
       min-width: 0;
       display: flex;
       overflow: hidden;
+
       &:hover {
         background-color: lighten($red, 5%);
       }
+
       a {
         text-align: center;
         width: 10vw;
@@ -163,7 +172,6 @@ header {
 
 .uploads-table,
 .uploads-table2 {
-  background-color: $background;
   flex: 3 1 80%;
   order: 2;
   font-size: 90%;
@@ -174,7 +182,6 @@ header {
   height: 230px;
   overflow-y: auto;
   overflow-x: hidden;
-  background-color: lighting($background, 2%);
 
   .row {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);

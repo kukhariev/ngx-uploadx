@@ -7,6 +7,7 @@ export enum ErrorType {
   Retryable,
   FatalError
 }
+
 export class ErrorHandler {
   static maxAttempts = 8;
   static shouldRestartCodes = [404, 410];

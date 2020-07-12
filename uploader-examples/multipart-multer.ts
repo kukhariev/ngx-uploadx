@@ -13,6 +13,7 @@ import { Uploader } from 'ngx-uploadx';
  */
 export class Multer extends Uploader {
   responseType = 'json' as XMLHttpRequestResponseType;
+
   async getFileUrl(): Promise<string> {
     this.offset = 0;
     const formData: FormData = new FormData();
