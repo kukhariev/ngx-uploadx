@@ -125,7 +125,7 @@ Activates the `.uploadx-drop-active` class on DnD operations.
 
 - `init(options?: UploadxOptions): Observable<UploadState>`
 
-  Initializes service. Returns Observable that emits a new value on progress or status changes
+  Initializes service. Returns Observable that emits a new value on progress or status changes.
 
   ```ts
   //  @example:
