@@ -17,7 +17,3 @@ export class AuthService {
     return of(this.accessToken).pipe(delay(400));
   }
 }
-
-export function tokenGetter(): string {
-  return `token-${new Date().getTime()}`;
-}
