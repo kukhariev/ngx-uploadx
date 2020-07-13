@@ -129,9 +129,9 @@ export abstract class Uploader implements UploadState {
       this.startTime = new Date().getTime();
       this.url = this.url || (await this.getFileUrl());
       this.errorHandler.reset();
-      await this.start();
-    } catch {
-      // TODO: e log
+      this.start().then(_ => {});
+    } catch (e) {
+      e instanceof Error && console.error(e);
       if (this.errorHandler.kind(this.responseStatus) !== ErrorType.FatalError) {
         this.status = 'retry';
         await this.errorHandler.wait();
@@ -158,8 +158,8 @@ export abstract class Uploader implements UploadState {
           }
           this.errorHandler.reset();
           this.offset = offset;
-        } catch {
-          // TODO: e log
+        } catch (e) {
+          e instanceof Error && console.error(e);
           const errType = this.errorHandler.kind(this.responseStatus);
           if (this.responseStatus === 413) {
             DynamicChunk.maxSize = this.chunkSize /= 2;
