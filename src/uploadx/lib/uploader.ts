@@ -1,7 +1,9 @@
 import { ErrorHandler, ErrorType } from './error-handler';
 import {
+  RequestParams,
   UploadAction,
   UploaderOptions,
+  UploadEvent,
   UploadState,
   UploadStatus,
   UploadxControlEvent
@@ -18,42 +20,10 @@ const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
   cancelAll: 'cancelled'
 };
 
-interface RequestParams {
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
-  body?: BodyInit | null;
-  url?: string;
-  headers?: Record<string, string>;
-  progress?: boolean;
-}
-
 /**
  * Uploader Base Class
  */
 export abstract class Uploader implements UploadState {
-  get url(): string {
-    return this._url || store.get(this.uploadId) || '';
-  }
-
-  set url(value: string) {
-    this._url !== value && store.set(this.uploadId, value);
-    this._url = value;
-  }
-
-  get status(): UploadStatus {
-    return this._status;
-  }
-
-  set status(s: UploadStatus) {
-    if (this._status === 'cancelled' || (this._status === 'complete' && s !== 'cancelled')) {
-      return;
-    }
-    if (s !== this._status) {
-      s === 'paused' && this.abort();
-      this._status = s;
-      ['cancelled', 'complete', 'error'].includes(s) && this.cleanup();
-      s === 'cancelled' ? this.onCancel() : this.stateChange(this);
-    }
-  }
   readonly name: string;
   readonly size: number;
   readonly uploadId: string;
@@ -80,12 +50,38 @@ export abstract class Uploader implements UploadState {
   protected offset? = 0;
   /** Set HttpRequest responseType */
   protected responseType: XMLHttpRequestResponseType = '';
+  private readonly prerequest: (req: RequestParams) => Promise<RequestParams> | RequestParams;
   private startTime: number;
-  private readonly stateChange: (evt: UploadState) => void;
+  private readonly stateChange: (evt: UploadEvent) => void;
 
   private _url = '';
 
+  get url(): string {
+    return this._url || store.get(this.uploadId) || '';
+  }
+
+  set url(value: string) {
+    this._url !== value && store.set(this.uploadId, value);
+    this._url = value;
+  }
+
   private _status: UploadStatus;
+
+  get status(): UploadStatus {
+    return this._status;
+  }
+
+  set status(s: UploadStatus) {
+    if (this._status === 'cancelled' || (this._status === 'complete' && s !== 'cancelled')) {
+      return;
+    }
+    if (s !== this._status) {
+      s === 'paused' && this.abort();
+      this._status = s;
+      ['cancelled', 'complete', 'error'].includes(s) && this.cleanup();
+      s === 'cancelled' ? this.onCancel() : this.stateChange(this);
+    }
+  }
 
   constructor(readonly file: File, readonly options: UploaderOptions) {
     this.name = file.name;
@@ -103,6 +99,7 @@ export abstract class Uploader implements UploadState {
     });
     this.uploadId = createHash(print).toString(16);
     this.stateChange = options.stateChange || noop;
+    this.prerequest = options.prerequest || noop;
     this.chunkSize = options.chunkSize || this.size;
     this.configure(options);
   }
@@ -188,33 +185,8 @@ export abstract class Uploader implements UploadState {
   /**
    * Performs http requests
    */
-  request({
-    method = 'GET',
-    body = null,
-    url,
-    headers = {},
-    progress
-  }: RequestParams): Promise<ProgressEvent> {
-    return new Promise((resolve, reject) => {
-      const xhr = (this._xhr = new XMLHttpRequest());
-      xhr.open(method, url || this.url, true);
-      if (body instanceof Blob || (body && progress)) {
-        xhr.upload.onprogress = this.onProgress();
-      }
-      this.responseStatus = 0;
-      this.response = undefined;
-      this.responseType && (xhr.responseType = this.responseType);
-      this.options.withCredentials && (xhr.withCredentials = true);
-      const _headers = { ...this.headers, ...headers };
-      Object.keys(_headers).forEach(key => xhr.setRequestHeader(key, _headers[key]));
-      xhr.onload = (evt: ProgressEvent) => {
-        this.responseStatus = xhr.status;
-        this.response = this.responseStatus !== 204 ? this.getResponseBody(xhr) : '';
-        this.responseStatus >= 400 ? reject(evt) : resolve(evt);
-      };
-      xhr.onerror = reject;
-      xhr.send(body);
-    });
+  async request(req: RequestParams): Promise<ProgressEvent> {
+    return this._request(await this.prerequest(req));
   }
 
   /**
@@ -273,6 +245,29 @@ export abstract class Uploader implements UploadState {
     const end = Math.min(start + this.chunkSize, this.size);
     const body = this.file.slice(this.offset, end);
     return { start, end, body };
+  }
+
+  private _request(req: RequestParams): Promise<ProgressEvent> {
+    return new Promise((resolve, reject) => {
+      const xhr = (this._xhr = new XMLHttpRequest());
+      xhr.open(req.method, req.url || this.url, true);
+      if (req.body instanceof Blob || (req.body && req.progress)) {
+        xhr.upload.onprogress = this.onProgress();
+      }
+      this.responseStatus = 0;
+      this.response = undefined;
+      this.responseType && (xhr.responseType = this.responseType);
+      this.options.withCredentials && (xhr.withCredentials = true);
+      const _headers = { ...this.headers, ...(req.headers || {}) };
+      Object.keys(_headers).forEach(key => xhr.setRequestHeader(key, _headers[key]));
+      xhr.onload = (evt: ProgressEvent) => {
+        this.responseStatus = xhr.status;
+        this.response = this.responseStatus !== 204 ? this.getResponseBody(xhr) : '';
+        this.responseStatus >= 400 ? reject(evt) : resolve(evt);
+      };
+      xhr.onerror = reject;
+      xhr.send(req.body);
+    });
   }
 
   private cleanup = () => store.delete(this.uploadId);
