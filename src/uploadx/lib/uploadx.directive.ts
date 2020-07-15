@@ -17,6 +17,7 @@ export class UploadxDirective implements OnInit {
   uploadxState = new EventEmitter();
   @Input()
   uploadx: UploadxOptions;
+
   @Input()
   set uploadxAction(ctrlEvent: UploadxControlEvent) {
     if (ctrlEvent && this.uploadService) {

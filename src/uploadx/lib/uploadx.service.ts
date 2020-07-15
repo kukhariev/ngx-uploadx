@@ -15,10 +15,6 @@ interface DefaultOptions {
 
 @Injectable({ providedIn: 'root' })
 export class UploadxService implements OnDestroy {
-  /** Upload status events */
-  get events(): Observable<UploadState> {
-    return this.eventsStream.asObservable();
-  }
   static stateKeys: Array<keyof UploadState> = [
     'file',
     'name',
@@ -34,6 +30,7 @@ export class UploadxService implements OnDestroy {
   ];
   /** Upload Queue */
   queue: Uploader[] = [];
+  private readonly eventsStream: Subject<UploadState> = new Subject();
   options: UploadxOptions & DefaultOptions = {
     endpoint: '/upload',
     autoUpload: true,
@@ -44,8 +41,12 @@ export class UploadxService implements OnDestroy {
       );
     }
   };
-  private readonly eventsStream: Subject<UploadState> = new Subject();
   private subs: Subscription[] = [];
+
+  /** Upload status events */
+  get events(): Observable<UploadState> {
+    return this.eventsStream.asObservable();
+  }
 
   constructor(private ngZone: NgZone) {
     this.subs.push(

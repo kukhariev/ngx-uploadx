@@ -24,6 +24,6 @@ Make your change. Add tests for your change. Make the tests pass:
 
 Push to your fork and [submit a pull request][pr].
 
-[style]: ./prettier.config.js
+[style]: .prettierrc
 [commit]: https://www.conventionalcommits.org/en/v1.0.0-beta.2/
 [pr]: https://github.com/kukhariev/ngx-uploadx/compare/
