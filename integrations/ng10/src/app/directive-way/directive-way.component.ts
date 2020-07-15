@@ -39,7 +39,7 @@ export class DirectiveWayComponent implements OnDestroy {
 
   onUpload(events$: Observable<UploadState>): void {
     this.state$ = events$;
-    events$.pipe(takeUntil(this.unsubscribe$)).subscribe((evt: UploadState) => {
+    events$.pipe(takeUntil(this.unsubscribe$)).subscribe(evt => {
       const target = this.uploads.find(f => f.uploadId === evt.uploadId);
       if (target) {
         target.progress = evt.progress;
