@@ -186,7 +186,7 @@ export abstract class Uploader implements UploadState {
    * Performs http requests
    */
   async request(req: RequestParams): Promise<ProgressEvent> {
-    return this._request(await this.prerequest(req));
+    return this._request((await this.prerequest(req)) || req);
   }
 
   /**
