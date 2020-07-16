@@ -1,3 +1,4 @@
+// noinspection ES6PreferShortImport
 import { ErrorHandler } from './error-handler';
 import { Uploader } from './uploader';
 
@@ -174,5 +175,29 @@ describe('start()', () => {
     await uploader.start();
     expect((uploader as any).offset).toEqual(1);
     expect(uploader.status).toEqual('complete');
+  });
+});
+describe('prerequest', () => {
+  let uploader: MockUploader;
+  const injected = { headers: { Auth: 'token' } };
+  it('sync', async () => {
+    uploader = new MockUploader(file, { prerequest: req => ({ ...req, ...injected }) });
+    const _request = spyOn<any>(uploader, '_request').and.callThrough();
+    await uploader.request({ method: 'POST' });
+    expect(_request).toHaveBeenCalledWith({ method: 'POST', headers: { Auth: 'token' } });
+  });
+  it('async', async () => {
+    uploader = new MockUploader(file, {
+      prerequest: req => Promise.resolve({ ...req, ...injected })
+    });
+    const _request = spyOn<any>(uploader, '_request').and.callThrough();
+    await uploader.request({ method: 'POST' });
+    expect(_request).toHaveBeenCalledWith({ method: 'POST', headers: { Auth: 'token' } });
+  });
+  it('void', async () => {
+    uploader = new MockUploader(file, { prerequest: (() => {}) as any });
+    const _request = spyOn<any>(uploader, '_request').and.callThrough();
+    await uploader.request({ method: 'POST' });
+    expect(_request).toHaveBeenCalledWith({ method: 'POST' });
   });
 });
