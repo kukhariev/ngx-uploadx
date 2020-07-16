@@ -85,6 +85,9 @@ export interface UploaderOptions extends UploadItem {
   chunkSize?: number;
   withCredentials?: boolean;
   readonly stateChange?: (evt: UploadEvent) => void;
+  /**
+   * Function called before every request
+   */
   prerequest?: (req: RequestParams) => Promise<RequestParams> | RequestParams;
 }
 
