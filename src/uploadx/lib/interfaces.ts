@@ -88,7 +88,7 @@ export interface UploaderOptions extends UploadItem {
   /**
    * Function called before every request
    */
-  prerequest?: (req: RequestParams) => Promise<RequestParams> | RequestParams;
+  prerequest?: (req: RequestParams) => Promise<RequestParams> | RequestParams | void;
 }
 
 /**

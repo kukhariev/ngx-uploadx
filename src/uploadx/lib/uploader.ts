@@ -50,7 +50,9 @@ export abstract class Uploader implements UploadState {
   protected offset? = 0;
   /** Set HttpRequest responseType */
   protected responseType: XMLHttpRequestResponseType = '';
-  private readonly prerequest: (req: RequestParams) => Promise<RequestParams> | RequestParams;
+  private readonly prerequest: (
+    req: RequestParams
+  ) => Promise<RequestParams> | RequestParams | void;
   private startTime: number;
   private readonly stateChange: (evt: UploadEvent) => void;
 
