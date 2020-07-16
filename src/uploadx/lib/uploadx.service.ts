@@ -1,7 +1,13 @@
 import { Injectable, NgZone, OnDestroy } from '@angular/core';
 import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
-import { UploaderOptions, UploadState, UploadxControlEvent, UploadxOptions } from './interfaces';
+import {
+  UploaderOptions,
+  UploadEvent,
+  UploadState,
+  UploadxControlEvent,
+  UploadxOptions
+} from './interfaces';
 import { Uploader } from './uploader';
 import { UploaderX } from './uploaderx';
 import { pick } from './utils';
@@ -10,7 +16,7 @@ interface DefaultOptions {
   endpoint: string;
   autoUpload: boolean;
   concurrency: number;
-  stateChange: (evt: Uploader) => void;
+  stateChange: (evt: UploadEvent) => void;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -35,7 +41,7 @@ export class UploadxService implements OnDestroy {
     endpoint: '/upload',
     autoUpload: true,
     concurrency: 2,
-    stateChange: (evt: Uploader) => {
+    stateChange: (evt: UploadEvent) => {
       setTimeout(() =>
         this.ngZone.run(() => this.eventsStream.next(pick(evt, UploadxService.stateKeys)))
       );

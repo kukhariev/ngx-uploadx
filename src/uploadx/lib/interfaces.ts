@@ -85,6 +85,10 @@ export interface UploaderOptions extends UploadItem {
   chunkSize?: number;
   withCredentials?: boolean;
   readonly stateChange?: (evt: UploadEvent) => void;
+  /**
+   * Function called before every request
+   */
+  prerequest?: (req: RequestParams) => Promise<RequestParams> | RequestParams | void;
 }
 
 /**
@@ -115,4 +119,12 @@ export interface UploadxOptions extends UploaderOptions {
    * @defaultValue true
    */
   multiple?: boolean;
+}
+
+export interface RequestParams {
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
+  body?: BodyInit | null;
+  url?: string;
+  headers?: Record<string, string>;
+  progress?: boolean;
 }

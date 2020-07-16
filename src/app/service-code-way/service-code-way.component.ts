@@ -63,7 +63,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
 
   onUpload(events$: Observable<UploadState>): void {
     this.state$ = events$;
-    events$.pipe(takeUntil(this.unsubscribe$)).subscribe((ufile: UploadState) => {
+    events$.pipe(takeUntil(this.unsubscribe$)).subscribe(ufile => {
       const target = this.uploads.find(f => f.uploadId === ufile.uploadId);
       target ? Object.assign(target, ufile) : this.uploads.push(new Ufile(ufile));
     });

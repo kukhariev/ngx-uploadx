@@ -81,6 +81,8 @@ export class AppHomeComponent {
 
 - `metadata`: Custom uploads metadata
 
+- `prerequest`: Function called before every request
+
 - `uploaderClass`: Upload API implementation. Built-in: `Uploaderx`(default), `Tus`. More [examples](uploader-examples).
 
 - `token`: Authorization token as a `string` or function returning a `string` or `Promise<string>`

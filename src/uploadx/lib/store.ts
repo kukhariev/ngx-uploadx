@@ -1,11 +1,11 @@
 class Store {
-  constructor(public prefix = 'UPLOADX-V3.0-') {}
+  prefix = 'UPLOADX-V3.0-';
 
   set(key: string, value: string): void {
     localStorage.setItem(this.prefix + key, value);
   }
 
-  get(key: string): string | null | false {
+  get(key: string): string | null {
     return localStorage.getItem(this.prefix + key);
   }
 
