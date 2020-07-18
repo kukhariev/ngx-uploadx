@@ -57,6 +57,7 @@ export class UploaderX extends Uploader {
     if (this.responseStatus <= 201) {
       return this.size;
     }
+    return;
   }
 }
 

@@ -8,7 +8,7 @@ export class UploadxDropDirective {
   active = false;
 
   @ContentChild(UploadxDirective)
-  fileInput: UploadxDirective;
+  fileInput!: UploadxDirective;
 
   constructor(private uploadService: UploadxService) {}
 
@@ -35,7 +35,7 @@ export class UploadxDropDirective {
   }
 
   @HostListener('dragleave', ['$event'])
-  onDragLeave(event: DragEvent): void {
+  onDragLeave(_event: DragEvent): void {
     this.active = false;
   }
 }
