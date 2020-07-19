@@ -1,6 +1,7 @@
 import { Component, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { UploadxControlEvent } from './interfaces';
 import { UploadxDirective } from './uploadx.directive';
 import { UploadxService } from './uploadx.service';
 
@@ -12,7 +13,7 @@ class UploadxTestComponent {
     allowedTypes: 'image/*,video/*',
     endpoint: `http://localhost:3003/upload/?parts=test`
   };
-  action = { action: 'pause' };
+  action: UploadxControlEvent = { action: 'pause' };
 }
 
 const file = new File([''], 'filename.mp4');

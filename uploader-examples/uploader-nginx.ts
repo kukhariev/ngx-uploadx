@@ -14,6 +14,7 @@ import { Uploader } from 'ngx-uploadx';
  */
 export class NginxUploadModuleUploader extends Uploader {
   offset = 0;
+  response = '';
 
   async getFileUrl(): Promise<string> {
     return this.endpoint;
@@ -45,7 +46,7 @@ export class NginxUploadModuleUploader extends Uploader {
   abort(): void {}
 
   private getOffsetFromResponse(): number {
-    if (this.responseStatus === 201) {
+    if (this.response && this.responseStatus === 201) {
       const [, end] = this.response
         .split(/\D+/)
         .filter((v: string) => v.length)
