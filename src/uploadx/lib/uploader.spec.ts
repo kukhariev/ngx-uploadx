@@ -2,6 +2,7 @@
 import { ErrorHandler } from './error-handler';
 import { Uploader } from './uploader';
 
+// tslint:disable: no-any
 function getFile(): File {
   return new File(['-'], 'filename.mp4', { type: 'video/mp4', lastModified: Date.now() });
 }
