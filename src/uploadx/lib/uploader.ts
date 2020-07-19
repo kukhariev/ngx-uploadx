@@ -2,7 +2,7 @@ import { ErrorHandler, ErrorType } from './error-handler';
 import {
   Metadata,
   RequestHeaders,
-  RequestParams,
+  RequestOptions,
   ResponseBody,
   UploadAction,
   UploaderOptions,
@@ -54,8 +54,8 @@ export abstract class Uploader implements UploadState {
   /** Set HttpRequest responseType */
   protected responseType: XMLHttpRequestResponseType = '';
   private readonly prerequest: (
-    req: RequestParams
-  ) => Promise<RequestParams> | RequestParams | void;
+    req: RequestOptions
+  ) => Promise<RequestOptions> | RequestOptions | void;
   private startTime!: number;
   private readonly stateChange: (evt: UploadEvent) => void;
 
@@ -190,7 +190,7 @@ export abstract class Uploader implements UploadState {
   /**
    * Performs http requests
    */
-  async request(req: RequestParams): Promise<ProgressEvent> {
+  async request(req: RequestOptions): Promise<ProgressEvent> {
     return this._request((await this.prerequest(req)) || req);
   }
 
@@ -252,7 +252,7 @@ export abstract class Uploader implements UploadState {
     return { start, end, body };
   }
 
-  private _request(req: RequestParams): Promise<ProgressEvent> {
+  private _request(req: RequestOptions): Promise<ProgressEvent> {
     return new Promise((resolve, reject) => {
       const xhr = (this._xhr = new XMLHttpRequest());
       xhr.open(req.method, req.url || this.url, true);
