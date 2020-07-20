@@ -1,13 +1,29 @@
 import { Uploader } from './uploader';
 
 export type Primitive = null | boolean | number | string;
+
 export type ResponseBody =
   | Primitive
   | { [key: number]: ResponseBody } // for older ts versions
   | { [key: string]: ResponseBody };
 
 export type RequestHeaders = Record<string, Primitive | Primitive[]>;
+
 export type Metadata = Record<string, Primitive | Primitive[]>;
+
+export interface RequestOptions {
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
+  body?: BodyInit | null;
+  url?: string;
+  headers?: RequestHeaders;
+  progress?: boolean;
+}
+
+/**
+ * @deprecated since 3.5.1
+ * use `RequestOptions` instead
+ */
+export type RequestParams = RequestOptions;
 
 export type UploadStatus =
   | 'added'
@@ -97,7 +113,7 @@ export interface UploaderOptions extends UploadItem {
   /**
    * Function called before every request
    */
-  prerequest?: (req: RequestParams) => Promise<RequestParams> | RequestParams | void;
+  prerequest?: (req: RequestOptions) => Promise<RequestOptions> | RequestOptions | void;
 }
 
 /**
@@ -128,12 +144,4 @@ export interface UploadxOptions extends UploaderOptions {
    * @defaultValue true
    */
   multiple?: boolean;
-}
-
-export interface RequestParams {
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
-  body?: BodyInit | null;
-  url?: string;
-  headers?: RequestHeaders;
-  progress?: boolean;
 }
