@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import {
   b64,
-  RequestParams,
+  RequestOptions,
   Uploader,
   UploaderX,
   UploadState,
@@ -70,7 +70,7 @@ const hasher = {
   }
 };
 
-async function injectDigestHeader(this: UploaderX, req: RequestParams): Promise<RequestParams> {
+async function injectDigestHeader(this: UploaderX, req: RequestOptions): Promise<RequestOptions> {
   if (hasher.isSupported && req.method === 'PUT' && req.body instanceof Blob) {
     const headers = req.headers || {};
     const sha = await hasher.getDigest(req.body);
