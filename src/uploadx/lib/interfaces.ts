@@ -19,12 +19,6 @@ export interface RequestOptions {
   progress?: boolean;
 }
 
-/**
- * @deprecated since 3.5.1
- * use `RequestOptions` instead
- */
-export type RequestParams = RequestOptions;
-
 export type UploadStatus =
   | 'added'
   | 'queue'
