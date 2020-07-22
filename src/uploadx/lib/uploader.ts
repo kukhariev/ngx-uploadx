@@ -17,10 +17,7 @@ import { createHash, DynamicChunk, isNumber, noop, unfunc } from './utils';
 const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
   pause: 'paused',
   upload: 'queue',
-  cancel: 'cancelled',
-  uploadAll: 'queue',
-  pauseAll: 'paused',
-  cancelAll: 'cancelled'
+  cancel: 'cancelled'
 };
 
 /**

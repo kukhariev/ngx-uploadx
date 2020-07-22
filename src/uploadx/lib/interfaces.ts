@@ -29,7 +29,7 @@ export type UploadStatus =
   | 'paused'
   | 'retry';
 
-export type UploadAction = 'uploadAll' | 'upload' | 'cancel' | 'cancelAll' | 'pauseAll' | 'pause';
+export type UploadAction = 'upload' | 'cancel' | 'pause';
 
 /**
  *  Read only upload stream events
