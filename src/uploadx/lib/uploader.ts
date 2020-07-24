@@ -131,7 +131,7 @@ export abstract class Uploader implements UploadState {
       this.start().then(_ => {});
     } catch (e) {
       e instanceof Error && console.error(e);
-      if (this.errorHandler.kind(this.responseStatus) !== ErrorType.FatalError) {
+      if (this.errorHandler.kind(this.responseStatus) !== ErrorType.Fatal) {
         this.status = 'retry';
         await this.errorHandler.wait();
         this.status = 'queue';
@@ -162,9 +162,9 @@ export abstract class Uploader implements UploadState {
           const errType = this.errorHandler.kind(this.responseStatus);
           if (this.responseStatus === 413) {
             DynamicChunk.maxSize = this.chunkSize /= 2;
-          } else if (errType === ErrorType.FatalError) {
+          } else if (errType === ErrorType.Fatal) {
             this.status = 'error';
-          } else if (errType === ErrorType.Restart) {
+          } else if (errType === ErrorType.NotFound) {
             this.url = '';
             this.status = 'queue';
           } else if (errType === ErrorType.Auth) {
