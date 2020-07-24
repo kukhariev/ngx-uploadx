@@ -27,7 +27,7 @@ export abstract class Uploader implements UploadState {
   readonly name: string;
   readonly size: number;
   readonly uploadId: string;
-  response: ResponseBody | undefined;
+  response: ResponseBody = null;
   responseStatus!: number;
   progress!: number;
   remaining!: number;
@@ -257,13 +257,14 @@ export abstract class Uploader implements UploadState {
         xhr.upload.onprogress = this.onProgress();
       }
       this.responseStatus = 0;
-      this.response = undefined;
+      this.response = null;
       this.responseType && (xhr.responseType = this.responseType);
       this.options.withCredentials && (xhr.withCredentials = true);
       const _headers = { ...this.headers, ...(req.headers || {}) };
       Object.keys(_headers).forEach(key => xhr.setRequestHeader(key, String(_headers[key])));
       xhr.onload = (evt: ProgressEvent) => {
         this.responseStatus = xhr.status;
+        // TODO: check null body status
         this.response = this.responseStatus !== 204 ? this.getResponseBody(xhr) : '';
         this.responseStatus >= 400 ? reject(evt) : resolve(evt);
       };

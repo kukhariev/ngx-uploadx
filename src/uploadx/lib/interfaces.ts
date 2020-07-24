@@ -50,7 +50,7 @@ export interface UploadState {
   readonly remaining: number;
 
   /** HTTP response body */
-  readonly response: ResponseBody | undefined;
+  readonly response: ResponseBody;
 
   /** HTTP response status code */
   readonly responseStatus: number;
