@@ -277,7 +277,7 @@ export abstract class Uploader implements UploadState {
 
   private cleanup = () => store.delete(this.uploadId);
 
-  private getResponseBody(xhr: XMLHttpRequest): ResponseBody {
+  getResponseBody(xhr: XMLHttpRequest): ResponseBody {
     let body = 'response' in (xhr as XMLHttpRequest) ? xhr.response : xhr.responseText;
     if (body && this.responseType === 'json' && typeof body === 'string') {
       try {
