@@ -17,10 +17,7 @@ import { createHash, DynamicChunk, isNumber, noop, unfunc } from './utils';
 const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
   pause: 'paused',
   upload: 'queue',
-  cancel: 'cancelled',
-  uploadAll: 'queue',
-  pauseAll: 'paused',
-  cancelAll: 'cancelled'
+  cancel: 'cancelled'
 };
 
 /**
@@ -30,7 +27,7 @@ export abstract class Uploader implements UploadState {
   readonly name: string;
   readonly size: number;
   readonly uploadId: string;
-  response: ResponseBody | undefined;
+  response: ResponseBody = null;
   responseStatus!: number;
   progress!: number;
   remaining!: number;
@@ -134,7 +131,7 @@ export abstract class Uploader implements UploadState {
       this.start().then(_ => {});
     } catch (e) {
       e instanceof Error && console.error(e);
-      if (this.errorHandler.kind(this.responseStatus) !== ErrorType.FatalError) {
+      if (this.errorHandler.kind(this.responseStatus) !== ErrorType.Fatal) {
         this.status = 'retry';
         await this.errorHandler.wait();
         this.status = 'queue';
@@ -165,9 +162,9 @@ export abstract class Uploader implements UploadState {
           const errType = this.errorHandler.kind(this.responseStatus);
           if (this.responseStatus === 413) {
             DynamicChunk.maxSize = this.chunkSize /= 2;
-          } else if (errType === ErrorType.FatalError) {
+          } else if (errType === ErrorType.Fatal) {
             this.status = 'error';
-          } else if (errType === ErrorType.Restart) {
+          } else if (errType === ErrorType.NotFound) {
             this.url = '';
             this.status = 'queue';
           } else if (errType === ErrorType.Auth) {
@@ -260,13 +257,14 @@ export abstract class Uploader implements UploadState {
         xhr.upload.onprogress = this.onProgress();
       }
       this.responseStatus = 0;
-      this.response = undefined;
+      this.response = null;
       this.responseType && (xhr.responseType = this.responseType);
       this.options.withCredentials && (xhr.withCredentials = true);
       const _headers = { ...this.headers, ...(req.headers || {}) };
       Object.keys(_headers).forEach(key => xhr.setRequestHeader(key, String(_headers[key])));
       xhr.onload = (evt: ProgressEvent) => {
         this.responseStatus = xhr.status;
+        // TODO: check null body status
         this.response = this.responseStatus !== 204 ? this.getResponseBody(xhr) : '';
         this.responseStatus >= 400 ? reject(evt) : resolve(evt);
       };

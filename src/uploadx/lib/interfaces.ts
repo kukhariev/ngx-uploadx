@@ -19,12 +19,6 @@ export interface RequestOptions {
   progress?: boolean;
 }
 
-/**
- * @deprecated since 3.5.1
- * use `RequestOptions` instead
- */
-export type RequestParams = RequestOptions;
-
 export type UploadStatus =
   | 'added'
   | 'queue'
@@ -35,7 +29,7 @@ export type UploadStatus =
   | 'paused'
   | 'retry';
 
-export type UploadAction = 'uploadAll' | 'upload' | 'cancel' | 'cancelAll' | 'pauseAll' | 'pause';
+export type UploadAction = 'upload' | 'cancel' | 'pause';
 
 /**
  *  Read only upload stream events
@@ -56,7 +50,7 @@ export interface UploadState {
   readonly remaining: number;
 
   /** HTTP response body */
-  readonly response: ResponseBody | undefined;
+  readonly response: ResponseBody;
 
   /** HTTP response status code */
   readonly responseStatus: number;
