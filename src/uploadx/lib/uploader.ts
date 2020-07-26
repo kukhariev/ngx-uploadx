@@ -192,6 +192,19 @@ export abstract class Uploader implements UploadState {
   }
 
   /**
+   * Get response body after request has been sent
+   */
+  getResponseBody(xhr: XMLHttpRequest): ResponseBody {
+    let body = 'response' in (xhr as XMLHttpRequest) ? xhr.response : xhr.responseText;
+    if (body && this.responseType === 'json' && typeof body === 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch {}
+    }
+    return body;
+  }
+
+  /**
    * Get file URI
    */
   protected abstract getFileUrl(): Promise<string>;
@@ -264,8 +277,7 @@ export abstract class Uploader implements UploadState {
       Object.keys(_headers).forEach(key => xhr.setRequestHeader(key, String(_headers[key])));
       xhr.onload = (evt: ProgressEvent) => {
         this.responseStatus = xhr.status;
-        // TODO: check null body status
-        this.response = this.responseStatus !== 204 ? this.getResponseBody(xhr) : '';
+        this.getResponseBody(xhr);
         this.responseStatus >= 400 ? reject(evt) : resolve(evt);
       };
       xhr.onerror = reject;
@@ -274,16 +286,6 @@ export abstract class Uploader implements UploadState {
   }
 
   private cleanup = () => store.delete(this.uploadId);
-
-  getResponseBody(xhr: XMLHttpRequest): ResponseBody {
-    let body = 'response' in (xhr as XMLHttpRequest) ? xhr.response : xhr.responseText;
-    if (body && this.responseType === 'json' && typeof body === 'string') {
-      try {
-        body = JSON.parse(body);
-      } catch {}
-    }
-    return body;
-  }
 
   private onProgress(): (evt: ProgressEvent) => void {
     let throttle = 0;
