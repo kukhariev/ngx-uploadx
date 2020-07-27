@@ -63,9 +63,10 @@ export const b64 = {
         .join('')
     ),
   serialize: (obj: Record<string, Primitive | Primitive[]>) =>
-    Object.entries(obj)
-      .map(([key, value]) => `${key} ${b64.encode(String(value))}`)
+    Object.keys(obj)
+      .map(key => `${key} ${b64.encode(String(obj[key]))}`)
       .toString(),
+
   parse: (encoded: string) => {
     const kvPairs = encoded.split(',').map(kv => kv.split(' '));
     const decoded: Record<string, string> = Object.create(null);

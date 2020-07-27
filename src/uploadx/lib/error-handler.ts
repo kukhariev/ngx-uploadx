@@ -32,13 +32,13 @@ export class ErrorHandler {
     if (this.attempts >= ErrorHandler.maxAttempts) {
       return ErrorType.Fatal;
     }
-    if (ErrorHandler.authErrorCodes.includes(code)) {
+    if (ErrorHandler.authErrorCodes.indexOf(code) !== -1) {
       return ErrorType.Auth;
     }
-    if (ErrorHandler.shouldRestartCodes.includes(code)) {
+    if (ErrorHandler.shouldRestartCodes.indexOf(code) !== -1) {
       return ErrorType.NotFound;
     }
-    if (code < 400 || code >= 500 || ErrorHandler.shouldRetryCodes.includes(code)) {
+    if (code < 400 || code >= 500 || ErrorHandler.shouldRetryCodes.indexOf(code) !== -1) {
       return ErrorType.Retryable;
     }
     return ErrorType.Fatal;

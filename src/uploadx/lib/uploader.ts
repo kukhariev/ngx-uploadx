@@ -80,7 +80,7 @@ export abstract class Uploader implements UploadState {
     if (s !== this._status) {
       s === 'paused' && this.abort();
       this._status = s;
-      ['cancelled', 'complete', 'error'].includes(s) && this.cleanup();
+      ['cancelled', 'complete', 'error'].indexOf(s) !== -1 && this.cleanup();
       s === 'cancelled' ? this.onCancel() : this.stateChange(this);
     }
   }
