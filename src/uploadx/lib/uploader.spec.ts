@@ -161,14 +161,14 @@ describe('start()', () => {
     code = 0;
     const getOffset = spyOn(uploader, 'getOffset').and.callThrough();
     await uploader.start();
-    expect(getOffset).toHaveBeenCalledTimes(3);
+    expect(getOffset).toHaveBeenCalledTimes(2);
     expect(uploader.status).toEqual('error');
   });
   it('should retry on 500', async () => {
     code = 500;
     const getOffset = spyOn(uploader, 'getOffset').and.callThrough();
     await uploader.start();
-    expect(getOffset).toHaveBeenCalledTimes(3);
+    expect(getOffset).toHaveBeenCalledTimes(2);
     expect(uploader.status).toEqual('error');
   });
   it('should complete on 200', async () => {

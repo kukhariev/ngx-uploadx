@@ -1,10 +1,14 @@
-import { ErrorHandler } from './error-handler';
+import { ErrorHandler, ErrorType } from './error-handler';
 
 describe('ErrorHandler', () => {
-  it('should set to defaults if no parameters are specified', () => {
+  it('ErrorHandler.kind(status)', () => {
     const errorHandler = new ErrorHandler();
-    expect(errorHandler.attempts).toBe(0);
-    expect(ErrorHandler.min).toBe(500);
-    expect(ErrorHandler.max).toBe(60_000);
+    expect(errorHandler.kind(400)).toBe(ErrorType.Fatal);
+    expect(errorHandler.kind(0)).toBe(ErrorType.Retryable);
+    expect(errorHandler.kind(500)).toBe(ErrorType.Retryable);
+    expect(errorHandler.kind(423)).toBe(ErrorType.Retryable);
+    expect(errorHandler.kind(200)).toBe(ErrorType.Retryable);
+    expect(errorHandler.kind(404)).toBe(ErrorType.NotFound);
+    expect(errorHandler.kind(401)).toBe(ErrorType.Auth);
   });
 });
