@@ -1,15 +1,23 @@
 import { NgZone } from '@angular/core';
-import { UploadAction } from './interfaces';
+import { UploadAction, UploadxOptions } from './interfaces';
+import { UploaderX } from './uploaderx';
 import { UploadxService } from './uploadx.service';
 
+class MockUploader extends UploaderX {
+  async upload(): Promise<void> {
+    this.status = 'uploading';
+  }
+}
+
 const ENDPOINT = `http://localhost:3003/upload?user_id=test`;
-const options = {
+const options: UploadxOptions = {
   concurrency: 3,
   allowedTypes: 'image/*,video/*',
   endpoint: ENDPOINT,
   token: '%token%',
   autoUpload: false,
-  chunkSize: 4096
+  chunkSize: 4096,
+  uploaderClass: MockUploader
 };
 
 function getFilelist(): FileList {
@@ -110,7 +118,7 @@ describe('UploadxService', () => {
   it('should limit concurrent uploads', async () => {
     service.connect({ ...options, autoUpload: true });
     service.handleFileList(getFilelist());
-    await delay(100);
+    await delay(1);
     expect(service.queue.map(f => f.status).filter(s => s !== 'queue').length).toEqual(3);
     expect(service.queue[3].status).toEqual('queue');
     service.disconnect();

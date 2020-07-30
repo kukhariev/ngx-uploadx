@@ -3,6 +3,7 @@ import { getRangeEnd, UploaderX } from './uploaderx';
 
 const fileWithType = new File(['123456'], 'filename.txt', { type: 'text/plain' });
 const fileWithoutType = new File([''], 'filename');
+
 describe('getFileUrl', () => {
   let upx: UploaderX;
   let req: jasmine.Spy;
@@ -34,22 +35,27 @@ describe('getFileUrl', () => {
     expect(getValueFromResponse).toHaveBeenCalled();
   });
 });
+
 describe('sendFileContent', () => {
   let upx: UploaderX;
   let req: jasmine.Spy;
-  let getOffsetFromResponse: jasmine.Spy;
+  let getValueFromResponse: jasmine.Spy;
   it('should set Content-Range header', async () => {
     upx = new UploaderX(fileWithType, {});
     req = spyOn<any>(upx, 'request').and.callFake(({ headers }: any) => {
       expect(headers['Content-Type']).toEqual('application/octet-stream');
       expect(headers['Content-Range']).toEqual('bytes 0-5/6');
     });
-    getOffsetFromResponse = spyOn<any>(upx, 'getOffsetFromResponse').and.returnValue(6);
+    getValueFromResponse = spyOn<any>(upx, 'getValueFromResponse').and.returnValue(
+      'Range: bytes=0-5'
+    );
+    upx.responseStatus = 308;
     expect(await upx.sendFileContent()).toEqual(6);
     expect(req).toHaveBeenCalled();
-    expect(getOffsetFromResponse).toHaveBeenCalled();
+    expect(getValueFromResponse).toHaveBeenCalled();
   });
 });
+
 describe('getRangeEnd', () => {
   it('invalid ranges', () => {
     expect(getRangeEnd(undefined)).toEqual(-1);

@@ -39,10 +39,6 @@ describe('primitives', () => {
   it('isNumber', () => {
     expect(isNumber(NaN)).toBe(false);
     expect(isNumber(null as any)).toBe(false);
-    expect(isNumber(false as any)).toBe(false);
-    expect(isNumber(true as any)).toBe(false);
-    expect(isNumber('NaN')).toBe(false);
-    expect(isNumber('')).toBe(false);
     expect(isNumber(undefined)).toBe(false);
     expect(isNumber(0)).toBe(true);
   });

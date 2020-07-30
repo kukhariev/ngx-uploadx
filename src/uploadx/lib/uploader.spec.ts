@@ -11,28 +11,23 @@ const file = getFile();
 
 const snip = { file, size: 1, name: 'filename.mp4' };
 
-let code = 0;
-
-function shouldReject(): boolean {
-  return code >= 400 || !code;
-}
-
 ErrorHandler.maxAttempts = 2;
 
 export class MockUploader extends Uploader {
+  shouldReject(): boolean {
+    return this.responseStatus >= 400 || !this.responseStatus;
+  }
+
   async getFileUrl(): Promise<string> {
-    this.responseStatus = code;
-    return shouldReject() ? Promise.reject() : Promise.resolve('');
+    return this.shouldReject() ? Promise.reject() : Promise.resolve('');
   }
 
   async getOffset(): Promise<number> {
-    this.responseStatus = code;
-    return shouldReject() ? Promise.reject() : Promise.resolve(1);
+    return this.shouldReject() ? Promise.reject() : Promise.resolve(this.size);
   }
 
   async sendFileContent(): Promise<number> {
-    this.responseStatus = code;
-    return shouldReject() ? Promise.reject() : Promise.resolve(1);
+    return this.shouldReject() ? Promise.reject() : Promise.resolve(this.size);
   }
 }
 
@@ -89,33 +84,31 @@ describe('upload()', () => {
   let uploader: MockUploader;
   beforeEach(() => {
     uploader = new MockUploader(file, {});
-    (uploader as any).offset = undefined;
-    uploader.url = '';
   });
   it('should queue on 0', async () => {
-    code = 0;
+    uploader.responseStatus = 0;
     await uploader.upload();
     expect(uploader.status).toEqual('queue');
   });
   it('should error on 400', async () => {
-    code = 400;
+    uploader.responseStatus = 400;
     await uploader.upload();
     expect(uploader.status).toEqual('error');
   });
   it('should queue on 401', async () => {
-    code = 401;
+    uploader.responseStatus = 401;
     const getToken = spyOn<any>(uploader, 'getToken').and.callThrough();
     await uploader.upload();
     expect(getToken).toHaveBeenCalled();
     expect(uploader.status).toEqual('queue');
   });
   it('should queue on 500', async () => {
-    code = 500;
+    uploader.responseStatus = 500;
     await uploader.upload();
     expect(uploader.status).toEqual('queue');
   });
   it('should complete on 200', async () => {
-    code = 200;
+    uploader.responseStatus = 200;
     const start = spyOn(uploader, 'start').and.callThrough();
     const getOffset = spyOn(uploader, 'getOffset').and.callThrough();
     const cleanup = spyOn<any>(uploader, 'cleanup').and.callThrough();
@@ -126,7 +119,7 @@ describe('upload()', () => {
     expect(uploader.status).toEqual('complete');
   });
   it('should complete on 201', async () => {
-    code = 201;
+    uploader.responseStatus = 201;
     const start = spyOn(uploader, 'start').and.callThrough();
     const cleanup = spyOn<any>(uploader, 'cleanup').and.callThrough();
     await uploader.upload();
@@ -144,35 +137,35 @@ describe('start()', () => {
     uploader.status = 'uploading';
   });
   it('should error on 400', async () => {
-    code = 400;
+    uploader.responseStatus = 400;
     const getOffset = spyOn(uploader, 'getOffset').and.callThrough();
     await uploader.start();
     expect(getOffset).toHaveBeenCalledTimes(1);
     expect(uploader.status).toEqual('error');
   });
   it('should queue on 404', async () => {
-    code = 404;
+    uploader.responseStatus = 404;
     const getOffset = spyOn(uploader, 'getOffset').and.callThrough();
     await uploader.start();
     expect(getOffset).toHaveBeenCalledTimes(1);
     expect(uploader.status).toEqual('queue');
   });
   it('should retry on 0', async () => {
-    code = 0;
+    uploader.responseStatus = 0;
     const getOffset = spyOn(uploader, 'getOffset').and.callThrough();
     await uploader.start();
     expect(getOffset).toHaveBeenCalledTimes(2);
     expect(uploader.status).toEqual('error');
   });
   it('should retry on 500', async () => {
-    code = 500;
+    uploader.responseStatus = 500;
     const getOffset = spyOn(uploader, 'getOffset').and.callThrough();
     await uploader.start();
     expect(getOffset).toHaveBeenCalledTimes(2);
     expect(uploader.status).toEqual('error');
   });
   it('should complete on 200', async () => {
-    code = 200;
+    uploader.responseStatus = 200;
     await uploader.start();
     expect((uploader as any).offset).toEqual(1);
     expect(uploader.status).toEqual('complete');

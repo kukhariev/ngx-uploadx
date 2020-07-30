@@ -54,10 +54,7 @@ export class UploaderX extends Uploader {
       const range = this.getValueFromResponse('Range');
       return range ? getRangeEnd(range) + 1 : undefined;
     }
-    if (this.responseStatus <= 201) {
-      return this.size;
-    }
-    return;
+    return this.size;
   }
 }
 

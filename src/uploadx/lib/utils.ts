@@ -31,7 +31,7 @@ export const pick = <T, K extends keyof T>(obj: T, whitelist: K[]): Pick<T, K> =
   return result;
 };
 
-export function isNumber(x?: number | string): x is number {
+export function isNumber(x?: number): x is number {
   return x === Number(x);
 }
 

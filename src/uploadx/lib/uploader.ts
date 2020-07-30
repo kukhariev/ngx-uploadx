@@ -123,7 +123,7 @@ export abstract class Uploader implements UploadState {
   async upload(): Promise<void> {
     this.status = 'uploading';
     try {
-      await this.getToken();
+      await this.updateToken();
       this.offset = undefined;
       this.startTime = new Date().getTime();
       this.url = this.url || (await this.getFileUrl());
@@ -168,7 +168,7 @@ export abstract class Uploader implements UploadState {
             this.url = '';
             this.status = 'queue';
           } else if (errType === ErrorType.Auth) {
-            await this.getToken();
+            await this.updateToken();
           } else {
             this.status = 'retry';
             await this.errorHandler.wait();
@@ -248,10 +248,11 @@ export abstract class Uploader implements UploadState {
   /**
    * Set auth token
    */
-  protected getToken(): Promise<string | void> {
-    return Promise.resolve(unfunc(this.token || '', this.responseStatus)).then(
-      token => token && this.setAuth(token)
-    );
+  protected async updateToken(): Promise<string | void> {
+    if (this.token) {
+      const token = await unfunc(this.token, this.responseStatus);
+      this.setAuth(token);
+    }
   }
 
   protected getChunk(): { start: number; end: number; body: Blob } {
@@ -275,7 +276,7 @@ export abstract class Uploader implements UploadState {
       this.options.withCredentials && (xhr.withCredentials = true);
       const _headers = { ...this.headers, ...(req.headers || {}) };
       Object.keys(_headers).forEach(key => xhr.setRequestHeader(key, String(_headers[key])));
-      xhr.onload = (evt: ProgressEvent) => {
+      xhr.onload = evt => {
         this.responseStatus = xhr.status;
         this.getResponseBody(xhr);
         this.responseStatus >= 400 ? reject(evt) : resolve(evt);

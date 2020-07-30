@@ -9,7 +9,7 @@ export enum ErrorType {
  * Retryable ErrorHandler
  */
 export class ErrorHandler {
-  /** Maximum number retry attempts */
+  /** Maximum number of retry attempts */
   static maxAttempts = 8;
   /** Upload not exist status codes */
   static shouldRestartCodes = [404, 410];
