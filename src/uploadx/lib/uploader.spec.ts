@@ -11,6 +11,8 @@ const file = getFile();
 
 const snip = { file, size: 1, name: 'filename.mp4' };
 
+let uploader: MockUploader;
+
 ErrorHandler.maxAttempts = 2;
 
 export class MockUploader extends Uploader {
@@ -33,13 +35,12 @@ export class MockUploader extends Uploader {
 
 describe('constructor()', () => {
   it('should new()', () => {
-    const uploader = new MockUploader(file, {});
+    uploader = new MockUploader(file, {});
     expect(uploader).toEqual(jasmine.objectContaining(snip));
   });
 });
 
 describe('configure', () => {
-  let uploader: MockUploader;
   beforeEach(() => {
     uploader = new MockUploader(file, {});
   });
@@ -62,7 +63,6 @@ describe('configure', () => {
 });
 
 describe('chunkSize', () => {
-  let uploader: MockUploader;
   it('should use adaptive chunkSize if not specified', async () => {
     uploader = new MockUploader(getFile(), {});
     (uploader as any).getChunk();
@@ -81,7 +81,6 @@ describe('chunkSize', () => {
 });
 
 describe('upload()', () => {
-  let uploader: MockUploader;
   beforeEach(() => {
     uploader = new MockUploader(file, {});
   });
@@ -97,9 +96,9 @@ describe('upload()', () => {
   });
   it('should queue on 401', async () => {
     uploader.responseStatus = 401;
-    const getToken = spyOn<any>(uploader, 'getToken').and.callThrough();
+    const updateToken = spyOn<any>(uploader, 'updateToken').and.callThrough();
     await uploader.upload();
-    expect(getToken).toHaveBeenCalled();
+    expect(updateToken).toHaveBeenCalled();
     expect(uploader.status).toEqual('queue');
   });
   it('should queue on 500', async () => {
@@ -130,7 +129,6 @@ describe('upload()', () => {
 });
 
 describe('start()', () => {
-  let uploader: MockUploader;
   beforeEach(() => {
     uploader = new MockUploader(file, {});
     (uploader as any).offset = undefined;
@@ -172,7 +170,6 @@ describe('start()', () => {
   });
 });
 describe('prerequest', () => {
-  let uploader: MockUploader;
   const injected = { headers: { Auth: 'token' } };
   it('sync', async () => {
     uploader = new MockUploader(file, { prerequest: req => ({ ...req, ...injected }) });
