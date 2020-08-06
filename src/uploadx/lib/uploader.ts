@@ -92,7 +92,8 @@ export abstract class Uploader implements UploadState {
       name: file.name,
       mimeType: file.type || 'application/octet-stream',
       size: file.size,
-      lastModified: file.lastModified
+      lastModified:
+        file.lastModified || (file as File & { lastModifiedDate: Date }).lastModifiedDate.getTime()
     };
     const print = JSON.stringify({
       ...this.metadata,
