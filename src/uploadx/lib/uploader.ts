@@ -279,7 +279,7 @@ export abstract class Uploader implements UploadState {
       Object.keys(_headers).forEach(key => xhr.setRequestHeader(key, String(_headers[key])));
       xhr.onload = evt => {
         this.responseStatus = xhr.status;
-        this.getResponseBody(xhr);
+        this.response = this.getResponseBody(xhr);
         this.responseStatus >= 400 ? reject(evt) : resolve(evt);
       };
       xhr.onerror = reject;
