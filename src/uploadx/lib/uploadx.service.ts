@@ -2,7 +2,7 @@ import { Injectable, NgZone, OnDestroy } from '@angular/core';
 import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import {
-  UploaderOptions,
+  UploaderClass,
   UploadEvent,
   UploadState,
   UploadxControlEvent,
@@ -17,7 +17,10 @@ interface DefaultOptions {
   autoUpload: boolean;
   concurrency: number;
   stateChange: (evt: UploadEvent) => void;
+  uploaderClass: UploaderClass;
 }
+
+type ServiceFactoryOptions = UploadxOptions & DefaultOptions;
 
 @Injectable({ providedIn: 'root' })
 export class UploadxService implements OnDestroy {
@@ -37,10 +40,11 @@ export class UploadxService implements OnDestroy {
   /** Upload Queue */
   queue: Uploader[] = [];
   private readonly eventsStream: Subject<UploadState> = new Subject();
-  options: UploadxOptions & DefaultOptions = {
+  options: ServiceFactoryOptions = {
     endpoint: '/upload',
     autoUpload: true,
     concurrency: 2,
+    uploaderClass: UploaderX,
     stateChange: (evt: UploadEvent) => {
       setTimeout(() =>
         this.ngZone.run(() => this.eventsStream.next(pick(evt, UploadxService.stateKeys)))
@@ -83,7 +87,7 @@ export class UploadxService implements OnDestroy {
    */
   connect(options?: UploadxOptions): Observable<Uploader[]> {
     return this.init(options).pipe(
-      startWith(0),
+      startWith({} as UploadState),
       map(() => this.queue)
     );
   }
@@ -105,19 +109,18 @@ export class UploadxService implements OnDestroy {
    * Create Uploader and add to the queue
    */
   handleFileList(fileList: FileList, options = {} as UploadxOptions): void {
-    const instanceOptions = { ...this.options, ...options };
+    const instanceOptions: ServiceFactoryOptions = { ...this.options, ...options };
     this.options.concurrency = instanceOptions.concurrency;
     Array.from(fileList).forEach(file => this.addUploaderInstance(file, instanceOptions));
-    this.autoUploadFiles();
   }
 
   /**
    * Create Uploader for the file and add to the queue
    */
   handleFile(file: File, options = {} as UploadxOptions): void {
-    const instanceOptions = { ...this.options, ...options };
+    const instanceOptions: ServiceFactoryOptions = { ...this.options, ...options };
+    this.options.concurrency = instanceOptions.concurrency;
     this.addUploaderInstance(file, instanceOptions);
-    this.autoUploadFiles();
   }
 
   /**
@@ -144,23 +147,14 @@ export class UploadxService implements OnDestroy {
     return this.queue.filter(({ status }) => status === 'uploading' || status === 'retry').length;
   }
 
-  private addUploaderInstance(file: File, options: UploadxOptions): void {
-    const uploader = new (options.uploaderClass || UploaderX)(file, options as UploaderOptions);
+  private addUploaderInstance(file: File, options: ServiceFactoryOptions): void {
+    const uploader = new options.uploaderClass(file, options);
     this.queue.push(uploader);
-    uploader.status = 'added';
-  }
-
-  private autoUploadFiles(): void {
-    if (this.options.autoUpload && window.navigator.onLine) {
-      this.queue
-        .filter(({ status }) => status === 'added')
-        .forEach(uploader => (uploader.status = 'queue'));
-    }
+    uploader.status = options.autoUpload && window.navigator.onLine ? 'queue' : 'added';
   }
 
   private processQueue(): void {
     this.queue = this.queue.filter(({ status }) => status !== 'cancelled');
-
     this.queue
       .filter(({ status }) => status === 'queue')
       .slice(0, Math.max(this.options.concurrency - this.runningProcess(), 0))
