@@ -71,8 +71,7 @@ export interface UploadState {
   readonly url: string;
 }
 
-export interface UploadItem {
-  readonly uploadId?: string;
+interface UploadItem {
   /**
    * URL to create new uploads.
    * @defaultValue '/upload'
@@ -93,6 +92,7 @@ export interface UploadItem {
 }
 
 export interface UploadxControlEvent extends UploadItem {
+  readonly uploadId?: string;
   action?: UploadAction;
 }
 
