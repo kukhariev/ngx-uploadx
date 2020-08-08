@@ -92,7 +92,8 @@ export abstract class Uploader implements UploadState {
       name: file.name,
       mimeType: file.type || 'application/octet-stream',
       size: file.size,
-      lastModified: file.lastModified
+      lastModified:
+        file.lastModified || (file as File & { lastModifiedDate: Date }).lastModifiedDate.getTime()
     };
     const print = JSON.stringify({
       ...this.metadata,
@@ -278,7 +279,7 @@ export abstract class Uploader implements UploadState {
       Object.keys(_headers).forEach(key => xhr.setRequestHeader(key, String(_headers[key])));
       xhr.onload = evt => {
         this.responseStatus = xhr.status;
-        this.getResponseBody(xhr);
+        this.response = this.getResponseBody(xhr);
         this.responseStatus >= 400 ? reject(evt) : resolve(evt);
       };
       xhr.onerror = reject;
