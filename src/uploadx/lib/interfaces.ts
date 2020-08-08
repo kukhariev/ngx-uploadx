@@ -71,8 +71,7 @@ export interface UploadState {
   readonly url: string;
 }
 
-export interface UploadItem {
-  readonly uploadId?: string;
+interface UploadItem {
   /**
    * URL to create new uploads.
    * @defaultValue '/upload'
@@ -93,6 +92,7 @@ export interface UploadItem {
 }
 
 export interface UploadxControlEvent extends UploadItem {
+  readonly uploadId?: string;
   action?: UploadAction;
 }
 
@@ -110,6 +110,7 @@ export interface UploaderOptions extends UploadItem {
   prerequest?: (req: RequestOptions) => Promise<RequestOptions> | RequestOptions | void;
 }
 
+export type UploaderClass = new (f: File, options: UploaderOptions) => Uploader;
 /**
  * Global Module Options
  */
@@ -118,7 +119,7 @@ export interface UploadxOptions extends UploaderOptions {
    * Provide a user-defined class to support another upload protocol or to extend an existing one.
    * @defaultValue UploadX
    */
-  uploaderClass?: new (f: File, options: UploaderOptions) => Uploader;
+  uploaderClass?: UploaderClass;
   /**
    * Set the maximum parallel uploads
    * @defaultValue 2
