@@ -8,13 +8,15 @@ import {
   Output,
   Renderer2
 } from '@angular/core';
-import { UploadxControlEvent, UploadxOptions } from './interfaces';
+import { Observable } from 'rxjs';
+import { UploadState, UploadxControlEvent, UploadxOptions } from './interfaces';
 import { UploadxService } from './uploadx.service';
 
 @Directive({ selector: '[uploadx]' })
 export class UploadxDirective implements OnInit {
   @Output()
-  uploadxState = new EventEmitter();
+  uploadxState = new EventEmitter<Observable<UploadState>>();
+
   @Input()
   uploadx!: UploadxOptions;
 
@@ -33,9 +35,7 @@ export class UploadxDirective implements OnInit {
 
   ngOnInit(): void {
     const { multiple, allowedTypes } = this.uploadx;
-
     multiple !== false && this.renderer.setAttribute(this.elementRef.nativeElement, 'multiple', '');
-
     allowedTypes &&
       this.renderer.setAttribute(this.elementRef.nativeElement, 'accept', allowedTypes);
 
