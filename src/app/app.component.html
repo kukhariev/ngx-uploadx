@@ -1,27 +1,26 @@
 <header>
+  <div class="logo">
+    <a href="#">ngx-uploadx</a>
+  </div>
   <nav>
-    <a class="logo" href="#">ngx-uploadx</a>
-    <ul>
+    <ul (click)="hidden = !hidden" [class.hidden]="hidden">
       <li>
-        <a routerLink="/directive-way" routerLinkActive="active">directive</a>
-      </li>
-      <li>
-        <a routerLink="/service-way" routerLinkActive="active">mixed</a>
-      </li>
-      <li>
-        <a routerLink="/service-code-way" routerLinkActive="active">service</a>
-      </li>
-      <li>
-        <a routerLink="/on-push" routerLinkActive="active">on-push</a>
-      </li>
-      <li>
-        <a routerLink="/multi" routerLinkActive="active">multi-options</a>
-      </li>
-      <li>
-        <a routerLink="/multi2" routerLinkActive="active">multi-service</a>
-      </li>
-      <li>
-        <a routerLink="/tus" routerLinkActive="active">tus</a>
+        <a href="">⠇</a>
+        <div>
+          <a routerLink="/directive-way" routerLinkActive="active">directive</a>
+
+          <a routerLink="/service-way" routerLinkActive="active">mixed</a>
+
+          <a routerLink="/service-code-way" routerLinkActive="active">service</a>
+
+          <a routerLink="/on-push" routerLinkActive="active">on-push</a>
+
+          <a routerLink="/multi" routerLinkActive="active">multi-options</a>
+
+          <a routerLink="/multi2" routerLinkActive="active">multi-service</a>
+
+          <a routerLink="/tus" routerLinkActive="active">tus</a>
+        </div>
       </li>
     </ul>
   </nav>

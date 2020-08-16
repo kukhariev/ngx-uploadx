@@ -5,6 +5,7 @@ import { Component, HostListener } from '@angular/core';
   templateUrl: './app.component.html'
 })
 export class AppComponent {
+  hidden = true;
   @HostListener('dragenter', ['$event'])
   @HostListener('dragover', ['$event'])
   @HostListener('drop', ['$event'])

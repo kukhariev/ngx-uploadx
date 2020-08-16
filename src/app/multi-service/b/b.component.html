@@ -1,25 +1,25 @@
-<div class="container">
-  <div class="btns">
-    <div class="btn-col">
-      <label class="upload-btn" uploadxDrop
-        >B
-        <input accept="image/*" style="display: none;" type="file" uploadx />
-      </label>
-      <button (click)="uploadAll()" class="btn red raised">Upload All</button>
-      <button (click)="cancelAll()" class="btn red raised">Cancel All</button>
-      <button (click)="pauseAll()" class="btn red raised">Pause All</button>
-    </div>
-  </div>
-
-  <div class="uploads-table2">
+<div uploadxDrop>
+  <div class="uploads-table">
     <div *ngFor="let item of uploads$ | async" class="row">
-      <span class="col-1">{{ item.name }}</span>
-      <span class="col-2">{{ item.progress }}%</span>
-      <span class="col-2">{{ item.status }}</span>
-      <span class="col-3 btn-row">
-        <button (click)="item.status = 'paused'" class="btn red raised">pause</button>
-        <button (click)="item.status = 'queue'" class="btn red raised">upload</button>
+      <span>{{ item.name }}</span>
+      <span>{{ item.progress }}%</span>
+      <span>{{ item.status }}</span>
+      <span>
+        <button (click)="item.status = 'paused'">pause</button>
+        <button (click)="item.status = 'queue'">upload</button>
       </span>
     </div>
+  </div>
+  <div class="control">
+    <span>
+      <span>Drop files to upload, or </span>
+      <label for="files-b" accesskey="o"> <strong>BROWSE</strong></label>
+      <input id="files-b" accept="image/*,video/*" style="display: none;" type="file" uploadx />
+    </span>
+    <span>
+      <button (click)="uploadAll()">Upload All</button>
+      <button (click)="pauseAll()">Pause All</button>
+      <button (click)="cancelAll()">Cancel All</button>
+    </span>
   </div>
 </div>

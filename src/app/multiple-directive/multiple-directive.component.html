@@ -1,30 +1,43 @@
-<div class="container">
-  <div class="btns">
-    <div class="btn-col">
-      <label class="upload-btn"
-        >I
-        <input [uploadx]="options" style="display: none;" type="file" />
-      </label>
-      <label class="upload-btn"
-        >V
-        <input [uploadx]="options2" class="video" style="display: none;" type="file" />
-      </label>
-      <button (click)="upload()" class="btn red raised">Upload All</button>
-      <button (click)="cancel()" class="btn red raised">Cancel All</button>
-      <button (click)="pause()" class="btn red raised">Pause All</button>
-    </div>
-  </div>
-
+<div uploadxDrop>
   <div class="uploads-table">
     <div *ngFor="let item of uploads$ | async" class="row">
-      <span class="col-1">{{ item.name }}</span>
-      <span class="col-2">{{ item.progress }}%</span>
-      <span class="col-2">{{ item.status }}</span>
-      <span class="col-3 btn-row">
-        <button (click)="item.status = 'paused'" class="btn red raised">pause</button>
-        <button (click)="item.status = 'queue'" class="btn red raised">upload</button>
+      <span>{{ item.name }}</span>
+      <span>{{ item.progress }}%</span>
+      <span>{{ item.status }}</span>
+      <span>
+        <button (click)="pause(item.uploadId)">pause</button>
+        <button (click)="upload(item.uploadId)">upload</button>
       </span>
     </div>
+  </div>
+  <div class="control">
+    <span>
+      <label for="files" accesskey="i"><strong>BROWSE Images</strong></label>
+      <input
+        #files
+        (click)="files.value = ''"
+        uploadx="options"
+        id="files"
+        style="display: none;"
+        type="file"
+      />
+    </span>
+    <span>
+      <label for="files2" accesskey="v"><strong>BROWSE Videos</strong></label>
+      <input
+        #files2
+        (click)="files.value = ''"
+        uploadx="options2"
+        id="files2"
+        style="display: none;"
+        type="file"
+      />
+    </span>
+    <span>
+      <button (click)="upload()">Upload All</button>
+      <button (click)="pause()">Pause All</button>
+      <button (click)="cancel()">Cancel All</button>
+    </span>
   </div>
 </div>
 <div class="json">
