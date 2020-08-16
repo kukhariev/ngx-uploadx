@@ -42,4 +42,7 @@ Thumbs.db
 
 src/uploadx/package.json
 
-
+/integrations/*/src/app
+/integrations/*/e2e
+/integrations/*/src/environments
+/integrations/*/src/styles.scss
