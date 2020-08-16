@@ -18,12 +18,18 @@ export class UploadxDirective implements OnInit {
   uploadxState = new EventEmitter<Observable<UploadState>>();
 
   @Input()
-  uploadx!: UploadxOptions;
+  set uploadx(value: UploadxOptions | string | null | undefined) {
+    if (value && typeof value === 'object') {
+      this.options = value;
+    }
+  }
+
+  options: UploadxOptions = {};
 
   @Input()
-  set uploadxAction(ctrlEvent: UploadxControlEvent) {
-    if (ctrlEvent && this.uploadService) {
-      this.uploadService.control(ctrlEvent);
+  set uploadxAction(value: UploadxControlEvent | string | null | undefined) {
+    if (value && typeof value === 'object') {
+      this.uploadService.control(value);
     }
   }
 
@@ -34,7 +40,7 @@ export class UploadxDirective implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const { multiple, allowedTypes } = this.uploadx;
+    const { multiple, allowedTypes } = this.options;
     multiple !== false && this.renderer.setAttribute(this.elementRef.nativeElement, 'multiple', '');
     allowedTypes &&
       this.renderer.setAttribute(this.elementRef.nativeElement, 'accept', allowedTypes);
@@ -45,7 +51,7 @@ export class UploadxDirective implements OnInit {
   @HostListener('change', ['$event.target.files'])
   fileListener(files: FileList): void {
     if (files && files.item(0)) {
-      this.uploadService.handleFileList(files, this.uploadx);
+      this.uploadService.handleFileList(files, this.options);
     }
   }
 }

@@ -8,19 +8,19 @@ export class UploadxDropDirective {
   active = false;
 
   @ContentChild(UploadxDirective)
-  fileInput!: UploadxDirective;
+  fileInput?: UploadxDirective;
 
   constructor(private uploadService: UploadxService) {}
 
   @HostListener('drop', ['$event'])
   dropHandler(event: DragEvent): void {
-    if (event.dataTransfer && event.dataTransfer.files) {
+    if (event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.item(0)) {
       event.stopPropagation();
       event.preventDefault();
       this.active = false;
-      if (event.dataTransfer.files.item(0)) {
-        this.uploadService.handleFileList(event.dataTransfer.files, this.fileInput.uploadx);
-      }
+      this.fileInput
+        ? this.fileInput.fileListener(event.dataTransfer.files)
+        : this.uploadService.handleFileList(event.dataTransfer.files);
     }
   }
 
