@@ -7,3 +7,7 @@ tmp
 out-tsc
 /.vscode
 
+/integrations/*/src/app
+/integrations/*/e2e
+/integrations/*/src/environments
+/integrations/*/src/styles.scss
