@@ -18,8 +18,8 @@
         #files
         (click)="files.value = ''"
         (uploadxState)="onUpload($event)"
-        uploadxAction="control"
-        uploadx="options"
+        [uploadxAction]="control"
+        [uploadx]="options"
         id="files"
         style="display: none;"
         type="file"

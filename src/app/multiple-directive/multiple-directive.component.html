@@ -12,23 +12,23 @@
   </div>
   <div class="control">
     <span>
-      <label for="files" accesskey="i"><strong>BROWSE Images</strong></label>
+      <label for="images" accesskey="i"><strong>BROWSE Images</strong></label>
       <input
-        #files
-        (click)="files.value = ''"
-        uploadx="options"
-        id="files"
+        #images
+        (click)="images.value = ''"
+        [uploadx]="options"
+        id="images"
         style="display: none;"
         type="file"
       />
     </span>
     <span>
-      <label for="files2" accesskey="v"><strong>BROWSE Videos</strong></label>
+      <label for="videos" accesskey="v"><strong>BROWSE Videos</strong></label>
       <input
-        #files2
-        (click)="files.value = ''"
-        uploadx="options2"
-        id="files2"
+        #videos
+        (click)="videos.value = ''"
+        [uploadx]="options2"
+        id="videos"
         style="display: none;"
         type="file"
       />

@@ -6,7 +6,6 @@ import { environment } from '../../environments/environment';
 @Component({
   selector: 'app-multiple-directive',
   templateUrl: './multiple-directive.component.html',
-  styleUrls: ['./multiple-directive.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MultipleDirectiveComponent {

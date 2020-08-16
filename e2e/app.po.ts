@@ -8,7 +8,7 @@ export class AppPage {
     return element(by.css('app-root input'));
   }
   getVideoFileInput(): ElementFinder {
-    return element(by.css('app-root  .video'));
+    return element(by.css('app-root #videos'));
   }
   getTable(): ElementFinder {
     return element(by.css('app-root .uploads-table'));
