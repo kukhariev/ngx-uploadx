@@ -4,6 +4,7 @@ import { build } from 'ng-packagr';
 (async () => {
   try {
     const rootPackage = JSON.parse(await fsp.readFile('package.json', 'utf8'));
+    // tslint:disable-next-line: no-any
     const libPackage: any = {};
     libPackage.name = rootPackage.name;
     libPackage.version = rootPackage.version;
