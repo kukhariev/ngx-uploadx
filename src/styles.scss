@@ -1,230 +1,189 @@
 /* You can add global styles to this file, and also import other style files */
 @import url('https://fonts.googleapis.com/css?family=Roboto');
 
-$dark: rgb(48, 48, 48);
-$red: rgb(187, 65, 106);
-$light: rgb(255, 255, 255);
+$dark: rgb(48, 48, 50);
+$light: rgb(240, 240, 240);
+$nav: rgb(60, 60, 70);
 
-$background: $dark;
-$main: $light;
+.shadow {
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+$dark-theme: 1;
+
+$background: $light;
+$main: $dark;
+
+@if $dark-theme == 1 {
+  $main: $light;
+  $background: $dark;
+}
+
+$border: 1px solid transparentize($main, 0.8);
 
 body {
+  background: $background;
+  color: $main;
   font-family: Roboto, sans-serif;
-  font-size: 16px;
-  background: $dark;
+  font-size: 14px;
   height: 100%;
-  color: $light;
 }
 
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
-
-.shadow {
-  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
-}
-
-.upload-btn {
-  text-align: center;
-  margin: 20px auto;
-  font-size: 75px;
-  line-height: 75px;
-  border-radius: 75px;
-  height: 75px;
-  width: 75px;
-  cursor: pointer;
-  color: $main;
-  background-color: $red;
-  @extend .shadow;
-  transition: all 150ms;
-
-  &:hover {
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3);
-    background-color: lighten($red, 5%);
-  }
-}
-
-.uploadx-drop-active {
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3);
-  background-color: lighten($red, 10%);
-}
-
-.container {
-  margin: 0;
-  padding: 0;
-  min-height: 250px;
-  display: flex;
-  flex-flow: row;
 }
 
 header {
+  @extend .shadow;
+  align-items: center;
+  background-color: $nav;
   color: $light;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
 
-  .active {
-    font-weight: bold;
+  .logo {
+    a {
+      color: $light;
+      font-size: 16px;
+      text-decoration: none;
+    }
   }
 
-  margin-bottom: 5px;
-  background-color: $red;
-  @extend .shadow;
+  a {
+    color: $light;
+    display: block;
+    padding: 8px;
+    text-decoration: none;
+  }
+
+  .active {
+    font-style: italic;
+  }
 
   nav {
-    display: flex;
-    flex-direction: row;
-
-    .logo {
-      height: 100%;
-      text-decoration: none;
-      text-align: center;
-      color: $light;
-      width: 115px;
-      margin: auto 0;
-      font-weight: bold;
+    .hidden > li > div {
+      display: none;
     }
 
     ul {
-      display: flex;
+      display: block;
+      list-style-type: none;
+      width: 30px;
+    }
+
+    li > a {
+      font-size: 20px;
+      padding: 0;
+      text-align: right;
     }
 
     li {
-      flex: 0 1 auto;
-      min-width: 0;
-      display: flex;
-      overflow: hidden;
+      position: relative;
 
-      &:hover {
-        background-color: lighten($red, 5%);
-      }
-
-      a {
-        text-align: center;
-        width: 10vw;
-        flex: 0 1 auto;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        color: $light;
-        text-transform: lowercase;
-        text-decoration: none;
-        padding: 20px 1vw;
-        font-size: 90%;
+      div {
+        background-color: lighten($nav, 5%);
+        height: 100%;
+        position: fixed;
+        right: 0px;
+        width: 200px;
+        z-index: 1;
+        @extend .shadow;
       }
     }
   }
 }
 
-.btns {
-  flex: 1 6 20%;
-  order: 1;
+.container {
   display: flex;
-  height: 230px;
+  flex-flow: row;
+  margin: 0;
+  min-height: 250px;
+  padding: 0;
 }
 
-.btn-col {
-  height: 100%;
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+.uploadx-drop-active {
+  background-color: lighten($background, 10%);
 }
 
-.btn-row {
-  margin: auto;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  min-width: 10vw;
-}
-
-.btn {
+button {
   background-color: transparent;
-  text-transform: capitalize;
-  text-align: center;
-  height: 28px;
-  font-size: 13px;
-  font-weight: 600;
-  color: $light;
-  width: 90px;
-  border: transparent;
-  border-radius: 2px;
+  border: $border;
+  border-radius: 5px;
+  color: $main;
   cursor: pointer;
-  transition: all 150ms;
+  font-family: inherit;
+  font-size: 13px;
+  height: 28px;
+  // border: transparent;
+  margin: auto 2px;
   overflow: hidden;
+  text-align: center;
   text-overflow: ellipsis;
+  text-transform: capitalize;
+  transition: all 150ms;
+  width: 80px;
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.1);
   }
 }
 
-.btn.red {
-  background-color: transparentize($red, 0.8);
-
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.1);
-  }
-}
-
-.btn.raised {
-  @extend .shadow;
+label {
+  cursor: pointer;
 }
 
 .uploads-table,
 .uploads-table2 {
-  flex: 3 1 80%;
-  order: 2;
   font-size: 90%;
-  border-radius: 2px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  padding: 0 2px;
-  margin: 0 5px;
-  height: 230px;
-  overflow-y: auto;
+  height: 200px;
+  margin: 5px;
   overflow-x: hidden;
+  overflow-y: auto;
+}
 
-  .row {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    height: 32px;
+.control {
+  border: $border;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
 
-    span {
-      margin: auto;
-      height: 29px;
-      line-height: 29px;
-    }
+  span {
+    margin: auto;
+    padding: 3px;
+    white-space: nowrap;
+  }
+}
 
-    .col-1 {
-      padding-left: 10px;
-      flex: 3 1 64%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+.row {
+  align-items: baseline;
+  display: flex;
+  justify-content: flex-end;
 
-    .col-2 {
-      flex: 3 1 8%;
-      padding-right: 10px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+  span:first-child {
+    flex: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-    .col-3 {
-      flex: 3 1 20%;
-    }
+  span {
+    margin: auto 10px;
+    white-space: nowrap;
   }
 }
 
 .json {
   display: block;
+  margin: 2px;
   min-height: 200px;
-  background-color: $background;
 
   pre {
     font-size: 80%;
-    padding: 5px;
     margin: auto;
     overflow: hidden;
+    padding: 5px;
     text-overflow: ellipsis;
   }
 }

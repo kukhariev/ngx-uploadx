@@ -1,33 +1,34 @@
-<div class="container">
-  <div class="btns">
-    <div class="btn-col">
-      <label class="upload-btn"
-        >+
-        <input
-          #file
-          (change)="onChange()"
-          accept="image/*,video/*"
-          multiple
-          style="display: none;"
-          type="file"
-        />
-      </label>
-      <button (click)="upload()" class="btn red raised">Upload All</button>
-      <button (click)="cancel()" class="btn red raised">Cancel All</button>
-      <button (click)="pause()" class="btn red raised">Pause All</button>
-    </div>
-  </div>
-
+<div uploadxDrop>
   <div class="uploads-table">
-    <div *ngFor="let ufile of uploads" class="row">
-      <span class="col-1">{{ ufile.name }}</span>
-      <span class="col-2">{{ ufile.progress }}%</span>
-      <span class="col-2">{{ ufile.status }}</span>
-      <span class="col-3 btn-row">
-        <button (click)="pause(ufile.uploadId)" class="btn red raised">pause</button>
-        <button (click)="upload(ufile.uploadId)" class="btn red raised">upload</button>
+    <div *ngFor="let item of uploads" class="row">
+      <span>{{ item.name }}</span>
+      <span>{{ item.progress }}%</span>
+      <span>{{ item.status }}</span>
+      <span>
+        <button (click)="pause(item.uploadId)">pause</button>
+        <button (click)="upload(item.uploadId)">upload</button>
       </span>
     </div>
+  </div>
+  <div class="control">
+    <span>
+      <span>Drop files to upload, or </span>
+      <label for="files" accesskey="o"> <strong>BROWSE</strong></label>
+      <input
+        #file
+        id="files"
+        (change)="onChange()"
+        accept="image/*,video/*"
+        multiple
+        style="display: none;"
+        type="file"
+      />
+    </span>
+    <span>
+      <button (click)="upload()">Upload All</button>
+      <button (click)="pause()">Pause All</button>
+      <button (click)="cancel()">Cancel All</button>
+    </span>
   </div>
 </div>
 <div class="json">
