@@ -6,10 +6,10 @@ module.exports = function (config) {
     basePath: '',
     frameworks: ['jasmine', '@angular-devkit/build-angular'],
     plugins: [
-      require('karma-jasmine/package'),
-      require('karma-chrome-launcher/package'),
-      require('karma-jasmine-html-reporter/package'),
-      require('karma-coverage-istanbul-reporter/package'),
+      require('karma-jasmine'),
+      require('karma-chrome-launcher'),
+      require('karma-jasmine-html-reporter'),
+      require('karma-coverage-istanbul-reporter'),
       require('@angular-devkit/build-angular/plugins/karma')
     ],
     client: {
