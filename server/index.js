@@ -5,9 +5,8 @@ const debug = args.includes('--debug');
 debug && (process.env.DEBUG = 'uploadx:*');
 const url = require('url');
 const { tmpdir } = require('os');
-const { Multipart, Tus, Uploadx, DiskStorage } = require('node-uploadx');
+const { Multipart, Tus, Uploadx } = require('node-uploadx');
 const { createServer } = require('http');
-const { join } = require('path');
 
 const PORT = 3003;
 const UPLOAD_DIR = `${tmpdir()}/ngx-uploadx/`;
