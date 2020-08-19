@@ -8,9 +8,7 @@
     "test": "ng build --prod",
     "build": "ng build",
     "lint": "ng lint",
-    "e2e": "ng e2e",
-    "pretest": "npm install",
-    "postinstall": "npm run copy:ng10 --prefix=\"../../\""
+    "e2e": "ng e2e --prod"
   },
   "private": true,
   "dependencies": {

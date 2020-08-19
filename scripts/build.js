@@ -1,11 +1,11 @@
-import { promises as fsp } from 'fs';
-import { build } from 'ng-packagr';
+//@ts-check
+const { promises: fsp } = require('fs');
+const { build } = require('ng-packagr');
 
 (async () => {
   try {
     const rootPackage = JSON.parse(await fsp.readFile('package.json', 'utf8'));
-    // tslint:disable-next-line: no-any
-    const libPackage: any = {};
+    const libPackage = {};
     libPackage.name = rootPackage.name;
     libPackage.version = rootPackage.version;
     libPackage.description = rootPackage.description;
