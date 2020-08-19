@@ -25,19 +25,19 @@ describe('uploader App', () => {
     expect(page.waitForStatus('complete')).toBeTruthy();
   });
 
-  it('should upload (mixed)', async () => {
+  it('should upload (mixed)', () => {
     page.navigateTo('/service-way');
     page.getFileInput().sendKeys(testFilePath);
     expect(page.waitForStatus('complete')).toBeTruthy();
   });
 
-  it('should upload (service)', async () => {
+  it('should upload (service)', () => {
     page.navigateTo('/service-code-way');
     page.getFileInput().sendKeys(testFilePath);
     expect(page.waitForStatus('complete')).toBeTruthy();
   });
 
-  it('should upload (onPush)', async () => {
+  it('should upload (onPush)', () => {
     page.navigateTo('/on-push');
     page.getFileInput().sendKeys(testFilePath);
     expect(page.waitForStatus('complete')).toBeTruthy();
