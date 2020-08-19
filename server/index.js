@@ -3,29 +3,26 @@
 const args = process.argv.slice(2);
 const debug = args.includes('--debug');
 debug && (process.env.DEBUG = 'uploadx:*');
-
-const http = require('http');
 const url = require('url');
-const rimraf = require('rimraf');
 const { tmpdir } = require('os');
-const { Multipart, Tus, Uploadx } = require('node-uploadx');
+const { Multipart, Tus, Uploadx, DiskStorage } = require('node-uploadx');
+const { createServer } = require('http');
+const { join } = require('path');
 
 const PORT = 3003;
 const UPLOAD_DIR = `${tmpdir()}/ngx-uploadx/`;
 
-const opts = {
-  directory: UPLOAD_DIR,
-  path: '/files'
-};
+const opts = { directory: UPLOAD_DIR, path: '/files' };
 
 const upx = new Uploadx(opts);
 const tus = new Tus(opts);
 const mpt = new Multipart(opts);
 
-const server = http.createServer((req, res) => {
-  const { pathname, query = {} } = url.parse(req.url, true);
-  if (/^\/files\W?/.test(pathname)) {
-    req['user'] = { id: query.uploadType };
+const pathRegexp = new RegExp(`^${opts.path}([\/\?]|$)`);
+
+createServer((req, res) => {
+  const { pathname, query = { uploadType: '' } } = url.parse(req.url, true);
+  if (pathRegexp.test(pathname)) {
     switch (query.uploadType) {
       case 'multipart':
         mpt.handle(req, res);
@@ -42,12 +39,4 @@ const server = http.createServer((req, res) => {
     res.statusCode = 404;
     res.end();
   }
-});
-
-server.listen(PORT);
-
-function storageCleanup() {
-  rimraf.sync(UPLOAD_DIR);
-}
-
-exports.reset = storageCleanup;
+}).listen(PORT);
