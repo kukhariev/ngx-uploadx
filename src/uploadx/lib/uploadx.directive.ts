@@ -8,30 +8,27 @@ import {
   Output,
   Renderer2
 } from '@angular/core';
-import { Observable } from 'rxjs';
+import { takeWhile } from 'rxjs/operators';
 import { UploadState, UploadxControlEvent, UploadxOptions } from './interfaces';
 import { UploadxService } from './uploadx.service';
 
 @Directive({ selector: '[uploadx]' })
 export class UploadxDirective implements OnInit {
-  @Output()
-  uploadxState = new EventEmitter<Observable<UploadState>>();
-
   @Input()
-  set uploadx(value: UploadxOptions | string | null | undefined) {
-    if (value && typeof value === 'object') {
+  set uploadx(value: UploadxOptions | '') {
+    if (value) {
       this.options = value;
     }
   }
 
-  options: UploadxOptions = {};
+  @Input() options: UploadxOptions = {};
 
   @Input() set control(value: UploadxControlEvent | '') {
     if (value) {
       this.uploadService.control(value);
     }
   }
-
+  @Output() state = new EventEmitter<UploadState>();
   constructor(
     private elementRef: ElementRef,
     private renderer: Renderer2,
@@ -44,7 +41,9 @@ export class UploadxDirective implements OnInit {
     allowedTypes &&
       this.renderer.setAttribute(this.elementRef.nativeElement, 'accept', allowedTypes);
 
-    this.uploadxState.emit(this.uploadService.events);
+    this.uploadService.events
+      .pipe(takeWhile(_ => this.state.observers.length > 0))
+      .subscribe(this.state);
   }
 
   @HostListener('change', ['$event.target.files'])
