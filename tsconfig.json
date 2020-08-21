@@ -11,7 +11,7 @@
     "experimentalDecorators": true,
     "downlevelIteration": true,
     "target": "es5",
-    "baseUrl": ".",
+    "baseUrl": "./",
     "paths": {
       "ngx-uploadx": ["src/uploadx/"]
     },
