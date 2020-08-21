@@ -111,6 +111,7 @@ export interface UploaderOptions extends UploadItem {
 }
 
 export type UploaderClass = new (f: File, options: UploaderOptions) => Uploader;
+
 /**
  * Global Module Options
  */

@@ -35,7 +35,7 @@ export class UploadxDropDirective {
   }
 
   @HostListener('dragleave', ['$event'])
-  onDragLeave(_event: DragEvent): void {
+  onDragLeave(event: DragEvent): void {
     this.active = false;
   }
 }
