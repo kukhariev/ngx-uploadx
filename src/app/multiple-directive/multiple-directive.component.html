@@ -1,4 +1,4 @@
-<div uploadxDrop>
+<div>
   <div class="uploads-table">
     <div *ngFor="let item of uploads$ | async" class="row">
       <span>{{ item.name }}</span>
@@ -12,26 +12,12 @@
   </div>
   <div class="control">
     <span>
-      <label for="images" accesskey="i"><strong>BROWSE Images</strong></label>
-      <input
-        #images
-        (click)="images.value = ''"
-        [uploadx]="options"
-        id="images"
-        style="display: none;"
-        type="file"
-      />
+      <label accesskey="i" for="images"><strong>BROWSE Images</strong></label>
+      <input #images (click)="images.value = ''" [uploadx]="options" id="images" type="file" />
     </span>
     <span>
-      <label for="videos" accesskey="v"><strong>BROWSE Videos</strong></label>
-      <input
-        #videos
-        (click)="videos.value = ''"
-        [uploadx]="options2"
-        id="videos"
-        style="display: none;"
-        type="file"
-      />
+      <label accesskey="v" for="videos"><strong>BROWSE Videos</strong></label>
+      <input #videos (click)="videos.value = ''" [uploadx]="options2" id="videos" type="file" />
     </span>
     <span>
       <button (click)="upload()">Upload All</button>

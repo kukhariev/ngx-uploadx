@@ -12,16 +12,14 @@
   </div>
   <div class="control">
     <span>
-      <span>Drop files to upload, or </span>
-      <label for="files" accesskey="o"> <strong>BROWSE</strong></label>
+      <em>Drop files to upload, or</em>
+      <label accesskey="o" for="files"> <strong>BROWSE</strong></label>
       <input
         #files
         (click)="files.value = ''"
-        (uploadxState)="onUpload($event)"
-        [uploadxAction]="control"
+        (state)="onStateChanged($event)"
         [uploadx]="options"
         id="files"
-        style="display: none;"
         type="file"
       />
     </span>
@@ -33,5 +31,5 @@
   </div>
 </div>
 <div class="json">
-  <pre>{{ state$ | async | json }}</pre>
+  <pre>{{ state | json }}</pre>
 </div>

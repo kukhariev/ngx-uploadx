@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Uploader, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -9,7 +9,7 @@ import { environment } from 'src/environments/environment';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [UploadxService]
 })
-export class BComponent implements OnDestroy {
+export class BComponent {
   uploads$: Observable<Uploader[]>;
   options: UploadxOptions = {
     endpoint: `${environment.api}/files?uploadType=uploadx`
@@ -17,10 +17,6 @@ export class BComponent implements OnDestroy {
 
   constructor(private uploadService: UploadxService) {
     this.uploads$ = this.uploadService.connect(this.options);
-  }
-
-  ngOnDestroy(): void {
-    // UploadxService disconnect() method will be called !!!
   }
 
   cancelAll(): void {
