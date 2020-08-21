@@ -1,5 +1,5 @@
+import { UploadStatus } from 'ngx-uploadx';
 import { browser, by, element, ElementFinder } from 'protractor';
-import { UploadStatus } from '../src/uploadx';
 
 export class AppPage {
   navigateTo(path: string): Promise<unknown> {
