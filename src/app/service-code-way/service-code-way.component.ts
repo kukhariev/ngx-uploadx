@@ -28,8 +28,11 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   constructor(private uploadService: UploadxService) {}
 
   ngOnInit(): void {
-    const uploadsProgress = this.uploadService.init(this.options);
-    this.onUpload(uploadsProgress);
+    this.state$ = this.uploadService.init(this.options);
+    this.state$.pipe(takeUntil(this.unsubscribe$)).subscribe(state => {
+      const file = this.uploads.find(item => item.uploadId === state.uploadId);
+      file ? file.update(state) : this.uploads.push(new Ufile(state));
+    });
   }
 
   ngOnDestroy(): void {
@@ -37,16 +40,16 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
     this.unsubscribe$.complete();
   }
 
-  cancel(id?: string): void {
-    this.uploadService.control({ action: 'cancel', uploadId: id });
+  cancel(uploadId?: string): void {
+    this.uploadService.control({ action: 'cancel', uploadId });
   }
 
-  pause(id?: string): void {
-    this.uploadService.control({ action: 'pause', uploadId: id });
+  pause(uploadId?: string): void {
+    this.uploadService.control({ action: 'pause', uploadId });
   }
 
-  upload(id?: string): void {
-    this.uploadService.control({ action: 'upload', uploadId: id });
+  upload(uploadId?: string): void {
+    this.uploadService.control({ action: 'upload', uploadId });
   }
 
   onChange(): void {
@@ -60,13 +63,5 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   // this.numberOfCopies = this.uploadService.runningProcess();
   getFiles(): FileList {
     return this.fileInput.nativeElement.files;
-  }
-
-  onUpload(events$: Observable<UploadState>): void {
-    this.state$ = events$;
-    events$.pipe(takeUntil(this.unsubscribe$)).subscribe(ufile => {
-      const target = this.uploads.find(f => f.uploadId === ufile.uploadId);
-      target ? Object.assign(target, ufile) : this.uploads.push(new Ufile(ufile));
-    });
   }
 }

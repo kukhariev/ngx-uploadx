@@ -87,7 +87,7 @@ header {
         background-color: lighten($nav, 5%);
         height: 100%;
         position: fixed;
-        right: 0px;
+        right: 0;
         width: 200px;
         z-index: 1;
         @extend .shadow;
@@ -135,6 +135,10 @@ label {
   cursor: pointer;
 }
 
+input[type='file'] {
+  display: none;
+}
+
 .uploads-table,
 .uploads-table2 {
   font-size: 90%;
@@ -149,6 +153,10 @@ label {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
+
+  em {
+    padding-right: 5px;
+  }
 
   span {
     margin: auto;

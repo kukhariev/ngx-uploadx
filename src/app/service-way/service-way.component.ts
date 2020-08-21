@@ -20,11 +20,17 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
   };
   private unsubscribe$ = new Subject();
 
-  constructor(private uploadService: UploadxService, private auth: AuthService) {}
+  constructor(private uploadxService: UploadxService, private auth: AuthService) {}
 
   ngOnInit(): void {
-    const uploadsProgress = this.uploadService.init(this.options);
-    this.onUpload(uploadsProgress);
+    this.state$ = this.uploadxService.init(this.options);
+    this.state$.pipe(takeUntil(this.unsubscribe$)).subscribe((state: UploadState) => {
+      if (state.status === 'retry' && state.responseStatus === 401) {
+        this.auth.renewToken().subscribe(token => console.log('new accessToken: ', token));
+      }
+      const file = this.uploads.find(item => item.uploadId === state.uploadId);
+      file ? file.update(state) : this.uploads.push(new Ufile(state));
+    });
   }
 
   ngOnDestroy(): void {
@@ -32,31 +38,15 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
     this.unsubscribe$.complete();
   }
 
-  cancel(id?: string): void {
-    this.uploadService.control({ action: 'cancel', uploadId: id });
+  cancel(uploadId?: string): void {
+    this.uploadxService.control({ action: 'cancel', uploadId });
   }
 
-  pause(id?: string): void {
-    this.uploadService.control({ action: 'pause', uploadId: id });
+  pause(uploadId?: string): void {
+    this.uploadxService.control({ action: 'pause', uploadId });
   }
 
-  upload(id?: string): void {
-    this.uploadService.control({ action: 'upload', uploadId: id });
-  }
-
-  onUpload(uploadsOutStream: Observable<UploadState>): void {
-    this.state$ = uploadsOutStream;
-    uploadsOutStream.pipe(takeUntil(this.unsubscribe$)).subscribe((evt: UploadState) => {
-      if (evt.status === 'retry' && evt.responseStatus === 401) {
-        this.auth.renewToken().subscribe(token => console.log('new accessToken: ', token));
-      }
-      const target = this.uploads.find(f => f.uploadId === evt.uploadId);
-      if (target) {
-        target.progress = evt.progress;
-        target.status = evt.status;
-      } else {
-        this.uploads.push(new Ufile(evt));
-      }
-    });
+  upload(uploadId?: string): void {
+    this.uploadxService.control({ action: 'upload', uploadId });
   }
 }
