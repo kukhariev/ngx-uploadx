@@ -26,9 +26,8 @@ export class UploadxDirective implements OnInit {
 
   options: UploadxOptions = {};
 
-  @Input()
-  set uploadxAction(value: UploadxControlEvent | string | null | undefined) {
-    if (value && typeof value === 'object') {
+  @Input() set control(value: UploadxControlEvent | '') {
+    if (value) {
       this.uploadService.control(value);
     }
   }
