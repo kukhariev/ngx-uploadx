@@ -6,7 +6,7 @@ import { UploadxDirective } from './uploadx.directive';
 import { UploadxService } from './uploadx.service';
 
 @Component({
-  template: ` <input type="file" [uploadx]="options" [uploadxAction]="action" /> `
+  template: ` <input type="file" [uploadx]="options" [control]="action" /> `
 })
 class UploadxTestComponent {
   options = {
@@ -50,7 +50,7 @@ describe('Directive: UploadxDirective', () => {
     fixture.detectChanges();
     expect(inputEl.nativeElement.hasAttribute('multiple')).toBe(true);
   });
-  it('set uploadxAction', () => {
+  it('set control', () => {
     fixture.detectChanges();
     expect(serviceControlSpy).toHaveBeenCalled();
   });
