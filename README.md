@@ -37,27 +37,24 @@ import { UploadxModule } from 'ngx-uploadx';
 ```ts
 // Component code
 //...
-import { Observable } from 'rxjs';
 import { UploadxOptions, UploadState } from 'ngx-uploadx';
 
 @Component({
   selector: 'app-home',
   templateUrl: `
-  <input type="file" [uploadx]="options" (uploadxState)="onUpload($event)">
+  <input type="file" [uploadx]="options" (state)="onUpload($event)">
   `
 })
 export class AppHomeComponent {
   options: UploadxOptions = { endpoint: `[URL]` };
-  onUpload(state: Observable<UploadState>) {
-    state.subscribe((item: UploadState) => {
-      console.log(item);
-      //...
-    });
+  onUpload(state: UploadState) {
+    console.log(item);
+    //...
   }
 }
 ```
 
-> Please navigate to the [src/app sub-folder](src/app) for more detailed examples
+> _Please navigate to the [src/app sub-folder](src/app) for more detailed examples_
 
 ## Server-side setup
 
@@ -67,39 +64,34 @@ export class AppHomeComponent {
 
 ## Options
 
-- `allowedTypes`: Allowed file types (directive only)
+- `allowedTypes` Allowed file types (directive only)
 
-- `multiple`: Allow to select multiple files. Default value: `true`
+- `multiple` Allow to select multiple files. Default value: `true`
 
-- `autoUpload`: Auto start upload when files added. Default value: `true`
+- `autoUpload` Auto start upload when files added. Default value: `true`
 
-- `chunkSize`: Set a fixed chunk size. If not specified, the optimal size will be automatically adjusted based on the network speed.
+- `chunkSize` Set a fixed chunk size. If not specified, the optimal size will be automatically adjusted based on the network speed.
 
-- `concurrency`: Set the maximum parallel uploads. Default value: `2`
+- `concurrency` Set the maximum parallel uploads. Default value: `2`
 
-- `headers`: Headers to be appended to each HTTP request
+- `headers` Headers to be appended to each HTTP request
 
-- `metadata`: Custom uploads metadata
+- `metadata` Custom uploads metadata
 
-- `prerequest`: Function called before every request
+- `prerequest` Function called before every request
 
-- `uploaderClass`: Upload API implementation. Built-in: `Uploaderx`(default), `Tus`. More [examples](uploader-examples).
+- `uploaderClass` Upload API implementation. Built-in: `Uploaderx`(default), `Tus`. More [examples](uploader-examples).
 
-- `token`: Authorization token as a `string` or function returning a `string` or `Promise<string>`
+- `token` Authorization token as a `string` or function returning a `string` or `Promise<string>`
 
-- `endpoint`: URL to create new uploads. Default value: `'/upload'`
+- `endpoint` URL to create new uploads. Default value: `'/upload'`
 
 ## Directives
 
 ```html
-<div>
-  <label class="file-drop" uploadxDrop>
-    <input
-      type="file"
-      [uploadx]="options"
-      [uploadxAction]="control"
-      (uploadxState)="onUpload($event)"
-    />
+<div uploadxDrop>
+  <label class="file-drop">
+    <input type="file" [uploadx]="options" [control]="control" (state)="onState($event)" />
   </label>
 </div>
 ```
@@ -108,20 +100,25 @@ export class AppHomeComponent {
 
 File input directive
 
-- `[uploadx]: UploadxOptions`
+selectors: `[uploadx]` `uploadx`
 
-  Set directive options
+Properties:
 
-- `[uploadxAction]: UploadxControlEvent`
+- `@Input() uploadx: UploadxOptions` Set directive options
 
-  Control the uploads
+- `@Input() options: UploadxOptions` Alias for `uploadx` property
 
-- `(uploadxState): ($event: <Observable>UploadState)=> void`
+- `@Input() control: UploadxControlEvent` Control the uploads
+
+- `@Output() state: EventEmitter<UploadState>` Event emitted on upload state change
 
 ### uploadxDrop
 
 File drop directive.
-Activates the `.uploadx-drop-active` class on DnD operations.
+
+selector: `uploadxDrop`
+
+_Activates the `.uploadx-drop-active` class on DnD operations._
 
 ## UploadxService
 
@@ -202,7 +199,7 @@ Activates the `.uploadx-drop-active` class on DnD operations.
 
 - `events: Observable<UploadState>`
 
-  Unloads status events
+  Uploads state events
 
 ## Run demo
 
