@@ -5,6 +5,9 @@
     "baseUrl": "./",
     "module": "commonjs",
     "target": "es5",
-    "types": ["jasmine", "jasminewd2", "node"]
+    "types": ["jasmine", "jasminewd2", "node"],
+    "paths": {
+      "ngx-uploadx": ["../src/uploadx/"]
+    }
   }
 }
