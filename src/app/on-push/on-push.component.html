@@ -12,16 +12,9 @@
   </div>
   <div class="control">
     <span>
-      <span>Drop files to upload, or </span>
-      <label for="files" accesskey="o"> <strong>BROWSE</strong></label>
-      <input
-        id="files"
-        accept="image/*,video/*"
-        style="display: none;"
-        multiple
-        type="file"
-        uploadx
-      />
+      <em>Drop files to upload, or</em>
+      <label accesskey="o" for="files"><strong>BROWSE</strong></label>
+      <input accept="image/*,video/*" id="files" multiple type="file" uploadx />
     </span>
     <span>
       <button (click)="uploadAll()">Upload All</button>

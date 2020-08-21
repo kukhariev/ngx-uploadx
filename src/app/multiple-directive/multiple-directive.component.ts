@@ -26,15 +26,15 @@ export class MultipleDirectiveComponent {
     this.state$ = this.uploadService.events;
   }
 
-  cancel(id?: string): void {
-    this.uploadService.control({ action: 'cancel', uploadId: id });
+  cancel(uploadId?: string): void {
+    this.uploadService.control({ action: 'cancel', uploadId });
   }
 
-  pause(id?: string): void {
-    this.uploadService.control({ action: 'pause', uploadId: id });
+  pause(uploadId?: string): void {
+    this.uploadService.control({ action: 'pause', uploadId });
   }
 
-  upload(id?: string): void {
-    this.uploadService.control({ action: 'upload', uploadId: id });
+  upload(uploadId?: string): void {
+    this.uploadService.control({ action: 'upload', uploadId });
   }
 }

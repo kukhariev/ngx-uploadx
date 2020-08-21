@@ -1,7 +1,5 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { Tus, UploadState, UploadxControlEvent, UploadxOptions } from 'ngx-uploadx';
-import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { Ufile } from '../ufile';
 
@@ -9,9 +7,9 @@ import { Ufile } from '../ufile';
   selector: 'app-tus',
   templateUrl: './tus.component.html'
 })
-export class TusComponent implements OnDestroy {
+export class TusComponent {
   control!: UploadxControlEvent;
-  state$!: Observable<UploadState>;
+  state!: UploadState;
   uploads: Ufile[] = [];
 
   options: UploadxOptions = {
@@ -21,35 +19,21 @@ export class TusComponent implements OnDestroy {
     uploaderClass: Tus,
     chunkSize: 0
   };
-  private unsubscribe$ = new Subject();
 
-  ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+  cancel(uploadId?: string): void {
+    this.control = { action: 'cancel', uploadId };
   }
 
-  cancel(id?: string): void {
-    this.control = { action: 'cancel', uploadId: id };
+  pause(uploadId?: string): void {
+    this.control = { action: 'pause', uploadId };
   }
 
-  pause(id?: string): void {
-    this.control = { action: 'pause', uploadId: id };
+  upload(uploadId?: string): void {
+    this.control = { action: 'upload', uploadId };
   }
 
-  upload(id?: string): void {
-    this.control = { action: 'upload', uploadId: id };
-  }
-
-  onUpload(events$: Observable<UploadState>): void {
-    this.state$ = events$;
-    events$.pipe(takeUntil(this.unsubscribe$)).subscribe((evt: UploadState) => {
-      const target = this.uploads.find(f => f.uploadId === evt.uploadId);
-      if (target) {
-        target.progress = evt.progress;
-        target.status = evt.status;
-      } else {
-        this.uploads.push(new Ufile(evt));
-      }
-    });
+  onStateChanged(state: UploadState): void {
+    const file = this.uploads.find(item => item.uploadId === state.uploadId);
+    file ? file.update(state) : this.uploads.push(new Ufile(state));
   }
 }
