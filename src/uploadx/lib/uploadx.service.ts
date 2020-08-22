@@ -1,10 +1,11 @@
-import { Injectable, NgZone, OnDestroy } from '@angular/core';
+import { Inject, Injectable, NgZone, OnDestroy, Optional } from '@angular/core';
 import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import {
   UploaderClass,
   UploadEvent,
   UploadState,
+  UPLOADX_OPTIONS,
   UploadxControlEvent,
   UploadxOptions
 } from './interfaces';
@@ -58,7 +59,11 @@ export class UploadxService implements OnDestroy {
     return this.eventsStream.asObservable();
   }
 
-  constructor(private ngZone: NgZone) {
+  constructor(
+    @Optional() @Inject(UPLOADX_OPTIONS) options: UploadxOptions | null,
+    private ngZone: NgZone
+  ) {
+    Object.assign(this.options, options);
     // TODO: add 'offline' status
     // FIXME: online/offline not supported on Windows
     this.subs.push(
