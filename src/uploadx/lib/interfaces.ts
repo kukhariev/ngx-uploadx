@@ -1,3 +1,4 @@
+import { InjectionToken } from '@angular/core';
 import { Uploader } from './uploader';
 
 export type Primitive = null | boolean | number | string;
@@ -141,3 +142,5 @@ export interface UploadxOptions extends UploaderOptions {
    */
   multiple?: boolean;
 }
+
+export const UPLOADX_OPTIONS = new InjectionToken<UploadxOptions>('uploadx.options');
