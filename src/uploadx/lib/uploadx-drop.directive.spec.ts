@@ -1,6 +1,7 @@
 import { Component, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { UPLOADX_OPTIONS } from './interfaces';
 import { UploadxDropDirective } from './uploadx-drop.directive';
 import { UploadxDirective } from './uploadx.directive';
 import { UploadxService } from './uploadx.service';
@@ -31,7 +32,7 @@ describe('Directive: UploadxDropDirective', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [UploadxTestComponent, UploadxDirective, UploadxDropDirective],
-      providers: [UploadxService]
+      providers: [UploadxService, { provide: UPLOADX_OPTIONS, useValue: {} }]
     }).compileComponents();
     fixture = TestBed.createComponent(UploadxTestComponent);
     dropEl = fixture.debugElement.query(By.directive(UploadxDropDirective));
