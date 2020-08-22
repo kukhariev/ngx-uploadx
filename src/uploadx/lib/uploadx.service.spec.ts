@@ -41,7 +41,7 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 describe('UploadxService', () => {
   let service: UploadxService;
   beforeEach(() => {
-    service = new UploadxService(new NgZone({}));
+    service = new UploadxService(null, new NgZone({}));
   });
 
   it('should set default options', () => {
@@ -50,18 +50,21 @@ describe('UploadxService', () => {
     expect(service.options.concurrency).toEqual(2);
     expect(service.options.autoUpload).toEqual(true);
   });
+
   it('should set endpoint', () => {
     service.init({ endpoint: ENDPOINT });
     expect(service.options.concurrency).toEqual(2);
     expect(service.options.autoUpload).toEqual(true);
     expect(service.options.endpoint).toEqual(ENDPOINT);
   });
+
   it('should overwrite default options', () => {
     service.init(options);
     expect(service.options.endpoint).toEqual(ENDPOINT);
     expect(service.options.token).toEqual('%token%');
     expect(service.options.chunkSize).toEqual(4096);
   });
+
   it('should keep the settings', () => {
     service.init(options);
     service.init({});
@@ -70,6 +73,7 @@ describe('UploadxService', () => {
     expect(service.options.token).toEqual('%token%');
     expect(service.options.chunkSize).toEqual(4096);
   });
+
   it('should add 4 files to queue', () => {
     const fileList = getFilelist();
     service.connect(options);
@@ -86,6 +90,7 @@ describe('UploadxService', () => {
     expect(service.queue[0].status).toEqual('added');
     service.disconnect();
   });
+
   it('should set correct status on `control` method call', () => {
     const file = getFile();
     service.connect(options);

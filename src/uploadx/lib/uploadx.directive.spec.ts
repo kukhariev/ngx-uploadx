@@ -1,7 +1,7 @@
 import { Component, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { UploadxControlEvent } from './interfaces';
+import { UPLOADX_OPTIONS, UploadxControlEvent } from './interfaces';
 import { UploadxDirective } from './uploadx.directive';
 import { UploadxService } from './uploadx.service';
 
@@ -32,7 +32,7 @@ describe('Directive: UploadxDirective', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [UploadxTestComponent, UploadxDirective],
-      providers: [UploadxService]
+      providers: [UploadxService, { provide: UPLOADX_OPTIONS, useValue: {} }]
     }).compileComponents();
     fixture = TestBed.createComponent(UploadxTestComponent);
 
