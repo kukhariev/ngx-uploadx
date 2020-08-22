@@ -28,7 +28,9 @@ export class UploadxDirective implements OnInit {
       this.uploadService.control(value);
     }
   }
+
   @Output() state = new EventEmitter<UploadState>();
+
   constructor(
     private elementRef: ElementRef,
     private renderer: Renderer2,
