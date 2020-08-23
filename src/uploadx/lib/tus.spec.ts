@@ -7,7 +7,7 @@ describe('getFileUrl', () => {
   let req: jasmine.Spy;
   let getValueFromResponse: jasmine.Spy;
   it('should set headers', async () => {
-    upx = new Tus(fileWithType, {});
+    upx = new Tus(fileWithType, {}, () => {});
     req = spyOn<any>(upx, 'request').and.callFake(({ headers }: any) => {
       expect(headers['Upload-Metadata']).toContain('name');
       expect(headers['Upload-Length']).toEqual('6');
@@ -25,7 +25,7 @@ describe('sendFileContent', () => {
   let req: jasmine.Spy;
   let getOffsetFromResponse: jasmine.Spy;
   it('should set Upload-Offset header', async () => {
-    upx = new Tus(fileWithType, {});
+    upx = new Tus(fileWithType, {}, () => {});
     req = spyOn<any>(upx, 'request').and.callFake(({ headers }: any) => {
       expect(headers['Content-Type']).toEqual('application/offset+octet-stream');
       expect(headers['Upload-Offset']).toEqual('0');

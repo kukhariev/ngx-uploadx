@@ -104,14 +104,17 @@ export interface UploaderOptions extends UploadItem {
    */
   chunkSize?: number;
   withCredentials?: boolean;
-  readonly stateChange?: (evt: UploadEvent) => void;
   /**
    * Function called before every request
    */
   prerequest?: (req: RequestOptions) => Promise<RequestOptions> | RequestOptions | void;
 }
 
-export type UploaderClass = new (f: File, options: UploaderOptions) => Uploader;
+export type UploaderClass = new (
+  file: File,
+  options: UploaderOptions,
+  stateChange: (evt: UploadEvent) => void
+) => Uploader;
 
 /**
  * Global Module Options

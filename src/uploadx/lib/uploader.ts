@@ -6,13 +6,12 @@ import {
   ResponseBody,
   UploadAction,
   UploaderOptions,
-  UploadEvent,
   UploadState,
   UploadStatus,
   UploadxControlEvent
 } from './interfaces';
 import { store } from './store';
-import { createHash, DynamicChunk, isNumber, noop, unfunc } from './utils';
+import { createHash, DynamicChunk, isNumber, unfunc } from './utils';
 
 const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
   pause: 'paused',
@@ -54,7 +53,6 @@ export abstract class Uploader implements UploadState {
     req: RequestOptions
   ) => Promise<RequestOptions> | RequestOptions | void;
   private startTime!: number;
-  private readonly stateChange: (evt: UploadEvent) => void;
 
   private _url = '';
 
@@ -85,7 +83,11 @@ export abstract class Uploader implements UploadState {
     }
   }
 
-  constructor(readonly file: File, readonly options: UploaderOptions) {
+  constructor(
+    readonly file: File,
+    readonly options: Readonly<UploaderOptions>,
+    readonly stateChange: (evt: UploadState) => void
+  ) {
     this.name = file.name;
     this.size = file.size;
     this.metadata = {
@@ -101,8 +103,7 @@ export abstract class Uploader implements UploadState {
       endpoint: options.endpoint
     });
     this.uploadId = createHash(print).toString(16);
-    this.stateChange = options.stateChange || noop;
-    this.prerequest = options.prerequest || noop;
+    this.prerequest = options.prerequest || (() => {});
     this.chunkSize = options.chunkSize || this.size;
     this.configure(options);
   }
