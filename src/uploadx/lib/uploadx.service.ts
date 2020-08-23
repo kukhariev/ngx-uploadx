@@ -3,7 +3,6 @@ import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import {
   UploaderClass,
-  UploadEvent,
   UploadState,
   UPLOADX_OPTIONS,
   UploadxControlEvent,
@@ -13,45 +12,34 @@ import { Uploader } from './uploader';
 import { UploaderX } from './uploaderx';
 import { pick } from './utils';
 
-interface DefaultOptions {
-  endpoint: string;
-  autoUpload: boolean;
-  concurrency: number;
-  stateChange: (evt: UploadEvent) => void;
-  uploaderClass: UploaderClass;
-}
+const stateKeys: Array<keyof UploadState> = [
+  'file',
+  'name',
+  'progress',
+  'remaining',
+  'response',
+  'responseStatus',
+  'size',
+  'speed',
+  'status',
+  'uploadId',
+  'url'
+];
+const defaultOptions = {
+  endpoint: '/upload',
+  autoUpload: true,
+  concurrency: 2,
+  uploaderClass: UploaderX as UploaderClass
+};
 
-type ServiceFactoryOptions = UploadxOptions & DefaultOptions;
+type ServiceFactoryOptions = UploadxOptions & typeof defaultOptions;
 
 @Injectable({ providedIn: 'root' })
 export class UploadxService implements OnDestroy {
-  static stateKeys: Array<keyof UploadState> = [
-    'file',
-    'name',
-    'progress',
-    'remaining',
-    'response',
-    'responseStatus',
-    'size',
-    'speed',
-    'status',
-    'uploadId',
-    'url'
-  ];
   /** Upload Queue */
   queue: Uploader[] = [];
+  options: ServiceFactoryOptions;
   private readonly eventsStream: Subject<UploadState> = new Subject();
-  options: ServiceFactoryOptions = {
-    endpoint: '/upload',
-    autoUpload: true,
-    concurrency: 2,
-    uploaderClass: UploaderX,
-    stateChange: (evt: UploadEvent) => {
-      setTimeout(() =>
-        this.ngZone.run(() => this.eventsStream.next(pick(evt, UploadxService.stateKeys)))
-      );
-    }
-  };
   private subs: Subscription[] = [];
 
   /** Upload status events */
@@ -63,7 +51,7 @@ export class UploadxService implements OnDestroy {
     @Optional() @Inject(UPLOADX_OPTIONS) options: UploadxOptions | null,
     private ngZone: NgZone
   ) {
-    Object.assign(this.options, options);
+    this.options = Object.assign({}, defaultOptions, options);
     // TODO: add 'offline' status
     // FIXME: online/offline not supported on Windows
     this.subs.push(
@@ -154,8 +142,12 @@ export class UploadxService implements OnDestroy {
     return this.queue.filter(({ status }) => status === 'uploading' || status === 'retry').length;
   }
 
+  private stateChange = (evt: UploadState) => {
+    setTimeout(() => this.ngZone.run(() => this.eventsStream.next(pick(evt, stateKeys))));
+  };
+
   private addUploaderInstance(file: File, options: ServiceFactoryOptions): void {
-    const uploader = new options.uploaderClass(file, options);
+    const uploader = new options.uploaderClass(file, options, this.stateChange);
     this.queue.push(uploader);
     uploader.status = options.autoUpload && window.navigator.onLine ? 'queue' : 'added';
   }

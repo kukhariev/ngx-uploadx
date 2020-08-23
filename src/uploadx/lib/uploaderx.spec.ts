@@ -9,7 +9,7 @@ describe('getFileUrl', () => {
   let req: jasmine.Spy;
   let getValueFromResponse: jasmine.Spy;
   it('should set headers', async () => {
-    upx = new UploaderX(fileWithType, {});
+    upx = new UploaderX(fileWithType, {}, () => {});
     req = spyOn<any>(upx, 'request').and.callFake(({ headers }: any) => {
       expect(headers['X-Upload-Content-Type']).toEqual('text/plain');
       expect(headers['X-Upload-Content-Length']).toEqual('6');
@@ -22,7 +22,7 @@ describe('getFileUrl', () => {
     expect(getValueFromResponse).toHaveBeenCalled();
   });
   it('should set default type header', async () => {
-    upx = new UploaderX(fileWithoutType, {});
+    upx = new UploaderX(fileWithoutType, {}, () => {});
     req = spyOn<any>(upx, 'request').and.callFake(({ headers }: any) => {
       expect(headers['X-Upload-Content-Type']).toEqual('application/octet-stream');
       expect(headers['X-Upload-Content-Length']).toEqual('0');
@@ -41,7 +41,7 @@ describe('sendFileContent', () => {
   let req: jasmine.Spy;
   let getValueFromResponse: jasmine.Spy;
   it('should set Content-Range header', async () => {
-    upx = new UploaderX(fileWithType, {});
+    upx = new UploaderX(fileWithType, {}, () => {});
     req = spyOn<any>(upx, 'request').and.callFake(({ headers }: any) => {
       expect(headers['Content-Type']).toEqual('application/octet-stream');
       expect(headers['Content-Range']).toEqual('bytes 0-5/6');

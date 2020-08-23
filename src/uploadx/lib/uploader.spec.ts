@@ -1,5 +1,6 @@
 // noinspection ES6PreferShortImport
 import { ErrorHandler } from './error-handler';
+import { UploaderOptions } from './interfaces';
 import { Uploader } from './uploader';
 
 // tslint:disable: no-any
@@ -16,6 +17,10 @@ let uploader: MockUploader;
 ErrorHandler.maxAttempts = 2;
 
 export class MockUploader extends Uploader {
+  constructor(readonly f: File, readonly opts: UploaderOptions) {
+    super(f, opts, () => {});
+  }
+
   shouldReject(): boolean {
     return this.responseStatus >= 400 || !this.responseStatus;
   }
@@ -174,23 +179,23 @@ describe('Uploader', () => {
     const injected = { headers: { Auth: 'token' } };
     it('sync', async () => {
       uploader = new MockUploader(file, { prerequest: req => ({ ...req, ...injected }) });
-      const _request = spyOn<any>(uploader, '_request').and.callThrough();
+      const request = spyOn<any>(uploader, '_request').and.callThrough();
       await uploader.request({ method: 'POST' });
-      expect(_request).toHaveBeenCalledWith({ method: 'POST', headers: { Auth: 'token' } });
+      expect(request).toHaveBeenCalledWith({ method: 'POST', headers: { Auth: 'token' } });
     });
     it('async', async () => {
       uploader = new MockUploader(file, {
         prerequest: req => Promise.resolve({ ...req, ...injected })
       });
-      const _request = spyOn<any>(uploader, '_request').and.callThrough();
+      const request = spyOn<any>(uploader, '_request').and.callThrough();
       await uploader.request({ method: 'POST' });
-      expect(_request).toHaveBeenCalledWith({ method: 'POST', headers: { Auth: 'token' } });
+      expect(request).toHaveBeenCalledWith({ method: 'POST', headers: { Auth: 'token' } });
     });
     it('void', async () => {
       uploader = new MockUploader(file, { prerequest: (() => {}) as any });
-      const _request = spyOn<any>(uploader, '_request').and.callThrough();
+      const request = spyOn<any>(uploader, '_request').and.callThrough();
       await uploader.request({ method: 'POST' });
-      expect(_request).toHaveBeenCalledWith({ method: 'POST' });
+      expect(request).toHaveBeenCalledWith({ method: 'POST' });
     });
   });
 });
