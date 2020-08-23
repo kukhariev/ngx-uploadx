@@ -33,6 +33,7 @@ export class TusComponent {
   }
 
   onStateChanged(state: UploadState): void {
+    this.state = state;
     const file = this.uploads.find(item => item.uploadId === state.uploadId);
     file ? file.update(state) : this.uploads.push(new Ufile(state));
   }
