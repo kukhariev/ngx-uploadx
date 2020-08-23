@@ -18,6 +18,7 @@
         #files
         (click)="files.value = ''"
         (state)="onStateChanged($event)"
+        [control]="control"
         [uploadx]="options"
         id="files"
         type="file"
