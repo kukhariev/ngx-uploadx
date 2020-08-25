@@ -5,40 +5,59 @@ export enum ErrorType {
   Fatal
 }
 
+export interface RetryConfig {
+  /** Maximum number of retry attempts */
+  maxAttempts?: number;
+  /** Upload not exist status codes */
+  shouldRestartCodes?: number[];
+  /** Bad token? status codes */
+  authErrorCodes?: number[];
+  /** Retryable 4xx status codes */
+  shouldRetryCodes?: number[];
+  minDelay?: number;
+  maxDelay?: number;
+  factor?: number;
+}
+
+const defaultRetryConfig: Required<RetryConfig> = {
+  maxAttempts: 8,
+  shouldRestartCodes: [404, 410],
+  authErrorCodes: [401],
+  shouldRetryCodes: [423, 429],
+  minDelay: 500,
+  maxDelay: 5000,
+  factor: 2
+};
+
 /**
  * Retryable ErrorHandler
  */
 export class ErrorHandler {
-  /** Maximum number of retry attempts */
-  static maxAttempts = 8;
-  /** Upload not exist status codes */
-  static shouldRestartCodes = [404, 410];
-  /** Bad token? status codes */
-  static authErrorCodes = [401];
-  /** Retryable 4xx status codes */
-  static shouldRetryCodes = [423, 429];
-  static minDelay = 500;
-  static maxDelay = ErrorHandler.minDelay * 120;
-  static factor = 2;
   public attempts = 0;
-  private delay: number = ErrorHandler.minDelay;
+  config: Required<RetryConfig>;
+  private delay: number;
   private code = -1;
+
+  constructor(configOptions: RetryConfig = {}) {
+    this.config = Object.assign({}, defaultRetryConfig, configOptions);
+    this.delay = this.config.minDelay;
+  }
 
   kind(code: number): ErrorType {
     code !== this.code && this.reset();
     this.code = code;
     this.attempts++;
 
-    if (this.attempts >= ErrorHandler.maxAttempts) {
+    if (this.attempts > this.config.maxAttempts) {
       return ErrorType.Fatal;
     }
-    if (ErrorHandler.authErrorCodes.indexOf(code) !== -1) {
+    if (this.config.authErrorCodes.indexOf(code) !== -1) {
       return ErrorType.Auth;
     }
-    if (ErrorHandler.shouldRestartCodes.indexOf(code) !== -1) {
+    if (this.config.shouldRestartCodes.indexOf(code) !== -1) {
       return ErrorType.NotFound;
     }
-    if (code < 400 || code >= 500 || ErrorHandler.shouldRetryCodes.indexOf(code) !== -1) {
+    if (code < 400 || code >= 500 || this.config.shouldRetryCodes.indexOf(code) !== -1) {
       return ErrorType.Retryable;
     }
     return ErrorType.Fatal;
@@ -46,16 +65,16 @@ export class ErrorHandler {
 
   wait(): Promise<number> {
     return new Promise(resolve => {
-      this.delay = Math.min(this.delay * ErrorHandler.factor, ErrorHandler.maxDelay);
+      this.delay = Math.min(this.delay * this.config.factor, this.config.maxDelay);
       setTimeout(
         () => resolve(this.attempts),
-        this.delay + Math.floor(Math.random() * ErrorHandler.minDelay)
+        this.delay + Math.floor(Math.random() * this.config.minDelay)
       );
     });
   }
 
   reset(): void {
-    this.delay = ErrorHandler.minDelay;
+    this.delay = this.config.minDelay;
     this.attempts = 0;
     this.code = -1;
   }

@@ -1,4 +1,5 @@
 import { InjectionToken } from '@angular/core';
+import { RetryConfig } from './error-handler';
 import { Uploader } from './uploader';
 
 export type Primitive = null | boolean | number | string;
@@ -98,6 +99,7 @@ export interface UploadxControlEvent extends UploadItem {
 }
 
 export interface UploaderOptions extends UploadItem {
+  retryConfig?: RetryConfig;
   /**
    * Set a fixed chunk size.
    * If not specified, the optimal size will be automatically adjusted based on the network speed.

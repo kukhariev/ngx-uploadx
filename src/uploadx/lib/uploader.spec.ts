@@ -14,8 +14,6 @@ const snip = { file, size: 1, name: 'filename.mp4' };
 
 let uploader: MockUploader;
 
-ErrorHandler.maxAttempts = 2;
-
 export class MockUploader extends Uploader {
   constructor(readonly f: File, readonly opts: UploaderOptions) {
     super(f, opts, () => {});
@@ -41,7 +39,7 @@ export class MockUploader extends Uploader {
 describe('Uploader', () => {
   describe('constructor()', () => {
     it('should new()', () => {
-      uploader = new MockUploader(file, {});
+      uploader = new MockUploader(file, { retryConfig: { maxAttempts: 1 } });
       expect(uploader).toEqual(jasmine.objectContaining(snip));
     });
   });
@@ -88,7 +86,7 @@ describe('Uploader', () => {
 
   describe('upload()', () => {
     beforeEach(() => {
-      uploader = new MockUploader(file, {});
+      uploader = new MockUploader(file, { retryConfig: { maxAttempts: 3 } });
     });
     it('should queue on 0', async () => {
       uploader.responseStatus = 0;

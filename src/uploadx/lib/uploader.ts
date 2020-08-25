@@ -42,7 +42,7 @@ export abstract class Uploader implements UploadState {
   /** Auth token/tokenGetter */
   token: UploadxControlEvent['token'];
   /** Retries handler */
-  protected errorHandler = new ErrorHandler();
+  protected errorHandler: ErrorHandler;
   /** Active HttpRequest */
   protected _xhr!: XMLHttpRequest;
   /** byte offset within the whole file */
@@ -88,6 +88,7 @@ export abstract class Uploader implements UploadState {
     readonly options: Readonly<UploaderOptions>,
     readonly stateChange: (evt: UploadState) => void
   ) {
+    this.errorHandler = new ErrorHandler(options.retryConfig);
     this.name = file.name;
     this.size = file.size;
     this.metadata = {
