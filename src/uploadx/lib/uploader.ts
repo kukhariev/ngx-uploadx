@@ -41,12 +41,12 @@ export abstract class Uploader implements UploadState {
   chunkSize: number;
   /** Auth token/tokenGetter */
   token: UploadxControlEvent['token'];
+  /** byte offset within the whole file */
+  offset? = 0;
   /** Retries handler */
   protected errorHandler: ErrorHandler;
   /** Active HttpRequest */
   protected _xhr!: XMLHttpRequest;
-  /** byte offset within the whole file */
-  protected offset? = 0;
   /** Set HttpRequest responseType */
   protected responseType: XMLHttpRequestResponseType = '';
   private readonly prerequest: (
@@ -79,7 +79,7 @@ export abstract class Uploader implements UploadState {
       s === 'paused' && this.abort();
       this._status = s;
       ['cancelled', 'complete', 'error'].indexOf(s) !== -1 && this.cleanup();
-      s === 'cancelled' ? this.onCancel() : this.stateChange(this);
+      s === 'cancelled' ? this.cancel() : this.stateChange(this);
     }
   }
 
@@ -125,64 +125,30 @@ export abstract class Uploader implements UploadState {
    */
   async upload(): Promise<void> {
     this.status = 'uploading';
-    try {
-      await this.updateToken();
-      this.offset = undefined;
-      this.startTime = new Date().getTime();
-      this.url = this.url || (await this.getFileUrl());
-      this.errorHandler.reset();
-      this.start().then(_ => {});
-    } catch (e) {
-      e instanceof Error && console.error(e);
-      if (this.errorHandler.kind(this.responseStatus) !== ErrorType.Fatal) {
-        this.status = 'retry';
-        await this.errorHandler.wait();
-        this.status = 'queue';
-      } else {
-        this.status = 'error';
-      }
-    }
-  }
-
-  /**
-   * Starts chunk upload
-   */
-  async start(): Promise<void> {
-    while (this.status === 'uploading' || this.status === 'retry') {
-      if (this.offset !== this.size) {
-        try {
-          const offset = isNumber(this.offset)
-            ? await this.sendFileContent()
-            : await this.getOffset();
-          if (offset === this.offset) {
-            // noinspection ExceptionCaughtLocallyJS
-            throw new Error('Content upload failed');
-          }
-          this.errorHandler.reset();
-          this.offset = offset;
-        } catch (e) {
-          e instanceof Error && console.error(e);
-          const errType = this.errorHandler.kind(this.responseStatus);
-          if (this.responseStatus === 413) {
-            DynamicChunk.maxSize = this.chunkSize /= 2;
-          } else if (errType === ErrorType.Fatal) {
+    this.startTime = new Date().getTime();
+    while (this.status === 'uploading') {
+      try {
+        this.url = this.url || (await this.getFileUrl());
+        this.offset = isNumber(this.offset) ? await this.sendFileContent() : await this.getOffset();
+        this.offset === this.size && (this.status = 'complete');
+      } catch (e) {
+        e instanceof Error && console.error(e);
+        switch (this.errorHandler.kind(this.responseStatus)) {
+          case ErrorType.Fatal:
             this.status = 'error';
-          } else if (errType === ErrorType.NotFound) {
+            break;
+          case ErrorType.NotFound:
             this.url = '';
-            this.status = 'queue';
-          } else if (errType === ErrorType.Auth) {
-            await this.updateToken();
-          } else {
-            this.status = 'retry';
-            await this.errorHandler.wait();
-            this.offset = this.responseStatus >= 400 ? undefined : this.offset;
+            break;
+          case ErrorType.Auth:
+            await this.updateToken().then(() => {});
+            break;
+          default:
+            this.responseStatus >= 400 && (this.offset = undefined);
+            await this.retry();
             this.status = 'uploading';
-          }
+            break;
         }
-      } else {
-        this.progress = 100;
-        this.remaining = 0;
-        this.status = 'complete';
       }
     }
   }
@@ -208,6 +174,15 @@ export abstract class Uploader implements UploadState {
   }
 
   /**
+   * Set auth token
+   */
+  updateToken = async (): Promise<string | void> => {
+    if (this.token) {
+      this.setAuth(await unfunc(this.token, this.responseStatus));
+    }
+  };
+
+  /**
    * Get file URI
    */
   protected abstract getFileUrl(): Promise<string>;
@@ -231,14 +206,12 @@ export abstract class Uploader implements UploadState {
     this._xhr && this._xhr.abort();
   }
 
-  protected onCancel(): void {
+  protected async cancel(): Promise<void> {
     this.abort();
-    const stateChange = () => this.stateChange(this);
     if (this.url) {
-      this.request({ method: 'DELETE' }).then(stateChange, stateChange);
-    } else {
-      stateChange();
+      await this.request({ method: 'DELETE' }).catch(() => {});
     }
+    this.stateChange(this);
   }
 
   /**
@@ -248,22 +221,17 @@ export abstract class Uploader implements UploadState {
     return this._xhr.getResponseHeader(key);
   }
 
-  /**
-   * Set auth token
-   */
-  protected async updateToken(): Promise<string | void> {
-    if (this.token) {
-      const token = await unfunc(this.token, this.responseStatus);
-      this.setAuth(token);
-    }
-  }
-
   protected getChunk(): { start: number; end: number; body: Blob } {
     this.chunkSize = isNumber(this.options.chunkSize) ? this.chunkSize : DynamicChunk.size;
     const start = this.offset || 0;
     const end = Math.min(start + this.chunkSize, this.size);
     const body = this.file.slice(this.offset, end);
     return { start, end, body };
+  }
+
+  private async retry(): Promise<void> {
+    this.status = 'retry';
+    await this.errorHandler.wait();
   }
 
   private _request(req: RequestOptions): Promise<ProgressEvent> {
