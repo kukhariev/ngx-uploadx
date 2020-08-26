@@ -1,4 +1,4 @@
-import { ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core';
+import { ModuleWithProviders, NgModule } from '@angular/core';
 import { UPLOADX_OPTIONS, UploadxOptions } from './interfaces';
 import { UploadxDropDirective } from './uploadx-drop.directive';
 import { UploadxDirective } from './uploadx.directive';
@@ -8,13 +8,7 @@ import { UploadxDirective } from './uploadx.directive';
   exports: [UploadxDirective, UploadxDropDirective]
 })
 export class UploadxModule {
-  constructor(@Optional() @SkipSelf() parentModule: UploadxModule) {
-    if (parentModule) {
-      throw new Error('UploadxModule is already loaded. Import it in the AppModule only');
-    }
-  }
-
-  static withConfig(options: UploadxOptions): ModuleWithProviders {
+  static withConfig(options: UploadxOptions): ModuleWithProviders<UploadxModule> {
     return {
       ngModule: UploadxModule,
       providers: [{ provide: UPLOADX_OPTIONS, useValue: options }]

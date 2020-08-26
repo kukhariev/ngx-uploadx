@@ -1,5 +1,4 @@
 // noinspection ES6PreferShortImport
-import { ErrorHandler } from './error-handler';
 import { UploaderOptions } from './interfaces';
 import { Uploader } from './uploader';
 
@@ -13,8 +12,6 @@ const file = getFile();
 const snip = { file, size: 1, name: 'filename.mp4' };
 
 let uploader: MockUploader;
-
-ErrorHandler.maxAttempts = 2;
 
 export class MockUploader extends Uploader {
   constructor(readonly f: File, readonly opts: UploaderOptions) {
@@ -41,7 +38,7 @@ export class MockUploader extends Uploader {
 describe('Uploader', () => {
   describe('constructor()', () => {
     it('should new()', () => {
-      uploader = new MockUploader(file, {});
+      uploader = new MockUploader(file, { retryConfig: { maxAttempts: 1 } });
       expect(uploader).toEqual(jasmine.objectContaining(snip));
     });
   });
@@ -57,9 +54,9 @@ describe('Uploader', () => {
       expect(abort).toHaveBeenCalled();
       expect(stateChange).toHaveBeenCalled();
     });
-    it('should onCancel on cancel', () => {
+    it('should cancel', () => {
       const abort = spyOn<any>(uploader, 'abort').and.callThrough();
-      const onCancel = spyOn<any>(uploader, 'onCancel').and.callThrough();
+      const onCancel = spyOn<any>(uploader, 'cancel').and.callThrough();
       const cleanup = spyOn<any>(uploader, 'cleanup').and.callThrough();
       uploader.configure({ action: 'cancel' });
       expect(abort).toHaveBeenCalled();
@@ -88,44 +85,46 @@ describe('Uploader', () => {
 
   describe('upload()', () => {
     beforeEach(() => {
-      uploader = new MockUploader(file, {});
+      uploader = new MockUploader(file, { retryConfig: { maxAttempts: 3 } });
     });
-    it('should queue on 0', async () => {
+    it('should retry on 0', async () => {
+      const retry = spyOn<any>(uploader, 'retry');
       uploader.responseStatus = 0;
       await uploader.upload();
-      expect(uploader.status).toEqual('queue');
+      expect(retry).toHaveBeenCalledTimes(3);
     });
     it('should error on 400', async () => {
       uploader.responseStatus = 400;
       await uploader.upload();
       expect(uploader.status).toEqual('error');
     });
-    it('should queue on 401', async () => {
+    it('should updateToken on 401', async () => {
       uploader.responseStatus = 401;
       const updateToken = spyOn<any>(uploader, 'updateToken').and.callThrough();
       await uploader.upload();
       expect(updateToken).toHaveBeenCalled();
-      expect(uploader.status).toEqual('queue');
     });
-    it('should queue on 500', async () => {
+    it('should retry on 500', async () => {
       uploader.responseStatus = 500;
+      const retry = spyOn<any>(uploader, 'retry');
       await uploader.upload();
-      expect(uploader.status).toEqual('queue');
+      expect(retry).toHaveBeenCalledTimes(3);
+      expect(uploader.status).toEqual('error');
     });
     it('should complete on 200', async () => {
       uploader.responseStatus = 200;
-      const start = spyOn(uploader, 'start').and.callThrough();
+      const getFileUrl = spyOn(uploader, 'getFileUrl').and.callThrough();
       const getOffset = spyOn(uploader, 'getOffset').and.callThrough();
       const cleanup = spyOn<any>(uploader, 'cleanup').and.callThrough();
       await uploader.upload();
-      expect(start).toHaveBeenCalledTimes(1);
-      expect(getOffset).toHaveBeenCalledTimes(1);
+      expect(getFileUrl).toHaveBeenCalledTimes(1);
+      expect(getOffset).toHaveBeenCalledTimes(0);
       expect(cleanup).toHaveBeenCalled();
       expect(uploader.status).toEqual('complete');
     });
     it('should complete on 201', async () => {
       uploader.responseStatus = 201;
-      const start = spyOn(uploader, 'start').and.callThrough();
+      const start = spyOn(uploader, 'upload').and.callThrough();
       const cleanup = spyOn<any>(uploader, 'cleanup').and.callThrough();
       await uploader.upload();
       expect(start).toHaveBeenCalledTimes(1);
@@ -134,47 +133,6 @@ describe('Uploader', () => {
     });
   });
 
-  describe('start()', () => {
-    beforeEach(() => {
-      uploader = new MockUploader(file, {});
-      (uploader as any).offset = undefined;
-      uploader.status = 'uploading';
-    });
-    it('should error on 400', async () => {
-      uploader.responseStatus = 400;
-      const getOffset = spyOn(uploader, 'getOffset').and.callThrough();
-      await uploader.start();
-      expect(getOffset).toHaveBeenCalledTimes(1);
-      expect(uploader.status).toEqual('error');
-    });
-    it('should queue on 404', async () => {
-      uploader.responseStatus = 404;
-      const getOffset = spyOn(uploader, 'getOffset').and.callThrough();
-      await uploader.start();
-      expect(getOffset).toHaveBeenCalledTimes(1);
-      expect(uploader.status).toEqual('queue');
-    });
-    it('should retry on 0', async () => {
-      uploader.responseStatus = 0;
-      const getOffset = spyOn(uploader, 'getOffset').and.callThrough();
-      await uploader.start();
-      expect(getOffset).toHaveBeenCalledTimes(2);
-      expect(uploader.status).toEqual('error');
-    });
-    it('should retry on 500', async () => {
-      uploader.responseStatus = 500;
-      const getOffset = spyOn(uploader, 'getOffset').and.callThrough();
-      await uploader.start();
-      expect(getOffset).toHaveBeenCalledTimes(2);
-      expect(uploader.status).toEqual('error');
-    });
-    it('should complete on 200', async () => {
-      uploader.responseStatus = 200;
-      await uploader.start();
-      expect((uploader as any).offset).toEqual(1);
-      expect(uploader.status).toEqual('complete');
-    });
-  });
   describe('prerequest', () => {
     const injected = { headers: { Auth: 'token' } };
     it('sync', async () => {
