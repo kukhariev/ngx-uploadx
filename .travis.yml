@@ -1,7 +1,8 @@
+os: linux
 dist: bionic
 language: node_js
 node_js:
-  - '12'
+  - '12.8.1'
 
 addons:
   chrome: stable

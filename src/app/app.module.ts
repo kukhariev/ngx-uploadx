@@ -30,7 +30,10 @@ import { TusComponent } from './tus/tus.component';
   imports: [
     RouterModule.forRoot(appRoutes),
     BrowserModule,
-    UploadxModule.withConfig({ headers: { 'ngsw-bypass': 'true' } })
+    UploadxModule.withConfig({
+      headers: { 'ngsw-bypass': 'true' },
+      retryConfig: { maxAttempts: 5 }
+    })
   ],
   providers: [],
   bootstrap: [AppComponent],
