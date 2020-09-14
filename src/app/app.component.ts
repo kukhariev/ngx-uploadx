@@ -1,11 +1,12 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, DoCheck, HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html'
 })
-export class AppComponent {
+export class AppComponent implements DoCheck {
   hidden = true;
+  changes = 0;
 
   @HostListener('dragenter', ['$event'])
   @HostListener('dragover', ['$event'])
@@ -16,5 +17,8 @@ export class AppComponent {
       event.dataTransfer.effectAllowed = 'none';
       event.dataTransfer.dropEffect = 'none';
     }
+  }
+  ngDoCheck(): void {
+    // console.log('change-detection ', this.changes++);
   }
 }
