@@ -20,7 +20,7 @@ export class UploadxDropDirective {
       this.active = false;
       this.fileInput
         ? this.fileInput.fileListener(event.dataTransfer.files)
-        : this.uploadService.handleFileList(event.dataTransfer.files);
+        : this.uploadService.handleFiles(event.dataTransfer.files);
     }
   }
 

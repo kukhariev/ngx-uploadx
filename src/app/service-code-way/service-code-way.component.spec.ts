@@ -14,7 +14,7 @@ describe('ServiceCodeWayComponent', () => {
     const uploadServiceStub = {
       init: jasmine.createSpy('init'),
       control: jasmine.createSpy('control'),
-      handleFile: jasmine.createSpy('handleFile')
+      handleFiles: jasmine.createSpy('handleFiles')
     };
     TestBed.configureTestingModule({
       declarations: [ServiceCodeWayComponent],
@@ -60,7 +60,7 @@ describe('ServiceCodeWayComponent', () => {
       dataTransfer.items.add(new File(['foo'], 'programmatically_created.txt'));
       spyOn(comp, 'getFiles').and.returnValue(dataTransfer.files);
       comp.onChange();
-      expect(uploadService.handleFile).toHaveBeenCalled();
+      expect(uploadService.handleFiles).toHaveBeenCalled();
     }));
   });
 });

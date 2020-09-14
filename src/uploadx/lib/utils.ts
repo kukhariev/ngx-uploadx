@@ -23,8 +23,6 @@ export function unfunc<T, V>(value: T | ((ref: V) => T), ref: V): T {
   return value instanceof Function ? value(ref) : value;
 }
 
-export const noop = <T>(p: T) => p;
-
 export const pick = <T, K extends keyof T>(obj: T, whitelist: K[]): Pick<T, K> => {
   const result = {} as Pick<T, K>;
   whitelist.forEach(key => (result[key] = obj[key]));

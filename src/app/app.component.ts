@@ -18,6 +18,7 @@ export class AppComponent implements DoCheck {
       event.dataTransfer.dropEffect = 'none';
     }
   }
+
   ngDoCheck(): void {
     // console.log('change-detection ', this.changes++);
   }

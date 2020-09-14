@@ -56,7 +56,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
     const files = this.getFiles();
     // tslint:disable-next-line: prefer-for-of
     for (let i = 0; i < files.length; i++) {
-      this.uploadService.handleFile(files[i]);
+      this.uploadService.handleFiles(files[i]);
     }
   }
 
