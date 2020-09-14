@@ -39,7 +39,7 @@ describe('Directive: UploadxDirective', () => {
     inputEl = fixture.debugElement.query(By.css('input'));
     service = fixture.debugElement.injector.get<UploadxService>(UploadxService);
     serviceControlSpy = spyOn(service, 'control');
-    serviceHandleFileListSpy = spyOn(service, 'handleFileList');
+    serviceHandleFileListSpy = spyOn(service, 'handleFiles');
   });
 
   it('has attribute "accept"', () => {

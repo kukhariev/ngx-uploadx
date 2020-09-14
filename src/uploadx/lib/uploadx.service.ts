@@ -105,19 +105,12 @@ export class UploadxService implements OnDestroy {
   /**
    * Create Uploader and add to the queue
    */
-  handleFileList(fileList: FileList, options = {} as UploadxOptions): void {
+  handleFiles(files: FileList | File | File[], options = {} as UploadxOptions): void {
     const instanceOptions: ServiceFactoryOptions = { ...this.options, ...options };
     this.options.concurrency = instanceOptions.concurrency;
-    Array.from(fileList).forEach(file => this.addUploaderInstance(file, instanceOptions));
-  }
-
-  /**
-   * Create Uploader for the file and add to the queue
-   */
-  handleFile(file: File, options = {} as UploadxOptions): void {
-    const instanceOptions: ServiceFactoryOptions = { ...this.options, ...options };
-    this.options.concurrency = instanceOptions.concurrency;
-    this.addUploaderInstance(file, instanceOptions);
+    ('name' in files ? [files] : Array.from(files)).forEach(file =>
+      this.addUploaderInstance(file, instanceOptions)
+    );
   }
 
   /**
