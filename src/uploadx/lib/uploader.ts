@@ -1,3 +1,4 @@
+import { Ajax, AjaxRequestConfig, RequestCanceler } from './ajax';
 import { ErrorHandler, ErrorType } from './error-handler';
 import {
   Metadata,
@@ -18,16 +19,16 @@ const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
   upload: 'queue',
   cancel: 'cancelled'
 };
-
 /**
  * Uploader Base Class
  */
 export abstract class Uploader implements UploadState {
-  readonly name: string;
+  name: string;
   readonly size: number;
   readonly uploadId: string;
   response: ResponseBody = null;
-  responseStatus!: number;
+  responseStatus = 0;
+  responseHeaders: Record<string, string> = {};
   progress!: number;
   remaining!: number;
   speed!: number;
@@ -41,19 +42,17 @@ export abstract class Uploader implements UploadState {
   chunkSize: number;
   /** Auth token/tokenGetter */
   token: UploadxControlEvent['token'];
-  /** byte offset within the whole file */
+  /** Byte offset within the whole file */
   offset? = 0;
   /** Retries handler */
-  protected errorHandler: ErrorHandler;
-  /** Active HttpRequest */
-  protected _xhr!: XMLHttpRequest;
+  errorHandler: ErrorHandler;
   /** Set HttpRequest responseType */
-  protected responseType: XMLHttpRequestResponseType = '';
+  protected responseType?: 'json' | 'text';
   private readonly prerequest: (
     req: RequestOptions
   ) => Promise<RequestOptions> | RequestOptions | void;
   private startTime!: number;
-
+  private canceler = new RequestCanceler();
   private _url = '';
 
   get url(): string {
@@ -86,7 +85,8 @@ export abstract class Uploader implements UploadState {
   constructor(
     readonly file: File,
     readonly options: Readonly<UploaderOptions>,
-    readonly stateChange: (evt: UploadState) => void
+    readonly stateChange: (evt: UploadState) => void,
+    readonly ajax: Ajax
   ) {
     this.errorHandler = new ErrorHandler(options.retryConfig);
     this.name = file.name;
@@ -130,9 +130,16 @@ export abstract class Uploader implements UploadState {
       try {
         this.url = this.url || (await this.getFileUrl());
         this.offset = isNumber(this.offset) ? await this.sendFileContent() : await this.getOffset();
-        this.offset === this.size && (this.status = 'complete');
+        if (this.offset === this.size) {
+          this.remaining = 0;
+          this.progress = 100;
+          this.status = 'complete';
+        }
       } catch (e) {
         e instanceof Error && console.error(e);
+        if (this.status !== 'uploading') {
+          return;
+        }
         switch (this.errorHandler.kind(this.responseStatus)) {
           case ErrorType.Fatal:
             this.status = 'error';
@@ -145,7 +152,8 @@ export abstract class Uploader implements UploadState {
             break;
           default:
             this.responseStatus >= 400 && (this.offset = undefined);
-            await this.retry();
+            this.status = 'retry';
+            await this.errorHandler.wait();
             this.status = 'uploading';
             break;
         }
@@ -156,21 +164,32 @@ export abstract class Uploader implements UploadState {
   /**
    * Performs http requests
    */
-  async request(req: RequestOptions): Promise<ProgressEvent> {
-    return this._request((await this.prerequest(req)) || req);
-  }
-
-  /**
-   * Get response body after request has been sent
-   */
-  getResponseBody(xhr: XMLHttpRequest): ResponseBody {
-    let body = 'response' in (xhr as XMLHttpRequest) ? xhr.response : xhr.responseText;
-    if (body && this.responseType === 'json' && typeof body === 'string') {
-      try {
-        body = JSON.parse(body);
-      } catch {}
-    }
-    return body;
+  async request(
+    requestOptions: RequestOptions
+  ): Promise<{ data: string; status: number; headers: Record<string, string> }> {
+    const { body = null, headers = {}, method, progress, url = this.url } =
+      (await this.prerequest(requestOptions)) || requestOptions;
+    const onUploadProgress =
+      body && (body instanceof Blob || progress) ? this.onProgress() : undefined;
+    const opts: AjaxRequestConfig = {
+      method,
+      headers: { ...this.headers, ...headers },
+      url,
+      data: body,
+      responseType: this.responseType || undefined,
+      onUploadProgress,
+      canceler: this.canceler,
+      withCredentials: !!this.options.withCredentials,
+      validateStatus: code => code < 400
+    };
+    this.responseStatus = 0;
+    this.response = null;
+    this.responseHeaders = {};
+    const response = await this.ajax.request(opts);
+    this.response = response.data;
+    this.responseHeaders = response.headers;
+    this.responseStatus = response.status;
+    return response;
   }
 
   /**
@@ -203,7 +222,7 @@ export abstract class Uploader implements UploadState {
 
   protected abort(): void {
     this.offset = undefined;
-    this._xhr && this._xhr.abort();
+    this.canceler.cancel();
   }
 
   protected async cancel(): Promise<void> {
@@ -218,7 +237,7 @@ export abstract class Uploader implements UploadState {
    * Gets the value from the response
    */
   protected getValueFromResponse(key: string): string | null {
-    return this._xhr.getResponseHeader(key);
+    return this.responseHeaders[key.toLowerCase()] || null;
   }
 
   protected getChunk(): { start: number; end: number; body: Blob } {
@@ -229,39 +248,11 @@ export abstract class Uploader implements UploadState {
     return { start, end, body };
   }
 
-  private async retry(): Promise<void> {
-    this.status = 'retry';
-    await this.errorHandler.wait();
-  }
-
-  private _request(req: RequestOptions): Promise<ProgressEvent> {
-    return new Promise((resolve, reject) => {
-      const xhr = (this._xhr = new XMLHttpRequest());
-      xhr.open(req.method, req.url || this.url, true);
-      if (req.body instanceof Blob || (req.body && req.progress)) {
-        xhr.upload.onprogress = this.onProgress();
-      }
-      this.responseStatus = 0;
-      this.response = null;
-      this.responseType && (xhr.responseType = this.responseType);
-      this.options.withCredentials && (xhr.withCredentials = true);
-      const _headers = { ...this.headers, ...(req.headers || {}) };
-      Object.keys(_headers).forEach(key => xhr.setRequestHeader(key, String(_headers[key])));
-      xhr.onload = evt => {
-        this.responseStatus = xhr.status;
-        this.response = this.getResponseBody(xhr);
-        this.responseStatus >= 400 ? reject(evt) : resolve(evt);
-      };
-      xhr.onerror = reject;
-      xhr.send(req.body);
-    });
-  }
-
   private cleanup = () => store.delete(this.uploadId);
 
   private onProgress(): (evt: ProgressEvent) => void {
     let throttle = 0;
-    return ({ loaded }: ProgressEvent) => {
+    return ({ loaded }) => {
       const now = new Date().getTime();
       const uploaded = (this.offset as number) + loaded;
       const elapsedTime = (now - this.startTime) / 1000;

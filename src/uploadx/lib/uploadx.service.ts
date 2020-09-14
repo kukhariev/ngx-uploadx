@@ -1,6 +1,7 @@
 import { Inject, Injectable, NgZone, OnDestroy, Optional } from '@angular/core';
 import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
+import { Ajax, UPLOADX_AJAX } from './ajax';
 import {
   UploaderClass,
   UploadState,
@@ -49,6 +50,7 @@ export class UploadxService implements OnDestroy {
 
   constructor(
     @Optional() @Inject(UPLOADX_OPTIONS) options: UploadxOptions | null,
+    @Inject(UPLOADX_AJAX) readonly ajax: Ajax,
     private ngZone: NgZone
   ) {
     this.options = Object.assign({}, defaultOptions, options);
@@ -147,7 +149,7 @@ export class UploadxService implements OnDestroy {
   };
 
   private addUploaderInstance(file: File, options: ServiceFactoryOptions): void {
-    const uploader = new options.uploaderClass(file, options, this.stateChange);
+    const uploader = new options.uploaderClass(file, options, this.stateChange, this.ajax);
     this.queue.push(uploader);
     uploader.status = options.autoUpload && window.navigator.onLine ? 'queue' : 'added';
   }
