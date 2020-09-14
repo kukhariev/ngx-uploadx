@@ -1,13 +1,11 @@
 import { InjectionToken } from '@angular/core';
+import { Ajax } from './ajax';
 import { RetryConfig } from './error-handler';
 import { Uploader } from './uploader';
 
 export type Primitive = null | boolean | number | string;
 
-export type ResponseBody =
-  | Primitive
-  | { [key: number]: ResponseBody } // for older ts versions
-  | { [key: string]: ResponseBody };
+export type ResponseBody = string | object | null;
 
 export type RequestHeaders = Record<string, Primitive | Primitive[]>;
 
@@ -56,6 +54,9 @@ export interface UploadState {
 
   /** HTTP response status code */
   readonly responseStatus: number;
+
+  /** HTTP response headers */
+  readonly responseHeaders: Record<string, string>;
 
   /** File size in bytes */
   readonly size: number;
@@ -115,7 +116,8 @@ export interface UploaderOptions extends UploadItem {
 export type UploaderClass = new (
   file: File,
   options: UploaderOptions,
-  stateChange: (evt: UploadEvent) => void
+  stateChange: (evt: UploadEvent) => void,
+  ajax: Ajax
 ) => Uploader;
 
 /**

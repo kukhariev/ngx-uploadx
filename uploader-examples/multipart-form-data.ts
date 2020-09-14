@@ -11,7 +11,7 @@ import { resolveUrl, Uploader } from 'ngx-uploadx';
  *   };
  */
 export class MultiPartFormData extends Uploader {
-  responseType = 'json' as XMLHttpRequestResponseType;
+  responseType = 'json' as 'json';
 
   async getFileUrl(): Promise<string> {
     this.offset = 0;

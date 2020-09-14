@@ -8,7 +8,7 @@ import { resolveUrl } from './utils';
  * @see {@link https://developers.google.com/drive/api/v3/manage-uploads#resumable|Google Drive API documentation}
  */
 export class UploaderX extends Uploader {
-  responseType = 'json' as XMLHttpRequestResponseType;
+  responseType = 'json' as 'json';
 
   async getFileUrl(): Promise<string> {
     const headers = {
