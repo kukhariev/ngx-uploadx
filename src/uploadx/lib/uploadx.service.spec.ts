@@ -1,4 +1,5 @@
 import { NgZone } from '@angular/core';
+import { Ajax } from 'ngx-uploadx';
 import { UploadAction, UploadxOptions } from './interfaces';
 import { UploaderX } from './uploaderx';
 import { UploadxService } from './uploadx.service';
@@ -41,7 +42,7 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 describe('UploadxService', () => {
   let service: UploadxService;
   beforeEach(() => {
-    service = new UploadxService(null, new NgZone({}));
+    service = new UploadxService(null, {} as Ajax, new NgZone({}));
   });
 
   it('should set default options', () => {
