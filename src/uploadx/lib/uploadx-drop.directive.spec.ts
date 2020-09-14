@@ -37,7 +37,7 @@ describe('Directive: UploadxDropDirective', () => {
     fixture = TestBed.createComponent(UploadxTestComponent);
     dropEl = fixture.debugElement.query(By.directive(UploadxDropDirective));
     service = fixture.debugElement.injector.get<UploadxService>(UploadxService);
-    serviceHandleFileListSpy = spyOn(service, 'handleFileList');
+    serviceHandleFileListSpy = spyOn(service, 'handleFiles');
   });
 
   it('should ignore non files dragover', () => {
@@ -71,7 +71,7 @@ describe('Directive: UploadxDropDirective', () => {
     expect(dropEl.nativeElement.classList.contains('uploadx-drop-active')).toBe(false);
   });
 
-  it('should call HandleFileList', () => {
+  it('should call HandleFiles', () => {
     const dropEvent = jasmine.createSpyObj('event', ['preventDefault', 'stopPropagation']);
     dropEvent.dataTransfer = { files };
     dropEl.triggerEventHandler('drop', dropEvent);

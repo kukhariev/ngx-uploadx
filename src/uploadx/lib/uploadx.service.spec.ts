@@ -78,7 +78,7 @@ describe('UploadxService', () => {
   it('should add 4 files to queue', () => {
     const fileList = getFilelist();
     service.connect(options);
-    service.handleFileList(fileList);
+    service.handleFiles(fileList);
     expect(service.queue.length).toEqual(4);
     service.disconnect();
     expect(service.queue.length).toEqual(0);
@@ -87,7 +87,7 @@ describe('UploadxService', () => {
   it('should add file to queue with status `added`', () => {
     const file = getFile();
     service.connect(options);
-    service.handleFile(file);
+    service.handleFiles(file);
     expect(service.queue[0].status).toEqual('added');
     service.disconnect();
   });
@@ -95,7 +95,7 @@ describe('UploadxService', () => {
   it('should set correct status on `control` method call', () => {
     const file = getFile();
     service.connect(options);
-    service.handleFile(file);
+    service.handleFiles(file);
     const upload = service.queue[0];
     service.control({ action: 'pause' });
     expect(service.queue[0].status).toEqual('paused');
@@ -116,14 +116,14 @@ describe('UploadxService', () => {
   it('should add file to queue with status `queue`', () => {
     const file = getFile();
     service.connect({ ...options, autoUpload: true });
-    service.handleFile(file);
+    service.handleFiles(file);
     expect(service.queue[0].status).toEqual('queue');
     service.disconnect();
   });
 
   it('should limit concurrent uploads', async () => {
     service.connect({ ...options, autoUpload: true });
-    service.handleFileList(getFilelist());
+    service.handleFiles(getFilelist());
     await delay(1);
     expect(service.queue.map(f => f.status).filter(s => s !== 'queue').length).toEqual(3);
     expect(service.queue[3].status).toEqual('queue');
