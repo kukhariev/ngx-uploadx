@@ -2,15 +2,9 @@ import { Inject, Injectable, NgZone, OnDestroy, Optional } from '@angular/core';
 import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { Ajax, UPLOADX_AJAX } from './ajax';
-import {
-  UploaderClass,
-  UploadState,
-  UPLOADX_OPTIONS,
-  UploadxControlEvent,
-  UploadxOptions
-} from './interfaces';
+import { UPLOADX_DEFAULT_OPTIONS, UploadxDefaultOptions } from './default-options';
+import { UploadState, UPLOADX_OPTIONS, UploadxControlEvent, UploadxOptions } from './interfaces';
 import { Uploader } from './uploader';
-import { UploaderX } from './uploaderx';
 import { pick } from './utils';
 
 const stateKeys: Array<keyof UploadState> = [
@@ -19,6 +13,7 @@ const stateKeys: Array<keyof UploadState> = [
   'progress',
   'remaining',
   'response',
+  'responseHeaders',
   'responseStatus',
   'size',
   'speed',
@@ -26,14 +21,7 @@ const stateKeys: Array<keyof UploadState> = [
   'uploadId',
   'url'
 ];
-const defaultOptions = {
-  endpoint: '/upload',
-  autoUpload: true,
-  concurrency: 2,
-  uploaderClass: UploaderX as UploaderClass
-};
-
-type ServiceFactoryOptions = UploadxOptions & typeof defaultOptions;
+type ServiceFactoryOptions = UploadxOptions & UploadxDefaultOptions;
 
 @Injectable({ providedIn: 'root' })
 export class UploadxService implements OnDestroy {
@@ -50,10 +38,11 @@ export class UploadxService implements OnDestroy {
 
   constructor(
     @Optional() @Inject(UPLOADX_OPTIONS) options: UploadxOptions | null,
+    @Inject(UPLOADX_DEFAULT_OPTIONS) defaults: UploadxDefaultOptions,
     @Inject(UPLOADX_AJAX) readonly ajax: Ajax,
     private ngZone: NgZone
   ) {
-    this.options = Object.assign({}, defaultOptions, options);
+    this.options = Object.assign({}, defaults, options);
     // TODO: add 'offline' status
     // FIXME: online/offline not supported on Windows
     this.subs.push(
