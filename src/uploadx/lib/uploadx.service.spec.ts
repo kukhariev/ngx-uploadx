@@ -1,8 +1,15 @@
 import { NgZone } from '@angular/core';
-import { Ajax } from 'ngx-uploadx';
+import { Ajax } from './ajax';
 import { UploadAction, UploadxOptions } from './interfaces';
 import { UploaderX } from './uploaderx';
 import { UploadxService } from './uploadx.service';
+
+const defaultOptions = {
+  endpoint: '/upload',
+  autoUpload: true,
+  concurrency: 2,
+  uploaderClass: UploaderX
+};
 
 class MockUploader extends UploaderX {
   async upload(): Promise<void> {
@@ -42,7 +49,7 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 describe('UploadxService', () => {
   let service: UploadxService;
   beforeEach(() => {
-    service = new UploadxService(null, {} as Ajax, new NgZone({}));
+    service = new UploadxService(null, defaultOptions, {} as Ajax, new NgZone({}));
   });
 
   it('should set default options', () => {
@@ -50,13 +57,7 @@ describe('UploadxService', () => {
     expect(service.options.endpoint).toEqual('/upload');
     expect(service.options.concurrency).toEqual(2);
     expect(service.options.autoUpload).toEqual(true);
-  });
-
-  it('should set endpoint', () => {
-    service.init({ endpoint: ENDPOINT });
-    expect(service.options.concurrency).toEqual(2);
-    expect(service.options.autoUpload).toEqual(true);
-    expect(service.options.endpoint).toEqual(ENDPOINT);
+    expect(service.options.uploaderClass).toEqual(UploaderX);
   });
 
   it('should overwrite default options', () => {
@@ -64,6 +65,7 @@ describe('UploadxService', () => {
     expect(service.options.endpoint).toEqual(ENDPOINT);
     expect(service.options.token).toEqual('%token%');
     expect(service.options.chunkSize).toEqual(4096);
+    expect(service.options.uploaderClass).toEqual(MockUploader);
   });
 
   it('should keep the settings', () => {

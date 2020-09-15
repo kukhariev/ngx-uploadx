@@ -9,3 +9,4 @@ export * from './lib/uploadx.service';
 export * from './lib/utils';
 export * from './lib/uploadx-drop.directive';
 export * from './lib/uploadx.directive';
+export * from './lib/default-options';
