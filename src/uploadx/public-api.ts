@@ -1,4 +1,4 @@
-export * from './lib/error-handler';
+export * from './lib/retry-handler';
 export * from './lib/ajax';
 export * from './lib/interfaces';
 export * from './lib/tus';

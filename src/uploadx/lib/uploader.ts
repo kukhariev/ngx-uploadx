@@ -1,5 +1,4 @@
 import { Ajax, AjaxRequestConfig, RequestCanceler } from './ajax';
-import { ErrorHandler, ErrorType } from './error-handler';
 import {
   Metadata,
   RequestHeaders,
@@ -11,6 +10,7 @@ import {
   UploadStatus,
   UploadxControlEvent
 } from './interfaces';
+import { ErrorType, RetryHandler } from './retry-handler';
 import { store } from './store';
 import { createHash, DynamicChunk, isNumber, unfunc } from './utils';
 
@@ -45,7 +45,7 @@ export abstract class Uploader implements UploadState {
   /** Byte offset within the whole file */
   offset? = 0;
   /** Retries handler */
-  retry: ErrorHandler;
+  retry: RetryHandler;
   /** Set HttpRequest responseType */
   protected responseType?: 'json' | 'text';
   private readonly prerequest: (
@@ -90,7 +90,7 @@ export abstract class Uploader implements UploadState {
     readonly stateChange: (evt: UploadState) => void,
     readonly ajax: Ajax
   ) {
-    this.retry = new ErrorHandler(options.retryConfig);
+    this.retry = new RetryHandler(options.retryConfig);
     this.name = file.name;
     this.size = file.size;
     this.metadata = {
