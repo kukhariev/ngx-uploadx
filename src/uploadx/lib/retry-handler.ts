@@ -30,7 +30,7 @@ const defaultRetryConfig: Required<RetryConfig> = {
 /**
  * Retryable ErrorHandler
  */
-export class ErrorHandler {
+export class RetryHandler {
   public attempts = 0;
   config: Required<RetryConfig>;
   cancel: () => void = () => {};

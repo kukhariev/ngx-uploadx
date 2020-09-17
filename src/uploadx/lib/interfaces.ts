@@ -1,6 +1,6 @@
 import { InjectionToken } from '@angular/core';
 import { Ajax } from './ajax';
-import { RetryConfig } from './error-handler';
+import { RetryConfig } from './retry-handler';
 import { Uploader } from './uploader';
 
 export type Primitive = null | boolean | number | string;
