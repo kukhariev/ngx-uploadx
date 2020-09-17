@@ -90,7 +90,7 @@ describe('Uploader', () => {
       uploader = new MockUploader(file, { retryConfig: { maxAttempts: 3 } });
     });
     it('should retry on 0', async () => {
-      const retry = spyOn<any>(uploader.errorHandler, 'wait');
+      const retry = spyOn<any>(uploader.retry, 'wait');
       uploader.responseStatus = 0;
       await uploader.upload();
       expect(retry).toHaveBeenCalledTimes(3);
@@ -108,7 +108,7 @@ describe('Uploader', () => {
     });
     it('should retry on 500', async () => {
       uploader.responseStatus = 500;
-      const retry = spyOn<any>(uploader.errorHandler, 'wait');
+      const retry = spyOn<any>(uploader.retry, 'wait');
       await uploader.upload();
       expect(retry).toHaveBeenCalledTimes(3);
       expect(uploader.status).toEqual('error');
