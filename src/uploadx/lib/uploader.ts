@@ -45,7 +45,7 @@ export abstract class Uploader implements UploadState {
   /** Byte offset within the whole file */
   offset? = 0;
   /** Retries handler */
-  errorHandler: ErrorHandler;
+  retry: ErrorHandler;
   /** Set HttpRequest responseType */
   protected responseType?: 'json' | 'text';
   private readonly prerequest: (
@@ -53,6 +53,7 @@ export abstract class Uploader implements UploadState {
   ) => Promise<RequestOptions> | RequestOptions | void;
   private startTime!: number;
   private canceler = new RequestCanceler();
+
   private _url = '';
 
   get url(): string {
@@ -75,8 +76,9 @@ export abstract class Uploader implements UploadState {
       return;
     }
     if (s !== this._status) {
-      s === 'paused' && this.abort();
+      this.status === 'retry' && this.retry.cancel();
       this._status = s;
+      s === 'paused' && this.abort();
       ['cancelled', 'complete', 'error'].indexOf(s) !== -1 && this.cleanup();
       s === 'cancelled' ? this.cancel() : this.stateChange(this);
     }
@@ -88,7 +90,7 @@ export abstract class Uploader implements UploadState {
     readonly stateChange: (evt: UploadState) => void,
     readonly ajax: Ajax
   ) {
-    this.errorHandler = new ErrorHandler(options.retryConfig);
+    this.retry = new ErrorHandler(options.retryConfig);
     this.name = file.name;
     this.size = file.size;
     this.metadata = {
@@ -124,12 +126,14 @@ export abstract class Uploader implements UploadState {
    * Starts uploading
    */
   async upload(): Promise<void> {
-    this.status = 'uploading';
+    this._status = 'uploading';
     this.startTime = new Date().getTime();
-    while (this.status === 'uploading') {
+    while (this.status === 'uploading' || this.status === 'retry') {
+      this.status = 'uploading';
       try {
         this.url = this.url || (await this.getFileUrl());
         this.offset = isNumber(this.offset) ? await this.sendFileContent() : await this.getOffset();
+        this.retry.reset();
         if (this.offset === this.size) {
           this.remaining = 0;
           this.progress = 100;
@@ -140,7 +144,7 @@ export abstract class Uploader implements UploadState {
         if (this.status !== 'uploading') {
           return;
         }
-        switch (this.errorHandler.kind(this.responseStatus)) {
+        switch (this.retry.kind(this.responseStatus)) {
           case ErrorType.Fatal:
             this.status = 'error';
             break;
@@ -153,9 +157,7 @@ export abstract class Uploader implements UploadState {
           default:
             this.responseStatus >= 400 && (this.offset = undefined);
             this.status = 'retry';
-            await this.errorHandler.wait();
-            this.status = 'uploading';
-            break;
+            await this.retry.wait();
         }
       }
     }

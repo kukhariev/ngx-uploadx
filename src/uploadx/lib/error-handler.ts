@@ -16,7 +16,6 @@ export interface RetryConfig {
   shouldRetryCodes?: number[];
   minDelay?: number;
   maxDelay?: number;
-  factor?: number;
 }
 
 const defaultRetryConfig: Required<RetryConfig> = {
@@ -25,8 +24,7 @@ const defaultRetryConfig: Required<RetryConfig> = {
   authErrorCodes: [401],
   shouldRetryCodes: [423, 429],
   minDelay: 500,
-  maxDelay: 5000,
-  factor: 2
+  maxDelay: 50000
 };
 
 /**
@@ -35,19 +33,14 @@ const defaultRetryConfig: Required<RetryConfig> = {
 export class ErrorHandler {
   public attempts = 0;
   config: Required<RetryConfig>;
-  private delay: number;
-  private code = -1;
+  cancel: () => void = () => {};
 
   constructor(configOptions: RetryConfig = {}) {
     this.config = Object.assign({}, defaultRetryConfig, configOptions);
-    this.delay = this.config.minDelay;
   }
 
   kind(code: number): ErrorType {
-    code !== this.code && this.reset();
-    this.code = code;
     this.attempts++;
-
     if (this.attempts > this.config.maxAttempts) {
       return ErrorType.Fatal;
     }
@@ -63,19 +56,21 @@ export class ErrorHandler {
     return ErrorType.Fatal;
   }
 
-  wait(): Promise<number> {
+  wait(): Promise<void> {
+    const ms =
+      Math.min(2 ** (this.attempts - 1) * this.config.minDelay, this.config.maxDelay) +
+      Math.floor(Math.random() * this.config.minDelay);
+    let id: number;
     return new Promise(resolve => {
-      this.delay = Math.min(this.delay * this.config.factor, this.config.maxDelay);
-      setTimeout(
-        () => resolve(this.attempts),
-        this.delay + Math.floor(Math.random() * this.config.minDelay)
-      );
+      this.cancel = () => {
+        window.clearTimeout(id);
+        resolve();
+      };
+      id = window.setTimeout(this.cancel, ms);
     });
   }
 
   reset(): void {
-    this.delay = this.config.minDelay;
     this.attempts = 0;
-    this.code = -1;
   }
 }
