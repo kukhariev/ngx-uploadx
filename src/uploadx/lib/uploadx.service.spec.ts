@@ -1,6 +1,7 @@
 import { NgZone } from '@angular/core';
 import { Ajax } from './ajax';
-import { UploadAction, UploadxOptions } from './interfaces';
+import { UploadAction } from './interfaces';
+import { UploadxOptions } from './options';
 import { UploaderX } from './uploaderx';
 import { UploadxService } from './uploadx.service';
 

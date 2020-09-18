@@ -9,7 +9,8 @@ import {
   Renderer2
 } from '@angular/core';
 import { takeWhile } from 'rxjs/operators';
-import { UploadState, UploadxControlEvent, UploadxOptions } from './interfaces';
+import { UploadState, UploadxControlEvent } from './interfaces';
+import { UploadxOptions } from './options';
 import { UploadxService } from './uploadx.service';
 
 @Directive({ selector: '[uploadx]' })
