@@ -1,4 +1,3 @@
-import { InjectionToken } from '@angular/core';
 import { Ajax } from './ajax';
 import { RetryConfig } from './retry-handler';
 import { Uploader } from './uploader';
@@ -30,11 +29,6 @@ export type UploadStatus =
   | 'retry';
 
 export type UploadAction = 'upload' | 'cancel' | 'pause';
-
-/**
- *  Read only upload stream events
- */
-export type UploadEvent = Readonly<UploadState>;
 
 export interface UploadState {
   /** Uploaded file */
@@ -116,38 +110,6 @@ export interface UploaderOptions extends UploadItem {
 export type UploaderClass = new (
   file: File,
   options: UploaderOptions,
-  stateChange: (evt: UploadEvent) => void,
+  stateChange: (evt: UploadState) => void,
   ajax: Ajax
 ) => Uploader;
-
-/**
- * Global Module Options
- */
-export interface UploadxOptions extends UploaderOptions {
-  /**
-   * Provide a user-defined class to support another upload protocol or to extend an existing one.
-   * @defaultValue UploadX
-   */
-  uploaderClass?: UploaderClass;
-  /**
-   * Set the maximum parallel uploads
-   * @defaultValue 2
-   */
-  concurrency?: number;
-  /**
-   * Automatically start upload when files added
-   * @defaultValue true
-   */
-  autoUpload?: boolean;
-  /**
-   * File types the user can pick from the file input
-   */
-  allowedTypes?: string;
-  /**
-   * Add 'multiple' attribute
-   * @defaultValue true
-   */
-  multiple?: boolean;
-}
-
-export const UPLOADX_OPTIONS = new InjectionToken<UploadxOptions>('uploadx.options');

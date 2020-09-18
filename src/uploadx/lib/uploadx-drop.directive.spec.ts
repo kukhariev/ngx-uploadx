@@ -1,7 +1,7 @@
 import { Component, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { UPLOADX_OPTIONS } from './interfaces';
+import { UPLOADX_OPTIONS } from './options';
 import { UploadxDropDirective } from './uploadx-drop.directive';
 import { UploadxDirective } from './uploadx.directive';
 import { UploadxService } from './uploadx.service';

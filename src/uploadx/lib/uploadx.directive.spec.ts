@@ -1,7 +1,8 @@
 import { Component, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { UPLOADX_OPTIONS, UploadxControlEvent } from './interfaces';
+import { UploadxControlEvent } from './interfaces';
+import { UPLOADX_OPTIONS } from './options';
 import { UploadxDirective } from './uploadx.directive';
 import { UploadxService } from './uploadx.service';
 

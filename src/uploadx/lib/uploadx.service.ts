@@ -2,8 +2,13 @@ import { Inject, Injectable, NgZone, OnDestroy, Optional } from '@angular/core';
 import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { Ajax, UPLOADX_AJAX } from './ajax';
-import { UPLOADX_DEFAULT_OPTIONS, UploadxDefaultOptions } from './default-options';
-import { UploadState, UPLOADX_OPTIONS, UploadxControlEvent, UploadxOptions } from './interfaces';
+import { UploadState, UploadxControlEvent } from './interfaces';
+import {
+  UPLOADX_FACTORY_OPTIONS,
+  UPLOADX_OPTIONS,
+  UploadxFactoryOptions,
+  UploadxOptions
+} from './options';
 import { Uploader } from './uploader';
 import { pick } from './utils';
 
@@ -21,13 +26,12 @@ const stateKeys: Array<keyof UploadState> = [
   'uploadId',
   'url'
 ];
-type ServiceFactoryOptions = UploadxOptions & UploadxDefaultOptions;
 
 @Injectable({ providedIn: 'root' })
 export class UploadxService implements OnDestroy {
   /** Upload Queue */
   queue: Uploader[] = [];
-  options: ServiceFactoryOptions;
+  options: UploadxFactoryOptions;
   private readonly eventsStream: Subject<UploadState> = new Subject();
   private subs: Subscription[] = [];
 
@@ -38,7 +42,7 @@ export class UploadxService implements OnDestroy {
 
   constructor(
     @Optional() @Inject(UPLOADX_OPTIONS) options: UploadxOptions | null,
-    @Inject(UPLOADX_DEFAULT_OPTIONS) defaults: UploadxDefaultOptions,
+    @Inject(UPLOADX_FACTORY_OPTIONS) defaults: UploadxFactoryOptions,
     @Inject(UPLOADX_AJAX) readonly ajax: Ajax,
     private ngZone: NgZone
   ) {
@@ -95,7 +99,7 @@ export class UploadxService implements OnDestroy {
    * Create Uploader and add to the queue
    */
   handleFiles(files: FileList | File | File[], options = {} as UploadxOptions): void {
-    const instanceOptions: ServiceFactoryOptions = { ...this.options, ...options };
+    const instanceOptions: UploadxFactoryOptions = { ...this.options, ...options };
     this.options.concurrency = instanceOptions.concurrency;
     ('name' in files ? [files] : Array.from(files)).forEach(file =>
       this.addUploaderInstance(file, instanceOptions)
@@ -130,7 +134,7 @@ export class UploadxService implements OnDestroy {
     setTimeout(() => this.ngZone.run(() => this.eventsStream.next(pick(evt, stateKeys))));
   };
 
-  private addUploaderInstance(file: File, options: ServiceFactoryOptions): void {
+  private addUploaderInstance(file: File, options: UploadxFactoryOptions): void {
     const uploader = new options.uploaderClass(file, options, this.stateChange, this.ajax);
     this.queue.push(uploader);
     uploader.status = options.autoUpload && window.navigator.onLine ? 'queue' : 'added';
