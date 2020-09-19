@@ -87,31 +87,7 @@ describe('Uploader', () => {
 
   describe('upload()', () => {
     beforeEach(() => {
-      uploader = new MockUploader(file, { retryConfig: { maxAttempts: 3 } });
-    });
-    it('should retry on 0', async () => {
-      const retry = spyOn<any>(uploader.retry, 'wait');
-      uploader.responseStatus = 0;
-      await uploader.upload();
-      expect(retry).toHaveBeenCalledTimes(3);
-    });
-    it('should error on 400', async () => {
-      uploader.responseStatus = 400;
-      await uploader.upload();
-      expect(uploader.status).toEqual('error');
-    });
-    it('should updateToken on 401', async () => {
-      uploader.responseStatus = 401;
-      const updateToken = spyOn<any>(uploader, 'updateToken').and.callThrough();
-      await uploader.upload();
-      expect(updateToken).toHaveBeenCalled();
-    });
-    it('should retry on 500', async () => {
-      uploader.responseStatus = 500;
-      const retry = spyOn<any>(uploader.retry, 'wait');
-      await uploader.upload();
-      expect(retry).toHaveBeenCalledTimes(3);
-      expect(uploader.status).toEqual('error');
+      uploader = new MockUploader(file, {});
     });
     it('should complete on 200', async () => {
       uploader.responseStatus = 200;

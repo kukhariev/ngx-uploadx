@@ -1,3 +1,5 @@
+import { Injectable } from '@angular/core';
+
 export enum ErrorType {
   NotFound,
   Auth,
@@ -30,20 +32,15 @@ const defaultRetryConfig: Required<RetryConfig> = {
 /**
  * Retryable ErrorHandler
  */
+@Injectable({ providedIn: 'root' })
 export class RetryHandler {
-  public attempts = 0;
-  config: Required<RetryConfig>;
-  cancel: () => void = () => {};
+  config: Required<RetryConfig> = defaultRetryConfig;
 
-  constructor(configOptions: RetryConfig = {}) {
-    this.config = Object.assign({}, defaultRetryConfig, configOptions);
+  init(configOptions: RetryConfig = {}): void {
+    this.config = Object.assign(this.config, configOptions);
   }
 
   kind(code: number): ErrorType {
-    this.attempts++;
-    if (this.attempts > this.config.maxAttempts) {
-      return ErrorType.Fatal;
-    }
     if (this.config.authErrorCodes.indexOf(code) !== -1) {
       return ErrorType.Auth;
     }
@@ -56,21 +53,17 @@ export class RetryHandler {
     return ErrorType.Fatal;
   }
 
-  wait(): Promise<void> {
+  wait(attempts: number, cancel: () => void): Promise<void> {
     const ms =
-      Math.min(2 ** (this.attempts - 1) * this.config.minDelay, this.config.maxDelay) +
+      Math.min(2 ** (attempts - 1) * this.config.minDelay, this.config.maxDelay) +
       Math.floor(Math.random() * this.config.minDelay);
     let id: number;
     return new Promise(resolve => {
-      this.cancel = () => {
+      cancel = () => {
         window.clearTimeout(id);
         resolve();
       };
-      id = window.setTimeout(this.cancel, ms);
+      id = window.setTimeout(cancel, ms);
     });
-  }
-
-  reset(): void {
-    this.attempts = 0;
   }
 }

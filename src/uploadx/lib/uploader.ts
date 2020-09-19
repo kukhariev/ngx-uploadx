@@ -10,7 +10,6 @@ import {
   UploadStatus,
   UploadxControlEvent
 } from './interfaces';
-import { ErrorType, RetryHandler } from './retry-handler';
 import { store } from './store';
 import { createHash, DynamicChunk, isNumber, unfunc } from './utils';
 
@@ -19,6 +18,7 @@ const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
   upload: 'queue',
   cancel: 'cancelled'
 };
+
 /**
  * Uploader Base Class
  */
@@ -44,8 +44,6 @@ export abstract class Uploader implements UploadState {
   token: UploadxControlEvent['token'];
   /** Byte offset within the whole file */
   offset? = 0;
-  /** Retries handler */
-  retry: RetryHandler;
   /** Set HttpRequest responseType */
   protected responseType?: 'json' | 'text';
   private readonly prerequest: (
@@ -53,6 +51,7 @@ export abstract class Uploader implements UploadState {
   ) => Promise<RequestOptions> | RequestOptions | void;
   private startTime!: number;
   private canceler = new RequestCanceler();
+  retryAttempts = 0;
 
   private _url = '';
 
@@ -76,7 +75,7 @@ export abstract class Uploader implements UploadState {
       return;
     }
     if (s !== this._status) {
-      this.status === 'retry' && this.retry.cancel();
+      this.status === 'retry' && this.retryCancel();
       this._status = s;
       s === 'paused' && this.abort();
       ['cancelled', 'complete', 'error'].indexOf(s) !== -1 && this.cleanup();
@@ -90,7 +89,6 @@ export abstract class Uploader implements UploadState {
     readonly stateChange: (evt: UploadState) => void,
     readonly ajax: Ajax
   ) {
-    this.retry = new RetryHandler(options.retryConfig);
     this.name = file.name;
     this.size = file.size;
     this.metadata = {
@@ -126,41 +124,16 @@ export abstract class Uploader implements UploadState {
    * Starts uploading
    */
   async upload(): Promise<void> {
-    this._status = 'uploading';
+    this.status = 'uploading';
     this.startTime = new Date().getTime();
-    while (this.status === 'uploading' || this.status === 'retry') {
-      this.status = 'uploading';
-      try {
-        this.url = this.url || (await this.getFileUrl());
-        this.offset = isNumber(this.offset) ? await this.sendFileContent() : await this.getOffset();
-        this.retry.reset();
-        if (this.offset === this.size) {
-          this.remaining = 0;
-          this.progress = 100;
-          this.status = 'complete';
-        }
-      } catch (e) {
-        e instanceof Error && console.error(e);
-        if (this.status !== 'uploading') {
-          return;
-        }
-        switch (this.retry.kind(this.responseStatus)) {
-          case ErrorType.Fatal:
-            this.status = 'error';
-            break;
-          case ErrorType.NotFound:
-            this.url = '';
-            break;
-          case ErrorType.Auth:
-            await this.updateToken().then(() => {});
-            break;
-          default:
-            this.responseStatus >= 400 && (this.offset = undefined);
-            this.status = 'retry';
-            await this.retry.wait();
-        }
-      }
+    while ((this.offset || 0) < this.size) {
+      this.url = this.url || (await this.getFileUrl());
+      this.offset = isNumber(this.offset) ? await this.sendFileContent() : await this.getOffset();
+      this.retryAttempts = 0;
     }
+    this.remaining = 0;
+    this.progress = 100;
+    this.status = 'complete';
   }
 
   /**
@@ -251,6 +224,8 @@ export abstract class Uploader implements UploadState {
   }
 
   private cleanup = () => store.delete(this.uploadId);
+
+  retryCancel: () => void = () => {};
 
   private onProgress(): (evt: ProgressEvent) => void {
     let throttle = 0;

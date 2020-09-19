@@ -9,6 +9,7 @@ import {
   UploadxFactoryOptions,
   UploadxOptions
 } from './options';
+import { ErrorType, RetryHandler } from './retry-handler';
 import { Uploader } from './uploader';
 import { pick } from './utils';
 
@@ -43,10 +44,12 @@ export class UploadxService implements OnDestroy {
   constructor(
     @Optional() @Inject(UPLOADX_OPTIONS) options: UploadxOptions | null,
     @Inject(UPLOADX_FACTORY_OPTIONS) defaults: UploadxFactoryOptions,
-    @Inject(UPLOADX_AJAX) readonly ajax: Ajax,
-    private ngZone: NgZone
+    @Inject(UPLOADX_AJAX) public ajax: Ajax,
+    private ngZone: NgZone,
+    private retry: RetryHandler
   ) {
     this.options = Object.assign({}, defaults, options);
+    this.retry.init(this.options.retryConfig);
     // TODO: add 'offline' status
     // FIXME: online/offline not supported on Windows
     this.subs.push(
@@ -145,6 +148,29 @@ export class UploadxService implements OnDestroy {
     this.queue
       .filter(({ status }) => status === 'queue')
       .slice(0, Math.max(this.options.concurrency - this.runningProcess(), 0))
-      .forEach(uploader => uploader.upload());
+      .forEach(uploader =>
+        uploader.upload().catch(e => {
+          this.onError(e, uploader).then(r => r);
+        })
+      );
   }
+
+  private onError = async (e: unknown, uploader: Uploader): Promise<void> => {
+    console.log(e);
+    uploader.retryAttempts++;
+    const errorType = this.retry.kind(uploader.responseStatus);
+    if (errorType === ErrorType.Fatal || uploader.retryAttempts > this.retry.config.maxAttempts) {
+      uploader.status = 'error';
+      return;
+    } else if (errorType === ErrorType.NotFound) {
+      uploader.url = '';
+    } else if (errorType === ErrorType.Auth) {
+      await uploader.updateToken().catch(r => r);
+    } else {
+      uploader.responseStatus >= 400 && (uploader.offset = undefined);
+      uploader.status = 'retry';
+      await this.retry.wait(uploader.retryAttempts, uploader.retryCancel);
+    }
+    uploader.status = 'queue';
+  };
 }
