@@ -11,7 +11,7 @@ import { UploaderExt } from './uploader-ext.class';
   templateUrl: './service-code-way.component.html'
 })
 export class ServiceCodeWayComponent implements OnDestroy, OnInit {
-  state$!: Observable<UploadState>;
+  state$: Observable<UploadState>;
   uploads: Ufile[] = [];
   options: UploadxOptions = {
     endpoint: `${environment.api}/files?uploadType=uploadx`,
@@ -20,8 +20,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
     uploaderClass: UploaderExt
   };
   numberOfCopies = 0;
-  @ViewChild('file', { read: ElementRef })
-  fileInput!: ElementRef;
+  @ViewChild('file', { read: ElementRef }) fileInput: ElementRef;
 
   private unsubscribe$ = new Subject();
 

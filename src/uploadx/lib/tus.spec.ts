@@ -1,6 +1,5 @@
 import { Tus } from './tus';
 
-// tslint:disable: no-any
 const fileWithType = new File(['123456'], 'filename.txt', { type: 'text/plain' });
 describe('getFileUrl', () => {
   let upx: Tus;

@@ -1,5 +1,4 @@
 import { getRangeEnd, UploaderX } from './uploaderx';
-// tslint:disable: no-any
 
 const fileWithType = new File(['123456'], 'filename.txt', { type: 'text/plain' });
 const fileWithoutType = new File([''], 'filename');

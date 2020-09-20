@@ -10,8 +10,8 @@ import { Ufile } from '../ufile';
   templateUrl: './directive-way.component.html'
 })
 export class DirectiveWayComponent implements OnDestroy {
-  control!: UploadxControlEvent;
-  state$!: Observable<UploadState>;
+  control: UploadxControlEvent;
+  state$: Observable<UploadState>;
   uploads: Ufile[] = [];
   options: UploadxOptions = {
     allowedTypes: 'image/*,video/*',

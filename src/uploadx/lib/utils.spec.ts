@@ -1,6 +1,4 @@
-import { b64, DynamicChunk, isNumber, resolveUrl, unfunc } from './utils';
-
-// tslint:disable: no-any
+import { b64, DynamicChunk, isNumber, isString, resolveUrl, unfunc } from './utils';
 
 const urlTestData = [
   ['https://a/b/c', 'https://d/e/f?g=1', 'https://d/e/f?g=1'],
@@ -38,13 +36,18 @@ describe('b64', () => {
 describe('primitives', () => {
   it('isNumber', () => {
     expect(isNumber(NaN)).toBe(false);
-    expect(isNumber(null as any)).toBe(false);
-    expect(isNumber(false as any)).toBe(false);
-    expect(isNumber(true as any)).toBe(false);
+    expect(isNumber(null)).toBe(false);
+    expect(isNumber(false)).toBe(false);
+    expect(isNumber(true)).toBe(false);
     expect(isNumber('NaN')).toBe(false);
     expect(isNumber('')).toBe(false);
     expect(isNumber(undefined)).toBe(false);
     expect(isNumber(0)).toBe(true);
+  });
+  it('isString', () => {
+    expect(isString(undefined)).toBe(false);
+    expect(isString(1)).toBe(false);
+    expect(isString('1')).toBe(true);
   });
   it('unfunc', () => {
     expect(unfunc(10, 2)).toBe(10);

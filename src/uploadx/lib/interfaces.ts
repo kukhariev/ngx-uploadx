@@ -2,14 +2,7 @@ import { Uploader } from './uploader';
 
 export type Primitive = null | boolean | number | string;
 
-export type ResponseBody =
-  | Primitive
-  | { [key: number]: ResponseBody } // for older ts versions
-  | { [key: string]: ResponseBody };
-
 export type RequestHeaders = Record<string, Primitive | Primitive[]>;
-
-export type Metadata = Record<string, Primitive | Primitive[]>;
 
 export interface RequestOptions {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
@@ -56,7 +49,7 @@ export interface UploadState {
   readonly remaining: number;
 
   /** HTTP response body */
-  readonly response: ResponseBody | undefined;
+  readonly response: any;
 
   /** HTTP response status code */
   readonly responseStatus: number;
@@ -91,7 +84,7 @@ export interface UploadItem {
   /**
    * Custom uploads metadata
    */
-  metadata?: Metadata | ((file?: File) => Metadata);
+  metadata?: Record<string, any> | ((file?: File) => Record<string, any>);
   /**
    * Authorization  token as a `string` or function returning a `string` or `Promise<string>`
    */

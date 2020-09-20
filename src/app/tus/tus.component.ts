@@ -10,8 +10,8 @@ import { Ufile } from '../ufile';
   templateUrl: './tus.component.html'
 })
 export class TusComponent implements OnDestroy {
-  control!: UploadxControlEvent;
-  state$!: Observable<UploadState>;
+  control: UploadxControlEvent;
+  state$: Observable<UploadState>;
   uploads: Ufile[] = [];
 
   options: UploadxOptions = {

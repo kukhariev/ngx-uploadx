@@ -1,7 +1,5 @@
 // tslint:disable: no-bitwise
 
-import { Primitive } from './interfaces';
-
 function safeMatch(base: string, re: RegExp): string {
   return (base.match(re) || [])[0] || '';
 }
@@ -23,16 +21,20 @@ export function unfunc<T, V>(value: T | ((ref: V) => T), ref: V): T {
   return value instanceof Function ? value(ref) : value;
 }
 
-export const noop = <T>(p: T) => p;
+export const noop = (p: any) => p;
 
 export const pick = <T, K extends keyof T>(obj: T, whitelist: K[]): Pick<T, K> => {
-  const result = {} as Pick<T, K>;
+  const result: any = {};
   whitelist.forEach(key => (result[key] = obj[key]));
   return result;
 };
 
-export function isNumber(x?: number | string): x is number {
+export function isNumber(x: any): x is number {
   return x === Number(x);
+}
+
+export function isString(x: any): x is string {
+  return typeof x === 'string';
 }
 
 /**
@@ -62,13 +64,14 @@ export const b64 = {
         .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
         .join('')
     ),
-  serialize: (obj: Record<string, Primitive | Primitive[]>) =>
-    Object.entries(obj)
+  serialize: (obj: Record<string, any>) => {
+    return Object.entries(obj)
       .map(([key, value]) => `${key} ${b64.encode(String(value))}`)
-      .toString(),
+      .toString();
+  },
   parse: (encoded: string) => {
     const kvPairs = encoded.split(',').map(kv => kv.split(' '));
-    const decoded: Record<string, string> = Object.create(null);
+    const decoded = Object.create(null);
     for (const [key, value] of kvPairs) {
       decoded[key] = b64.decode(value);
     }

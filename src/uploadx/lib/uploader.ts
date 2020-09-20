@@ -1,9 +1,6 @@
 import { ErrorHandler, ErrorType } from './error-handler';
 import {
-  Metadata,
-  RequestHeaders,
   RequestOptions,
-  ResponseBody,
   UploadAction,
   UploaderOptions,
   UploadEvent,
@@ -30,15 +27,15 @@ export abstract class Uploader implements UploadState {
   readonly name: string;
   readonly size: number;
   readonly uploadId: string;
-  response: ResponseBody | undefined;
-  responseStatus!: number;
-  progress!: number;
-  remaining!: number;
-  speed!: number;
+  response: any;
+  responseStatus: number;
+  progress: number;
+  remaining: number;
+  speed: number;
   /** Custom headers */
-  headers: RequestHeaders = {};
+  headers: Record<string, any> = {};
   /** Metadata Object */
-  metadata: Metadata;
+  metadata: Record<string, any>;
   /** Upload endpoint */
   endpoint = '/upload';
   /** Chunk size in bytes */
@@ -48,7 +45,7 @@ export abstract class Uploader implements UploadState {
   /** Retries handler */
   protected errorHandler = new ErrorHandler();
   /** Active HttpRequest */
-  protected _xhr!: XMLHttpRequest;
+  protected _xhr: XMLHttpRequest;
   /** byte offset within the whole file */
   protected offset? = 0;
   /** Set HttpRequest responseType */
@@ -70,7 +67,7 @@ export abstract class Uploader implements UploadState {
     this._url = value;
   }
 
-  private _status!: UploadStatus;
+  private _status: UploadStatus;
 
   get status(): UploadStatus {
     return this._status;
@@ -238,7 +235,7 @@ export abstract class Uploader implements UploadState {
   /**
    * Set auth token
    */
-  protected getToken(): Promise<string | void> {
+  protected getToken(): Promise<any> {
     return Promise.resolve(unfunc(this.token || '', this.responseStatus)).then(
       token => token && this.setAuth(token)
     );
@@ -264,7 +261,7 @@ export abstract class Uploader implements UploadState {
       this.responseType && (xhr.responseType = this.responseType);
       this.options.withCredentials && (xhr.withCredentials = true);
       const _headers = { ...this.headers, ...(req.headers || {}) };
-      Object.keys(_headers).forEach(key => xhr.setRequestHeader(key, String(_headers[key])));
+      Object.keys(_headers).forEach(key => xhr.setRequestHeader(key, _headers[key]));
       xhr.onload = (evt: ProgressEvent) => {
         this.responseStatus = xhr.status;
         this.response = this.responseStatus !== 204 ? this.getResponseBody(xhr) : '';
@@ -277,8 +274,8 @@ export abstract class Uploader implements UploadState {
 
   private cleanup = () => store.delete(this.uploadId);
 
-  private getResponseBody(xhr: XMLHttpRequest): ResponseBody {
-    let body = 'response' in (xhr as XMLHttpRequest) ? xhr.response : xhr.responseText;
+  private getResponseBody(xhr: XMLHttpRequest): any {
+    let body = 'response' in (xhr as any) ? xhr.response : xhr.responseText;
     if (body && this.responseType === 'json' && typeof body === 'string') {
       try {
         body = JSON.parse(body);

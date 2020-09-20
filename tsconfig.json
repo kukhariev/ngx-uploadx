@@ -14,8 +14,10 @@
     "paths": {
       "ngx-uploadx": ["src/uploadx/"]
     },
-    "strict": true,
-    "noImplicitReturns": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "strictNullChecks": true,
     "noUnusedLocals": true,
     "typeRoots": ["node_modules/@types"],
     "lib": ["es2017", "dom"]

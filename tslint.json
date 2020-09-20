@@ -17,7 +17,6 @@
         "order": ["static-field", "instance-field", "static-method", "instance-method"]
       }
     ],
-    "no-any": true,
     "no-empty": false,
     "no-console": [true, "debug", "info", "time", "timeEnd", "trace"],
     "no-host-metadata-property": true,

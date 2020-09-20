@@ -11,7 +11,7 @@ import { Ufile } from '../ufile';
   templateUrl: './service-way.component.html'
 })
 export class ServiceWayComponent implements OnDestroy, OnInit {
-  state$!: Observable<UploadState>;
+  state$: Observable<UploadState>;
   uploads: Ufile[] = [];
   options: UploadxOptions = {
     endpoint: `${environment.api}/files?uploadType=uploadx`,
