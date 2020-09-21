@@ -25,6 +25,7 @@ import { build } from 'ng-packagr';
     await build({ project: 'src/uploadx/package.json' });
     await fsp.copyFile('LICENSE', 'dist/uploadx/LICENSE');
     await fsp.copyFile('README.md', 'dist/uploadx/README.md');
+    await fsp.copyFile('CHANGELOG.md', 'dist/uploadx/CHANGELOG.md').catch(() => {});
     await fsp.unlink('src/uploadx/package.json');
   } catch (error) {
     console.error(error);
