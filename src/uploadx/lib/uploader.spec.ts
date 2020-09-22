@@ -1,10 +1,22 @@
-import { ajax } from 'ngx-uploadx';
-
+// tslint:disable: no-any
 // noinspection ES6PreferShortImport
+import { Ajax, AjaxRequestConfig } from './ajax';
 import { UploaderOptions } from './interfaces';
 import { Uploader } from './uploader';
 
-// tslint:disable: no-any
+let serverStatus: number;
+
+const mockAjax: Ajax = {
+  request<T>(
+    config: AjaxRequestConfig
+  ): Promise<{ data: T; status: number; headers: Record<string, string> }> {
+    if (!serverStatus) {
+      return Promise.reject();
+    }
+    return Promise.resolve({ data: ('' as unknown) as T, headers: {}, status: serverStatus });
+  }
+};
+
 function getFile(): File {
   return new File(['-'], 'filename.mp4', { type: 'video/mp4', lastModified: Date.now() });
 }
@@ -17,23 +29,22 @@ let uploader: MockUploader;
 
 export class MockUploader extends Uploader {
   constructor(readonly f: File, readonly opts: UploaderOptions) {
-    super(f, opts, () => {}, ajax);
-  }
-
-  shouldReject(): boolean {
-    return this.responseStatus >= 400 || !this.responseStatus;
+    super(f, opts, () => {}, mockAjax);
   }
 
   async getFileUrl(): Promise<string> {
-    return this.shouldReject() ? Promise.reject() : Promise.resolve('');
+    await this.request({ method: 'POST' });
+    return '/upload/href';
   }
 
   async getOffset(): Promise<number> {
-    return this.shouldReject() ? Promise.reject() : Promise.resolve(this.size);
+    await this.request({ method: 'PUT' });
+    return 0;
   }
 
   async sendFileContent(): Promise<number> {
-    return this.shouldReject() ? Promise.reject() : Promise.resolve(this.size);
+    await this.request({ method: 'PUT' });
+    return this.size;
   }
 }
 
@@ -91,30 +102,33 @@ describe('Uploader', () => {
     });
     it('should retry on 0', async () => {
       const retry = spyOn<any>(uploader.retry, 'wait');
-      uploader.responseStatus = 0;
+      serverStatus = 0;
       await uploader.upload();
+      expect(uploader.responseStatus).toEqual(0);
       expect(retry).toHaveBeenCalledTimes(3);
     });
     it('should error on 400', async () => {
-      uploader.responseStatus = 400;
+      serverStatus = 400;
       await uploader.upload();
+      expect(uploader.responseStatus).toEqual(400);
       expect(uploader.status).toEqual('error');
     });
     it('should updateToken on 401', async () => {
-      uploader.responseStatus = 401;
+      serverStatus = 401;
       const updateToken = spyOn<any>(uploader, 'updateToken').and.callThrough();
       await uploader.upload();
+      expect(uploader.responseStatus).toEqual(401);
       expect(updateToken).toHaveBeenCalled();
     });
     it('should retry on 500', async () => {
-      uploader.responseStatus = 500;
+      serverStatus = 500;
       const retry = spyOn<any>(uploader.retry, 'wait');
       await uploader.upload();
       expect(retry).toHaveBeenCalledTimes(3);
       expect(uploader.status).toEqual('error');
     });
     it('should complete on 200', async () => {
-      uploader.responseStatus = 200;
+      serverStatus = 200;
       const getFileUrl = spyOn(uploader, 'getFileUrl').and.callThrough();
       const getOffset = spyOn(uploader, 'getOffset').and.callThrough();
       const cleanup = spyOn<any>(uploader, 'cleanup').and.callThrough();
@@ -125,7 +139,7 @@ describe('Uploader', () => {
       expect(uploader.status).toEqual('complete');
     });
     it('should complete on 201', async () => {
-      uploader.responseStatus = 201;
+      serverStatus = 201;
       const start = spyOn(uploader, 'upload').and.callThrough();
       const cleanup = spyOn<any>(uploader, 'cleanup').and.callThrough();
       await uploader.upload();
@@ -138,12 +152,14 @@ describe('Uploader', () => {
   describe('prerequest', () => {
     const injected = { headers: { Auth: 'token' } };
     it('sync', async () => {
+      serverStatus = 201;
       uploader = new MockUploader(file, { prerequest: req => ({ ...req, ...injected }) });
       const request = spyOn<any>(uploader.ajax, 'request').and.callThrough();
       await uploader.request({ method: 'POST' });
       expect(request).toHaveBeenCalledWith(jasmine.objectContaining(injected));
     });
     it('async', async () => {
+      serverStatus = 201;
       uploader = new MockUploader(file, {
         prerequest: req => Promise.resolve({ ...req, ...injected })
       });
@@ -152,6 +168,7 @@ describe('Uploader', () => {
       expect(request).toHaveBeenCalledWith(jasmine.objectContaining(injected));
     });
     it('void', async () => {
+      serverStatus = 201;
       uploader = new MockUploader(file, { prerequest: (() => {}) as any });
       const request = spyOn<any>(uploader.ajax, 'request').and.callThrough();
       await uploader.request({ method: 'POST' });
