@@ -1,4 +1,4 @@
-import { Ajax } from 'ngx-uploadx';
+import { Ajax } from './ajax';
 import { getRangeEnd, UploaderX } from './uploaderx';
 // tslint:disable: no-any
 
