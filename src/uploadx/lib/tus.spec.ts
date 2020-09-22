@@ -1,4 +1,4 @@
-import { Ajax } from 'ngx-uploadx';
+import { Ajax } from './ajax';
 import { Tus } from './tus';
 
 // tslint:disable: no-any
