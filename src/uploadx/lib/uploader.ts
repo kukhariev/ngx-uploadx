@@ -19,6 +19,7 @@ const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
   upload: 'queue',
   cancel: 'cancelled'
 };
+
 /**
  * Uploader Base Class
  */
@@ -128,8 +129,7 @@ export abstract class Uploader implements UploadState {
   async upload(): Promise<void> {
     this._status = 'uploading';
     this.startTime = new Date().getTime();
-    while (this.status === 'uploading' || this.status === 'retry') {
-      this.status = 'uploading';
+    while (this.status === 'uploading') {
       try {
         this.url = this.url || (await this.getFileUrl());
         this.offset = isNumber(this.offset) ? await this.sendFileContent() : await this.getOffset();
@@ -147,17 +147,18 @@ export abstract class Uploader implements UploadState {
         switch (this.retry.kind(this.responseStatus)) {
           case ErrorType.Fatal:
             this.status = 'error';
-            break;
+            return;
           case ErrorType.NotFound:
             this.url = '';
             break;
           case ErrorType.Auth:
-            await this.updateToken().then(() => {});
+            await this.updateToken();
             break;
           default:
             this.responseStatus >= 400 && (this.offset = undefined);
             this.status = 'retry';
             await this.retry.wait();
+            this.status = 'uploading';
         }
       }
     }
@@ -166,24 +167,21 @@ export abstract class Uploader implements UploadState {
   /**
    * Performs http requests
    */
-  async request(
-    requestOptions: RequestOptions
-  ): Promise<{ data: string; status: number; headers: Record<string, string> }> {
+  async request(requestOptions: RequestOptions): Promise<void> {
     const { body = null, headers = {}, method, progress, url = this.url } =
       (await this.prerequest(requestOptions)) || requestOptions;
-    const onUploadProgress =
-      body && (body instanceof Blob || progress) ? this.onProgress() : undefined;
     const opts: AjaxRequestConfig = {
       method,
       headers: { ...this.headers, ...headers },
       url,
       data: body,
       responseType: this.responseType || undefined,
-      onUploadProgress,
       canceler: this.canceler,
       withCredentials: !!this.options.withCredentials,
-      validateStatus: code => code < 400
+      validateStatus: () => true
     };
+    opts.onUploadProgress =
+      body && (body instanceof Blob || progress) ? this.onProgress() : undefined;
     this.responseStatus = 0;
     this.response = null;
     this.responseHeaders = {};
@@ -191,7 +189,9 @@ export abstract class Uploader implements UploadState {
     this.response = response.data;
     this.responseHeaders = response.headers;
     this.responseStatus = response.status;
-    return response;
+    if (response.status >= 400) {
+      return Promise.reject();
+    }
   }
 
   /**

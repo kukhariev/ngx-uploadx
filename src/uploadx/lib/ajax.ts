@@ -25,6 +25,14 @@ export interface Ajax {
   ) => Promise<{ data: T; status: number; headers: Record<string, string> }>;
 }
 
+function createXhr(): XMLHttpRequest {
+  return new XMLHttpRequest();
+}
+
+function releaseXhr(xhr: unknown): void {
+  xhr = null;
+}
+
 export const ajax: Ajax = {
   request: <T = string>({
     method,
@@ -34,32 +42,32 @@ export const ajax: Ajax = {
     responseType,
     canceler,
     onUploadProgress,
-    withCredentials = false,
-    validateStatus = () => true
+    withCredentials = false
   }: AjaxRequestConfig): Promise<{
     data: T;
     status: number;
     headers: Record<string, string>;
   }> => {
-    const xhr = new XMLHttpRequest();
+    const xhr = createXhr();
     canceler.onCancel = () => xhr && xhr.readyState !== xhr.DONE && xhr.abort();
     return new Promise((resolve, reject) => {
-      const response = { data: (null as unknown) as T, status: 0, headers: {} };
       xhr.open(method, url, true);
-      responseType && (xhr.responseType = responseType);
+      xhr.responseType = responseType || '';
       withCredentials && (xhr.withCredentials = true);
       Object.keys(headers).forEach(key => xhr.setRequestHeader(key, String(headers[key])));
-      onUploadProgress && (xhr.upload.onprogress = onUploadProgress);
+      xhr.upload.onprogress = onUploadProgress || null;
       xhr.onerror = xhr.ontimeout = xhr.onabort = evt => {
-        ((xhr as unknown) as null) = null;
-        return reject({ ...response, error: evt.type });
+        releaseXhr(xhr);
+        return reject({ error: evt.type, url, method });
       };
       xhr.onload = () => {
-        response.status = xhr.status;
-        response.data = getResponseBody<T>(xhr);
-        response.headers = getResponseHeaders(xhr);
-        ((xhr as unknown) as null) = null;
-        return validateStatus(response.status) ? resolve(response) : reject(response);
+        const response = {
+          data: getResponseBody<T>(xhr),
+          status: xhr.status,
+          headers: getResponseHeaders(xhr)
+        };
+        releaseXhr(xhr);
+        return resolve(response);
       };
       xhr.send(data);
     });
@@ -75,10 +83,7 @@ function getResponseHeaders(xhr: XMLHttpRequest): Record<string, string> {
   }, {});
 }
 
-function getResponseBody<T = string>(
-  xhr: XMLHttpRequest,
-  responseType?: XMLHttpRequestResponseType
-): T {
+function getResponseBody<T = string>(xhr: XMLHttpRequest, responseType?: 'json' | 'text'): T {
   let body = 'response' in (xhr as XMLHttpRequest) ? xhr.response : xhr.responseText;
   if (body && responseType === 'json' && typeof body === 'string') {
     try {
