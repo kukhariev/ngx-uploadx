@@ -96,7 +96,7 @@ export class UploadxService implements OnDestroy {
   }
 
   /**
-   * Create Uploader and add to the queue
+   * Creates loaders for files and adds them to the queue
    */
   handleFiles(files: FileList | File | File[], options = {} as UploadxOptions): void {
     const instanceOptions: UploadxFactoryOptions = { ...this.options, ...options };

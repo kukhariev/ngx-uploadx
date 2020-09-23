@@ -66,25 +66,42 @@ export class AppHomeComponent {
 
 - `allowedTypes` Allowed file types (directive only)
 
-- `multiple` Allow to select multiple files. Default value: `true`
-
 - `autoUpload` Auto start upload when files added. Default value: `true`
 
 - `chunkSize` Set a fixed chunk size. If not specified, the optimal size will be automatically adjusted based on the network speed.
 
 - `concurrency` Set the maximum parallel uploads. Default value: `2`
 
+- `endpoint` URL to create new uploads. Default value: `'/upload'`
+
 - `headers` Headers to be appended to each HTTP request
 
 - `metadata` Custom uploads metadata
 
-- `prerequest` Function called before every request
+- `multiple` Allow selecting multiple files. Default value: `true` (directive only)
 
-- `uploaderClass` Upload API implementation. Built-in: `Uploaderx`(default), `Tus`. More [examples](uploader-examples).
+- `prerequest` Function called before every request [(example)](src/app/on-push/on-push.component.spec.ts)
+
+- `retryConfig` Configure retry settings
 
 - `token` Authorization token as a `string` or function returning a `string` or `Promise<string>`
 
-- `endpoint` URL to create new uploads. Default value: `'/upload'`
+- `uploaderClass` Upload API implementation. Built-in: `UploaderX`(default), `Tus`. More [examples](uploader-examples).
+
+Possible ways to provide options:
+
+- `[uploadx]` directive input
+
+- `init(uploadxOptions)` or `connect(uploadxOptions)` UploadxService methods
+
+- UploadxModule.withConfig
+  ```ts
+  UploadxModule.withConfig(uploadxOptions);
+  ```
+- `UPLOADX_FACTORY_OPTIONS` token
+  ```ts
+  providers: [{ provide: UPLOADX_FACTORY_OPTIONS, useValue: uploadxFactoryOptions }];
+  ```
 
 ## Directives
 
@@ -161,6 +178,7 @@ _Activates the `.uploadx-drop-active` class on DnD operations._
     options: UploadxOptions = {
       endpoint: `${environment.api}/upload?uploadType=uploadx`,
       token:  () => localStorage.getItem('access_token'),
+      headers: { 'ngsw-bypass': 1 }
     }
     constructor(private uploadService: UploadxService) {
       this.uploads$ = this.uploadService.connect(this.options);
@@ -171,13 +189,9 @@ _Activates the `.uploadx-drop-active` class on DnD operations._
 
   Terminate all uploads and clears the queue
 
-- `handleFile(file: File, options?: UploadxOptions): void`
+- `handleFiles(files: FileList | File | File[], options = {} as UploadxOptions): void`
 
-  Create Uploader for the file and add to the queue
-
-- `handleFileList(fileList: FileList, options?: UploadxOptions): void`
-
-  Add files to the upload queue
+  Creates uploaders for files and adds them to the queue
 
 - `control(event: UploadxControlEvent): void`
 
