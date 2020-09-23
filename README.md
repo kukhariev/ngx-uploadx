@@ -80,7 +80,7 @@ export class AppHomeComponent {
 
 - `multiple` Allow selecting multiple files. Default value: `true` (directive only)
 
-- `prerequest` Function called before every request [(example)](src/app/on-push/on-push.component.spec.ts)
+- `prerequest` Function called before every request [(example)](src/app/on-push/on-push.component.ts)
 
 - `retryConfig` Configure retry settings
 
