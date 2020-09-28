@@ -15,7 +15,9 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
   uploads: Ufile[] = [];
   options: UploadxOptions = {
     endpoint: `${environment.api}/files?uploadType=uploadx`,
-    token: () => this.auth.accessToken,
+    prerequest: req => {
+      req.headers.Authorization = `Token ${this.auth.accessToken}`;
+    },
     chunkSize: 2_097_152
   };
   private unsubscribe$ = new Subject();
@@ -25,9 +27,6 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
   ngOnInit(): void {
     this.state$ = this.uploadxService.init(this.options);
     this.state$.pipe(takeUntil(this.unsubscribe$)).subscribe((state: UploadState) => {
-      if (state.status === 'retry' && state.responseStatus === 401) {
-        this.auth.renewToken().subscribe(token => console.log('new accessToken: ', token));
-      }
       const file = this.uploads.find(item => item.uploadId === state.uploadId);
       file ? file.update(state) : this.uploads.push(new Ufile(state));
     });

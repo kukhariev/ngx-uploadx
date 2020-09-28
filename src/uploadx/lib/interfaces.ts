@@ -104,7 +104,7 @@ export interface UploaderOptions extends UploadItem {
   /**
    * Function called before every request
    */
-  prerequest?: (req: RequestOptions) => Promise<RequestOptions> | RequestOptions | void;
+  prerequest?: (req: Required<RequestOptions>) => Promise<RequestOptions> | RequestOptions | void;
 }
 
 export type UploaderClass = new (
