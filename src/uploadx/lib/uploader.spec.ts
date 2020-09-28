@@ -150,29 +150,39 @@ describe('Uploader', () => {
   });
 
   describe('prerequest', () => {
-    const injected = { headers: { Auth: 'token' } };
+    const common = { common: 'true' };
+    const auth = { auth: 'token' };
+    const injected = { headers: auth };
+    const sample = { headers: { ...auth, ...common }, method: 'POST' };
     it('sync', async () => {
       serverStatus = 201;
-      uploader = new MockUploader(file, { prerequest: req => ({ ...req, ...injected }) });
+      uploader = new MockUploader(file, {
+        prerequest: req => ({ ...req, ...injected })
+      });
       const request = spyOn<any>(uploader.ajax, 'request').and.callThrough();
-      await uploader.request({ method: 'POST' });
-      expect(request).toHaveBeenCalledWith(jasmine.objectContaining(injected));
+      await uploader.request({ method: 'POST', headers: common });
+      expect(request).toHaveBeenCalledWith(jasmine.objectContaining(sample));
     });
     it('async', async () => {
       serverStatus = 201;
       uploader = new MockUploader(file, {
+        headers: common,
         prerequest: req => Promise.resolve({ ...req, ...injected })
       });
       const request = spyOn<any>(uploader.ajax, 'request').and.callThrough();
       await uploader.request({ method: 'POST' });
-      expect(request).toHaveBeenCalledWith(jasmine.objectContaining(injected));
+      expect(request).toHaveBeenCalledWith(jasmine.objectContaining(sample));
     });
     it('void', async () => {
       serverStatus = 201;
-      uploader = new MockUploader(file, { prerequest: (() => {}) as any });
+      uploader = new MockUploader(file, {
+        prerequest: req => {
+          req.headers.auth = 'token';
+        }
+      });
       const request = spyOn<any>(uploader.ajax, 'request').and.callThrough();
-      await uploader.request({ method: 'POST' });
-      expect(request).toHaveBeenCalledWith(jasmine.objectContaining({ method: 'POST' }));
+      await uploader.request({ method: 'POST', headers: common });
+      expect(request).toHaveBeenCalledWith(jasmine.objectContaining(sample));
     });
   });
 });
