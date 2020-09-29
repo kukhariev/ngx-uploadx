@@ -11,6 +11,8 @@ export class RequestCanceler {
 }
 
 export interface AjaxRequestConfig extends RequestOptions {
+  // tslint:disable-next-line:no-any
+  [x: string]: any;
   data: BodyInit | null;
   responseType?: 'json' | 'text';
   onUploadProgress?: (evt: ProgressEvent) => void;
@@ -19,10 +21,14 @@ export interface AjaxRequestConfig extends RequestOptions {
   validateStatus: (status: number) => boolean;
 }
 
+export interface AjaxResponse<T> {
+  data: T;
+  status: number;
+  headers: Record<string, string>;
+}
+
 export interface Ajax {
-  request: <T = string>(
-    config: AjaxRequestConfig
-  ) => Promise<{ data: T; status: number; headers: Record<string, string> }>;
+  request: <T = string>(config: AjaxRequestConfig) => Promise<AjaxResponse<T>>;
 }
 
 function createXhr(): XMLHttpRequest {
@@ -43,11 +49,7 @@ export const ajax: Ajax = {
     canceler,
     onUploadProgress,
     withCredentials = false
-  }: AjaxRequestConfig): Promise<{
-    data: T;
-    status: number;
-    headers: Record<string, string>;
-  }> => {
+  }: AjaxRequestConfig): Promise<AjaxResponse<T>> => {
     const xhr = createXhr();
     canceler.onCancel = () => xhr && xhr.readyState !== xhr.DONE && xhr.abort();
     return new Promise((resolve, reject) => {
