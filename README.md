@@ -62,7 +62,9 @@ i    console.log(state);
 - [tus-node-server](https://github.com/tus/tus-node-server)
 - [tusd](https://github.com/tus/tusd)
 
-## Options
+## API
+
+### Options
 
 - `allowedTypes` Allowed file types (directive only)
 
@@ -88,11 +90,11 @@ i    console.log(state);
 
 - `uploaderClass` Upload API implementation. Built-in: `UploaderX`(default), `Tus`. More [examples](uploader-examples).
 
-## UploadxModule
+### UploadxModule
 
-Adds directives and provide static method `withConfig` for global configuration [(example)](src\app\app.module.ts)
+Adds directives and provide static method `withConfig` for global configuration [(example)](src/app/app.module.ts)
 
-## Directives
+### Directives
 
 ```html
 <div uploadxDrop>
@@ -102,7 +104,7 @@ Adds directives and provide static method `withConfig` for global configuration 
 </div>
 ```
 
-### uploadx
+#### uploadx
 
 File input directive
 
@@ -118,7 +120,7 @@ Properties:
 
 - `@Output() state: EventEmitter<UploadState>` Event emitted on upload state change
 
-### uploadxDrop
+#### uploadxDrop
 
 File drop directive.
 
@@ -126,7 +128,7 @@ selector: `uploadxDrop`
 
 _Activates the `.uploadx-drop-active` class on DnD operations._
 
-## UploadxService
+### UploadxService
 
 - `init(options?: UploadxOptions): Observable<UploadState>`
 
@@ -204,13 +206,13 @@ _Activates the `.uploadx-drop-active` class on DnD operations._
 
   Uploads state events
 
-## DI tokens
+### DI tokens
 
 - `UPLOADX_FACTORY_OPTIONS` for override default configuration
 
-- `UPLOADX_OPTIONS` global options
+- `UPLOADX_OPTIONS` for global options
 
-- `UPLOADX_AJAX` override internal ajax request
+- `UPLOADX_AJAX` for override internal ajax lib
 
 ## Run demo
 
