@@ -21,8 +21,7 @@ export class Multer extends Uploader {
     await this.request({
       method: 'POST',
       body: formData,
-      url: this.endpoint,
-      progress: true
+      url: this.endpoint
     });
     this.offset = this.size;
     return '';

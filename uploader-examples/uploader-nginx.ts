@@ -36,8 +36,7 @@ export class NginxUploadModuleUploader extends Uploader {
       method: 'POST',
       body,
       url: this.url,
-      headers,
-      progress: true
+      headers
     });
     return this.getOffsetFromResponse();
   }

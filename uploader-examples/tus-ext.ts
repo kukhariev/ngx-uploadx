@@ -29,8 +29,7 @@ export class TusExt extends Tus {
       method: 'POST',
       url: this.endpoint,
       headers,
-      body,
-      progress: true
+      body
     });
     const location = this.getValueFromResponse('location');
     if (!location) {

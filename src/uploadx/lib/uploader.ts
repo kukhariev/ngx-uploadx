@@ -172,10 +172,9 @@ export abstract class Uploader implements UploadState {
       body: requestOptions.body || null,
       headers: { ...this.headers, ...requestOptions.headers },
       method: requestOptions.method,
-      progress: !!requestOptions.progress,
       url: requestOptions.url || this.url
     };
-    const { body = null, headers, method, progress, url } = (await this.prerequest(req)) || req;
+    const { body = null, headers, method, url } = (await this.prerequest(req)) || req;
     const ajaxRequestConfig: AjaxRequestConfig = {
       method,
       headers: { ...req.headers, ...headers },
@@ -186,8 +185,9 @@ export abstract class Uploader implements UploadState {
       withCredentials: !!this.options.withCredentials,
       validateStatus: () => true
     };
-    ajaxRequestConfig.onUploadProgress =
-      (body && progress) || body instanceof Blob ? this.onProgress() : undefined;
+    if (body && typeof body !== 'string') {
+      ajaxRequestConfig.onUploadProgress = this.onProgress();
+    }
     this.responseStatus = 0;
     this.response = null;
     this.responseHeaders = {};

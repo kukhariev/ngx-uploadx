@@ -15,7 +15,6 @@ export interface RequestOptions {
   body?: BodyInit | null;
   url?: string;
   headers?: RequestHeaders;
-  progress?: boolean;
 }
 
 export type UploadStatus =
