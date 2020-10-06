@@ -1,9 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
+import { Tus, UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../auth.service';
+import { injectDigestHeader } from '../digest';
 import { Ufile } from '../ufile';
 
 @Component({
@@ -13,23 +14,33 @@ import { Ufile } from '../ufile';
 export class ServiceWayComponent implements OnDestroy, OnInit {
   state$!: Observable<UploadState>;
   uploads: Ufile[] = [];
-  options: UploadxOptions = {
-    endpoint: `${environment.api}/files?uploadType=uploadx`,
-    prerequest: req => {
-      req.headers.Authorization = `Token ${this.auth.accessToken}`;
-    },
-    chunkSize: 2_097_152
-  };
   private unsubscribe$ = new Subject();
 
   constructor(private uploadxService: UploadxService, private auth: AuthService) {}
 
   ngOnInit(): void {
-    this.state$ = this.uploadxService.init(this.options);
-    this.state$.pipe(takeUntil(this.unsubscribe$)).subscribe((state: UploadState) => {
-      const file = this.uploads.find(item => item.uploadId === state.uploadId);
-      file ? file.update(state) : this.uploads.push(new Ufile(state));
-    });
+    const endpoint = `${environment.api}/files?uploadType=tus`;
+    this.uploadxService.request({ method: 'OPTIONS', url: endpoint }).then(
+      ({ headers }) => {
+        console.table(headers);
+        const checkSumSupported = 'Tus-Checksum-Algorithm' in headers || true; // debug
+        const options: UploadxOptions = {
+          endpoint,
+          uploaderClass: Tus,
+          token: this.auth.accessToken,
+          prerequest: checkSumSupported ? injectDigestHeader : () => {}
+        };
+        this.state$ = this.uploadxService.init(options);
+        this.state$.pipe(takeUntil(this.unsubscribe$)).subscribe((state: UploadState) => {
+          const file = this.uploads.find(item => item.uploadId === state.uploadId);
+          file ? file.update(state) : this.uploads.push(new Ufile(state));
+        });
+      },
+      e => {
+        console.error(e);
+        this.ngOnInit();
+      }
+    );
   }
 
   ngOnDestroy(): void {
