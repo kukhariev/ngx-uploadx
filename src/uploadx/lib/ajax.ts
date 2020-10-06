@@ -2,7 +2,7 @@ import { InjectionToken } from '@angular/core';
 import { RequestOptions } from './interfaces';
 
 export class RequestCanceler {
-  onCancel: () => void = () => {};
+  onCancel = () => {};
 
   cancel(): void {
     this.onCancel();
@@ -13,12 +13,12 @@ export class RequestCanceler {
 export interface AjaxRequestConfig extends RequestOptions {
   // tslint:disable-next-line:no-any
   [x: string]: any;
-  data: BodyInit | null;
+  data?: BodyInit | null;
   responseType?: 'json' | 'text';
   onUploadProgress?: (evt: ProgressEvent) => void;
-  withCredentials: boolean;
-  canceler: RequestCanceler;
-  validateStatus: (status: number) => boolean;
+  withCredentials?: boolean;
+  canceler?: RequestCanceler;
+  validateStatus?: (status: number) => boolean;
 }
 
 export interface AjaxResponse<T> {
@@ -42,20 +42,22 @@ function releaseXhr(xhr: unknown): void {
 export const ajax: Ajax = {
   request: <T = string>({
     method,
-    data,
+    data = null,
     headers = {},
     url = '/upload',
     responseType,
     canceler,
     onUploadProgress,
-    withCredentials = false
+    withCredentials = false,
+    validateStatus = status => status < 400 && status >= 200
   }: AjaxRequestConfig): Promise<AjaxResponse<T>> => {
     const xhr = createXhr();
-    canceler.onCancel = () => xhr && xhr.readyState !== xhr.DONE && xhr.abort();
+    canceler && (canceler.onCancel = () => xhr && xhr.readyState !== xhr.DONE && xhr.abort());
     return new Promise((resolve, reject) => {
       xhr.open(method, url, true);
-      xhr.responseType = responseType || '';
       withCredentials && (xhr.withCredentials = true);
+      responseType && (xhr.responseType = responseType);
+      responseType === 'json' && (headers.Accept = 'application/json');
       Object.keys(headers).forEach(key => xhr.setRequestHeader(key, String(headers[key])));
       xhr.upload.onprogress = onUploadProgress || null;
       xhr.onerror = xhr.ontimeout = xhr.onabort = evt => {
@@ -69,7 +71,7 @@ export const ajax: Ajax = {
           headers: getResponseHeaders(xhr)
         };
         releaseXhr(xhr);
-        return resolve(response);
+        return validateStatus(response.status) ? resolve(response) : reject(response);
       };
       xhr.send(data);
     });

@@ -180,9 +180,9 @@ export abstract class Uploader implements UploadState {
       headers: { ...req.headers, ...headers },
       url,
       data: body,
-      responseType: this.responseType,
-      canceler: this.requestCanceler,
+      responseType: this.responseType || 'text',
       withCredentials: !!this.options.withCredentials,
+      canceler: this.requestCanceler,
       validateStatus: () => true
     };
     if (body && typeof body !== 'string') {
