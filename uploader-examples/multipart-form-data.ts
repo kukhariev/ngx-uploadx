@@ -21,8 +21,7 @@ export class MultiPartFormData extends Uploader {
     await this.request({
       method: 'POST',
       body: formData,
-      url: this.endpoint,
-      progress: true
+      url: this.endpoint
     });
     this.offset = this.size;
     const location = this.getValueFromResponse('location');

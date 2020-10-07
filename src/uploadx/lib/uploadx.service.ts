@@ -1,7 +1,7 @@
 import { Inject, Injectable, NgZone, OnDestroy, Optional } from '@angular/core';
 import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
-import { Ajax, UPLOADX_AJAX } from './ajax';
+import { Ajax, AjaxRequestConfig, AjaxResponse, UPLOADX_AJAX } from './ajax';
 import { UploadState, UploadxControlEvent } from './interfaces';
 import {
   UPLOADX_FACTORY_OPTIONS,
@@ -128,6 +128,15 @@ export class UploadxService implements OnDestroy {
    */
   runningProcess(): number {
     return this.queue.filter(({ status }) => status === 'uploading' || status === 'retry').length;
+  }
+
+  /**
+   * Performs http requests
+   */
+  async request<T = string>(config: AjaxRequestConfig): Promise<AjaxResponse<T>> {
+    config.data = config.body ? config.body : config.data || null;
+    config.url = config.url || this.options.endpoint;
+    return this.ajax.request(config);
   }
 
   private stateChange = (evt: UploadState) => {

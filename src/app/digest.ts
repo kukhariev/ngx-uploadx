@@ -24,7 +24,7 @@ export async function injectDigestHeader(
 ): Promise<RequestOptions> {
   if (hasher.isSupported && req.body instanceof Blob) {
     const sha = await hasher.getDigest(req.body);
-    Object.assign(req.headers, { Digest: 'sha=' + b64.encode(sha) });
+    Object.assign(req.headers, { 'Upload-Checksum': `sha1 ${b64.encode(sha)}` });
   }
   return req;
 }
