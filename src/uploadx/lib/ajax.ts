@@ -14,7 +14,7 @@ export interface AjaxRequestConfig extends RequestOptions {
   // tslint:disable-next-line:no-any
   [x: string]: any;
   data?: BodyInit | null;
-  responseType?: 'json' | 'text';
+  responseType?: Exclude<XMLHttpRequestResponseType, ''>; // axios/gaxios type compat
   onUploadProgress?: (evt: ProgressEvent) => void;
   withCredentials?: boolean;
   canceler?: RequestCanceler;
@@ -66,7 +66,7 @@ export const ajax: Ajax = {
       };
       xhr.onload = () => {
         const response = {
-          data: getResponseBody<T>(xhr),
+          data: getResponseBody<T>(xhr, responseType === 'json'),
           status: xhr.status,
           headers: getResponseHeaders(xhr)
         };
@@ -87,9 +87,9 @@ function getResponseHeaders(xhr: XMLHttpRequest): Record<string, string> {
   }, {});
 }
 
-function getResponseBody<T = string>(xhr: XMLHttpRequest, responseType?: 'json' | 'text'): T {
+function getResponseBody<T = string>(xhr: XMLHttpRequest, isJson: boolean): T {
   let body = 'response' in (xhr as XMLHttpRequest) ? xhr.response : xhr.responseText;
-  if (body && responseType === 'json' && typeof body === 'string') {
+  if (body && isJson && typeof body === 'string') {
     try {
       body = JSON.parse(body);
     } catch {}
