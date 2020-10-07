@@ -48,7 +48,7 @@ import { UploadxOptions, UploadState } from 'ngx-uploadx';
 export class AppHomeComponent {
   options: UploadxOptions = { endpoint: `[URL]` };
   onUpload(state: UploadState) {
-    console.log(item);
+    console.log(state);
     //...
   }
 }
@@ -62,11 +62,11 @@ export class AppHomeComponent {
 - [tus-node-server](https://github.com/tus/tus-node-server)
 - [tusd](https://github.com/tus/tusd)
 
-## Options
+## API
+
+### UploadxOptions
 
 - `allowedTypes` Allowed file types (directive only)
-
-- `multiple` Allow to select multiple files. Default value: `true`
 
 - `autoUpload` Auto start upload when files added. Default value: `true`
 
@@ -74,19 +74,27 @@ export class AppHomeComponent {
 
 - `concurrency` Set the maximum parallel uploads. Default value: `2`
 
+- `endpoint` URL to create new uploads. Default value: `'/upload'`
+
 - `headers` Headers to be appended to each HTTP request
 
 - `metadata` Custom uploads metadata
 
-- `prerequest` Function called before every request
+- `multiple` Allow selecting multiple files. Default value: `true` (directive only)
 
-- `uploaderClass` Upload API implementation. Built-in: `Uploaderx`(default), `Tus`. More [examples](uploader-examples).
+- `prerequest` Function called before every request [(example)](src/app/service-way/service-way.component.ts)
+
+- `retryConfig` Configure retry settings
 
 - `token` Authorization token as a `string` or function returning a `string` or `Promise<string>`
 
-- `endpoint` URL to create new uploads. Default value: `'/upload'`
+- `uploaderClass` Upload API implementation. Built-in: `UploaderX`(default), `Tus`. More [examples](uploader-examples).
 
-## Directives
+### UploadxModule
+
+Adds directives and provide static method `withConfig` for global configuration [(example)](src/app/app.module.ts)
+
+### Directives
 
 ```html
 <div uploadxDrop>
@@ -96,11 +104,11 @@ export class AppHomeComponent {
 </div>
 ```
 
-### uploadx
+#### uploadx
 
 File input directive
 
-selectors: `[uploadx]` `uploadx`
+selectors: `[uploadx]`, `uploadx`
 
 Properties:
 
@@ -112,7 +120,7 @@ Properties:
 
 - `@Output() state: EventEmitter<UploadState>` Event emitted on upload state change
 
-### uploadxDrop
+#### uploadxDrop
 
 File drop directive.
 
@@ -120,7 +128,7 @@ selector: `uploadxDrop`
 
 _Activates the `.uploadx-drop-active` class on DnD operations._
 
-## UploadxService
+### UploadxService
 
 - `init(options?: UploadxOptions): Observable<UploadState>`
 
@@ -161,6 +169,7 @@ _Activates the `.uploadx-drop-active` class on DnD operations._
     options: UploadxOptions = {
       endpoint: `${environment.api}/upload?uploadType=uploadx`,
       token:  () => localStorage.getItem('access_token'),
+      headers: { 'ngsw-bypass': 1 }
     }
     constructor(private uploadService: UploadxService) {
       this.uploads$ = this.uploadService.connect(this.options);
@@ -171,13 +180,9 @@ _Activates the `.uploadx-drop-active` class on DnD operations._
 
   Terminate all uploads and clears the queue
 
-- `handleFile(file: File, options?: UploadxOptions): void`
+- `handleFiles(files: FileList | File | File[], options = {} as UploadxOptions): void`
 
-  Create Uploader for the file and add to the queue
-
-- `handleFileList(fileList: FileList, options?: UploadxOptions): void`
-
-  Add files to the upload queue
+  Creates uploaders for files and adds them to the upload queue
 
 - `control(event: UploadxControlEvent): void`
 
@@ -193,6 +198,10 @@ _Activates the `.uploadx-drop-active` class on DnD operations._
   }
   ```
 
+- `request<T = string>(config: AjaxRequestConfig): Promise<AjaxResponse<T>>`
+
+  Make HTTP request with `axios` like interface.
+
 - `queue: Uploader[]`
 
   Uploaders array
@@ -200,6 +209,14 @@ _Activates the `.uploadx-drop-active` class on DnD operations._
 - `events: Observable<UploadState>`
 
   Uploads state events
+
+### DI tokens
+
+- `UPLOADX_FACTORY_OPTIONS` for override default configuration
+
+- `UPLOADX_OPTIONS` for global options
+
+- `UPLOADX_AJAX` for override internal ajax lib
 
 ## Run demo
 
