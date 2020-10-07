@@ -48,7 +48,7 @@ import { UploadxOptions, UploadState } from 'ngx-uploadx';
 export class AppHomeComponent {
   options: UploadxOptions = { endpoint: `[URL]` };
   onUpload(state: UploadState) {
-i    console.log(state);
+    console.log(state);
     //...
   }
 }
@@ -64,7 +64,7 @@ i    console.log(state);
 
 ## API
 
-### Options
+### UploadxOptions
 
 - `allowedTypes` Allowed file types (directive only)
 
@@ -82,7 +82,7 @@ i    console.log(state);
 
 - `multiple` Allow selecting multiple files. Default value: `true` (directive only)
 
-- `prerequest` Function called before every request [(example)](src/app/on-push/on-push.component.ts)
+- `prerequest` Function called before every request [(example)](src/app/service-way/service-way.component.ts)
 
 - `retryConfig` Configure retry settings
 
@@ -197,6 +197,10 @@ _Activates the `.uploadx-drop-active` class on DnD operations._
     this.uploadService.control({ token });
   }
   ```
+
+- `request<T = string>(config: AjaxRequestConfig): Promise<AjaxResponse<T>>`
+
+  Make HTTP request with `axios` like interface.
 
 - `queue: Uploader[]`
 
