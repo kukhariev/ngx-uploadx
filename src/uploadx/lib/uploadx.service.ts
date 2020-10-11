@@ -51,12 +51,7 @@ export class UploadxService implements OnDestroy {
     // FIXME: online/offline not supported on Windows
     this.subs.push(
       fromEvent(window, 'online').subscribe(() => this.control({ action: 'upload' })),
-      fromEvent(window, 'offline').subscribe(() => this.control({ action: 'pause' })),
-      this.events.subscribe(({ status }) => {
-        if (status !== 'uploading' && status !== 'added') {
-          this.ngZone.runOutsideAngular(() => this.processQueue());
-        }
-      })
+      fromEvent(window, 'offline').subscribe(() => this.control({ action: 'pause' }))
     );
   }
 
@@ -140,7 +135,10 @@ export class UploadxService implements OnDestroy {
   }
 
   private stateChange = (evt: UploadState) => {
-    setTimeout(() => this.ngZone.run(() => this.eventsStream.next(pick(evt, stateKeys))));
+    this.ngZone.run(() => this.eventsStream.next(pick(evt, stateKeys)));
+    if (evt.status !== 'uploading' && evt.status !== 'added') {
+      this.ngZone.runOutsideAngular(() => setTimeout(() => this.processQueue()));
+    }
   };
 
   private addUploaderInstance(file: File, options: UploadxFactoryOptions): void {
