@@ -1,6 +1,7 @@
 import { Ajax, AjaxRequestConfig, RequestCanceler } from './ajax';
 import {
   Metadata,
+  RequestConfig,
   RequestHeaders,
   RequestOptions,
   ResponseBody,
@@ -50,7 +51,7 @@ export abstract class Uploader implements UploadState {
   /** Set HttpRequest responseType */
   protected responseType?: 'json' | 'text';
   private readonly prerequest: (
-    req: Required<RequestOptions>
+    req: RequestConfig
   ) => Promise<RequestOptions> | RequestOptions | void;
   private startTime!: number;
   private requestCanceler = new RequestCanceler();
@@ -168,13 +169,13 @@ export abstract class Uploader implements UploadState {
    * Performs http requests
    */
   async request(requestOptions: RequestOptions): Promise<void> {
-    const req: Required<RequestOptions> = {
+    const req: RequestConfig = {
       body: requestOptions.body || null,
       headers: { ...this.headers, ...requestOptions.headers },
-      method: requestOptions.method,
+      method: requestOptions.method || 'GET',
       url: requestOptions.url || this.url
     };
-    const { body = null, headers, method, url } = (await this.prerequest(req)) || req;
+    const { body = null, headers, method, url = req.url } = (await this.prerequest(req)) || req;
     const ajaxRequestConfig: AjaxRequestConfig = {
       method,
       headers: { ...req.headers, ...headers },
