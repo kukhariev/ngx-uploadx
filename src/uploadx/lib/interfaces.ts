@@ -4,7 +4,8 @@ import { Uploader } from './uploader';
 
 export type Primitive = null | boolean | number | string;
 
-export type ResponseBody = string | object | null;
+// tslint:disable-next-line:no-any
+export type ResponseBody = any;
 
 export type RequestHeaders = Record<string, Primitive | Primitive[]>;
 
