@@ -10,11 +10,9 @@ Install dependencies:
 
     npm install
 
+Make your changes. Add tests for your changes.
+
 Make sure the tests pass:
-
-    npm test && npm run e2e
-
-Make your change. Add tests for your change. Make the tests pass:
 
     npm run ci
 
@@ -25,5 +23,5 @@ Make your change. Add tests for your change. Make the tests pass:
 Push to your fork and [submit a pull request][pr].
 
 [style]: .prettierrc
-[commit]: https://www.conventionalcommits.org/en/v1.0.0-beta.2/
+[commit]: https://www.conventionalcommits.org/en/v1.0.0/
 [pr]: https://github.com/kukhariev/ngx-uploadx/compare/
