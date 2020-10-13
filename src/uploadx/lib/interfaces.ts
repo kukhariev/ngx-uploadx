@@ -1,4 +1,5 @@
-import { Ajax, RequestCanceler } from './ajax';
+import { Ajax } from './ajax';
+import { Canceler } from './canceler';
 import { RetryConfig } from './retry-handler';
 import { Uploader } from './uploader';
 
@@ -13,7 +14,7 @@ export type Metadata = Record<string, Primitive | Primitive[]>;
 
 export interface RequestConfig {
   body?: BodyInit | null;
-  canceler?: RequestCanceler;
+  canceler?: Canceler;
   headers: RequestHeaders;
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
   onUploadProgress?: (evt: ProgressEvent) => void;

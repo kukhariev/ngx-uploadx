@@ -1,4 +1,5 @@
-import { Ajax, AjaxRequestConfig, RequestCanceler } from './ajax';
+import { Ajax, AjaxRequestConfig } from './ajax';
+import { Canceler } from './canceler';
 import {
   Metadata,
   RequestConfig,
@@ -54,7 +55,7 @@ export abstract class Uploader implements UploadState {
     req: RequestConfig
   ) => Promise<RequestOptions> | RequestOptions | void;
   private startTime!: number;
-  private requestCanceler = new RequestCanceler();
+  private canceler = new Canceler();
 
   private _url = '';
 
@@ -183,7 +184,7 @@ export abstract class Uploader implements UploadState {
       data: body,
       responseType: this.responseType || 'text',
       withCredentials: !!this.options.withCredentials,
-      canceler: this.requestCanceler,
+      canceler: this.canceler,
       validateStatus: () => true
     };
     if (body && typeof body !== 'string') {
@@ -231,7 +232,7 @@ export abstract class Uploader implements UploadState {
 
   protected abort(): void {
     this.offset = undefined;
-    this.requestCanceler.cancel();
+    this.canceler.cancel();
   }
 
   protected async cancel(): Promise<void> {

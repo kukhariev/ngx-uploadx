@@ -1,15 +1,6 @@
 import { InjectionToken } from '@angular/core';
 import { RequestOptions } from './interfaces';
 
-export class RequestCanceler {
-  onCancel = () => {};
-
-  cancel(): void {
-    this.onCancel();
-    this.onCancel = () => {};
-  }
-}
-
 export interface AjaxRequestConfig extends RequestOptions {
   // tslint:disable-next-line:no-any
   [x: string]: any;
