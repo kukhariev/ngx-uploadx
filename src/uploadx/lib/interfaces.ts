@@ -1,4 +1,5 @@
 import { Ajax } from './ajax';
+import { Canceler } from './canceler';
 import { RetryConfig } from './retry-handler';
 import { Uploader } from './uploader';
 
@@ -11,12 +12,19 @@ export type RequestHeaders = Record<string, Primitive | Primitive[]>;
 
 export type Metadata = Record<string, Primitive | Primitive[]>;
 
-export interface RequestOptions {
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
+export interface RequestConfig {
   body?: BodyInit | null;
-  url?: string;
-  headers?: RequestHeaders;
+  canceler: Canceler;
+  headers: RequestHeaders;
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
+  onUploadProgress?: (evt: ProgressEvent) => void;
+  responseType?: 'arraybuffer' | 'blob' | 'document' | 'json' | 'text';
+  url: string;
+  validateStatus?: (status: number) => boolean;
+  withCredentials?: boolean;
 }
+
+export type RequestOptions = Partial<RequestConfig>;
 
 export type UploadStatus =
   | 'added'
@@ -104,7 +112,7 @@ export interface UploaderOptions extends UploadItem {
   /**
    * Function called before every request
    */
-  prerequest?: (req: Required<RequestOptions>) => Promise<RequestOptions> | RequestOptions | void;
+  prerequest?: (req: RequestConfig) => Promise<RequestOptions> | RequestOptions | void;
 }
 
 export type UploaderClass = new (

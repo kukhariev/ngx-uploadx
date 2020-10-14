@@ -1,6 +1,8 @@
-import { Ajax, AjaxRequestConfig, RequestCanceler } from './ajax';
+import { Ajax, AjaxRequestConfig } from './ajax';
+import { Canceler } from './canceler';
 import {
   Metadata,
+  RequestConfig,
   RequestHeaders,
   RequestOptions,
   ResponseBody,
@@ -47,13 +49,13 @@ export abstract class Uploader implements UploadState {
   offset? = 0;
   /** Retries handler */
   retry: RetryHandler;
+  canceler = new Canceler();
   /** Set HttpRequest responseType */
   protected responseType?: 'json' | 'text';
   private readonly prerequest: (
-    req: Required<RequestOptions>
+    req: RequestConfig
   ) => Promise<RequestOptions> | RequestOptions | void;
   private startTime!: number;
-  private requestCanceler = new RequestCanceler();
 
   private _url = '';
 
@@ -168,29 +170,30 @@ export abstract class Uploader implements UploadState {
    * Performs http requests
    */
   async request(requestOptions: RequestOptions): Promise<void> {
-    const req: Required<RequestOptions> = {
+    this.responseStatus = 0;
+    this.response = null;
+    this.responseHeaders = {};
+    const req: RequestConfig = {
       body: requestOptions.body || null,
+      canceler: this.canceler,
       headers: { ...this.headers, ...requestOptions.headers },
-      method: requestOptions.method,
+      method: requestOptions.method || 'GET',
       url: requestOptions.url || this.url
     };
-    const { body = null, headers, method, url } = (await this.prerequest(req)) || req;
+    const { body = null, headers, method, url = req.url } = (await this.prerequest(req)) || req;
     const ajaxRequestConfig: AjaxRequestConfig = {
       method,
       headers: { ...req.headers, ...headers },
       url,
       data: body,
-      responseType: this.responseType || 'text',
+      responseType: this.responseType,
       withCredentials: !!this.options.withCredentials,
-      canceler: this.requestCanceler,
+      canceler: this.canceler,
       validateStatus: () => true
     };
     if (body && typeof body !== 'string') {
       ajaxRequestConfig.onUploadProgress = this.onProgress();
     }
-    this.responseStatus = 0;
-    this.response = null;
-    this.responseHeaders = {};
     const response = await this.ajax.request(ajaxRequestConfig);
     this.response = response.data;
     this.responseHeaders = response.headers;
@@ -230,7 +233,7 @@ export abstract class Uploader implements UploadState {
 
   protected abort(): void {
     this.offset = undefined;
-    this.requestCanceler.cancel();
+    this.canceler.cancel();
   }
 
   protected async cancel(): Promise<void> {

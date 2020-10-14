@@ -1,24 +1,11 @@
 import { InjectionToken } from '@angular/core';
 import { RequestOptions } from './interfaces';
 
-export class RequestCanceler {
-  onCancel = () => {};
-
-  cancel(): void {
-    this.onCancel();
-    this.onCancel = () => {};
-  }
-}
-
 export interface AjaxRequestConfig extends RequestOptions {
   // tslint:disable-next-line:no-any
   [x: string]: any;
   data?: BodyInit | null;
-  responseType?: Exclude<XMLHttpRequestResponseType, ''>; // axios/gaxios type compat
-  onUploadProgress?: (evt: ProgressEvent) => void;
-  withCredentials?: boolean;
-  canceler?: RequestCanceler;
-  validateStatus?: (status: number) => boolean;
+  url: string;
 }
 
 export interface AjaxResponse<T> {
@@ -41,10 +28,10 @@ function releaseXhr(xhr: unknown): void {
 
 export const ajax: Ajax = {
   request: <T = string>({
-    method,
+    method = 'GET',
     data = null,
     headers = {},
-    url = '/upload',
+    url,
     responseType,
     canceler,
     onUploadProgress,

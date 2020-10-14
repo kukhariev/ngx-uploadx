@@ -129,8 +129,7 @@ export class UploadxService implements OnDestroy {
    * Performs http requests
    */
   async request<T = string>(config: AjaxRequestConfig): Promise<AjaxResponse<T>> {
-    config.data = config.body ? config.body : config.data || null;
-    config.url = config.url || this.options.endpoint;
+    config.data = config.body ? config.body : config.data;
     return this.ajax.request(config);
   }
 
