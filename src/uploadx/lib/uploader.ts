@@ -49,13 +49,13 @@ export abstract class Uploader implements UploadState {
   offset? = 0;
   /** Retries handler */
   retry: RetryHandler;
+  canceler = new Canceler();
   /** Set HttpRequest responseType */
   protected responseType?: 'json' | 'text';
   private readonly prerequest: (
     req: RequestConfig
   ) => Promise<RequestOptions> | RequestOptions | void;
   private startTime!: number;
-  private canceler = new Canceler();
 
   private _url = '';
 
@@ -170,8 +170,12 @@ export abstract class Uploader implements UploadState {
    * Performs http requests
    */
   async request(requestOptions: RequestOptions): Promise<void> {
+    this.responseStatus = 0;
+    this.response = null;
+    this.responseHeaders = {};
     const req: RequestConfig = {
       body: requestOptions.body || null,
+      canceler: this.canceler,
       headers: { ...this.headers, ...requestOptions.headers },
       method: requestOptions.method || 'GET',
       url: requestOptions.url || this.url
@@ -182,7 +186,7 @@ export abstract class Uploader implements UploadState {
       headers: { ...req.headers, ...headers },
       url,
       data: body,
-      responseType: this.responseType || 'text',
+      responseType: this.responseType,
       withCredentials: !!this.options.withCredentials,
       canceler: this.canceler,
       validateStatus: () => true
@@ -190,9 +194,6 @@ export abstract class Uploader implements UploadState {
     if (body && typeof body !== 'string') {
       ajaxRequestConfig.onUploadProgress = this.onProgress();
     }
-    this.responseStatus = 0;
-    this.response = null;
-    this.responseHeaders = {};
     const response = await this.ajax.request(ajaxRequestConfig);
     this.response = response.data;
     this.responseHeaders = response.headers;

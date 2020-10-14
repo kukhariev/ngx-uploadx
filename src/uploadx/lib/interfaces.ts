@@ -14,7 +14,7 @@ export type Metadata = Record<string, Primitive | Primitive[]>;
 
 export interface RequestConfig {
   body?: BodyInit | null;
-  canceler?: Canceler;
+  canceler: Canceler;
   headers: RequestHeaders;
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
   onUploadProgress?: (evt: ProgressEvent) => void;
