@@ -85,15 +85,15 @@ interface UploadItem {
   /**
    * Headers to be appended to each HTTP request
    */
-  headers?: RequestHeaders | ((file?: File) => RequestHeaders);
+  headers?: RequestHeaders | ((file: File) => RequestHeaders);
   /**
    * Custom uploads metadata
    */
-  metadata?: Metadata | ((file?: File) => Metadata);
+  metadata?: Metadata | ((file: File) => Metadata);
   /**
    * Authorization  token as a `string` or function returning a `string` or `Promise<string>`
    */
-  token?: string | ((httpStatus?: number) => string | Promise<string>);
+  token?: string | ((httpStatus: number) => string | Promise<string>);
 }
 
 export interface UploadxControlEvent extends UploadItem {

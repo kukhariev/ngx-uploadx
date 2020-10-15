@@ -16,9 +16,8 @@ export class OnPushComponent implements OnDestroy {
   options: UploadxOptions = {
     endpoint: `${environment.api}/files?uploadType=uploadx`,
     prerequest: injectDigestHeader,
-    token: async (httpStatus?: number): Promise<string> => {
-      return httpStatus === 401 ? await this.auth.renewToken().toPromise() : this.auth.accessToken;
-    }
+    token: async (httpStatus?: number): Promise<string> =>
+      httpStatus === 401 ? await this.auth.renewToken().toPromise() : this.auth.accessToken
   };
 
   constructor(private uploadService: UploadxService, private auth: AuthService) {

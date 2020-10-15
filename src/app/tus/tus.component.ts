@@ -15,9 +15,11 @@ export class TusComponent {
   options: UploadxOptions = {
     allowedTypes: 'image/*,video/*',
     endpoint: `${environment.api}/files?uploadType=tus`,
-    // endpoint: `https://master.tus.io/files/`,
     uploaderClass: Tus,
-    chunkSize: 0
+    chunkSize: 0,
+    metadata(file): Record<string, string> {
+      return { original_name: file.name };
+    }
   };
 
   cancel(uploadId?: string): void {
