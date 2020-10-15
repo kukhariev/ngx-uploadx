@@ -8,8 +8,12 @@ import { delay } from 'rxjs/operators';
 export class AuthService {
   accessToken = `token-${new Date().getTime()}`;
 
-  renewToken(): Observable<string> {
+  getToken(): Observable<string> {
     this.accessToken = `token-${new Date().getTime()}`;
     return of(this.accessToken).pipe(delay(400));
+  }
+
+  getTokenAsPromise(): Promise<string> {
+    return this.getToken().toPromise();
   }
 }

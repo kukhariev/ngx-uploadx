@@ -17,12 +17,15 @@ export class OnPushComponent implements OnDestroy {
     endpoint: `${environment.api}/files?uploadType=uploadx`,
     prerequest: injectDigestHeader,
     token: async (httpStatus?: number): Promise<string> =>
-      httpStatus === 401 ? await this.auth.renewToken().toPromise() : this.auth.accessToken
+      httpStatus === 401 ? await this.auth.getTokenAsPromise() : this.auth.accessToken
   };
 
   constructor(private uploadService: UploadxService, private auth: AuthService) {
     this.uploads$ = this.uploadService.connect(this.options);
     this.state$ = this.uploadService.events;
+    // this.auth.getToken().subscribe(token => {
+    //   this.uploadService.control({ token });
+    // });
   }
 
   ngOnDestroy(): void {

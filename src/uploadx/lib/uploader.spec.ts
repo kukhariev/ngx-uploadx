@@ -98,8 +98,9 @@ describe('Uploader', () => {
 
   describe('upload()', () => {
     beforeEach(() => {
-      uploader = new MockUploader(file, { retryConfig: { maxAttempts: 3 } });
+      uploader = new MockUploader(file, { retryConfig: { maxAttempts: 3 }, token: 'token' });
     });
+
     it('should retry on 0', async () => {
       const retry = spyOn<any>(uploader.retry, 'wait');
       serverStatus = 0;
@@ -114,11 +115,11 @@ describe('Uploader', () => {
       expect(uploader.status).toEqual('error');
     });
     it('should updateToken on 401', async () => {
-      serverStatus = 401;
       const updateToken = spyOn<any>(uploader, 'updateToken').and.callThrough();
+      serverStatus = 401;
       await uploader.upload();
       expect(uploader.responseStatus).toEqual(401);
-      expect(updateToken).toHaveBeenCalled();
+      expect(updateToken).toHaveBeenCalledTimes(4);
     });
     it('should retry on 500', async () => {
       serverStatus = 500;
@@ -129,10 +130,12 @@ describe('Uploader', () => {
     });
     it('should complete on 200', async () => {
       serverStatus = 200;
+      const updateToken = spyOn<any>(uploader, 'updateToken').and.callThrough();
       const getFileUrl = spyOn(uploader, 'getFileUrl').and.callThrough();
       const getOffset = spyOn(uploader, 'getOffset').and.callThrough();
       const cleanup = spyOn<any>(uploader, 'cleanup').and.callThrough();
       await uploader.upload();
+      expect(updateToken).toHaveBeenCalledTimes(1);
       expect(getFileUrl).toHaveBeenCalledTimes(1);
       expect(getOffset).toHaveBeenCalledTimes(0);
       expect(cleanup).toHaveBeenCalled();
