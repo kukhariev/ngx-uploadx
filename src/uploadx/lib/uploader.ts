@@ -131,6 +131,7 @@ export abstract class Uploader implements UploadState {
   async upload(): Promise<void> {
     this._status = 'uploading';
     this.startTime = new Date().getTime();
+    await this.updateToken();
     while (this.status === 'uploading') {
       try {
         this.url = this.url || (await this.getFileUrl());
