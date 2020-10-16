@@ -220,8 +220,7 @@ _Activates the `.uploadx-drop-active` class on DnD operations._
 
 ## Run demo
 
-- Start server `npm run server`
-- Run demo app `npm start`
+- Run script `npm run dev`
 - Navigate to `http://localhost:4200/`
 
 ## Build

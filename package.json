@@ -25,6 +25,7 @@
   },
   "scripts": {
     "start": "ng serve",
+    "dev": "run-p start server",
     "lint": "ng lint",
     "test": "ng test --watch=false --progress=false --browsers=ChromeHeadless",
     "e2e": "ng e2e",
@@ -36,8 +37,8 @@
     "test:ng7": "ng build --prod",
     "test:ng10": "npm run setup:ng10 && npm run test --prefix=\"integrations/ng10\"",
     "ci": "npm run lint && npm test && npm run e2e && npm run build && npm run test:integration",
-    "serve:static:ng7": "angular-http-server --path dist/app",
-    "serve:static:ng10": "angular-http-server --path integrations/ng10/dist/ng10"
+    "serve:ng7": "angular-http-server --path dist/app",
+    "serve:ng10": "angular-http-server --path integrations/ng10/dist/ng10"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.13.10",
@@ -71,6 +72,7 @@
     "lint-staged": "10.2.0",
     "ng-packagr": "^5.7.1",
     "node-uploadx": "^4.1.6",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.1.0",
     "protractor": "~7.0.0",
     "rimraf": "^3.0.2",
