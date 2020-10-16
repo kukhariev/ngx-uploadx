@@ -24,8 +24,8 @@
     "node": ">=10.13.0"
   },
   "scripts": {
-    "start": "ng serve",
-    "dev": "run-p start server",
+    "serve:dev": "ng serve",
+    "start": "run-p serve:dev server",
     "lint": "ng lint",
     "test": "ng test --watch=false --progress=false --browsers=ChromeHeadless",
     "e2e": "ng e2e",
