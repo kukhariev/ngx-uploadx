@@ -6,10 +6,11 @@ import { delay } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthService {
-  accessToken = `token-${new Date().getTime()}`;
+  accessToken = `${new Date().getTime()}`;
 
   getToken(): Observable<string> {
-    this.accessToken = `token-${new Date().getTime()}`;
+    this.accessToken = `${new Date().getTime()}`;
+    localStorage.setItem('token', this.accessToken);
     return of(this.accessToken).pipe(delay(400));
   }
 

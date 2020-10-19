@@ -1,15 +1,19 @@
 import { NgZone } from '@angular/core';
 import { Ajax } from './ajax';
 import { UploadAction } from './interfaces';
-import { UploadxOptions } from './options';
+import { UploadxFactoryOptions, UploadxOptions } from './options';
 import { UploaderX } from './uploaderx';
 import { UploadxService } from './uploadx.service';
 
-const defaultOptions = {
+const defaultOptions: UploadxFactoryOptions = {
   endpoint: '/upload',
   autoUpload: true,
   concurrency: 2,
-  uploaderClass: UploaderX
+  uploaderClass: UploaderX,
+  authorize: (req, token) => {
+    token && (req.headers.Authorization = `Bearer ${token}`);
+    return req;
+  }
 };
 
 class MockUploader extends UploaderX {

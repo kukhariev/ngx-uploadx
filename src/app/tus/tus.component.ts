@@ -17,6 +17,11 @@ export class TusComponent {
     endpoint: `${environment.api}/files?uploadType=tus`,
     uploaderClass: Tus,
     chunkSize: 0,
+    authorize: req => {
+      const token = localStorage.getItem('token');
+      token && (req.headers.Authorization = `Token ${token}`);
+      return req;
+    },
     metadata(file): Record<string, string> {
       return { original_name: file.name };
     }

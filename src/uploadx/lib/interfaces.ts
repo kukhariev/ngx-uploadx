@@ -25,6 +25,12 @@ export interface RequestConfig {
 }
 
 export type RequestOptions = Partial<RequestConfig>;
+export type AuthorizeRequest = (
+  req: RequestConfig,
+  token?: string
+) => RequestConfig | Promise<RequestConfig>;
+
+export type PreRequest = (req: RequestConfig) => Promise<RequestOptions> | RequestOptions | void;
 
 export type UploadStatus =
   | 'added'
@@ -112,7 +118,11 @@ export interface UploaderOptions extends UploadItem {
   /**
    * Function called before every request
    */
-  prerequest?: (req: RequestConfig) => Promise<RequestOptions> | RequestOptions | void;
+  prerequest?: PreRequest;
+  /**
+   * Function used to apply authorization token
+   */
+  authorize?: AuthorizeRequest;
 }
 
 export type UploaderClass = new (

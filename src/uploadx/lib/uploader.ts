@@ -1,6 +1,7 @@
 import { Ajax, AjaxRequestConfig } from './ajax';
 import { Canceler } from './canceler';
 import {
+  AuthorizeRequest,
   Metadata,
   RequestConfig,
   RequestHeaders,
@@ -56,7 +57,7 @@ export abstract class Uploader implements UploadState {
     req: RequestConfig
   ) => Promise<RequestOptions> | RequestOptions | void;
   private startTime!: number;
-
+  private _token!: string;
   private _url = '';
 
   get url(): string {
@@ -111,6 +112,7 @@ export abstract class Uploader implements UploadState {
     this.uploadId = createHash(print).toString(16);
     this.prerequest = options.prerequest || (() => {});
     this.chunkSize = options.chunkSize || this.size;
+    this.authorize = options.authorize || (req => req);
     this.configure(options);
   }
 
@@ -132,7 +134,8 @@ export abstract class Uploader implements UploadState {
     this._status = 'uploading';
     this.startTime = new Date().getTime();
     await this.updateToken();
-    while (this.status === 'uploading') {
+    while (this.status === 'uploading' || this.status === 'retry') {
+      this.status = 'uploading';
       try {
         this.url = this.url || (await this.getFileUrl());
         this.offset = isNumber(this.offset) ? await this.sendFileContent() : await this.getOffset();
@@ -161,7 +164,6 @@ export abstract class Uploader implements UploadState {
             this.responseStatus >= 400 && (this.offset = undefined);
             this.status = 'retry';
             await this.retry.wait();
-            this.status = 'uploading';
         }
       }
     }
@@ -174,13 +176,14 @@ export abstract class Uploader implements UploadState {
     this.responseStatus = 0;
     this.response = null;
     this.responseHeaders = {};
-    const req: RequestConfig = {
+    let req: RequestConfig = {
       body: requestOptions.body || null,
       canceler: this.canceler,
       headers: { ...this.headers, ...requestOptions.headers },
       method: requestOptions.method || 'GET',
       url: requestOptions.url || this.url
     };
+    req = await this.authorize(req, this._token);
     const { body = null, headers, method, url = req.url } = (await this.prerequest(req)) || req;
     const ajaxRequestConfig: AjaxRequestConfig = {
       method,
@@ -205,13 +208,12 @@ export abstract class Uploader implements UploadState {
   }
 
   /**
-   * Set auth token
+   * Set auth token cache
    */
   updateToken = async (): Promise<string | void> => {
-    if (this.token) {
-      this.setAuth(await unfunc(this.token, this.responseStatus));
-    }
+    this._token = await unfunc(this.token || '', this.responseStatus);
   };
+  protected authorize: AuthorizeRequest = req => req;
 
   /**
    * Get file URI
@@ -227,10 +229,6 @@ export abstract class Uploader implements UploadState {
    * Get an offset for the next request
    */
   protected abstract getOffset(): Promise<number | undefined>;
-
-  protected setAuth(token: string): void {
-    this.headers.Authorization = `Bearer ${token}`;
-  }
 
   protected abort(): void {
     this.offset = undefined;

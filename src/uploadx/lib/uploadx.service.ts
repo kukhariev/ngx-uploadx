@@ -47,8 +47,7 @@ export class UploadxService implements OnDestroy {
     private ngZone: NgZone
   ) {
     this.options = Object.assign({}, defaults, options);
-    // TODO: add 'offline' status
-    // FIXME: online/offline not supported on Windows
+    // TODO: add 'offline' status?
     this.subs.push(
       fromEvent(window, 'online').subscribe(() => this.control({ action: 'upload' })),
       fromEvent(window, 'offline').subscribe(() => this.control({ action: 'pause' }))
