@@ -1,5 +1,5 @@
 import { InjectionToken } from '@angular/core';
-import { UploaderClass, UploaderOptions } from './interfaces';
+import { AuthorizeRequest, UploaderClass, UploaderOptions } from './interfaces';
 import { UploaderX } from './uploaderx';
 
 /**
@@ -37,13 +37,18 @@ export interface UploadxFactoryOptions extends UploadxOptions {
   autoUpload: boolean;
   concurrency: number;
   uploaderClass: UploaderClass;
+  authorize: AuthorizeRequest;
 }
 
 const defaultOptions: UploadxFactoryOptions = {
   endpoint: '/upload',
   autoUpload: true,
   concurrency: 2,
-  uploaderClass: UploaderX
+  uploaderClass: UploaderX,
+  authorize: (req, token) => {
+    token && (req.headers.Authorization = `Bearer ${token}`);
+    return req;
+  }
 };
 
 export const UPLOADX_FACTORY_OPTIONS = new InjectionToken<UploadxFactoryOptions>(
