@@ -68,6 +68,8 @@ export class AppHomeComponent {
 
 - `allowedTypes` Allowed file types (directive only)
 
+- `authorize` Function used to apply authorization token [(example)](src/app/on-push/on-push.component.ts)
+
 - `autoUpload` Auto start upload when files added. Default value: `true`
 
 - `chunkSize` Set a fixed chunk size. If not specified, the optimal size will be automatically adjusted based on the network speed.
