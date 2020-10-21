@@ -31,7 +31,7 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
           prerequest: checkSumSupported ? injectDigestHeader : () => {}
         };
         this.state$ = this.uploadxService.init(options);
-        this.state$.pipe(takeUntil(this.unsubscribe$)).subscribe((state: UploadState) => {
+        this.state$.pipe(takeUntil(this.unsubscribe$)).subscribe(state => {
           const file = this.uploads.find(item => item.uploadId === state.uploadId);
           file ? file.update(state) : this.uploads.push(new Ufile(state));
         });
