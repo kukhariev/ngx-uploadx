@@ -1,4 +1,4 @@
-import { UploadxAjax } from 'ngx-uploadx';
+import { UploadxAjax } from './ajax';
 
 const data = { key0: '0', key1: '1' };
 const mockXHR = ({
@@ -26,6 +26,7 @@ const mockXHR = ({
   statusText: 'OK',
   timeout: 0,
   withCredentials: false,
+  upload: { onprogress: (evt: ProgressEvent) => {} },
   abort(): void {},
   open(): void {},
   send: () => {
