@@ -44,7 +44,7 @@ export const ajax: Ajax = {
       xhr.open(method, url, true);
       withCredentials && (xhr.withCredentials = true);
       responseType && (xhr.responseType = responseType);
-      responseType === 'json' && (headers.Accept = 'application/json');
+      responseType === 'json' && !headers.Accept && (headers.Accept = 'application/json');
       Object.keys(headers).forEach(key => xhr.setRequestHeader(key, String(headers[key])));
       xhr.upload.onprogress = onUploadProgress || null;
       xhr.onerror = xhr.ontimeout = xhr.onabort = evt => {
