@@ -3,6 +3,7 @@ import { Canceler } from './canceler';
 import {
   AuthorizeRequest,
   Metadata,
+  PreRequest,
   RequestConfig,
   RequestHeaders,
   RequestOptions,
@@ -53,9 +54,8 @@ export abstract class Uploader implements UploadState {
   canceler = new Canceler();
   /** Set HttpRequest responseType */
   protected responseType?: 'json' | 'text';
-  private readonly prerequest: (
-    req: RequestConfig
-  ) => Promise<RequestOptions> | RequestOptions | void;
+  private readonly _authorize: AuthorizeRequest;
+  private readonly _prerequest: PreRequest;
   private startTime!: number;
   private _token!: string;
   private _url = '';
@@ -110,9 +110,9 @@ export abstract class Uploader implements UploadState {
       endpoint: options.endpoint
     });
     this.uploadId = createHash(print).toString(16);
-    this.prerequest = options.prerequest || (() => {});
     this.chunkSize = options.chunkSize || this.size;
-    this.authorize = options.authorize || (req => req);
+    this._prerequest = options.prerequest || (req => req);
+    this._authorize = options.authorize || (req => req);
     this.configure(options);
   }
 
@@ -183,8 +183,8 @@ export abstract class Uploader implements UploadState {
       method: requestOptions.method || 'GET',
       url: requestOptions.url || this.url
     };
-    req = await this.authorize(req, this._token);
-    const { body = null, headers, method, url = req.url } = (await this.prerequest(req)) || req;
+    req = await this._authorize(req, this._token);
+    const { body = null, headers, method, url = req.url } = (await this._prerequest(req)) || req;
     const ajaxRequestConfig: AjaxRequestConfig = {
       method,
       headers: { ...req.headers, ...headers },
@@ -213,7 +213,6 @@ export abstract class Uploader implements UploadState {
   updateToken = async (): Promise<string | void> => {
     this._token = await unfunc(this.token || '', this.responseStatus);
   };
-  protected authorize: AuthorizeRequest = req => req;
 
   /**
    * Get file URI
