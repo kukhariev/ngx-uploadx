@@ -131,3 +131,5 @@ export type UploaderClass = new (
   stateChange: (evt: UploadState) => void,
   ajax: Ajax
 ) => Uploader;
+
+export type Writable<T> = { -readonly [K in keyof T]: T[K] };

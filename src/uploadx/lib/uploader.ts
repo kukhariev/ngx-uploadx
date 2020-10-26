@@ -16,7 +16,7 @@ import {
 } from './interfaces';
 import { ErrorType, RetryHandler } from './retry-handler';
 import { store } from './store';
-import { createHash, DynamicChunk, isNumber, unfunc } from './utils';
+import { DynamicChunk, isNumber, unfunc } from './utils';
 
 const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
   pause: 'paused',
@@ -30,7 +30,7 @@ const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
 export abstract class Uploader implements UploadState {
   name: string;
   readonly size: number;
-  readonly uploadId: string;
+  readonly uploadId!: string;
   response: ResponseBody = null;
   responseStatus = 0;
   responseHeaders: Record<string, string> = {};
@@ -104,12 +104,6 @@ export abstract class Uploader implements UploadState {
       lastModified:
         file.lastModified || (file as File & { lastModifiedDate: Date }).lastModifiedDate.getTime()
     };
-    const print = JSON.stringify({
-      ...this.metadata,
-      type: this.constructor.name,
-      endpoint: options.endpoint
-    });
-    this.uploadId = createHash(print).toString(16);
     this.chunkSize = options.chunkSize || this.size;
     this._prerequest = options.prerequest || (req => req);
     this._authorize = options.authorize || (req => req);

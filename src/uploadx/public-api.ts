@@ -11,3 +11,4 @@ export * from './lib/uploadx-drop.directive';
 export * from './lib/uploadx.directive';
 export * from './lib/options';
 export * from './lib/canceler';
+export * from './lib/id.service';

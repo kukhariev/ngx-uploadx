@@ -2,7 +2,8 @@ import { Inject, Injectable, NgZone, OnDestroy, Optional } from '@angular/core';
 import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { debounceTime, map, startWith } from 'rxjs/operators';
 import { Ajax, AjaxRequestConfig, AjaxResponse, UPLOADX_AJAX } from './ajax';
-import { UploadState, UploadxControlEvent } from './interfaces';
+import { IdService } from './id.service';
+import { UploadState, UploadxControlEvent, Writable } from './interfaces';
 import {
   UPLOADX_FACTORY_OPTIONS,
   UPLOADX_OPTIONS,
@@ -46,7 +47,8 @@ export class UploadxService implements OnDestroy {
     @Optional() @Inject(UPLOADX_OPTIONS) options: UploadxOptions | null,
     @Inject(UPLOADX_FACTORY_OPTIONS) defaults: UploadxFactoryOptions,
     @Inject(UPLOADX_AJAX) readonly ajax: Ajax,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private idService: IdService
   ) {
     this.options = Object.assign({}, defaults, options);
     // TODO: add 'offline' status?
@@ -142,8 +144,9 @@ export class UploadxService implements OnDestroy {
     }
   };
 
-  private addUploaderInstance(file: File, options: UploadxFactoryOptions): void {
+  private async addUploaderInstance(file: File, options: UploadxFactoryOptions): Promise<void> {
     const uploader = new options.uploaderClass(file, options, this.stateChange, this.ajax);
+    (uploader.uploadId as Writable<string>) = await this.idService.generateId(uploader);
     this.queue.push(uploader);
     uploader.status = options.autoUpload && window.navigator.onLine ? 'queue' : 'added';
   }

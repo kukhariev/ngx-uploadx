@@ -1,15 +1,27 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Tus, UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
+import { IdService, Tus, UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../auth.service';
-import { injectDigestHeader } from '../digest';
+import { hasher, injectDigestHeader } from '../digest';
 import { Ufile } from '../ufile';
 
+export class CustomId implements IdService {
+  async generateId(uploader: Tus): Promise<string> {
+    // if (uploader.file.size < 256) {
+    //   return new Date().getTime().toString(36);
+    // }
+    const blob = uploader.file.slice(0, 256);
+    return await hasher.getDigest(blob);
+  }
+}
+
+// tslint:disable-next-line:max-classes-per-file
 @Component({
   selector: 'app-service-way',
-  templateUrl: './service-way.component.html'
+  templateUrl: './service-way.component.html',
+  providers: [UploadxService, { provide: IdService, useClass: CustomId }]
 })
 export class ServiceWayComponent implements OnDestroy, OnInit {
   state$!: Observable<UploadState>;
