@@ -1,6 +1,6 @@
 import { Inject, Injectable, NgZone, OnDestroy, Optional } from '@angular/core';
 import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { debounceTime, map, startWith } from 'rxjs/operators';
 import { Ajax, AjaxRequestConfig, AjaxResponse, UPLOADX_AJAX } from './ajax';
 import { UploadState, UploadxControlEvent } from './interfaces';
 import {
@@ -26,6 +26,8 @@ const stateKeys: Array<keyof UploadState> = [
   'uploadId',
   'url'
 ];
+
+const DUE_TIME = 5;
 
 @Injectable({ providedIn: 'root' })
 export class UploadxService implements OnDestroy {
@@ -71,8 +73,9 @@ export class UploadxService implements OnDestroy {
    */
   connect(options?: UploadxOptions): Observable<Uploader[]> {
     return this.init(options).pipe(
-      startWith({} as UploadState),
-      map(() => this.queue)
+      startWith(null),
+      map(() => this.queue),
+      debounceTime(DUE_TIME)
     );
   }
 
