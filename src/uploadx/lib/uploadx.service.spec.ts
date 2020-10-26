@@ -1,4 +1,6 @@
 import { NgZone } from '@angular/core';
+import { IdService } from 'ngx-uploadx';
+import { Subscription } from 'rxjs';
 import { Ajax } from './ajax';
 import { UploadAction } from './interfaces';
 import { UploadxFactoryOptions, UploadxOptions } from './options';
@@ -49,12 +51,14 @@ function getFile(): File {
   return new File([''], 'filename.mp4');
 }
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 describe('UploadxService', () => {
   let service: UploadxService;
+  let sub: Subscription;
   beforeEach(() => {
-    service = new UploadxService(null, defaultOptions, {} as Ajax, new NgZone({}));
+    service = new UploadxService(null, defaultOptions, {} as Ajax, new NgZone({}), new IdService());
+  });
+  afterEach(() => {
+    sub && sub.unsubscribe();
   });
 
   it('should set default options', () => {
@@ -82,59 +86,56 @@ describe('UploadxService', () => {
     expect(service.options.chunkSize).toEqual(4096);
   });
 
-  it('should add 4 files to queue', () => {
-    const fileList = getFilelist();
-    service.connect(options);
-    service.handleFiles(fileList);
-    expect(service.queue.length).toEqual(4);
-    service.disconnect();
-    expect(service.queue.length).toEqual(0);
-  });
-
-  it('should add file to queue with status `added`', () => {
+  it('should add file to queue with status `added`', done => {
     const file = getFile();
-    service.connect(options);
+    sub = service.init(options).subscribe(({ status }) => {
+      expect(status).toEqual('added');
+      done();
+    });
     service.handleFiles(file);
-    expect(service.queue[0].status).toEqual('added');
-    service.disconnect();
   });
 
-  it('should set correct status on `control` method call', () => {
+  it('should add file to queue with status `queue`', done => {
     const file = getFile();
-    service.connect(options);
+    sub = service.init({ ...options, autoUpload: true }).subscribe(({ status }) => {
+      expect(status).toEqual('queue');
+      done();
+    });
     service.handleFiles(file);
-    const upload = service.queue[0];
-    service.control({ action: 'pause' });
-    expect(service.queue[0].status).toEqual('paused');
-    service.control({ action: 'upload' });
-    expect(service.queue[0].status).toEqual('queue');
-    service.control({ ...upload, action: 'pause' });
-    expect(service.queue[0].status).toEqual('paused');
-    service.control({ ...upload, action: 'upload' });
-    expect(service.queue[0].status).toEqual('queue');
-    service.control({ ...upload, action: 'cancel' });
-    service.control({ action: 'cancel' });
-    service.control({ action: '???' as UploadAction });
-    expect(service.queue[0].status).toEqual('cancelled');
-    service.control({ action: 'upload' });
-    expect(service.queue[0].status).toEqual('cancelled');
   });
 
-  it('should add file to queue with status `queue`', () => {
-    const file = getFile();
-    service.connect({ ...options, autoUpload: true });
-    service.handleFiles(file);
-    expect(service.queue[0].status).toEqual('queue');
-    service.disconnect();
-  });
-
-  it('should limit concurrent uploads', async () => {
-    service.connect({ ...options, autoUpload: true });
+  it('should set correct status on `control` method call', done => {
+    sub = service.connect({ ...options, autoUpload: true }).subscribe(queue => {
+      if (queue.length === 4) {
+        const upload = service.queue[0];
+        service.control({ action: 'pause' });
+        expect(upload.status).toEqual('paused');
+        service.control({ action: 'upload' });
+        expect(upload.status).toEqual('queue');
+        service.control({ ...upload, action: 'pause' });
+        expect(upload.status).toEqual('paused');
+        service.control({ ...upload, action: 'upload' });
+        expect(upload.status).toEqual('queue');
+        service.control({ ...upload, action: 'cancel' });
+        service.control({ action: 'cancel' });
+        service.control({ action: '???' as UploadAction });
+        expect(upload.status).toEqual('cancelled');
+        service.control({ action: 'upload' });
+        expect(upload.status).toEqual('cancelled');
+        done();
+      }
+    });
     service.handleFiles(getFilelist());
-    await delay(1);
-    expect(service.queue.map(f => f.status).filter(s => s !== 'queue').length).toEqual(3);
-    expect(service.queue[3].status).toEqual('queue');
-    service.disconnect();
+  });
+
+  it('should limit concurrent uploads', async done => {
+    sub = service.connect({ ...options, autoUpload: true }).subscribe(queue => {
+      if (queue.length === 4) {
+        expect(queue.map(({ status }) => status).filter(s => s === 'uploading').length).toEqual(3);
+        done();
+      }
+    });
+    service.handleFiles(getFilelist());
   });
 
   it('should listen offline/online events', () => {
