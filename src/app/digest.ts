@@ -1,14 +1,14 @@
 import { b64, Canceler, RequestConfig, Uploader } from 'ngx-uploadx';
 
-const hasher = {
+export const hasher = {
   isSupported: window.crypto && !!window.crypto.subtle,
   async sha(data: ArrayBuffer): Promise<string> {
     return this.hex(await crypto.subtle.digest('SHA-1', data));
   },
-  getDigest(body: Blob, canceler: Canceler): Promise<string> {
+  getDigest(body: Blob, canceler?: Canceler): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      canceler.onCancel = () => reject(reader.abort());
+      canceler && (canceler.onCancel = () => reject(reader.abort()));
       reader.onload = async () => resolve(await this.sha(reader.result as ArrayBuffer));
       reader.onerror = reject;
       reader.readAsArrayBuffer(body);
