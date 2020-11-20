@@ -14,7 +14,7 @@ export class DirectiveWayComponent {
   options: UploadxOptions = {
     allowedTypes: 'image/*,video/*',
     endpoint: `${environment.api}/files?uploadType=uploadx`,
-    token: localStorage.getItem('token') || ''
+    token: localStorage.getItem('token') || 'token'
   };
 
   cancel(uploadId?: string): void {
