@@ -21,7 +21,7 @@
   "license": "MIT",
   "private": true,
   "engines": {
-    "node": ">=10.13.0"
+    "node": ">=12.12.0"
   },
   "scripts": {
     "serve:dev": "ng serve",
@@ -31,14 +31,13 @@
     "e2e": "ng e2e",
     "server": "node ./server/ --debug",
     "build": "node ./scripts/build.js",
-    "setup:ng10": "node ./scripts/ng10.js",
     "prettier": "prettier --write \"**/*.{js,json,scss,md,ts,html}\"",
-    "test:integration": "npm run test:ng7 && npm run test:ng10",
-    "test:ng7": "ng build --prod",
-    "test:ng10": "npm run setup:ng10 && npm run test --prefix=\"integrations/ng10\"",
-    "ci": "npm run lint && npm test && npm run e2e && npm run build && npm run test:integration",
+    "test:integration": "run-s -sn build:**",
+    "build:prod": "ng build --prod",
+    "build:apps": "node scripts/runner.js \"ng build --prod\"",
+    "ci": "run-s lint test e2e build test:integration",
     "serve:ng7": "angular-http-server --path dist/app",
-    "serve:ng10": "angular-http-server --path integrations/ng10/dist/ng10"
+    "serve:latest": "angular-http-server --path integrations/latest/dist/latest"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.13.10",
@@ -56,7 +55,7 @@
     "@types/cpx": "^1.5.1",
     "@types/jasmine": "~3.5.11",
     "@types/jasminewd2": "~2.0.8",
-    "@types/node": "^10.17.26",
+    "@types/node": "^12.18.1",
     "@uploadx/core": "^4.2.0",
     "angular-http-server": "^1.9.0",
     "codelyzer": "^5.2.2",
