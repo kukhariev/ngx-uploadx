@@ -1,18 +1,24 @@
 //@ts-check
+const args = process.argv.slice(2);
+const cmd = args[0] && args[0].trim();
 const { execSync } = require('child_process');
 const { copySync } = require('cpx');
 const { writeFileSync, copyFileSync, promises } = require('fs');
 const { join, resolve } = require('path');
 
-const rootDir = resolve(`${__dirname}/..`);
-const integrationsPath = resolve(rootDir, `integrations`);
+const baseDir = resolve(`${__dirname}/..`);
+const integrationsPath = resolve(baseDir, `integrations`);
 
-const buildCmd = 'ng build --prod';
+const testCmd = cmd || 'ng build --prod';
 
-function buildProject(path = rootDir) {
-  console.info(`- Building project "${path}"...`);
-  execSync(buildCmd, { cwd: path, stdio: [0, 1, 2] });
-  console.info(`√ Building project complete.\n`);
+if (baseDir !== process.cwd()) {
+  process.chdir(baseDir);
+}
+
+function testProject(path = baseDir) {
+  console.info(`- Running "${testCmd}" for "${path}"`);
+  execSync(testCmd, { cwd: path, stdio: [0, 1, 2] });
+  console.info(`√ Complete.\n`);
 }
 
 /**
@@ -57,13 +63,13 @@ async function scanProjects() {
 async function processing() {
   let exitCode = 0;
   try {
-    buildProject();
+    // testProject();
 
     const projects = await scanProjects();
     for (const project of projects) {
       try {
         prepareProject(project);
-        buildProject(project);
+        testProject(project);
       } catch (e) {
         console.error(e);
         exitCode = exitCode || 1;
@@ -71,7 +77,7 @@ async function processing() {
     }
   } catch (e) {
     console.error(e);
-    exitCode = exitCode || 1;
+    exitCode = 1;
   }
 
   process.exit(exitCode);

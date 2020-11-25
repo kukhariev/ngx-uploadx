@@ -34,7 +34,7 @@
     "prettier": "prettier --write \"**/*.{js,json,scss,md,ts,html}\"",
     "test:integration": "run-s -sn build:**",
     "build:prod": "ng build --prod",
-    "build:apps": "node ./scripts/build-apps.js",
+    "build:apps": "node scripts/runner.js \"ng build --prod\"",
     "ci": "run-s lint test e2e build test:integration",
     "serve:ng7": "angular-http-server --path dist/app",
     "serve:ng10": "angular-http-server --path integrations/ng10/dist/ng10"
@@ -55,7 +55,7 @@
     "@types/cpx": "^1.5.1",
     "@types/jasmine": "~3.5.11",
     "@types/jasminewd2": "~2.0.8",
-    "@types/node": "^12.19.1",
+    "@types/node": "^12.18.1",
     "@uploadx/core": "^4.2.0",
     "angular-http-server": "^1.9.0",
     "codelyzer": "^5.2.2",
