@@ -39,6 +39,12 @@ function prepareProject(path) {
   execSync('npm install', { cwd: path, stdio: [0, 1, 2] });
   copySync('dist/uploadx/**/*', `${path}/node_modules/ngx-uploadx`, { clean: true });
   console.info('√ Installing dependencies complete.\n');
+  console.info('- Migrate project...');
+  execSync('ng update @angular/core --migrateOnly=true --from=7.2', {
+    cwd: path,
+    stdio: [0, 1, 2]
+  });
+  console.info('√ Migrate project complete');
 }
 
 async function scanProjects() {
