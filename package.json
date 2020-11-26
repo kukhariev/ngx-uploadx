@@ -85,7 +85,7 @@
     "zone.js": "0.8.26"
   },
   "peerDependencies": {
-    "@angular/core": ">=7.0.0 <11.0.0",
+    "@angular/core": ">=7.0.0 <12.0.0",
     "rxjs": "^6.3.0"
   },
   "husky": {
