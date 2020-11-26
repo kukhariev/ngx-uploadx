@@ -4,6 +4,7 @@
 
 [![npm version][npm-image]][npm-url]
 [![Build status][travis-image]][travis-url]
+[![commits since latest release][comm-image]][comm-url]
 
 ## Key Features
 
@@ -248,3 +249,5 @@ The MIT License (see the [LICENSE](LICENSE) file for the full text)
 [npm-url]: https://www.npmjs.com/package/ngx-uploadx
 [travis-image]: https://travis-ci.org/kukhariev/ngx-uploadx.svg?branch=master
 [travis-url]: https://travis-ci.org/kukhariev/ngx-uploadx
+[comm-image]: https://img.shields.io/github/commits-since/kukhariev/ngx-uploadx/latest
+[comm-url]: https://github.com/kukhariev/ngx-uploadx/releases/latest
