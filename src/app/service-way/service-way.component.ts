@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Injectable, OnDestroy, OnInit } from '@angular/core';
 import { IdService, Tus, UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -7,6 +7,7 @@ import { AuthService } from '../auth.service';
 import { hasher, injectDigestHeader } from '../digest';
 import { Ufile } from '../ufile';
 
+@Injectable()
 export class CustomId implements IdService {
   async generateId(uploader: Tus): Promise<string> {
     // if (uploader.file.size < 256) {
