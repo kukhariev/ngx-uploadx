@@ -60,13 +60,13 @@ export class RetryHandler {
     const ms =
       Math.min(2 ** (this.attempts - 1) * this.config.minDelay, this.config.maxDelay) +
       Math.floor(Math.random() * this.config.minDelay);
-    let id: number;
+    let id: ReturnType<typeof setTimeout>;
     return new Promise(resolve => {
       this.cancel = () => {
-        window.clearTimeout(id);
+        clearTimeout(id);
         resolve();
       };
-      id = window.setTimeout(this.cancel, ms);
+      id = setTimeout(this.cancel, ms);
     });
   }
 

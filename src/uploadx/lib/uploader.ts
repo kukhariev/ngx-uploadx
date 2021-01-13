@@ -254,7 +254,7 @@ export abstract class Uploader implements UploadState {
   private cleanup = () => store.delete(this.uploadId);
 
   private onProgress(): (evt: ProgressEvent) => void {
-    let throttle = 0;
+    let throttle: ReturnType<typeof setTimeout> | undefined;
     return ({ loaded }) => {
       const now = new Date().getTime();
       const uploaded = (this.offset as number) + loaded;
@@ -262,7 +262,7 @@ export abstract class Uploader implements UploadState {
       this.speed = Math.round(uploaded / elapsedTime);
       DynamicChunk.scale(this.speed);
       if (!throttle) {
-        throttle = window.setTimeout(() => (throttle = 0), 500);
+        throttle = setTimeout(() => (throttle = undefined), 500);
         this.progress = +((uploaded / this.size) * 100).toFixed(2);
         this.remaining = Math.ceil((this.size - uploaded) / this.speed);
         this.stateChange(this);

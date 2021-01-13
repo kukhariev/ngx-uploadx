@@ -14,4 +14,7 @@ class Store {
   }
 }
 
-export const store = 'localStorage' in window ? new Store() : new Map<string, string>();
+export const store =
+  typeof window !== 'undefined' && 'localStorage' in window
+    ? new Store()
+    : new Map<string, string>();
