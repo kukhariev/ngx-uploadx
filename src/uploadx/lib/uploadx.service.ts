@@ -51,11 +51,12 @@ export class UploadxService implements OnDestroy {
     private idService: IdService
   ) {
     this.options = Object.assign({}, defaults, options);
-    // TODO: add 'offline' status?
-    this.subs.push(
-      fromEvent(window, 'online').subscribe(() => this.control({ action: 'upload' })),
-      fromEvent(window, 'offline').subscribe(() => this.control({ action: 'pause' }))
-    );
+    if (typeof window !== 'undefined') {
+      this.subs.push(
+        fromEvent(window, 'online').subscribe(() => this.control({ action: 'upload' })),
+        fromEvent(window, 'offline').subscribe(() => this.control({ action: 'pause' }))
+      );
+    }
   }
 
   /**
@@ -148,7 +149,7 @@ export class UploadxService implements OnDestroy {
     const uploader = new options.uploaderClass(file, options, this.stateChange, this.ajax);
     (uploader.uploadId as Writable<string>) = await this.idService.generateId(uploader);
     this.queue.push(uploader);
-    uploader.status = options.autoUpload && window.navigator.onLine ? 'queue' : 'added';
+    uploader.status = options.autoUpload && onLine() ? 'queue' : 'added';
   }
 
   private processQueue(): void {
@@ -158,4 +159,8 @@ export class UploadxService implements OnDestroy {
       .slice(0, Math.max(this.options.concurrency - this.runningProcess(), 0))
       .forEach(uploader => uploader.upload());
   }
+}
+
+function onLine(): boolean {
+  return typeof window !== 'undefined' ? window.navigator.onLine : true;
 }
