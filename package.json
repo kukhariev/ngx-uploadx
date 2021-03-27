@@ -4,10 +4,11 @@
   "description": "Angular Resumable Upload Module",
   "keywords": [
     "angular",
-    "upload",
     "chunk",
     "resumable",
-    "tus"
+    "tus",
+    "upload",
+    "uploadx"
   ],
   "author": {
     "name": "Oleg Kukhariev",
