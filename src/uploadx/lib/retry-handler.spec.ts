@@ -1,4 +1,4 @@
-import { ErrorType, RetryHandler } from './retry-handler';
+import { ErrorType, RetryHandler, ShouldRetryFunction } from './retry-handler';
 
 describe('ErrorHandler', () => {
   it('ErrorHandler.kind(status)', () => {
@@ -10,5 +10,13 @@ describe('ErrorHandler', () => {
     expect(errorHandler.kind(200)).toBe(ErrorType.Retryable);
     expect(errorHandler.kind(404)).toBe(ErrorType.NotFound);
     expect(errorHandler.kind(401)).toBe(ErrorType.Auth);
+  });
+
+  it('Custom shouldRetry', () => {
+    const shouldRetry: ShouldRetryFunction = (code, attempts) => code === 500 && attempts < 2;
+    const errorHandler = new RetryHandler({ shouldRetry });
+    expect(errorHandler.kind(500)).toBe(ErrorType.Retryable);
+    errorHandler.attempts = 3;
+    expect(errorHandler.kind(500)).toBe(ErrorType.Fatal);
   });
 });

@@ -5,6 +5,8 @@ export enum ErrorType {
   Fatal
 }
 
+export type ShouldRetryFunction = (code: number, attempts: number) => boolean;
+
 export interface RetryConfig {
   /** Maximum number of retry attempts */
   maxAttempts?: number;
@@ -14,6 +16,8 @@ export interface RetryConfig {
   authErrorCodes?: number[];
   /** Retryable 4xx status codes */
   shouldRetryCodes?: number[];
+  /** Overrides the built-in function that determines whether the operation should be repeated */
+  shouldRetry?: ShouldRetryFunction;
   minDelay?: number;
   maxDelay?: number;
 }
@@ -23,6 +27,9 @@ const defaultRetryConfig: Required<RetryConfig> = {
   shouldRestartCodes: [404, 410],
   authErrorCodes: [401],
   shouldRetryCodes: [423, 429],
+  shouldRetry(code: number): boolean {
+    return code < 400 || code >= 500 || this.shouldRetryCodes.indexOf(code) !== -1;
+  },
   minDelay: 500,
   maxDelay: 50000
 };
@@ -50,7 +57,7 @@ export class RetryHandler {
     if (this.config.shouldRestartCodes.indexOf(code) !== -1) {
       return ErrorType.NotFound;
     }
-    if (code < 400 || code >= 500 || this.config.shouldRetryCodes.indexOf(code) !== -1) {
+    if (this.config.shouldRetry(code, this.attempts)) {
       return ErrorType.Retryable;
     }
     return ErrorType.Fatal;
