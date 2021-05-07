@@ -19,4 +19,14 @@ describe('ErrorHandler', () => {
     errorHandler.attempts = 3;
     expect(errorHandler.kind(500)).toBe(ErrorType.Fatal);
   });
+
+  it('ErrorHandler.observe(offset)', () => {
+    const errorHandler = new RetryHandler({ maxAttempts: 2 });
+    errorHandler.observe();
+    expect(errorHandler.kind(500)).toBe(ErrorType.Retryable);
+    errorHandler.observe();
+    expect(errorHandler.kind(500)).toBe(ErrorType.Retryable);
+    errorHandler.observe();
+    expect(errorHandler.kind(500)).toBe(ErrorType.Fatal);
+  });
 });

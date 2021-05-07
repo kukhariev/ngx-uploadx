@@ -40,6 +40,7 @@ const defaultRetryConfig: Required<RetryConfig> = {
 export class RetryHandler {
   public attempts = 0;
   config: Required<RetryConfig>;
+  private observedValue?: string | number;
   cancel: () => void = () => {};
 
   constructor(configOptions: RetryConfig = {}) {
@@ -77,7 +78,8 @@ export class RetryHandler {
     });
   }
 
-  reset(): void {
-    this.attempts = 0;
+  observe(value?: string | number): void {
+    this.observedValue !== value && (this.attempts = 0);
+    this.observedValue = value;
   }
 }
