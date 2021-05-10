@@ -1,7 +1,7 @@
 import { UploadxAjax } from './ajax';
 
 const data = { key0: '0', key1: '1' };
-const mockXHR = ({
+const mockXHR = {
   DONE: 0,
   HEADERS_RECEIVED: 0,
   LOADING: 0,
@@ -36,7 +36,7 @@ const mockXHR = ({
   },
   getAllResponseHeaders: () => `key0: 0\r\nkey1: 1\r\n`,
   response: JSON.stringify(data)
-} as unknown) as XMLHttpRequest;
+} as unknown as XMLHttpRequest;
 
 describe('Ajax', () => {
   let ajax: UploadxAjax;

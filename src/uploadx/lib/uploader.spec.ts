@@ -13,7 +13,7 @@ const mockAjax: Ajax = {
     if (!serverStatus) {
       return Promise.reject();
     }
-    return Promise.resolve({ data: ('' as unknown) as T, headers: {}, status: serverStatus });
+    return Promise.resolve({ data: '' as unknown as T, headers: {}, status: serverStatus });
   }
 };
 

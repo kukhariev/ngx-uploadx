@@ -50,10 +50,13 @@ export class UploadxAjax {
       responseType === 'json' && !headers.Accept && (headers.Accept = 'application/json');
       Object.keys(headers).forEach(key => xhr.setRequestHeader(key, String(headers[key])));
       xhr.upload.onprogress = onUploadProgress || null;
-      xhr.onerror = xhr.ontimeout = xhr.onabort = evt => {
-        releaseXhr(xhr);
-        return reject({ error: evt.type, url, method });
-      };
+      xhr.onerror =
+        xhr.ontimeout =
+        xhr.onabort =
+          evt => {
+            releaseXhr(xhr);
+            return reject({ error: evt.type, url, method });
+          };
       xhr.onload = () => {
         const response = {
           data: this.getResponseBody<T>(xhr, responseType === 'json'),
