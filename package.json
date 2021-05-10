@@ -38,7 +38,8 @@
     "build:apps": "node scripts/runner.js \"ng build --prod\"",
     "ci": "run-s lint test e2e build test:integration",
     "serve:ng7": "angular-http-server --path dist/app",
-    "serve:latest": "angular-http-server --path integrations/latest/dist/latest"
+    "serve:latest": "angular-http-server --path integrations/latest/dist/latest",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.13.10",
@@ -50,19 +51,19 @@
     "@angular/platform-browser": "~7.2.16",
     "@angular/platform-browser-dynamic": "~7.2.16",
     "@angular/router": "~7.2.16",
-    "@commitlint/cli": "^12.0.1",
-    "@commitlint/config-conventional": "^12.0.1",
-    "@commitlint/travis-cli": "^12.0.1",
+    "@commitlint/cli": "^12.1.1",
+    "@commitlint/config-conventional": "^12.1.1",
+    "@commitlint/travis-cli": "^12.1.1",
     "@types/cpx": "^1.5.1",
     "@types/jasmine": "~3.5.11",
     "@types/jasminewd2": "~2.0.8",
     "@types/node": "~12.12.0",
-    "@uploadx/core": "^4.2.0",
-    "angular-http-server": "^1.9.0",
+    "@uploadx/core": "^4.4.0",
+    "angular-http-server": "^1.10.0",
     "codelyzer": "^5.2.2",
     "core-js": "2.6.11",
     "cpx": "^1.5.0",
-    "husky": "^4.3.0",
+    "husky": "^6.0.0",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~5.0.2",
     "karma": "^5.2.3",
@@ -70,7 +71,7 @@
     "karma-coverage-istanbul-reporter": "~3.0.3",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "^1.5.4",
-    "lint-staged": "^10.5.4",
+    "lint-staged": "^11.0.0",
     "ng-packagr": "^5.7.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.2.1",
@@ -88,12 +89,6 @@
   "peerDependencies": {
     "@angular/core": ">=7.0.0 <12.0.0",
     "rxjs": "^6.3.0"
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "lint-staged"
-    }
   },
   "lint-staged": {
     "*.{js,json,scss,md,ts,html}": [
