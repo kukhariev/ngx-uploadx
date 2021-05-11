@@ -1,7 +1,7 @@
 import { NgZone } from '@angular/core';
-import { IdService } from 'ngx-uploadx';
 import { Subscription } from 'rxjs';
 import { Ajax } from './ajax';
+import { IdService } from './id.service';
 import { UploadAction } from './interfaces';
 import { UploadxFactoryOptions, UploadxOptions } from './options';
 import { UploaderX } from './uploaderx';
@@ -128,7 +128,7 @@ describe('UploadxService', () => {
     service.handleFiles(getFilelist());
   });
 
-  it('should limit concurrent uploads', async done => {
+  it('should limit concurrent uploads', done => {
     sub = service.connect({ ...options, autoUpload: true }).subscribe(queue => {
       if (queue.length === 4) {
         expect(queue.map(({ status }) => status).filter(s => s === 'uploading').length).toEqual(3);
