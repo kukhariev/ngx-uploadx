@@ -35,7 +35,7 @@
     "prettier": "prettier --write \"**/*.{js,json,scss,md,ts,html}\"",
     "test:integration": "run-s -sn build:**",
     "build:prod": "ng build --prod",
-    "build:apps": "node scripts/runner.js \"ng build --prod\"",
+    "build:apps": "node scripts/runner.js \"ng build --configuration production\"",
     "ci": "run-s lint test e2e build test:integration",
     "serve:ng7": "angular-http-server --path dist/app",
     "serve:latest": "angular-http-server --path integrations/latest/dist/latest",
@@ -87,7 +87,7 @@
     "zone.js": "0.8.26"
   },
   "peerDependencies": {
-    "@angular/core": ">=7.0.0 <12.0.0",
+    "@angular/core": ">=7.0.0 <13.0.0",
     "rxjs": "^6.3.0"
   },
   "lint-staged": {
