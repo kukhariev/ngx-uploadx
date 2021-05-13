@@ -35,7 +35,7 @@
     "prettier": "prettier --write \"**/*.{js,json,scss,md,ts,html}\"",
     "test:integration": "run-s -sn build:**",
     "build:prod": "ng build --prod",
-    "build:apps": "node scripts/runner.js \"ng build --prod\"",
+    "build:apps": "node scripts/runner.js \"ng build --configuration production\"",
     "ci": "run-s lint test e2e build test:integration",
     "serve:ng7": "angular-http-server --path dist/app",
     "serve:latest": "angular-http-server --path integrations/latest/dist/latest",
