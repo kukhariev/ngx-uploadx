@@ -4,12 +4,12 @@ const cmd = args[0] && args[0].trim();
 const { execSync } = require('child_process');
 const { copySync } = require('cpx');
 const { writeFileSync, copyFileSync, promises } = require('fs');
-const { join, resolve } = require('path');
+const { join, resolve, basename } = require('path');
 
 const baseDir = resolve(`${__dirname}/..`);
 const integrationsPath = resolve(baseDir, `integrations`);
 
-const testCmd = cmd || 'ng build --prod';
+const testCmd = cmd || 'ng build --configuration production';
 
 if (baseDir !== process.cwd()) {
   process.chdir(baseDir);
@@ -30,7 +30,7 @@ function prepareProject(path) {
   copyFileSync('src/styles.scss', `${path}/src/styles.scss`);
   writeFileSync(
     `${path}/src/app/package.json`,
-    JSON.stringify({ sideEffects: false, name: path, private: true }, undefined, 2)
+    JSON.stringify({ sideEffects: false, name: basename(path), private: true }, undefined, 2)
   );
   copySync('e2e/**/*', `${path}/e2e`, { clean: true });
   copySync('src/environments/**/*', `${path}/src/environments`, { clean: true });
