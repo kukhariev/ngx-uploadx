@@ -1,4 +1,5 @@
-import { Inject, Injectable, NgZone, OnDestroy, Optional } from '@angular/core';
+import { Inject, Injectable, NgZone, Optional } from '@angular/core';
+import { OnDestroy } from '@angular/core';
 import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { debounceTime, map, startWith } from 'rxjs/operators';
 import { Ajax, AjaxRequestConfig, AjaxResponse, UPLOADX_AJAX } from './ajax';
