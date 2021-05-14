@@ -1,13 +1,5 @@
-import {
-  Directive,
-  ElementRef,
-  EventEmitter,
-  HostListener,
-  Input,
-  OnInit,
-  Output,
-  Renderer2
-} from '@angular/core';
+import { ElementRef, EventEmitter, HostListener, Input, Output, Renderer2 } from '@angular/core';
+import { Directive, OnInit } from '@angular/core';
 import { takeWhile } from 'rxjs/operators';
 import { UploadState, UploadxControlEvent } from './interfaces';
 import { UploadxOptions } from './options';
