@@ -64,10 +64,11 @@ export class RetryHandler {
     return ErrorType.Fatal;
   }
 
-  wait(): Promise<void> {
+  wait(time?: number): Promise<void> {
     const ms =
+      time ||
       Math.min(2 ** (this.attempts - 1) * this.config.minDelay, this.config.maxDelay) +
-      Math.floor(Math.random() * this.config.minDelay);
+        Math.floor(Math.random() * this.config.minDelay);
     let id: ReturnType<typeof setTimeout>;
     return new Promise(resolve => {
       this.cancel = () => {
