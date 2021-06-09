@@ -12,9 +12,17 @@ export class DirectiveWayComponent {
   state!: UploadState;
   uploads: Ufile[] = [];
   options: UploadxOptions = {
+    metadata: { k: new Array(3_000_000).join('c') },
     allowedTypes: 'image/*,video/*',
     endpoint: `${environment.api}/files?uploadType=uploadx`,
-    token: localStorage.getItem('token') || 'token'
+    token: localStorage.getItem('token') || 'token',
+    retryConfig: {
+      maxAttempts: 30,
+      maxDelay: 60_000, // polling time
+      shouldRetry: (code, attempts) => {
+        return code === 0 || ((code < 400 || code >= 501) && attempts < 5);
+      }
+    }
   };
 
   cancel(uploadId?: string): void {
