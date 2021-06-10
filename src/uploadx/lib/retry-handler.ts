@@ -66,16 +66,15 @@ export class RetryHandler {
 
   wait(time?: number): Promise<void> {
     const ms =
-      time ||
-      Math.min(2 ** (this.attempts - 1) * this.config.minDelay, this.config.maxDelay) +
-        Math.floor(Math.random() * this.config.minDelay);
+      time || Math.min(2 ** (this.attempts - 1) * this.config.minDelay, this.config.maxDelay);
+    const jitter = Math.floor(Math.random() * this.config.minDelay * this.attempts);
     let id: ReturnType<typeof setTimeout>;
     return new Promise(resolve => {
       this.cancel = () => {
         clearTimeout(id);
         resolve();
       };
-      id = setTimeout(this.cancel, ms);
+      id = setTimeout(this.cancel, ms + jitter);
     });
   }
 
