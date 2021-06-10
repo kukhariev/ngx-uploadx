@@ -157,7 +157,7 @@ export abstract class Uploader implements UploadState {
           default:
             this.responseStatus >= 400 && (this.offset = undefined);
             this.status = 'retry';
-            await this.retry.wait();
+            await this.retry.wait(Number(this.responseHeaders['retry-after']) * 1000);
         }
       }
     }

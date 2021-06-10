@@ -1,32 +1,66 @@
 import { ErrorType, RetryHandler, ShouldRetryFunction } from './retry-handler';
 
-describe('ErrorHandler', () => {
-  it('ErrorHandler.kind(status)', () => {
-    const errorHandler = new RetryHandler();
-    expect(errorHandler.kind(400)).toBe(ErrorType.Fatal);
-    expect(errorHandler.kind(0)).toBe(ErrorType.Retryable);
-    expect(errorHandler.kind(500)).toBe(ErrorType.Retryable);
-    expect(errorHandler.kind(423)).toBe(ErrorType.Retryable);
-    expect(errorHandler.kind(200)).toBe(ErrorType.Retryable);
-    expect(errorHandler.kind(404)).toBe(ErrorType.NotFound);
-    expect(errorHandler.kind(401)).toBe(ErrorType.Auth);
+describe('RetryHandler', () => {
+  let retry: RetryHandler;
+  beforeEach(() => {
+    retry = new RetryHandler();
+    jasmine.clock().install();
+  });
+  afterEach(() => jasmine.clock().uninstall());
+
+  it('kind(status)', () => {
+    expect(retry.kind(400)).toBe(ErrorType.Fatal);
+    expect(retry.kind(0)).toBe(ErrorType.Retryable);
+    expect(retry.kind(500)).toBe(ErrorType.Retryable);
+    expect(retry.kind(423)).toBe(ErrorType.Retryable);
+    expect(retry.kind(200)).toBe(ErrorType.Retryable);
+    expect(retry.kind(404)).toBe(ErrorType.NotFound);
+    expect(retry.kind(401)).toBe(ErrorType.Auth);
   });
 
-  it('Custom shouldRetry', () => {
+  it('shouldRetry', () => {
     const shouldRetry: ShouldRetryFunction = (code, attempts) => code === 500 && attempts < 2;
-    const errorHandler = new RetryHandler({ shouldRetry });
-    expect(errorHandler.kind(500)).toBe(ErrorType.Retryable);
-    errorHandler.attempts = 3;
-    expect(errorHandler.kind(500)).toBe(ErrorType.Fatal);
+    retry.config.shouldRetry = shouldRetry;
+    expect(retry.kind(500)).toBe(ErrorType.Retryable);
+    retry.attempts = 3;
+    expect(retry.kind(500)).toBe(ErrorType.Fatal);
   });
 
-  it('ErrorHandler.observe(offset)', () => {
-    const errorHandler = new RetryHandler({ maxAttempts: 2 });
-    errorHandler.observe();
-    expect(errorHandler.kind(500)).toBe(ErrorType.Retryable);
-    errorHandler.observe();
-    expect(errorHandler.kind(500)).toBe(ErrorType.Retryable);
-    errorHandler.observe();
-    expect(errorHandler.kind(500)).toBe(ErrorType.Fatal);
+  it('observe(offset)', () => {
+    retry.config.maxAttempts = 2;
+    retry.observe('same value');
+    expect(retry.kind(500)).toBe(ErrorType.Retryable);
+    retry.observe('same value');
+    expect(retry.kind(500)).toBe(ErrorType.Retryable);
+    retry.observe('same value');
+    expect(retry.kind(500)).toBe(ErrorType.Fatal);
+  });
+
+  it('wait()', done => {
+    const wait = retry.wait();
+    jasmine.clock().tick(1001);
+    wait.then(() => {
+      expect(retry.kind(500)).toBe(ErrorType.Retryable);
+      done();
+    });
+  });
+
+  it('wait(time)', done => {
+    const wait = retry.wait(30_000);
+    jasmine.clock().tick(30_001);
+    wait.then(() => {
+      expect(retry.kind(500)).toBe(ErrorType.Retryable);
+      done();
+    });
+  });
+
+  it('wait cancel()', done => {
+    const wait = retry.wait(30_000);
+    jasmine.clock().tick(1);
+    retry.cancel();
+    wait.then(() => {
+      expect(retry.kind(500)).toBe(ErrorType.Retryable);
+      done();
+    });
   });
 });

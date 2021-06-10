@@ -14,7 +14,14 @@ export class DirectiveWayComponent {
   options: UploadxOptions = {
     allowedTypes: 'image/*,video/*',
     endpoint: `${environment.api}/files?uploadType=uploadx`,
-    token: localStorage.getItem('token') || 'token'
+    token: localStorage.getItem('token') || 'token',
+    retryConfig: {
+      maxAttempts: 30,
+      maxDelay: 60_000,
+      shouldRetry: (code, attempts) => {
+        return code === 504 || ((code < 400 || code >= 501) && attempts < 5);
+      }
+    }
   };
 
   cancel(uploadId?: string): void {
