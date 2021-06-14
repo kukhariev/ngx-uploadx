@@ -1,5 +1,6 @@
 import { Ajax } from './ajax';
 import { Canceler } from './canceler';
+import { DynamicChunk } from './dynamic-chunk';
 import { RetryConfig } from './retry-handler';
 import { Uploader } from './uploader';
 
@@ -129,7 +130,8 @@ export type UploaderClass = new (
   file: File,
   options: UploaderOptions,
   stateChange: (evt: UploadState) => void,
-  ajax: Ajax
+  ajax: Ajax,
+  chunk: DynamicChunk
 ) => Uploader;
 
 export type Writable<T> = { -readonly [K in keyof T]: T[K] };

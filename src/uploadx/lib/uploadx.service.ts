@@ -3,6 +3,7 @@ import { OnDestroy } from '@angular/core';
 import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { debounceTime, map, startWith } from 'rxjs/operators';
 import { Ajax, AjaxRequestConfig, AjaxResponse, UPLOADX_AJAX } from './ajax';
+import { DynamicChunk } from './dynamic-chunk';
 import { IdService } from './id.service';
 import { UploadState, UploadxControlEvent, Writable } from './interfaces';
 import {
@@ -38,6 +39,7 @@ export class UploadxService implements OnDestroy {
   options: UploadxFactoryOptions;
   private readonly eventsStream: Subject<UploadState> = new Subject();
   private subs: Subscription[] = [];
+  chunk = new DynamicChunk();
 
   /** Upload status events */
   get events(): Observable<UploadState> {
@@ -102,9 +104,14 @@ export class UploadxService implements OnDestroy {
   handleFiles(files: FileList | File | File[], options = {} as UploadxOptions): void {
     const instanceOptions: UploadxFactoryOptions = { ...this.options, ...options };
     this.options.concurrency = instanceOptions.concurrency;
+    this.configureChunks(instanceOptions);
     ('name' in files ? [files] : Array.from(files)).forEach(file =>
       this.addUploaderInstance(file, instanceOptions)
     );
+  }
+
+  private configureChunks({ chunkSize, maxChunkSize }: UploadxFactoryOptions): void {
+    maxChunkSize ? (this.chunk.maxChunkSize = maxChunkSize) : (this.chunk.chunkSize = chunkSize);
   }
 
   /**
@@ -147,7 +154,13 @@ export class UploadxService implements OnDestroy {
   };
 
   private async addUploaderInstance(file: File, options: UploadxFactoryOptions): Promise<void> {
-    const uploader = new options.uploaderClass(file, options, this.stateChange, this.ajax);
+    const uploader = new options.uploaderClass(
+      file,
+      options,
+      this.stateChange,
+      this.ajax,
+      this.chunk
+    );
     (uploader.uploadId as Writable<string>) = await this.idService.generateId(uploader);
     this.queue.push(uploader);
     uploader.status = options.autoUpload && onLine() ? 'queue' : 'added';

@@ -1,5 +1,6 @@
 import { Ajax, AjaxRequestConfig } from './ajax';
 import { Canceler } from './canceler';
+import { DynamicChunk } from './dynamic-chunk';
 import {
   AuthorizeRequest,
   Metadata,
@@ -16,7 +17,7 @@ import {
 } from './interfaces';
 import { ErrorType, RetryHandler } from './retry-handler';
 import { store } from './store';
-import { DynamicChunk, isNumber, unfunc } from './utils';
+import { isNumber, unfunc } from './utils';
 
 const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
   pause: 'paused',
@@ -43,8 +44,6 @@ export abstract class Uploader implements UploadState {
   metadata: Metadata;
   /** Upload endpoint */
   endpoint = '/upload';
-  /** Chunk size in bytes */
-  chunkSize: number;
   /** Auth token/tokenGetter */
   token: UploadxControlEvent['token'];
   /** Byte offset within the whole file */
@@ -92,7 +91,8 @@ export abstract class Uploader implements UploadState {
     readonly file: File,
     readonly options: Readonly<UploaderOptions>,
     readonly stateChange: (evt: UploadState) => void,
-    readonly ajax: Ajax
+    readonly ajax: Ajax,
+    readonly chunk: DynamicChunk
   ) {
     this.retry = new RetryHandler(options.retryConfig);
     this.name = file.name;
@@ -104,7 +104,6 @@ export abstract class Uploader implements UploadState {
       lastModified:
         file.lastModified || (file as File & { lastModifiedDate: Date }).lastModifiedDate.getTime()
     };
-    this.chunkSize = options.chunkSize || this.size;
     this._prerequest = options.prerequest || (req => req);
     this._authorize = options.authorize || (req => req);
     this.configure(options);
@@ -244,9 +243,8 @@ export abstract class Uploader implements UploadState {
   }
 
   protected getChunk(): { start: number; end: number; body: Blob } {
-    this.chunkSize = isNumber(this.options.chunkSize) ? this.chunkSize : DynamicChunk.size;
     const start = this.offset || 0;
-    const end = Math.min(start + this.chunkSize, this.size);
+    const end = Math.min(start + this.chunk.size, this.size);
     const body = this.file.slice(this.offset, end);
     return { start, end, body };
   }
@@ -260,7 +258,7 @@ export abstract class Uploader implements UploadState {
       const uploaded = (this.offset as number) + loaded;
       const elapsedTime = (now - this.startTime) / 1000;
       this.speed = Math.round(uploaded / elapsedTime);
-      DynamicChunk.scale(this.speed);
+      this.chunk.scale(this.speed);
       if (!throttle) {
         throttle = setTimeout(() => (throttle = undefined), 500);
         this.progress = +((uploaded / this.size) * 100).toFixed(2);
