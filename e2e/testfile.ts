@@ -5,9 +5,9 @@ import '../server';
 
 export function getTestFile(): string {
   const filename = join(tmpdir(), 'testfile.mp4');
-  const filesize = 5 * 1024 * 1024;
+  const fileSize = 5 * 1024 * 1024;
   const file = createWriteStream(filename, { flags: 'w' });
-  file.write(Buffer.alloc(filesize));
+  file.write(Buffer.alloc(fileSize));
   file.end();
 
   return filename;

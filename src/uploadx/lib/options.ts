@@ -30,6 +30,7 @@ export interface UploadxOptions extends UploaderOptions {
    * @defaultValue true
    */
   multiple?: boolean;
+  maxChunkSize?: number;
 }
 
 export interface UploadxFactoryOptions extends UploadxOptions {

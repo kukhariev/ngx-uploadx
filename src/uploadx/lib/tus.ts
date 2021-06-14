@@ -39,7 +39,7 @@ export class Tus extends Uploader {
     return this.getOffsetFromResponse();
   }
 
-  protected getOffsetFromResponse(): number | undefined {
+  getOffsetFromResponse(): number | undefined {
     const offsetStr = this.getValueFromResponse('Upload-Offset');
     return offsetStr ? parseInt(offsetStr, 10) : undefined;
   }

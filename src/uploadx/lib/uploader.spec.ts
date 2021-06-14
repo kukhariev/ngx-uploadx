@@ -1,10 +1,13 @@
 // tslint:disable: no-any
 // noinspection ES6PreferShortImport
 import { Ajax, AjaxRequestConfig } from './ajax';
+import { DynamicChunk } from './dynamic-chunk';
 import { UploaderOptions } from './interfaces';
 import { Uploader } from './uploader';
 
 let serverStatus: number;
+
+const chunk = new DynamicChunk();
 
 const mockAjax: Ajax = {
   request<T>(
@@ -25,11 +28,11 @@ const file = getFile();
 
 const snip = { file, size: 1, name: 'filename.mp4' };
 
-let uploader: MockUploader;
+let uploader: MockUploader | any;
 
 export class MockUploader extends Uploader {
   constructor(readonly f: File, readonly opts: UploaderOptions) {
-    super(f, opts, () => {}, mockAjax);
+    super(f, opts, () => {}, mockAjax, chunk);
   }
 
   async getFileUrl(): Promise<string> {
@@ -61,38 +64,20 @@ describe('Uploader', () => {
       uploader = new MockUploader(file, {});
     });
     it('should abort on pause', () => {
-      const abort = spyOn<any>(uploader, 'abort').and.callThrough();
-      const stateChange = spyOn<any>(uploader, 'stateChange').and.callThrough();
+      const abort = spyOn(uploader, 'abort').and.callThrough();
+      const stateChange = spyOn(uploader, 'stateChange').and.callThrough();
       uploader.configure({ action: 'pause' });
       expect(abort).toHaveBeenCalled();
       expect(stateChange).toHaveBeenCalled();
     });
     it('should cancel', () => {
-      const abort = spyOn<any>(uploader, 'abort').and.callThrough();
-      const onCancel = spyOn<any>(uploader, 'cancel').and.callThrough();
-      const cleanup = spyOn<any>(uploader, 'cleanup').and.callThrough();
+      const abort = spyOn(uploader, 'abort').and.callThrough();
+      const onCancel = spyOn(uploader, 'cancel').and.callThrough();
+      const cleanup = spyOn(uploader, 'cleanup').and.callThrough();
       uploader.configure({ action: 'cancel' });
       expect(abort).toHaveBeenCalled();
       expect(cleanup).toHaveBeenCalled();
       expect(onCancel).toHaveBeenCalled();
-    });
-  });
-
-  describe('chunkSize', () => {
-    it('should use adaptive chunkSize if not specified', async () => {
-      uploader = new MockUploader(getFile(), {});
-      (uploader as any).getChunk();
-      expect(uploader.chunkSize).toEqual(4096 * 256);
-    });
-    it('should set fixed chunkSize', async () => {
-      uploader = new MockUploader(file, { chunkSize: 4_194_304 });
-      (uploader as any).getChunk();
-      expect(uploader.chunkSize).toEqual(4_194_304);
-    });
-    it('should disable chunks', async () => {
-      uploader = new MockUploader(file, { chunkSize: 0 });
-      (uploader as any).getChunk();
-      expect(uploader.chunkSize).toEqual(1);
     });
   });
 
@@ -115,7 +100,7 @@ describe('Uploader', () => {
       expect(uploader.status).toEqual('error');
     });
     it('should updateToken on 401', async () => {
-      const updateToken = spyOn<any>(uploader, 'updateToken').and.callThrough();
+      const updateToken = spyOn<Uploader>(uploader, 'updateToken').and.callThrough();
       serverStatus = 401;
       await uploader.upload();
       expect(uploader.responseStatus).toEqual(401);
@@ -130,10 +115,10 @@ describe('Uploader', () => {
     });
     it('should complete on 200', async () => {
       serverStatus = 200;
-      const updateToken = spyOn<any>(uploader, 'updateToken').and.callThrough();
+      const updateToken = spyOn(uploader, 'updateToken').and.callThrough();
       const getFileUrl = spyOn(uploader, 'getFileUrl').and.callThrough();
       const getOffset = spyOn(uploader, 'getOffset').and.callThrough();
-      const cleanup = spyOn<any>(uploader, 'cleanup').and.callThrough();
+      const cleanup = spyOn(uploader, 'cleanup').and.callThrough();
       await uploader.upload();
       expect(updateToken).toHaveBeenCalledTimes(1);
       expect(getFileUrl).toHaveBeenCalledTimes(1);
@@ -144,7 +129,7 @@ describe('Uploader', () => {
     it('should complete on 201', async () => {
       serverStatus = 201;
       const start = spyOn(uploader, 'upload').and.callThrough();
-      const cleanup = spyOn<any>(uploader, 'cleanup').and.callThrough();
+      const cleanup = spyOn(uploader, 'cleanup').and.callThrough();
       await uploader.upload();
       expect(start).toHaveBeenCalledTimes(1);
       expect(cleanup).toHaveBeenCalled();
@@ -162,7 +147,7 @@ describe('Uploader', () => {
       uploader = new MockUploader(file, {
         prerequest: req => ({ ...req, ...injected })
       });
-      const request = spyOn<any>(uploader.ajax, 'request').and.callThrough();
+      const request = spyOn<Ajax>(uploader.ajax, 'request').and.callThrough();
       await uploader.request({ method: 'POST', headers: common });
       expect(request).toHaveBeenCalledWith(jasmine.objectContaining(sample));
     });
@@ -172,7 +157,7 @@ describe('Uploader', () => {
         headers: common,
         prerequest: req => Promise.resolve({ ...req, ...injected })
       });
-      const request = spyOn<any>(uploader.ajax, 'request').and.callThrough();
+      const request = spyOn<Ajax>(uploader.ajax, 'request').and.callThrough();
       await uploader.request({ method: 'POST' });
       expect(request).toHaveBeenCalledWith(jasmine.objectContaining(sample));
     });
@@ -183,7 +168,7 @@ describe('Uploader', () => {
           req.headers.auth = 'token';
         }
       });
-      const request = spyOn<any>(uploader.ajax, 'request').and.callThrough();
+      const request = spyOn<Ajax>(uploader.ajax, 'request').and.callThrough();
       await uploader.request({ method: 'POST', headers: common });
       expect(request).toHaveBeenCalledWith(jasmine.objectContaining(sample));
     });
