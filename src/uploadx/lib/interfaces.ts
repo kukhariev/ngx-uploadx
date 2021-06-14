@@ -114,6 +114,8 @@ export interface UploaderOptions extends UploadItem {
    * If not specified, the optimal size will be automatically adjusted based on the network speed.
    */
   chunkSize?: number;
+  /** Adaptive chunk size limit */
+  maxChunkSize?: number;
   withCredentials?: boolean;
   /**
    * Function called before every request
