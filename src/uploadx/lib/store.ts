@@ -14,7 +14,17 @@ class Store {
   }
 }
 
-export const store =
-  typeof window !== 'undefined' && 'localStorage' in window
-    ? new Store()
-    : new Map<string, string>();
+export const store = isLocalStorageAvailable() ? new Store() : new Map<string, string>();
+
+function isLocalStorageAvailable(): boolean {
+  try {
+    const key = 'uploadxLocalStorageTest';
+    const value = 'value';
+    localStorage.setItem(key, value);
+    const getValue = localStorage.getItem(key);
+    localStorage.removeItem(key);
+    return getValue === value;
+  } catch {
+    return false;
+  }
+}
