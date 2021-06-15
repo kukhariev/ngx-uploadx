@@ -44,7 +44,7 @@ export abstract class Uploader implements UploadState {
   /** Upload endpoint */
   endpoint = '/upload';
   /** Chunk size in bytes */
-  chunkSize: number;
+  chunkSize?: number;
   /** Auth token/tokenGetter */
   token: UploadxControlEvent['token'];
   /** Byte offset within the whole file */
@@ -104,7 +104,7 @@ export abstract class Uploader implements UploadState {
       lastModified:
         file.lastModified || (file as File & { lastModifiedDate: Date }).lastModifiedDate.getTime()
     };
-    this.chunkSize = options.chunkSize || this.size;
+    options.maxChunkSize && (DynamicChunk.maxSize = options.maxChunkSize);
     this._prerequest = options.prerequest || (req => req);
     this._authorize = options.authorize || (req => req);
     this.configure(options);
@@ -244,7 +244,8 @@ export abstract class Uploader implements UploadState {
   }
 
   protected getChunk(): { start: number; end: number; body: Blob } {
-    this.chunkSize = isNumber(this.options.chunkSize) ? this.chunkSize : DynamicChunk.size;
+    this.chunkSize =
+      this.options.chunkSize === 0 ? this.size : this.options.chunkSize || DynamicChunk.size;
     const start = this.offset || 0;
     const end = Math.min(start + this.chunkSize, this.size);
     const body = this.file.slice(this.offset, end);
