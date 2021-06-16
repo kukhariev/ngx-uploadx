@@ -28,8 +28,9 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
   state$!: Observable<UploadState>;
   uploads: Ufile[] = [];
   private unsubscribe$ = new Subject();
+  options!: UploadxOptions;
 
-  constructor(private uploadxService: UploadxService, private auth: AuthService) {}
+  constructor(private uploadxService: UploadxService, private authService: AuthService) {}
 
   ngOnInit(): void {
     const endpoint = `${environment.api}/files?uploadType=tus`;
@@ -37,13 +38,13 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
       ({ headers }) => {
         console.table(headers);
         const checkSumSupported = 'Tus-Checksum-Algorithm' in headers || true; // debug
-        const options: UploadxOptions = {
+        this.options = {
           endpoint,
           uploaderClass: Tus,
-          token: this.auth.accessToken,
+          token: this.authService.getAccessToken(),
           prerequest: checkSumSupported ? injectDigestHeader : () => {}
         };
-        this.state$ = this.uploadxService.init(options);
+        this.state$ = this.uploadxService.init(this.options);
         this.state$.pipe(takeUntil(this.unsubscribe$)).subscribe(state => {
           const file = this.uploads.find(item => item.uploadId === state.uploadId);
           file ? file.update(state) : this.uploads.push(new Ufile(state));

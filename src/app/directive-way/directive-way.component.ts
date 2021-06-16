@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { UploadState, UploadxControlEvent, UploadxOptions } from 'ngx-uploadx';
 import { environment } from '../../environments/environment';
+import { AuthService } from '../auth.service';
 import { Ufile } from '../ufile';
 
 @Component({
@@ -14,16 +15,18 @@ export class DirectiveWayComponent {
   options: UploadxOptions = {
     allowedTypes: 'image/*,video/*',
     endpoint: `${environment.api}/files?uploadType=uploadx`,
-    token: localStorage.getItem('token') || 'token',
+    token: this.authService.getAccessToken(),
+    maxChunkSize: 1024 * 1024 * 8,
     retryConfig: {
       maxAttempts: 30,
       maxDelay: 60_000,
       shouldRetry: (code, attempts) => {
-        return code === 504 || ((code < 400 || code >= 501) && attempts < 5);
+        return code === 503 || ((code < 400 || code >= 501) && attempts < 5);
       }
     }
   };
 
+  constructor(private authService: AuthService) {}
   cancel(uploadId?: string): void {
     this.control = { action: 'cancel', uploadId };
   }

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Tus, UploadState, UploadxControlEvent, UploadxOptions } from 'ngx-uploadx';
 import { environment } from '../../environments/environment';
+import { AuthService } from '../auth.service';
 import { Ufile } from '../ufile';
 
 @Component({
@@ -16,17 +17,16 @@ export class TusComponent {
     allowedTypes: 'image/*,video/*',
     endpoint: `${environment.api}/files?uploadType=tus`,
     uploaderClass: Tus,
-    chunkSize: 0,
-    authorize: req => {
-      const token = localStorage.getItem('token');
-      token && (req.headers.Authorization = `Token ${token}`);
+    authorize: async req => {
+      const token = await this.authService.getTokenAsPromise();
+      req.headers.Authorization = `Token ${token}`;
       return req;
     },
     metadata(file): Record<string, string> {
       return { original_name: file.name };
     }
   };
-
+  constructor(private authService: AuthService) {}
   cancel(uploadId?: string): void {
     this.control = { action: 'cancel', uploadId };
   }
