@@ -13,7 +13,7 @@ export class MultipleDirectiveComponent {
   uploads$: Observable<Uploader[]>;
   options: UploadxOptions = {
     endpoint: `${environment.api}/files?uploadType=uploadx`,
-    allowedTypes: 'image/*'
+    allowedTypes: 'video/*'
   };
   options2: UploadxOptions = {
     endpoint: `${environment.api}/files?uploadType=tus`,

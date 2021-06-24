@@ -2,7 +2,7 @@ import { browser, logging } from 'protractor';
 import { AppPage } from './app.po';
 import { getTestFile } from './testfile';
 
-describe('uploader App', () => {
+describe('uploader App', async () => {
   let page: AppPage;
   const testFilePath = getTestFile();
   beforeEach(() => {
@@ -10,13 +10,18 @@ describe('uploader App', () => {
   });
   afterEach(async () => {
     page.getButton('Cancel All').click();
-    // Assert that there are no errors emitted from the browser
-    const logs = await browser.manage().logs().get(logging.Type.BROWSER);
-    expect(logs).not.toContain(
-      jasmine.objectContaining({
-        level: logging.Level.SEVERE
-      } as logging.Entry)
-    );
+
+    const caps = await browser.driver.getCapabilities();
+    browser.browserName = caps.get('browserName');
+    if (browser.browserName === 'chrome') {
+      // Assert that there are no errors emitted from the browser
+      const logs = await browser.manage().logs().get(logging.Type.BROWSER);
+      expect(logs).not.toContain(
+        jasmine.objectContaining({
+          level: logging.Level.SEVERE
+        } as logging.Entry)
+      );
+    }
   });
 
   it('should upload (directive)', () => {

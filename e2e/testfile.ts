@@ -1,7 +1,6 @@
 import { createWriteStream } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import '../server';
 
 export function getTestFile(): string {
   const filename = join(tmpdir(), 'testfile.mp4');

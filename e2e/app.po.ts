@@ -1,5 +1,6 @@
 import { UploadStatus } from 'ngx-uploadx';
 import { browser, by, element, ElementFinder } from 'protractor';
+import * as remote from 'selenium-webdriver/remote';
 
 export class AppPage {
   navigateTo(path: string): Promise<unknown> {
@@ -7,6 +8,7 @@ export class AppPage {
   }
 
   getFileInput(): ElementFinder {
+    browser.setFileDetector(new remote.FileDetector());
     return element.all(by.css('app-root input')).first();
   }
 
