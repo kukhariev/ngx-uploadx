@@ -8,7 +8,7 @@ const { tmpdir } = require('os');
 const { Multipart, Tus, Uploadx } = require('@uploadx/core');
 const { createServer } = require('http');
 
-const PORT = 3003;
+const PORT = 3002;
 const UPLOAD_DIR = `${tmpdir()}/ngx-uploadx/`;
 
 const opts = { directory: UPLOAD_DIR, path: '/files' };
