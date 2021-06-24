@@ -10,9 +10,9 @@ import { Ufile } from '../ufile';
 @Injectable()
 export class CustomId implements IdService {
   async generateId(uploader: Tus): Promise<string> {
-    // if (uploader.file.size < 256) {
-    //   return new Date().getTime().toString(36);
-    // }
+    if (uploader.file.size < 256 || !hasher.isSupported) {
+      return new Date().getTime().toString(36);
+    }
     const blob = uploader.file.slice(0, 256);
     return await hasher.getDigest(blob);
   }
@@ -37,7 +37,8 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
     this.uploadxService.request({ method: 'OPTIONS', url: endpoint }).then(
       ({ headers }) => {
         console.table(headers);
-        const checkSumSupported = 'Tus-Checksum-Algorithm' in headers || true; // debug
+        const checkSumSupported =
+          hasher.isSupported && ('Tus-Checksum-Algorithm' in headers || true); // debug
         this.options = {
           endpoint,
           uploaderClass: Tus,
