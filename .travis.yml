@@ -11,6 +11,6 @@ script:
   - 'commitlint-travis'
   - 'npm run lint'
   - 'npm test'
-  - 'npm run e2e'
+  - 'npm run browserstack'
   - 'npm run build'
   - 'npm run test:integration'

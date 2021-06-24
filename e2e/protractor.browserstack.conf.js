@@ -11,7 +11,8 @@ exports.config = {
   commonCapabilities: {
     projectName: 'ngx-uploadx',
     build: 'browserstack-e2e',
-    'browserstack.local': true
+    'browserstack.local': true,
+    'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER
   },
 
   multiCapabilities: [
@@ -54,7 +55,7 @@ exports.config = {
         if (error) {
           return reject(error);
         }
-        console.log('√ Started BrowserStackLocal');
+        console.log('▶ Started BrowserStackLocal');
         resolve();
       });
     });
@@ -63,7 +64,7 @@ exports.config = {
   afterLaunch: () =>
     new Promise(resolve => {
       exports.bs_local.stop(() => {
-        console.log('√ Stopped BrowserStackLocal');
+        console.log('■ Stopped BrowserStackLocal');
         resolve();
       });
     })
