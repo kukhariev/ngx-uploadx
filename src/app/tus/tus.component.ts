@@ -17,6 +17,7 @@ export class TusComponent {
     allowedTypes: 'image/*,video/*',
     endpoint: `${environment.api}/files?uploadType=tus`,
     uploaderClass: Tus,
+    chunkSize: 0,
     authorize: async req => {
       const token = await this.authService.getTokenAsPromise();
       req.headers.Authorization = `Token ${token}`;
@@ -24,7 +25,8 @@ export class TusComponent {
     },
     metadata(file): Record<string, string> {
       return { original_name: file.name };
-    }
+    },
+    retryConfig: { timeout: 10_000 }
   };
   constructor(private authService: AuthService) {}
   cancel(uploadId?: string): void {

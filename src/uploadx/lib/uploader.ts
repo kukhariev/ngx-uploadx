@@ -187,7 +187,8 @@ export abstract class Uploader implements UploadState {
       responseType: this.responseType,
       withCredentials: !!this.options.withCredentials,
       canceler: this.canceler,
-      validateStatus: () => true
+      validateStatus: () => true,
+      timeout: this.retry.config.timeout
     };
     if (body && typeof body !== 'string') {
       ajaxRequestConfig.onUploadProgress = this.onProgress();
