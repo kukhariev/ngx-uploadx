@@ -17,7 +17,6 @@ export class TusComponent {
     allowedTypes: 'image/*,video/*',
     endpoint: `${environment.api}/files?uploadType=tus`,
     uploaderClass: Tus,
-    chunkSize: 0,
     authorize: async req => {
       const token = await this.authService.getTokenAsPromise();
       req.headers.Authorization = `Token ${token}`;

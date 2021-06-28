@@ -12,9 +12,9 @@
 - Retries using exponential back-off strategy
 - Chunking
 
-## Setup
+## Basic usage
 
-- Add ngx-uploadx module as dependency :
+- Add ngx-uploadx module as dependency:
 
 ```sh
   npm install ngx-uploadx
@@ -33,7 +33,7 @@ import { UploadxModule } from 'ngx-uploadx';
 });
 ```
 
-## Basic usage
+- Add `uploadx` directive to the component template and provide the required options:
 
 ```ts
 // Component code
@@ -69,11 +69,14 @@ export class AppHomeComponent {
 
 - `allowedTypes` Allowed file types (directive only)
 
-- `authorize` Function used to apply authorization token [(example)](src/app/on-push/on-push.component.ts)
+- `authorize` Function used to authorize requests [(example)](src/app/on-push/on-push.component.ts)
 
 - `autoUpload` Auto start upload when files added. Default value: `true`
 
-- `chunkSize` Set a fixed chunk size. If not specified, the optimal size will be automatically adjusted based on the network speed.
+- `chunkSize` Fixed chunk size. If not specified, the optimal size will be automatically adjusted based on the network speed.
+  If set to `0`, normal unloading will be used instead of chunked.
+
+- `maxChunkSize` Dynamic chunk size limit
 
 - `concurrency` Set the maximum parallel uploads. Default value: `2`
 
@@ -81,13 +84,22 @@ export class AppHomeComponent {
 
 - `headers` Headers to be appended to each HTTP request
 
-- `metadata` Custom uploads metadata
+- `metadata` Custom metadata to be added to the uploaded files
 
 - `multiple` Allow selecting multiple files. Default value: `true` (directive only)
 
 - `prerequest` Function called before every request [(example)](src/app/service-way/service-way.component.ts)
 
-- `retryConfig` Configure retry settings
+- `retryConfig` Object to configure retry settings:
+
+  - `maxAttempts` Maximum number of retry attempts. Default value: `8`
+  - `shouldRestartCodes` Upload not exist and will be restarted. Default value: `[404, 410]`
+  - `authErrorCodes` If one of these codes is received, the request will be repeated with an updated authorization token . Default value: `[401]`
+  - `shouldRetryCodes` Retryable 4xx status codes. Default value: `[423, 429]`
+  - `shouldRetry` Overrides the built-in function that determines whether the operation should be retried
+  - `minDelay` Minimum (initial) retry interval. Default value: `500`
+  - `maxDelay` Maximum retry interval. Default value: `50_000`
+  - `timeout` Time interval after which unfinished requests must be retried
 
 - `token` Authorization token as a `string` or function returning a `string` or `Promise<string>`
 
@@ -142,14 +154,13 @@ _Activates the `.uploadx-drop-active` class on DnD operations._
   uploadxOptions: UploadxOptions = {
     concurrency: 4,
     endpoint: `${environment.api}/upload`,
-    token:  () => localStorage.getItem('access_token'),
     uploaderClass: Tus
   };
   ngOnInit() {
     this.uploadService.init(this.uploadxOptions)
       .subscribe((item: UploadState) => {
         console.log(item);
-        //...
+        // ...
       }
   }
   ```
@@ -171,7 +182,6 @@ _Activates the `.uploadx-drop-active` class on DnD operations._
     uploads$: Observable<Uploader[]>;
     options: UploadxOptions = {
       endpoint: `${environment.api}/upload?uploadType=uploadx`,
-      token:  () => localStorage.getItem('access_token'),
       headers: { 'ngsw-bypass': 1 }
     }
     constructor(private uploadService: UploadxService) {
