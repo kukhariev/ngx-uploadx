@@ -155,6 +155,7 @@ export abstract class Uploader implements UploadState {
             await this.updateToken();
             break;
           default:
+            // force getOffset() on http errors and repeat request on network errors
             this.responseStatus >= 400 && (this.offset = undefined);
             this.status = 'retry';
             await this.retry.wait(Number(this.responseHeaders['retry-after']) * 1000);
@@ -187,7 +188,8 @@ export abstract class Uploader implements UploadState {
       responseType: this.responseType,
       withCredentials: !!this.options.withCredentials,
       canceler: this.canceler,
-      validateStatus: () => true
+      validateStatus: () => true,
+      timeout: this.retry.config.timeout
     };
     if (body && typeof body !== 'string') {
       ajaxRequestConfig.onUploadProgress = this.onProgress();

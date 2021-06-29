@@ -20,6 +20,7 @@ export interface RetryConfig {
   shouldRetry?: ShouldRetryFunction;
   minDelay?: number;
   maxDelay?: number;
+  timeout?: number;
 }
 
 const defaultRetryConfig: Required<RetryConfig> = {
@@ -31,7 +32,8 @@ const defaultRetryConfig: Required<RetryConfig> = {
     return code < 400 || code >= 500 || this.shouldRetryCodes.indexOf(code) !== -1;
   },
   minDelay: 500,
-  maxDelay: 50000
+  maxDelay: 50000,
+  timeout: 0
 };
 
 /**

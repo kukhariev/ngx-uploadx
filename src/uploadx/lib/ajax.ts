@@ -38,6 +38,7 @@ export class UploadxAjax {
     responseType,
     canceler,
     onUploadProgress,
+    timeout = 0,
     withCredentials = false,
     validateStatus = status => status < 400 && status >= 200
   }: AjaxRequestConfig): Promise<AjaxResponse<T>> => {
@@ -45,6 +46,7 @@ export class UploadxAjax {
     canceler && (canceler.onCancel = () => xhr && xhr.readyState !== xhr.DONE && xhr.abort());
     return new Promise((resolve, reject) => {
       xhr.open(method, url, true);
+      xhr.timeout = timeout;
       withCredentials && (xhr.withCredentials = true);
       responseType && (xhr.responseType = responseType);
       responseType === 'json' && !headers.Accept && (headers.Accept = 'application/json');
