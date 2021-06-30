@@ -39,7 +39,8 @@
     "ci": "run-s lint test e2e build test:integration",
     "serve:ng7": "angular-http-server --path dist/app",
     "serve:latest": "angular-http-server --path integrations/latest/dist/latest",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "browserstack": "ng e2e --configuration browserstack --port 9091"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.13.10",
@@ -60,6 +61,7 @@
     "@types/node": "~12.12.0",
     "@uploadx/core": "^4.4.0",
     "angular-http-server": "^1.10.0",
+    "browserstack-local": "^1.4.8",
     "codelyzer": "^5.2.2",
     "core-js": "2.6.11",
     "cpx": "^1.5.0",
