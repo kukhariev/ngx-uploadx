@@ -139,6 +139,7 @@ export abstract class Uploader implements UploadState {
           this.progress = 100;
           this.status = 'complete';
         }
+        !this.offset && (await this.retry.wait(Number(this.responseHeaders['retry-after']) * 1000));
       } catch (e) {
         e instanceof Error && console.error(e);
         if (this.status !== 'uploading') {
