@@ -24,6 +24,8 @@ const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
   cancel: 'cancelled'
 };
 
+const POLLING_TIME = 1_000;
+
 /**
  * Uploader Base Class
  */
@@ -139,7 +141,10 @@ export abstract class Uploader implements UploadState {
           this.progress = 100;
           this.status = 'complete';
         }
-        !this.offset && (await this.retry.wait(Number(this.responseHeaders['retry-after']) * 1000));
+        if (!this.offset) {
+          this.stateChange(this);
+          await this.retry.wait(Number(this.responseHeaders['retry-after']) * 1000 || POLLING_TIME);
+        }
       } catch (e) {
         e instanceof Error && console.error(e);
         if (this.status !== 'uploading') {
