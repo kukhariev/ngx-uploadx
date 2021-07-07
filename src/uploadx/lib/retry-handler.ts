@@ -18,8 +18,13 @@ export interface RetryConfig {
   shouldRetryCodes?: number[];
   /** Overrides the built-in function that determines whether the operation should be repeated */
   shouldRetry?: ShouldRetryFunction;
+  /** The minimum retry delay */
   minDelay?: number;
+  /** The maximum retry delay */
   maxDelay?: number;
+  /** Delay used between retries for non-error responses with missing range/offset */
+  onBusyDelay?: number;
+  /** Time interval after which hanged requests must be retried */
   timeout?: number;
 }
 
@@ -33,6 +38,7 @@ const defaultRetryConfig: Required<RetryConfig> = {
   },
   minDelay: 500,
   maxDelay: 50000,
+  onBusyDelay: 1000,
   timeout: 0
 };
 

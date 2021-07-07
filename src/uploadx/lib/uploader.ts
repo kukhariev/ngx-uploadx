@@ -24,8 +24,6 @@ const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
   cancel: 'cancelled'
 };
 
-const POLLING_TIME = 1_000;
-
 /**
  * Uploader Base Class
  */
@@ -140,10 +138,9 @@ export abstract class Uploader implements UploadState {
           this.remaining = 0;
           this.progress = 100;
           this.status = 'complete';
-        }
-        if (!this.offset) {
+        } else if (!this.offset) {
           this.stateChange(this);
-          await this.retry.wait(Number(this.responseHeaders['retry-after']) * 1000 || POLLING_TIME);
+          await this.retry.wait(this.getRetryAfterFromBackend() || this.retry.config.onBusyDelay);
         }
       } catch (e) {
         e instanceof Error && console.error(e);
@@ -164,10 +161,14 @@ export abstract class Uploader implements UploadState {
             // force getOffset() on http errors and repeat request on network errors
             this.responseStatus >= 400 && (this.offset = undefined);
             this.status = 'retry';
-            await this.retry.wait(Number(this.responseHeaders['retry-after']) * 1000);
+            await this.retry.wait(this.getRetryAfterFromBackend());
         }
       }
     }
+  }
+
+  private getRetryAfterFromBackend(): number {
+    return Number(this.getValueFromResponse('retry-after')) * 1000;
   }
 
   /**
