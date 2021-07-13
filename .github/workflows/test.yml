@@ -22,6 +22,8 @@ jobs:
         run: npm run browserstack
         env:
           CI: true
+          BROWSERSTACK_ACCESS_KEY: "${{ secrets.BROWSERSTACK_ACCESS_KEY }}"
+          BROWSERSTACK_USERNAME: "${{ secrets.BROWSERSTACK_USERNAME }}"
       - name: Build
         run: npm run build
       - name: Integration test
