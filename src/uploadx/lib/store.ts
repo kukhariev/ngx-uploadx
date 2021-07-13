@@ -17,7 +17,7 @@ class Store {
 
   clear(): void {
     Object.keys(localStorage).forEach(
-      key => key.startsWith(this.prefix) && localStorage.removeItem(key)
+      key => key.indexOf(this.prefix) === 0 && localStorage.removeItem(key)
     );
   }
 }
