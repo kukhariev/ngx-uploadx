@@ -125,6 +125,11 @@ export interface UploaderOptions extends UploadItem {
    * Function used to apply authorization token
    */
   authorize?: AuthorizeRequest;
+  /**
+   * Keep an incomplete upload url for allow resuming after browser restart
+   * @defaultValue true
+   */
+  storeIncompleteUploadUrl?: boolean;
 }
 
 export type UploaderClass = new (
