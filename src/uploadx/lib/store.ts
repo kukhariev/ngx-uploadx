@@ -1,18 +1,16 @@
 class Store {
   prefix = 'UPLOADX-V3.0-';
 
-  set(key: string, value: string): this {
+  set(key: string, value: string): void {
     localStorage.setItem(this.prefix + key, value);
-    return this;
   }
 
   get(key: string): string | null {
     return localStorage.getItem(this.prefix + key);
   }
 
-  delete(key: string): boolean {
+  delete(key: string): void {
     localStorage.removeItem(this.prefix + key);
-    return true;
   }
 
   clear(): void {

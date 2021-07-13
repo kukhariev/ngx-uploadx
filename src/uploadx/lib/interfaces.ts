@@ -126,7 +126,7 @@ export interface UploaderOptions extends UploadItem {
    */
   authorize?: AuthorizeRequest;
   /**
-   * Keep an incomplete upload url for allow resuming after browser restart
+   * Keep an incomplete upload url to allow resuming after browser restart
    * @defaultValue true
    */
   storeIncompleteUploadUrl?: boolean;
