@@ -16,6 +16,6 @@ export class IdService implements UidService {
       type: uploader.constructor.name,
       endpoint: uploader.endpoint
     });
-    return createHash(print).toString(16);
+    return createHash(uploader.name + uploader.size).toString(16) + createHash(print).toString(16);
   }
 }
