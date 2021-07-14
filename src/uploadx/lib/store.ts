@@ -12,6 +12,12 @@ class Store {
   delete(key: string): void {
     localStorage.removeItem(this.prefix + key);
   }
+
+  clear(): void {
+    Object.keys(localStorage).forEach(
+      key => key.indexOf(this.prefix) === 0 && localStorage.removeItem(key)
+    );
+  }
 }
 
 export const store = isLocalStorageAvailable() ? new Store() : new Map<string, string>();

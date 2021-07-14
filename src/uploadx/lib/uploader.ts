@@ -59,13 +59,14 @@ export abstract class Uploader implements UploadState {
   private startTime!: number;
   private _token!: string;
   private _url = '';
+  private storeEnabled = this.options.storeIncompleteUploadUrl !== false;
 
   get url(): string {
-    return this._url || store.get(this.uploadId) || '';
+    return this._url || (this.storeEnabled && store.get(this.uploadId)) || '';
   }
 
   set url(value: string) {
-    this._url !== value && store.set(this.uploadId, value);
+    this._url !== value && this.storeEnabled && store.set(this.uploadId, value);
     this._url = value;
   }
 
@@ -261,7 +262,7 @@ export abstract class Uploader implements UploadState {
     return { start, end, body };
   }
 
-  private cleanup = () => store.delete(this.uploadId);
+  private cleanup = () => this.storeEnabled && store.delete(this.uploadId);
 
   private onProgress(): (evt: ProgressEvent) => void {
     let throttle: ReturnType<typeof setTimeout> | undefined;
