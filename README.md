@@ -99,6 +99,7 @@ export class AppHomeComponent {
   - `shouldRetry` Overrides the built-in function that determines whether the operation should be retried
   - `minDelay` Minimum (initial) retry interval. Default value: `500`
   - `maxDelay` Maximum retry interval. Default value: `50_000`
+  - `onBusyDelay` Delay used between retries for non-error responses with missing range/offset
   - `timeout` Time interval after which unfinished requests must be retried
 
 - `token` Authorization token as a `string` or function returning a `string` or `Promise<string>`
