@@ -27,6 +27,9 @@ const { build } = require('ng-packagr');
     await fsp.copyFile('LICENSE', 'dist/uploadx/LICENSE');
     await fsp.copyFile('README.md', 'dist/uploadx/README.md');
     await fsp.unlink('src/uploadx/package.json');
+    const distPackage = JSON.parse(await fsp.readFile('dist/uploadx/package.json', 'utf8'));
+    delete distPackage.dependencies.tslib;
+    await fsp.writeFile('dist/uploadx/package.json', JSON.stringify(distPackage, undefined, 2));
   } catch (error) {
     console.error(error);
     process.exit(1);
