@@ -61,6 +61,8 @@ export abstract class Uploader implements UploadState {
   private _url = '';
   private storeEnabled = this.options.storeIncompleteUploadUrl !== false;
 
+  private bodyData?: ArrayBuffer;
+
   get url(): string {
     return this._url || (this.storeEnabled && store.get(this.uploadId)) || '';
   }
@@ -253,13 +255,31 @@ export abstract class Uploader implements UploadState {
     return this.responseHeaders[key.toLowerCase()] || null;
   }
 
-  protected getChunk(): { start: number; end: number; body: Blob } {
-    this.chunkSize =
-      this.options.chunkSize === 0 ? this.size : this.options.chunkSize || DynamicChunk.size;
-    const start = this.offset || 0;
-    const end = Math.min(start + this.chunkSize, this.size);
-    const body = this.file.slice(this.offset, end);
-    return { start, end, body };
+  protected getChunk(): Promise<{ start: number; end: number; body: Blob }> {
+    return new Promise((resolve, reject) => {
+      this.chunkSize =
+        this.options.chunkSize === 0 ? this.size : this.options.chunkSize || DynamicChunk.size;
+      const start = this.offset || 0;
+      const end = Math.min(start + this.chunkSize, this.size);
+      if (this.bodyData) {
+        const body = new Blob([this.bodyData.slice(this.offset || 0, end)]);
+        return resolve({ start, end, body });
+      }
+
+      const reader = new FileReader();
+      reader.onerror = evt => {
+        console.error(evt);
+        this._status = 'error';
+        reject(new Error('FileReader fatal error'));
+      };
+
+      reader.onload = (evt: ProgressEvent) => {
+        this.bodyData = reader.result as ArrayBuffer;
+        const body = new Blob([this.bodyData.slice(this.offset || 0, end)]);
+        resolve({ start, end, body });
+      };
+      reader.readAsArrayBuffer(this.file);
+    });
   }
 
   private cleanup = () => this.storeEnabled && store.delete(this.uploadId);

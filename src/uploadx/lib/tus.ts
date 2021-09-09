@@ -25,7 +25,7 @@ export class Tus extends Uploader {
   }
 
   async sendFileContent(): Promise<number | undefined> {
-    const { body } = this.getChunk();
+    const { body } = await this.getChunk();
     const headers = {
       'Content-Type': 'application/offset+octet-stream',
       'Upload-Offset': `${this.offset}`

@@ -31,7 +31,7 @@ export class UploaderX extends Uploader {
   }
 
   async sendFileContent(): Promise<number | undefined> {
-    const { end, body } = this.getChunk();
+    const { end, body } = await this.getChunk();
     const headers = {
       'Content-Type': 'application/octet-stream',
       'Content-Range': `bytes ${this.offset}-${end - 1}/${this.size}`
