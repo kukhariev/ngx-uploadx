@@ -12,7 +12,13 @@ import {
   UploadxOptions
 } from './options';
 import { Uploader } from './uploader';
-import { pick } from './utils';
+import { isIOS, pick } from './utils';
+
+const iOSPatch = (options: UploadxOptions) => {
+  console.warn('iOS device is detected, chunk uploading and retries on errors are disabled.');
+  options.chunkSize = 0;
+  options.retryConfig = { shouldRetry: () => false };
+};
 
 const stateKeys: Array<keyof UploadState> = [
   'file',
@@ -102,6 +108,7 @@ export class UploadxService implements OnDestroy {
   handleFiles(files: FileList | File | File[], options = {} as UploadxOptions): void {
     const instanceOptions: UploadxFactoryOptions = { ...this.options, ...options };
     this.options.concurrency = instanceOptions.concurrency;
+    isIOS() && iOSPatch(instanceOptions);
     ('name' in files ? [files] : Array.from(files)).forEach(file =>
       this.addUploaderInstance(file, instanceOptions)
     );
