@@ -6,6 +6,7 @@ import { Ajax, AjaxRequestConfig, AjaxResponse, UPLOADX_AJAX } from './ajax';
 import { IdService } from './id.service';
 import { UploadState, UploadxControlEvent, Writable } from './interfaces';
 import {
+  iOSPatch,
   UPLOADX_FACTORY_OPTIONS,
   UPLOADX_OPTIONS,
   UploadxFactoryOptions,
@@ -13,12 +14,6 @@ import {
 } from './options';
 import { Uploader } from './uploader';
 import { isIOS, pick } from './utils';
-
-const iOSPatch = (options: UploadxOptions) => {
-  console.warn('iOS device is detected, chunk uploading and retries on errors are disabled.');
-  options.chunkSize = 0;
-  options.retryConfig = { shouldRetry: () => false };
-};
 
 const stateKeys: Array<keyof UploadState> = [
   'file',
