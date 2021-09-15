@@ -22,25 +22,25 @@
   "license": "MIT",
   "private": true,
   "engines": {
-    "node": ">=12.12.0"
+    "node": ">=12.12.0",
+    "npm": "<7.0.0"
   },
   "scripts": {
-    "serve:dev": "ng serve",
     "start": "run-p serve:dev server",
-    "lint": "ng lint",
     "test": "ng test --watch=false --progress=false --browsers=ChromeHeadless",
     "e2e": "ng e2e",
+    "lint": "ng lint",
+    "serve:dev": "ng serve",
     "server": "node ./server/ --debug",
-    "build": "node ./scripts/build.js",
-    "prettier": "prettier --write \"**/*.{js,json,scss,md,ts,html}\"",
-    "test:integration": "run-s -sn build:**",
+    "build:pkg": "node scripts/build.js",
+    "build:ng": "node scripts/build-app",
     "build:prod": "ng build --prod",
-    "build:apps": "node scripts/runner.js \"ng build --configuration production\"",
-    "ci": "run-s lint test e2e build test:integration",
-    "serve:ng7": "angular-http-server --path dist/app",
+    "serve:prod": "angular-http-server --path dist/app",
+    "build:latest": "npm run build:ng latest",
     "serve:latest": "angular-http-server --path integrations/latest/dist/latest",
     "prepare": "husky install",
-    "browserstack": "ng e2e --configuration browserstack --port 9091"
+    "browserstack": "ng e2e --configuration browserstack --port 9091",
+    "prettier": "prettier --write \"**/*.{js,json,scss,md,ts,html}\""
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.13.10",
