@@ -1,0 +1,26 @@
+name: build
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: '0 6 * * *'
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ng: [latest, 10]
+    name: Build app with @angular/cli
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12.x'
+      - name: Build package
+        run: |
+          npm install
+          npm run build:pkg
+      - name: Build app
+        run: npm run build:ng ${{ matrix.ng }}

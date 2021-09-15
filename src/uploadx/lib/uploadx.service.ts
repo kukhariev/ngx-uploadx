@@ -6,13 +6,14 @@ import { Ajax, AjaxRequestConfig, AjaxResponse, UPLOADX_AJAX } from './ajax';
 import { IdService } from './id.service';
 import { UploadState, UploadxControlEvent, Writable } from './interfaces';
 import {
+  iOSPatch,
   UPLOADX_FACTORY_OPTIONS,
   UPLOADX_OPTIONS,
   UploadxFactoryOptions,
   UploadxOptions
 } from './options';
 import { Uploader } from './uploader';
-import { pick } from './utils';
+import { isIOS, pick } from './utils';
 
 const stateKeys: Array<keyof UploadState> = [
   'file',
@@ -102,6 +103,7 @@ export class UploadxService implements OnDestroy {
   handleFiles(files: FileList | File | File[], options = {} as UploadxOptions): void {
     const instanceOptions: UploadxFactoryOptions = { ...this.options, ...options };
     this.options.concurrency = instanceOptions.concurrency;
+    isIOS() && iOSPatch(instanceOptions);
     ('name' in files ? [files] : Array.from(files)).forEach(file =>
       this.addUploaderInstance(file, instanceOptions)
     );

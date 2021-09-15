@@ -2,7 +2,7 @@
 const { promises: fsp } = require('fs');
 const { build } = require('ng-packagr');
 
-(async () => {
+async function buildPkg() {
   try {
     const rootPackage = JSON.parse(await fsp.readFile('package.json', 'utf8'));
     const libPackage = {};
@@ -31,4 +31,6 @@ const { build } = require('ng-packagr');
     console.error(error);
     process.exit(1);
   }
-})();
+}
+
+void buildPkg();

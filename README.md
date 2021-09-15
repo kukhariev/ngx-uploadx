@@ -3,8 +3,11 @@
 > Angular Resumable Upload Module
 
 [![npm version][npm-image]][npm-url]
-[![Build status][travis-image]][travis-url]
 [![commits since latest release][comm-image]][comm-url]
+
+[![tests][tests-image]][tests-url]
+[![build][build-image]][build-url]
+[![browserstack][browserstack-image]][browserstack-url]
 
 ## Key Features
 
@@ -260,7 +263,11 @@ The MIT License (see the [LICENSE](LICENSE) file for the full text)
 
 [npm-image]: https://img.shields.io/npm/v/ngx-uploadx.svg
 [npm-url]: https://www.npmjs.com/package/ngx-uploadx
-[travis-image]: https://travis-ci.org/kukhariev/ngx-uploadx.svg?branch=master
-[travis-url]: https://travis-ci.org/kukhariev/ngx-uploadx
+[tests-image]: https://github.com/kukhariev/ngx-uploadx/actions/workflows/test.yml/badge.svg
+[tests-url]: https://github.com/kukhariev/ngx-uploadx/actions/workflows/test.yml
+[build-image]: https://github.com/kukhariev/ngx-uploadx/actions/workflows/integration.yml/badge.svg
+[build-url]: https://github.com/kukhariev/ngx-uploadx/actions/workflows/integration.yml
+[browserstack-image]: https://github.com/kukhariev/ngx-uploadx/actions/workflows/browserstack.yml/badge.svg
+[browserstack-url]: https://github.com/kukhariev/ngx-uploadx/actions/workflows/browserstack.yml
 [comm-image]: https://img.shields.io/github/commits-since/kukhariev/ngx-uploadx/latest
 [comm-url]: https://github.com/kukhariev/ngx-uploadx/releases/latest

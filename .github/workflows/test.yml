@@ -1,30 +1,55 @@
-name: CI
-'on':
-  - push
+name: test
+on: push
 jobs:
-  test:
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: 'Use Node.js'
-        uses: actions/setup-node@v2
+      - uses: actions/setup-node@v2
         with:
           node-version: '12.x'
       - name: Install dependencies
         run: npm install
-      - name: Lint
+      - name: Run linter
         run: npm run lint
-      - name: Test
+  specs:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12.x'
+      - name: Install dependencies
+        run: npm install
+      - name: Run unit tests
         run: npm test
         env:
           CI: true
-      - name: Browserstack e2e
-        run: npm run browserstack
+  e2e:
+    name: End-to-end tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12.x'
+      - name: Install dependencies
+        run: npm install
+      - name: Run e2e tests
+        run: npm run e2e
         env:
           CI: true
-          BROWSERSTACK_ACCESS_KEY: "${{ secrets.BROWSERSTACK_ACCESS_KEY }}"
-          BROWSERSTACK_USERNAME: "${{ secrets.BROWSERSTACK_USERNAME }}"
-      - name: Build
-        run: npm run build
-      - name: Integration test
-        run: npm run test:integration
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12.x'
+      - name: Install dependencies
+        run: npm install
+      - name: Build package
+        run: npm run build:pkg

@@ -99,3 +99,13 @@ export class DynamicChunk {
     return DynamicChunk.size;
   }
 }
+
+export function isIOS(): boolean {
+  return /iPad|iPhone|iPod/.test(navigator.platform)
+    ? true
+    : !!(
+        navigator.maxTouchPoints &&
+        navigator.maxTouchPoints > 2 &&
+        /MacIntel/.test(navigator.platform)
+      );
+}

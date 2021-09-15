@@ -56,3 +56,9 @@ export const UPLOADX_FACTORY_OPTIONS = new InjectionToken<UploadxFactoryOptions>
   { providedIn: 'root', factory: () => defaultOptions }
 );
 export const UPLOADX_OPTIONS = new InjectionToken<UploadxOptions>('uploadx.options');
+
+export const iOSPatch = (options: UploadxOptions) => {
+  console.warn('iOS device is detected, chunk uploading and retries on errors are disabled.');
+  options.chunkSize = 0;
+  options.retryConfig = { shouldRetry: () => false };
+};
