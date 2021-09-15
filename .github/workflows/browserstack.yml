@@ -1,0 +1,24 @@
+name: browserstack
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: '0 7 * * *'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12.x'
+      - name: Install dependencies
+        run: npm install
+      - name: Browserstack e2e
+        run: npm run browserstack
+        env:
+          CI: true
+          BROWSERSTACK_ACCESS_KEY: '${{ secrets.BROWSERSTACK_ACCESS_KEY }}'
+          BROWSERSTACK_USERNAME: '${{ secrets.BROWSERSTACK_USERNAME }}'
