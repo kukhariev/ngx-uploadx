@@ -3,7 +3,7 @@ const browserstack = require('browserstack-local');
 const { StacktraceOption } = require('jasmine-spec-reporter');
 
 exports.config = {
-  allScriptsTimeout: 180_000,
+  allScriptsTimeout: 240_000,
   specs: ['./**/*.e2e-spec.ts'],
   browserstackUser: process.env.BROWSERSTACK_USERNAME,
   browserstackKey: process.env.BROWSERSTACK_ACCESS_KEY,
@@ -12,6 +12,7 @@ exports.config = {
     projectName: 'ngx-uploadx',
     build: 'browserstack-e2e',
     'browserstack.local': true,
+    'browserstack.debug': true,
     'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER
   },
 
@@ -35,7 +36,7 @@ exports.config = {
   framework: 'jasmine',
   jasmineNodeOpts: {
     showColors: true,
-    defaultTimeoutInterval: 50000,
+    defaultTimeoutInterval: 60000,
     print: function () {}
   },
   onPrepare: () => {
