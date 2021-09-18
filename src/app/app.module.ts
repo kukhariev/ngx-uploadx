@@ -5,6 +5,8 @@ import { UploadxModule } from 'ngx-uploadx';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
 import { DirectiveWayComponent } from './directive-way/directive-way.component';
+import { DownloadComponent } from './file-generator/download/download.component';
+import { FileGeneratorComponent } from './file-generator/file-generator.component';
 import { AComponent } from './multi-service/a/a.component';
 import { BComponent } from './multi-service/b/b.component';
 import { MultiServiceComponent } from './multi-service/multi-service.component';
@@ -16,16 +18,18 @@ import { TusComponent } from './tus/tus.component';
 
 @NgModule({
   declarations: [
-    AppComponent,
-    DirectiveWayComponent,
-    ServiceWayComponent,
-    ServiceCodeWayComponent,
-    OnPushComponent,
-    MultipleDirectiveComponent,
-    TusComponent,
-    MultiServiceComponent,
     AComponent,
-    BComponent
+    AppComponent,
+    BComponent,
+    DirectiveWayComponent,
+    DownloadComponent,
+    FileGeneratorComponent,
+    MultipleDirectiveComponent,
+    MultiServiceComponent,
+    OnPushComponent,
+    ServiceCodeWayComponent,
+    ServiceWayComponent,
+    TusComponent
   ],
   imports: [
     RouterModule.forRoot(appRoutes),

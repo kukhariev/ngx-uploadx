@@ -1,0 +1,8 @@
+<div>
+  <h4>Download test files:</h4>
+  <div class="files">
+    <div *ngFor="let size of sizesMB" class="file">
+      <downloader [size]="size"></downloader>
+    </div>
+  </div>
+</div>
