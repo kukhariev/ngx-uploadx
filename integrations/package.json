@@ -4,11 +4,11 @@
   "private": true,
   "description": "Some script examples",
   "scripts": {
-    "build:latest": "npm run build:ng -prefix ../",
-    "build:ng10": "npm run build:ng 10  -prefix ../",
-    "build:next": "npm run build:ng next  -prefix ../",
+    "build:latest": "npm run build:ng latest -prefix ../",
+    "build:ng10": "npm run build:ng 10 -prefix ../",
+    "build:next": "npm run build:ng next -prefix ../",
     "test:latest": "npm run test -prefix latest",
-    "clean": "echo -todo-",
+    "clean": "npx rimraf ./*/",
     "serve:latest": "npx angular-http-server --path latest/dist/latest",
     "serve:ng10": "npx angular-http-server --path ng10/dist/ng10"
   }
