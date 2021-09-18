@@ -1,4 +1,5 @@
 import { DirectiveWayComponent } from './directive-way/directive-way.component';
+import { FileGeneratorComponent } from './file-generator/file-generator.component';
 import { MultiServiceComponent } from './multi-service/multi-service.component';
 import { MultipleDirectiveComponent } from './multiple-directive/multiple-directive.component';
 import { OnPushComponent } from './on-push/on-push.component';
@@ -14,5 +15,6 @@ export const appRoutes = [
   { path: 'on-push', component: OnPushComponent },
   { path: 'multi', component: MultipleDirectiveComponent },
   { path: 'multi2', component: MultiServiceComponent },
-  { path: 'tus', component: TusComponent }
+  { path: 'tus', component: TusComponent },
+  { path: 'file-generator', component: FileGeneratorComponent }
 ];
