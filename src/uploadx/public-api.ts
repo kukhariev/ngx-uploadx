@@ -12,3 +12,4 @@ export * from './lib/uploadx.directive';
 export * from './lib/options';
 export * from './lib/canceler';
 export * from './lib/id.service';
+export * from './lib/store';
