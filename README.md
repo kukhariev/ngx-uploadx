@@ -78,6 +78,8 @@ export class AppHomeComponent {
 
 - `storeIncompleteUploadUrl` Keep an incomplete upload URL to allow resuming after browser restart. Default value: `true`
 
+- `storeIncompleteHours` Limit upload lifetime. Default value: `24`
+
 - `chunkSize` Fixed chunk size. If not specified, the optimal size will be automatically adjusted based on the network speed.
   If set to `0`, normal unloading will be used instead of chunked.
 
