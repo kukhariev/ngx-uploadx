@@ -2,6 +2,11 @@ const { SpecReporter } = require('jasmine-spec-reporter');
 const browserstack = require('browserstack-local');
 const { StacktraceOption } = require('jasmine-spec-reporter');
 
+chromeDriver =
+  process.env.CI && process.env.CHROMEWEBDRIVER
+    ? process.env.CHROMEWEBDRIVER + '/chromedriver'
+    : '';
+
 exports.config = {
   allScriptsTimeout: 240_000,
   specs: ['./**/*.e2e-spec.ts'],
@@ -33,6 +38,7 @@ exports.config = {
   ],
 
   baseUrl: 'http://localhost:9091/',
+  chromeDriver,
   framework: 'jasmine',
   jasmineNodeOpts: {
     showColors: true,
