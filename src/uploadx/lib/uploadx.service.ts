@@ -12,6 +12,7 @@ import {
   UploadxFactoryOptions,
   UploadxOptions
 } from './options';
+import { store } from './store';
 import { Uploader } from './uploader';
 import { isIOS, pick } from './utils';
 
@@ -40,11 +41,6 @@ export class UploadxService implements OnDestroy {
   private readonly eventsStream: Subject<UploadState> = new Subject();
   private subs: Subscription[] = [];
 
-  /** Upload status events */
-  get events(): Observable<UploadState> {
-    return this.eventsStream.asObservable();
-  }
-
   constructor(
     @Optional() @Inject(UPLOADX_OPTIONS) options: UploadxOptions | null,
     @Inject(UPLOADX_FACTORY_OPTIONS) defaults: UploadxFactoryOptions,
@@ -59,6 +55,11 @@ export class UploadxService implements OnDestroy {
         fromEvent(window, 'offline').subscribe(() => this.control({ action: 'pause' }))
       );
     }
+  }
+
+  /** Upload status events */
+  get events(): Observable<UploadState> {
+    return this.eventsStream.asObservable();
   }
 
   /**
@@ -101,9 +102,12 @@ export class UploadxService implements OnDestroy {
    * Creates uploaders for files and adds them to the upload queue
    */
   handleFiles(files: FileList | File | File[], options = {} as UploadxOptions): void {
+    isIOS() && iOSPatch(options);
     const instanceOptions: UploadxFactoryOptions = { ...this.options, ...options };
+    store.clear(
+      (instanceOptions.storeIncompleteUploadUrl || 0) && instanceOptions.storeIncompleteHours
+    );
     this.options.concurrency = instanceOptions.concurrency;
-    isIOS() && iOSPatch(instanceOptions);
     ('name' in files ? [files] : Array.from(files)).forEach(file =>
       this.addUploaderInstance(file, instanceOptions)
     );

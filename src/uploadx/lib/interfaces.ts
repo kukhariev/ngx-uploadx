@@ -97,7 +97,7 @@ interface UploadItem {
    */
   metadata?: Metadata | ((file: File) => Metadata);
   /**
-   * Authorization  token as a `string` or function returning a `string` or `Promise<string>`
+   * Authorization token as a `string` or function returning a `string` or `Promise<string>`
    */
   token?: string | ((httpStatus: number) => string | Promise<string>);
 }
@@ -125,11 +125,6 @@ export interface UploaderOptions extends UploadItem {
    * Function used to apply authorization token
    */
   authorize?: AuthorizeRequest;
-  /**
-   * Keep an incomplete upload url to allow resuming after browser restart
-   * @defaultValue true
-   */
-  storeIncompleteUploadUrl?: boolean;
 }
 
 export type UploaderClass = new (
