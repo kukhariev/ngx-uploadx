@@ -14,7 +14,8 @@ describe('ServiceCodeWayComponent', () => {
     const uploadServiceStub = {
       init: jasmine.createSpy('init'),
       control: jasmine.createSpy('control'),
-      handleFiles: jasmine.createSpy('handleFiles')
+      handleFiles: jasmine.createSpy('handleFiles'),
+      queue: []
     };
     TestBed.configureTestingModule({
       declarations: [ServiceCodeWayComponent],

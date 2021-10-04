@@ -24,7 +24,12 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
 
   private unsubscribe$ = new Subject();
 
-  constructor(private uploadService: UploadxService) {}
+  constructor(private uploadService: UploadxService) {
+    // restore background uploads
+    this.uploadService.queue.forEach(uploader => {
+      this.uploads.push(new Ufile(uploader));
+    });
+  }
 
   ngOnInit(): void {
     this.state$ = this.uploadService.init(this.options);

@@ -117,7 +117,7 @@ export class AppHomeComponent {
 
 Adds directives and provide static method `withConfig` for global configuration [(example)](src/app/app.module.ts)
 
-:bulb: _No need to import `UploadxModule` if you do not use the `uploadx` or `uploadxDrop` directives in your application!_
+> :bulb: _No need to import `UploadxModule` if you do not use the `uploadx` or `uploadxDrop` directives in your application_
 
 ### Directives
 
