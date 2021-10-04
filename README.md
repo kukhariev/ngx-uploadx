@@ -117,6 +117,8 @@ export class AppHomeComponent {
 
 Adds directives and provide static method `withConfig` for global configuration [(example)](src/app/app.module.ts)
 
+:bulb: _No need to import `UploadxModule` if you do not use the `uploadx` or `uploadxDrop` directives in your application!_
+
 ### Directives
 
 ```html
@@ -202,7 +204,6 @@ _Activates the `.uploadx-drop-active` class on DnD operations._
   Terminate all uploads and clears the queue
 
 - `handleFiles(files: FileList | File | File[], options = {} as UploadxOptions): void`
-
   Creates uploaders for files and adds them to the upload queue
 
 - `control(event: UploadxControlEvent): void`
