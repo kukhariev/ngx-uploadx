@@ -203,6 +203,10 @@ _Activates the `.uploadx-drop-active` class on DnD operations._
 
   Terminate all uploads and clears the queue
 
+- `ngOnDestroy(): void`
+
+  Called when the service instance is destroyed. By default interrupts all uploads and clears the queue and subscriptions
+
 - `handleFiles(files: FileList | File | File[], options = {} as UploadxOptions): void`
   Creates uploaders for files and adds them to the upload queue
 
