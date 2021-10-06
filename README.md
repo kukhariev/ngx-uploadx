@@ -58,7 +58,7 @@ export class AppHomeComponent {
 }
 ```
 
-> _Please navigate to the [src/app sub-folder](src/app) for more detailed examples_
+> _Please navigate to the [src/app sub-folder](src/app) for more detailed examples._
 
 ## Server-side setup
 
@@ -81,7 +81,7 @@ export class AppHomeComponent {
 - `storeIncompleteHours` Limit upload lifetime. Default value: `24`
 
 - `chunkSize` Fixed chunk size. If not specified, the optimal size will be automatically adjusted based on the network speed.
-  If set to `0`, normal unloading will be used instead of chunked.
+  If set to `0`, normal unloading will be used instead of chunked
 
 - `maxChunkSize` Dynamic chunk size limit
 
@@ -101,7 +101,7 @@ export class AppHomeComponent {
 
   - `maxAttempts` Maximum number of retry attempts. Default value: `8`
   - `shouldRestartCodes` Upload not exist and will be restarted. Default value: `[404, 410]`
-  - `authErrorCodes` If one of these codes is received, the request will be repeated with an updated authorization token . Default value: `[401]`
+  - `authErrorCodes` If one of these codes is received, the request will be repeated with an updated authorization token. Default value: `[401]`
   - `shouldRetryCodes` Retryable 4xx status codes. Default value: `[423, 429]`
   - `shouldRetry` Overrides the built-in function that determines whether the operation should be retried
   - `minDelay` Minimum (initial) retry interval. Default value: `500`
@@ -111,11 +111,13 @@ export class AppHomeComponent {
 
 - `token` Authorization token as a `string` or function returning a `string` or `Promise<string>`
 
-- `uploaderClass` Upload API implementation. Built-in: `UploaderX`(default), `Tus`. More [examples](uploader-examples).
+- `uploaderClass` Upload API implementation. Built-in: `UploaderX`(default), `Tus`. More [examples](uploader-examples)
 
 ### UploadxModule
 
-Adds directives and provide static method `withConfig` for global configuration [(example)](src/app/app.module.ts)
+Adds directives and provide static method `withConfig` for global configuration [(example)](src/app/app.module.ts).
+
+> :bulb: _No need to import `UploadxModule` if you do not use the `uploadx` or `uploadxDrop` directives in your application._
 
 ### Directives
 
@@ -129,7 +131,7 @@ Adds directives and provide static method `withConfig` for global configuration 
 
 #### uploadx
 
-File input directive
+File input directive.
 
 selectors: `[uploadx]`, `uploadx`
 
@@ -149,7 +151,7 @@ File drop directive.
 
 selector: `uploadxDrop`
 
-_Activates the `.uploadx-drop-active` class on DnD operations._
+> :bulb: _Activates the `.uploadx-drop-active` class on DnD operations._
 
 ### UploadxService
 
@@ -166,8 +168,8 @@ _Activates the `.uploadx-drop-active` class on DnD operations._
   };
   ngOnInit() {
     this.uploadService.init(this.uploadxOptions)
-      .subscribe((item: UploadState) => {
-        console.log(item);
+      .subscribe((state: UploadState) => {
+        console.log(state);
         // ...
       }
   }
@@ -175,7 +177,7 @@ _Activates the `.uploadx-drop-active` class on DnD operations._
 
 - `connect(options?: UploadxOptions): Observable<Uploader[]>`
 
-  Initializes service. Returns Observable that emits the current queue
+  Initializes service. Returns Observable that emits the current queue.
 
   ```ts
   // @example:
@@ -199,19 +201,33 @@ _Activates the `.uploadx-drop-active` class on DnD operations._
 
 - `disconnect(): void`
 
-  Terminate all uploads and clears the queue
+  Terminate all uploads and clears the queue.
+
+- `ngOnDestroy(): void`
+
+  Called when the service instance is destroyed. Interrupts all uploads and clears the queue and subscriptions.
+
+  > :bulb: _Normally `ngOnDestroy()` is never called because `UploadxService` is an application-wide service,
+  > and uploading will continue even after the upload component is destroyed._
 
 - `handleFiles(files: FileList | File | File[], options = {} as UploadxOptions): void`
 
-  Creates uploaders for files and adds them to the upload queue
+  ```ts
+  // @example:
+  onFilesSelected(): void {
+    this.uploadService.handleFiles(this.fileInput.nativeElement.files);
+  }
+  ```
+
+  Creates uploaders for files and adds them to the upload queue.
 
 - `control(event: UploadxControlEvent): void`
 
-  Uploads control
+  Uploads control.
 
   ```ts
   // @example:
-  pause(uploadId: string) {
+  pause(uploadId?: string) {
     this.uploadService.control({ action: 'pause', uploadId });
   }
   setToken(token: string) {
@@ -221,23 +237,37 @@ _Activates the `.uploadx-drop-active` class on DnD operations._
 
 - `request<T = string>(config: AjaxRequestConfig): Promise<AjaxResponse<T>>`
 
-  Make HTTP request with `axios` like interface.
+  Make HTTP request with `axios` like interface. [(example)](src/app/service-way/service-way.component.ts)
 
 - `queue: Uploader[]`
 
-  Uploaders array
+  Uploaders array.
+
+  ```ts
+  // @example:
+  export class UploadComponent {
+    state: UploadState;
+    options: UploadxOptions = {
+      concurrency: 1,
+      multiple: false,
+      endpoint: `${environment.api}/upload`,
+    }
+    constructor(private uploadService: UploadxService) {
+      this.state = this.uploadService.queue[0] || {};
+    }
+  ```
 
 - `events: Observable<UploadState>`
 
-  Uploads state events
+  Uploads state events.
 
 ### DI tokens
 
-- `UPLOADX_FACTORY_OPTIONS` for override default configuration
+- `UPLOADX_FACTORY_OPTIONS`: override default configuration
 
-- `UPLOADX_OPTIONS` for global options
+- `UPLOADX_OPTIONS`: global options
 
-- `UPLOADX_AJAX` for override internal ajax lib
+- `UPLOADX_AJAX`: override internal ajax lib
 
 ## Run demo
 
