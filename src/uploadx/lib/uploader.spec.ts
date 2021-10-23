@@ -133,11 +133,13 @@ describe('Uploader', () => {
       const updateToken = spyOn<any>(uploader, 'updateToken').and.callThrough();
       const getFileUrl = spyOn(uploader, 'getFileUrl').and.callThrough();
       const getOffset = spyOn(uploader, 'getOffset').and.callThrough();
+      const sendFileContent = spyOn(uploader, 'sendFileContent').and.callThrough();
       const cleanup = spyOn<any>(uploader, 'cleanup').and.callThrough();
       await uploader.upload();
       expect(updateToken).toHaveBeenCalledTimes(1);
       expect(getFileUrl).toHaveBeenCalledTimes(1);
-      expect(getOffset).toHaveBeenCalledTimes(0);
+      expect(getOffset).toHaveBeenCalledTimes(1);
+      expect(sendFileContent).toHaveBeenCalledTimes(1);
       expect(cleanup).toHaveBeenCalled();
       expect(uploader.status).toEqual('complete');
     });

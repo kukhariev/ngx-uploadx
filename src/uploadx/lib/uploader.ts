@@ -48,7 +48,7 @@ export abstract class Uploader implements UploadState {
   /** Auth token/tokenGetter */
   token: UploadxControlEvent['token'];
   /** Byte offset within the whole file */
-  offset? = 0;
+  offset?: number;
   /** Retries handler */
   retry: RetryHandler;
   canceler = new Canceler();
