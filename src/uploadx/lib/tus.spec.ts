@@ -4,35 +4,38 @@ import { Tus } from './tus';
 // tslint:disable: no-any
 const fileWithType = new File(['123456'], 'filename.txt', { type: 'text/plain' });
 describe('getFileUrl', () => {
-  let upx: Tus;
+  let uploader: Tus;
   let req: jasmine.Spy;
   let getValueFromResponse: jasmine.Spy;
   it('should set headers', async () => {
-    upx = new Tus(fileWithType, {}, () => {}, {} as Ajax);
-    req = spyOn<any>(upx, 'request').and.callFake(({ headers }: any) => {
+    uploader = new Tus(fileWithType, {}, () => {}, {} as Ajax);
+    req = spyOn<any>(uploader, 'request').and.callFake(({ headers }: any) => {
       expect(headers['Upload-Metadata']).toContain('name');
       expect(headers['Upload-Length']).toEqual('6');
     });
-    getValueFromResponse = spyOn<any>(upx, 'getValueFromResponse').and.returnValue('/12345678');
-    expect(upx.name).toEqual('filename.txt');
-    expect(upx.size).toEqual(6);
-    expect(await upx.getFileUrl()).toEqual('/12345678');
+    getValueFromResponse = spyOn<any>(uploader, 'getValueFromResponse').and.returnValue(
+      '/12345678'
+    );
+    expect(uploader.name).toEqual('filename.txt');
+    expect(uploader.size).toEqual(6);
+    expect(await uploader.getFileUrl()).toEqual('/12345678');
     expect(req).toHaveBeenCalled();
     expect(getValueFromResponse).toHaveBeenCalled();
   });
 });
 describe('sendFileContent', () => {
-  let upx: Tus;
+  let uploader: Tus;
   let req: jasmine.Spy;
   let getOffsetFromResponse: jasmine.Spy;
   it('should set Upload-Offset header', async () => {
-    upx = new Tus(fileWithType, {}, () => {}, {} as Ajax);
-    req = spyOn<any>(upx, 'request').and.callFake(({ headers }: any) => {
+    uploader = new Tus(fileWithType, {}, () => {}, {} as Ajax);
+    uploader.offset = 0;
+    req = spyOn<any>(uploader, 'request').and.callFake(({ headers }: any) => {
       expect(headers['Content-Type']).toEqual('application/offset+octet-stream');
       expect(headers['Upload-Offset']).toEqual('0');
     });
-    getOffsetFromResponse = spyOn<any>(upx, 'getOffsetFromResponse').and.returnValue(6);
-    expect(await upx.sendFileContent()).toEqual(6);
+    getOffsetFromResponse = spyOn<any>(uploader, 'getOffsetFromResponse').and.returnValue(6);
+    expect(await uploader.sendFileContent()).toEqual(6);
     expect(req).toHaveBeenCalled();
     expect(getOffsetFromResponse).toHaveBeenCalled();
   });
