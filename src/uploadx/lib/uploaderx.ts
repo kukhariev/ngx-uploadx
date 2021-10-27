@@ -26,7 +26,7 @@ export class UploaderX extends Uploader {
     if (!location) {
       throw new Error('Invalid or missing Location header');
     }
-    this.offset = this.responseStatus === 201 ? 0 : undefined;
+    this.offset = this.getOffsetFromResponse() || (this.responseStatus === 201 ? 0 : undefined);
     return resolveUrl(location, this.endpoint);
   }
 
@@ -37,7 +37,7 @@ export class UploaderX extends Uploader {
       'Content-Range': `bytes ${this.offset}-${end - 1}/${this.size}`
     };
     await this.request({ method: 'PUT', body, headers });
-    return this.getOffsetFromResponse();
+    return this.responseStatus > 201 ? this.getOffsetFromResponse() : this.size;
   }
 
   async getOffset(): Promise<number | undefined> {
@@ -46,15 +46,12 @@ export class UploaderX extends Uploader {
       'Content-Range': `bytes */${this.size}`
     };
     await this.request({ method: 'PUT', headers });
-    return this.getOffsetFromResponse();
+    return this.responseStatus > 201 ? this.getOffsetFromResponse() : this.size;
   }
 
   protected getOffsetFromResponse(): number | undefined {
-    if (this.responseStatus > 201) {
-      const range = this.getValueFromResponse('Range');
-      return range ? getRangeEnd(range) + 1 : undefined;
-    }
-    return this.size;
+    const range = this.getValueFromResponse('Range');
+    return range ? getRangeEnd(range) + 1 : undefined;
   }
 }
 
