@@ -58,7 +58,7 @@
     "@types/jasmine": "~3.10.1",
     "@types/jasminewd2": "~2.0.10",
     "@types/node": "12.12.41",
-    "@uploadx/core": "^4.4.2",
+    "@uploadx/core": "^4.5.0",
     "angular-http-server": "^1.10.0",
     "browserstack-local": "^1.4.8",
     "codelyzer": "^5.2.2",

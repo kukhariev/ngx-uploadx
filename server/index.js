@@ -5,17 +5,17 @@ const debug = args.includes('--debug');
 debug && (process.env.DEBUG = 'uploadx:*');
 const url = require('url');
 const { tmpdir } = require('os');
-const { Multipart, Tus, Uploadx } = require('@uploadx/core');
+const { DiskStorage, Multipart, Tus, Uploadx } = require('@uploadx/core');
 const { createServer } = require('http');
 
 const PORT = 3002;
 const UPLOAD_DIR = `${tmpdir()}/ngx-uploadx/`;
 
 const opts = { directory: UPLOAD_DIR, path: '/files' };
-
-const upx = new Uploadx(opts);
-const tus = new Tus(opts);
-const mpt = new Multipart(opts);
+const storage = new DiskStorage(opts);
+const upx = new Uploadx({ storage });
+const tus = new Tus({ storage });
+const mpt = new Multipart({ storage });
 
 const pathRegexp = new RegExp(`^${opts.path}([\/\?]|$)`);
 
