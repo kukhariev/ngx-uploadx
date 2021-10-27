@@ -132,7 +132,11 @@ export abstract class Uploader implements UploadState {
       this.status = 'uploading';
       try {
         this.url = this.url || (await this.getFileUrl());
-        this.offset = isNumber(this.offset) ? await this.sendFileContent() : await this.getOffset();
+        if (this.offset !== this.size) {
+          this.offset = isNumber(this.offset)
+            ? await this.sendFileContent()
+            : await this.getOffset();
+        }
         this.retry.observe(this.offset);
         if (this.offset === this.size) {
           this.remaining = 0;

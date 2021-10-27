@@ -20,7 +20,7 @@ export class Tus extends Uploader {
     if (!location) {
       throw new Error('Invalid or missing Location header');
     }
-    this.offset = this.responseStatus === 201 ? 0 : undefined;
+    this.offset = this.getOffsetFromResponse() || (this.responseStatus === 201 ? 0 : undefined);
     return resolveUrl(location, this.endpoint);
   }
 
@@ -40,7 +40,7 @@ export class Tus extends Uploader {
   }
 
   protected getOffsetFromResponse(): number | undefined {
-    const offsetStr = this.getValueFromResponse('Upload-Offset');
-    return offsetStr ? parseInt(offsetStr, 10) : undefined;
+    const offset = this.getValueFromResponse('Upload-Offset');
+    return offset ? parseInt(offset, 10) : undefined;
   }
 }
