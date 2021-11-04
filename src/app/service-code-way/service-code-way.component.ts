@@ -22,7 +22,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   @ViewChild('file', { read: ElementRef })
   fileInput!: ElementRef;
 
-  private unsubscribe$ = new Subject();
+  private unsubscribe$ = new Subject<void>();
 
   constructor(private uploadService: UploadxService) {
     // restore background uploads

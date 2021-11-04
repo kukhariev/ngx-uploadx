@@ -27,7 +27,7 @@ export class CustomId implements IdService {
 export class ServiceWayComponent implements OnDestroy, OnInit {
   state$!: Observable<UploadState>;
   uploads: Ufile[] = [];
-  private unsubscribe$ = new Subject();
+  private unsubscribe$ = new Subject<void>();
   options!: UploadxOptions;
 
   constructor(private uploadxService: UploadxService, private authService: AuthService) {}

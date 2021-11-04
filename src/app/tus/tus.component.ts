@@ -19,7 +19,7 @@ export class TusComponent {
     uploaderClass: Tus,
     authorize: async req => {
       const token = await this.authService.getTokenAsPromise();
-      req.headers.Authorization = `Token ${token}`;
+      req.headers['Authorization'] = `Token ${token}`;
       return req;
     },
     metadata(file): Record<string, string> {
