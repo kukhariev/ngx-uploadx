@@ -31,13 +31,13 @@ export class UploaderX extends Uploader {
   }
 
   async sendFileContent(): Promise<number | undefined> {
-    const { end, body } = this.getChunk();
+    const { body, end } = this.getChunk();
     const headers = {
       'Content-Type': 'application/octet-stream',
       'Content-Range': `bytes ${this.offset}-${end - 1}/${this.size}`
     };
     await this.request({ method: 'PUT', body, headers });
-    return this.responseStatus > 201 ? this.getOffsetFromResponse() : this.size;
+    return this.responseStatus > 201 ? this.getOffsetFromResponse() : end;
   }
 
   async getOffset(): Promise<number | undefined> {
