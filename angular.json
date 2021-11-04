@@ -15,18 +15,23 @@
             "index": "src/index.html",
             "main": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
-            "es5BrowserSupport": true,
             "polyfills": "src/polyfills.ts",
             "assets": ["src/assets", "src/favicon.ico"],
             "styles": ["src/styles.scss"],
-            "scripts": []
+            "scripts": [],
+            "aot": false,
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
           },
           "configurations": {
             "production": {
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
@@ -39,13 +44,13 @@
                 }
               ]
             }
-          }
+          },
+          "defaultConfiguration": ""
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "app-uploadx:build",
-            "progress": false
+            "browserTarget": "app-uploadx:build"
           },
           "configurations": {
             "production": {
@@ -114,11 +119,10 @@
   "defaultProject": "app-uploadx",
   "schematics": {
     "@schematics/angular:component": {
-      "prefix": "app",
-      "styleext": "scss"
+      "style": "scss"
     },
-    "@schematics/angular:directive": {
-      "prefix": "app"
+    "@schematics/angular:application": {
+      "strict": true
     }
   }
 }

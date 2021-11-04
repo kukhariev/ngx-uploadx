@@ -49,7 +49,7 @@ export class UploadxAjax {
       xhr.timeout = timeout;
       withCredentials && (xhr.withCredentials = true);
       responseType && (xhr.responseType = responseType);
-      responseType === 'json' && !headers.Accept && (headers.Accept = 'application/json');
+      responseType === 'json' && !headers['Accept'] && (headers['Accept'] = 'application/json');
       Object.keys(headers).forEach(key => xhr.setRequestHeader(key, String(headers[key])));
       xhr.upload.onprogress = onUploadProgress || null;
       xhr.onerror =

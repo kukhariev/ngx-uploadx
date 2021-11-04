@@ -58,7 +58,7 @@ const defaultOptions: UploadxFactoryOptions = {
   concurrency: 2,
   uploaderClass: UploaderX,
   authorize: (req, token) => {
-    token && (req.headers.Authorization = `Bearer ${token}`);
+    token && (req.headers['Authorization'] = `Bearer ${token}`);
     return req;
   },
   storeIncompleteUploadUrl: true,

@@ -2,7 +2,7 @@
 import { DebugElement, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { UPLOADX_AJAX, UploadxDirective } from 'ngx-uploadx';
+import { UploadxDirective, UPLOADX_AJAX } from 'ngx-uploadx';
 import { timer } from 'rxjs';
 import { DirectiveWayComponent } from './directive-way.component';
 
@@ -41,7 +41,7 @@ describe('DirectiveWayComponent', () => {
     await timer(10).toPromise();
     const { headers, url, data } = ajaxSpy.calls.mostRecent().args[0];
     expect(url).toBe(comp.options.endpoint!);
-    expect(headers!.Authorization).toContain('Bearer ');
+    expect(headers!['Authorization']).toContain('Bearer ');
     expect(headers!['X-Upload-Content-Length']).toBe('0');
     expect(JSON.parse(data as string)).toEqual(jasmine.objectContaining({ size: 0 }));
   });

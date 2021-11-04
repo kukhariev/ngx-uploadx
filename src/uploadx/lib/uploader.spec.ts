@@ -182,7 +182,7 @@ describe('Uploader', () => {
       serverStatus = 201;
       uploader = new MockUploader(file, {
         prerequest: req => {
-          req.headers.auth = 'token';
+          req.headers['auth'] = 'token';
         }
       });
       const request = spyOn<any>(uploader.ajax, 'request').and.callThrough();
