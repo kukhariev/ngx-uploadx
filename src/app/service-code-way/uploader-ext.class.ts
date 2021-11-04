@@ -1,8 +1,6 @@
-import { resolveUrl, unfunc, Uploader } from 'ngx-uploadx';
+import { resolveUrl, Uploader } from 'ngx-uploadx';
 
 export class UploaderExt extends Uploader {
-  responseType = 'json' as 'json';
-
   async getFileUrl(): Promise<string> {
     this.offset = 0;
     const formData: FormData = new FormData();
@@ -25,9 +23,4 @@ export class UploaderExt extends Uploader {
   async getOffset(): Promise<number | undefined> {
     return 0;
   }
-
-  updateToken = async (): Promise<string | void> => {
-    const token = await unfunc(this.token || '', this.responseStatus);
-    this.headers.Authorization = `Basic ${token}`;
-  };
 }

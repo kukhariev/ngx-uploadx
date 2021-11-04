@@ -32,6 +32,7 @@
     "no-switch-case-fall-through": true,
     "no-unnecessary-callback-wrapper": true,
     "no-unused-expression": false,
+    "no-string-literal": false,
     "no-var-requires": false,
     "object-literal-sort-keys": false,
     "ordered-imports": true,

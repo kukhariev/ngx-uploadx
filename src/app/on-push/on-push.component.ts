@@ -17,7 +17,7 @@ export class OnPushComponent implements OnDestroy {
     endpoint: `${environment.api}/files?uploadType=uploadx`,
     prerequest: injectDigestHeader,
     authorize: (req, token) => {
-      token && (req.headers.Authorization = `Token ${token}`);
+      token && (req.headers['Authorization'] = `Token ${token}`);
       return req;
     }
   };
