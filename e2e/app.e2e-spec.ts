@@ -12,8 +12,8 @@ describe('uploader App', async () => {
     page.getButton('Cancel All').click();
 
     const caps = await browser.driver.getCapabilities();
-    browser.browserName = caps.get('browserName');
-    if (browser.browserName === 'chrome') {
+    browser['browserName'] = caps.get('browserName');
+    if (browser['browserName'] === 'chrome') {
       // Assert that there are no errors emitted from the browser
       const logs = await browser.manage().logs().get(logging.Type.BROWSER);
       expect(logs).not.toContain(

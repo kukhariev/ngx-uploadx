@@ -1,5 +1,5 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { UPLOADX_OPTIONS, UploadxOptions } from './options';
+import { UploadxOptions, UPLOADX_OPTIONS } from './options';
 import { UploadxDropDirective } from './uploadx-drop.directive';
 import { UploadxDirective } from './uploadx.directive';
 

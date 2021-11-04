@@ -32,7 +32,7 @@ import { TusComponent } from './tus/tus.component';
     TusComponent
   ],
   imports: [
-    RouterModule.forRoot(appRoutes),
+    RouterModule.forRoot(appRoutes, { relativeLinkResolution: 'legacy' }),
     BrowserModule,
     UploadxModule.withConfig({
       headers: { 'ngsw-bypass': 'true' },

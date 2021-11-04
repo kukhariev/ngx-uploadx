@@ -10,9 +10,9 @@ const TEMP = join(require('os').tmpdir(), 'ngx-uploadx-build');
 const baseDir = resolve(`${__dirname}/..`);
 const integrationsPath = resolve(baseDir, `integrations`);
 const buildCmd = 'ng build --configuration production';
-const ngUpdateCmd = 'ng update @angular/core --allow-dirty --migrateOnly=true --from=7.2';
+const ngUpdateCmd = 'ng update @angular/core --allow-dirty --migrateOnly=true --from=12';
 const ngNewCmd = projectName =>
-  `ng new ${projectName} --style=scss --strict=true --skipInstall=true --skipGit=true --routing=true`;
+  `ng new ${projectName} --style=scss --skipInstall=true --skipGit=true --routing=true`;
 
 const cleanup = directory => new Promise(resolve => require('rimraf')(directory, resolve));
 

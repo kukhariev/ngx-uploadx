@@ -1,5 +1,5 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { UploadxService } from 'ngx-uploadx';
 import { Observable } from 'rxjs';
 import { ServiceCodeWayComponent } from './service-code-way.component';
@@ -56,12 +56,15 @@ describe('ServiceCodeWayComponent', () => {
   });
 
   describe('onChange', () => {
-    it('should upload the files after the input files change', async(() => {
-      const dataTransfer = new ClipboardEvent('').clipboardData || new DataTransfer();
-      dataTransfer.items.add(new File(['foo'], 'programmatically_created.txt'));
-      spyOn(comp, 'getFiles').and.returnValue(dataTransfer.files);
-      comp.onChange();
-      expect(uploadService.handleFiles).toHaveBeenCalled();
-    }));
+    it(
+      'should upload the files after the input files change',
+      waitForAsync(() => {
+        const dataTransfer = new ClipboardEvent('').clipboardData || new DataTransfer();
+        dataTransfer.items.add(new File(['foo'], 'programmatically_created.txt'));
+        spyOn(comp, 'getFiles').and.returnValue(dataTransfer.files);
+        comp.onChange();
+        expect(uploadService.handleFiles).toHaveBeenCalled();
+      })
+    );
   });
 });

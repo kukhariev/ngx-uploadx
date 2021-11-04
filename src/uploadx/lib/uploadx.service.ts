@@ -7,16 +7,16 @@ import { IdService } from './id.service';
 import { UploadState, UploadxControlEvent, Writable } from './interfaces';
 import {
   iOSPatch,
-  UPLOADX_FACTORY_OPTIONS,
-  UPLOADX_OPTIONS,
   UploadxFactoryOptions,
-  UploadxOptions
+  UploadxOptions,
+  UPLOADX_FACTORY_OPTIONS,
+  UPLOADX_OPTIONS
 } from './options';
 import { store } from './store';
 import { Uploader } from './uploader';
 import { isIOS, pick } from './utils';
 
-const stateKeys: Array<keyof UploadState> = [
+const stateKeys: (keyof UploadState)[] = [
   'file',
   'name',
   'progress',
