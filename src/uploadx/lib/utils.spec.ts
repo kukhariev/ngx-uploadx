@@ -1,6 +1,6 @@
 import { b64, DynamicChunk, isNumber, resolveUrl, unfunc } from './utils';
 
-// tslint:disable: no-any
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 const urlTestData = [
   ['https://a/b/c', 'https://d/e/f?g=1', 'https://d/e/f?g=1'],

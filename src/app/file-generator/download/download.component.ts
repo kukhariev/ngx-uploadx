@@ -4,6 +4,7 @@ import { Component, Inject, Input } from '@angular/core';
 const MIB = 1024 * 1024;
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'downloader',
   template: '<a (click)="generateAndDownload()">{{ size }}MB</a>',
   styleUrls: ['./download.component.scss']

@@ -1,4 +1,4 @@
-// tslint:disable: no-any
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // noinspection ES6PreferShortImport
 import { Ajax, AjaxRequestConfig } from './ajax';
 import { UploaderOptions } from './interfaces';

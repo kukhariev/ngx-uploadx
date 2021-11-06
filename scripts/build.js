@@ -1,4 +1,3 @@
-//@ts-check
 const { promises: fsp } = require('fs');
 const packagr = require('ng-packagr');
 
