@@ -8,7 +8,7 @@ export const hasher = {
   getDigest(body: Blob, canceler?: Canceler): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      canceler && (canceler.onCancel = () => reject(reader.abort()));
+      canceler && (canceler.onCancel = () => reject('aborted' && reader.abort()));
       reader.onload = async () => resolve(await this.sha(reader.result as ArrayBuffer));
       reader.onerror = reject;
       reader.readAsArrayBuffer(body);
@@ -25,8 +25,6 @@ export async function injectDigestHeader(
 ): Promise<RequestConfig> {
   if (hasher.isSupported && req.body instanceof Blob) {
     const sha = await hasher.getDigest(req.body, req.canceler);
-    // or
-    // const sha = await hasher.getDigest(req.body, this.canceler);
     Object.assign(req.headers, { 'Upload-Checksum': `sha1 ${b64.encode(sha)}` });
   }
   return req;

@@ -94,7 +94,7 @@
   },
   "peerDependencies": {
     "@angular/core": ">=12.0.0 <14.0.0",
-    "rxjs": "^6.6.0"
+    "rxjs": "^6.4.0 || ^7.0.0"
   },
   "lint-staged": {
     "*.{js,json,scss,md,ts,html}": [
