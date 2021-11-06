@@ -2,7 +2,7 @@ import { InjectionToken } from '@angular/core';
 import { RequestOptions } from './interfaces';
 
 export interface AjaxRequestConfig extends RequestOptions {
-  // tslint:disable-next-line:no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [x: string]: any;
 
   data?: BodyInit | null;

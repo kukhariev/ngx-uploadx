@@ -20,6 +20,6 @@ export class AppComponent implements DoCheck {
   }
 
   ngDoCheck(): void {
-    // console.log('change-detection ', this.changes++);
+    console.log('change-detection ', this.changes++);
   }
 }

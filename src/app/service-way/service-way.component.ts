@@ -18,7 +18,7 @@ export class CustomId implements IdService {
   }
 }
 
-// tslint:disable-next-line:max-classes-per-file
+// eslint-disable-next-line max-classes-per-file
 @Component({
   selector: 'app-service-way',
   templateUrl: './service-way.component.html',

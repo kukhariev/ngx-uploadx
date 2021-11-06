@@ -1,7 +1,7 @@
 import { Ajax } from './ajax';
 import { Tus } from './tus';
 
-// tslint:disable: no-any
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const fileWithType = new File(['123456'], 'filename.txt', { type: 'text/plain' });
 describe('getFileUrl', () => {
   let uploader: Tus;
