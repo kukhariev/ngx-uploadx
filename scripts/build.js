@@ -1,9 +1,10 @@
 //@ts-check
 const { promises: fsp } = require('fs');
-const { build } = require('ng-packagr');
+const packagr = require('ng-packagr');
 
 async function buildPkg() {
   try {
+    const libPackagePath = 'src/uploadx/package.json';
     const rootPackage = JSON.parse(await fsp.readFile('package.json', 'utf8'));
     const libPackage = {};
     libPackage.name = rootPackage.name;
@@ -22,11 +23,15 @@ async function buildPkg() {
       dest: '../../dist/uploadx',
       deleteDestPath: true
     };
-    await fsp.writeFile('src/uploadx/package.json', JSON.stringify(libPackage, undefined, 2));
-    await build({ project: 'src/uploadx/package.json' });
+    await fsp.writeFile(libPackagePath, JSON.stringify(libPackage));
+    await packagr
+      .ngPackagr()
+      .forProject(libPackagePath)
+      .withTsConfig('src/uploadx/tsconfig.lib.json')
+      .build();
     await fsp.copyFile('LICENSE', 'dist/uploadx/LICENSE');
     await fsp.copyFile('README.md', 'dist/uploadx/README.md');
-    await fsp.unlink('src/uploadx/package.json');
+    await fsp.unlink(libPackagePath);
   } catch (error) {
     console.error(error);
     process.exit(1);
