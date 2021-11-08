@@ -196,7 +196,7 @@ export abstract class Uploader implements UploadState {
       headers: { ...req.headers, ...headers },
       url,
       data: body,
-      responseType: this.responseType,
+      responseType: this.options.responseType ?? this.responseType,
       withCredentials: !!this.options.withCredentials,
       canceler: this.canceler,
       validateStatus: () => true,

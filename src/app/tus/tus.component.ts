@@ -25,7 +25,8 @@ export class TusComponent {
     metadata(file): Record<string, string> {
       return { original_name: file.name };
     },
-    retryConfig: { timeout: 10_000 }
+    retryConfig: { timeout: 10_000 },
+    responseType: 'json'
   };
   constructor(private authService: AuthService) {}
   cancel(uploadId?: string): void {
