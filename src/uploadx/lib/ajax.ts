@@ -2,7 +2,6 @@ import { InjectionToken } from '@angular/core';
 import { RequestOptions } from './interfaces';
 
 export interface AjaxRequestConfig extends RequestOptions {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [x: string]: any;
 
   data?: BodyInit | null;
@@ -49,7 +48,6 @@ export class UploadxAjax {
       xhr.timeout = timeout;
       withCredentials && (xhr.withCredentials = true);
       responseType && (xhr.responseType = responseType);
-      responseType === 'json' && !headers['Accept'] && (headers['Accept'] = 'application/json');
       Object.keys(headers).forEach(key => xhr.setRequestHeader(key, String(headers[key])));
       xhr.upload.onprogress = onUploadProgress || null;
       xhr.onerror =
@@ -61,7 +59,7 @@ export class UploadxAjax {
           };
       xhr.onload = () => {
         const response = {
-          data: this.getResponseBody<T>(xhr, responseType === 'json'),
+          data: this.getResponseBody<T>(xhr),
           status: xhr.status,
           headers: this.getResponseHeaders(xhr)
         };
@@ -81,12 +79,17 @@ export class UploadxAjax {
     }, {});
   }
 
-  getResponseBody<T = string>(xhr: XMLHttpRequest, json?: boolean): T {
-    let body = 'response' in (xhr as XMLHttpRequest) ? xhr.response : xhr.responseText;
-    if (body && json && typeof body === 'string') {
-      try {
-        body = JSON.parse(body);
-      } catch {}
+  getResponseBody<T>(xhr: XMLHttpRequest): T {
+    if (xhr.responseType === 'document') {
+      return 'response' in xhr ? xhr.response : xhr.responseXML;
+    }
+    let body = 'response' in xhr ? xhr.response : xhr.responseText;
+    if (xhr.responseType === 'json') {
+      if (body && typeof body === 'string') {
+        try {
+          body = JSON.parse(body);
+        } catch {}
+      }
     }
     return body;
   }

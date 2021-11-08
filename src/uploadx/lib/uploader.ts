@@ -53,7 +53,7 @@ export abstract class Uploader implements UploadState {
   retry: RetryHandler;
   canceler = new Canceler();
   /** Set HttpRequest responseType */
-  responseType?: 'json' | 'text';
+  responseType?: 'json' | 'text' | 'document';
   private readonly _authorize: AuthorizeRequest;
   private readonly _prerequest: PreRequest;
   private startTime!: number;
