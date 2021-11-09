@@ -3,7 +3,6 @@ import { UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { Ufile } from '../ufile';
 import { UploaderExt } from './uploader-ext.class';
 
 @Component({
@@ -12,7 +11,7 @@ import { UploaderExt } from './uploader-ext.class';
 })
 export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   state$!: Observable<UploadState>;
-  uploads: Ufile[] = [];
+  uploads: Map<string, UploadState> = new Map();
   options: UploadxOptions = {
     endpoint: `${environment.api}/files?uploadType=multipart`,
     token: btoa('user:pass'),
@@ -27,15 +26,14 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   constructor(private uploadService: UploadxService) {
     // restore background uploads
     this.uploadService.queue.forEach(uploader => {
-      this.uploads.push(new Ufile(uploader));
+      this.uploads.set(uploader.uploadId, uploader);
     });
   }
 
   ngOnInit(): void {
     this.state$ = this.uploadService.init(this.options);
     this.state$.pipe(takeUntil(this.unsubscribe$)).subscribe(state => {
-      const file = this.uploads.find(item => item.uploadId === state.uploadId);
-      file ? file.update(state) : this.uploads.push(new Ufile(state));
+      this.uploads.set(state.uploadId, state);
     });
   }
 

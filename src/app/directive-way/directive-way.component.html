@@ -1,12 +1,12 @@
 <div uploadxDrop>
   <div class="uploads-table">
-    <div *ngFor="let item of uploads" class="row">
-      <span>{{ item.name }}</span>
-      <span>{{ item.progress }}%</span>
-      <span>{{ item.status }}</span>
+    <div *ngFor="let item of uploads | keyvalue" class="row">
+      <span>{{ item.value.name }}</span>
+      <span>{{ item.value.progress }}%</span>
+      <span>{{ item.value.status }}</span>
       <span>
-        <button (click)="pause(item.uploadId)">pause</button>
-        <button (click)="upload(item.uploadId)">upload</button>
+        <button (click)="pause(item.key)">pause</button>
+        <button (click)="upload(item.key)">upload</button>
       </span>
     </div>
   </div>

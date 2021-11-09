@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { Tus, UploadState, UploadxControlEvent, UploadxOptions } from 'ngx-uploadx';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../auth.service';
-import { Ufile } from '../ufile';
 
 @Component({
   selector: 'app-tus',
@@ -11,7 +10,7 @@ import { Ufile } from '../ufile';
 export class TusComponent {
   control!: UploadxControlEvent;
   state!: UploadState;
-  uploads: Ufile[] = [];
+  uploads: Map<string, UploadState> = new Map();
 
   options: UploadxOptions = {
     allowedTypes: 'image/*,video/*',
@@ -25,9 +24,10 @@ export class TusComponent {
     metadata(file): Record<string, string> {
       return { original_name: file.name };
     },
-    retryConfig: { timeout: 10_000 }
+    retryConfig: { timeout: 60_000 }
   };
   constructor(private authService: AuthService) {}
+
   cancel(uploadId?: string): void {
     this.control = { action: 'cancel', uploadId };
   }
@@ -42,7 +42,6 @@ export class TusComponent {
 
   onStateChanged(state: UploadState): void {
     this.state = state;
-    const file = this.uploads.find(item => item.uploadId === state.uploadId);
-    file ? file.update(state) : this.uploads.push(new Ufile(state));
+    this.uploads.set(state.uploadId, state);
   }
 }

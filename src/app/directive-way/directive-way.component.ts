@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { UploadState, UploadxControlEvent, UploadxOptions } from 'ngx-uploadx';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../auth.service';
-import { Ufile } from '../ufile';
 
 @Component({
   selector: 'app-directive-way',
@@ -11,7 +10,7 @@ import { Ufile } from '../ufile';
 export class DirectiveWayComponent {
   control!: UploadxControlEvent;
   state!: UploadState;
-  uploads: Ufile[] = [];
+  uploads: Map<string, UploadState> = new Map();
   options: UploadxOptions = {
     allowedTypes: 'image/*,video/*',
     endpoint: `${environment.api}/files?uploadType=uploadx`,
@@ -29,6 +28,7 @@ export class DirectiveWayComponent {
   };
 
   constructor(private authService: AuthService) {}
+
   cancel(uploadId?: string): void {
     this.control = { action: 'cancel', uploadId };
   }
@@ -41,9 +41,8 @@ export class DirectiveWayComponent {
     this.control = { action: 'upload', uploadId };
   }
 
-  onStateChanged(evt: UploadState): void {
-    this.state = evt;
-    const file = this.uploads.find(item => item.uploadId === evt.uploadId);
-    file ? file.update(evt) : this.uploads.push(new Ufile(evt));
+  onStateChanged(state: UploadState): void {
+    this.state = state;
+    this.uploads.set(state.uploadId, state);
   }
 }
