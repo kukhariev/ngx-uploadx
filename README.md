@@ -76,8 +76,6 @@ export class AppHomeComponent {
 
 - `autoUpload` Auto start upload when files added. Default value: `true`
 
-- `storeIncompleteUploadUrl` Keep an incomplete upload URL to allow resuming after browser restart. Default value: `true`
-
 - `storeIncompleteHours` Limit upload lifetime. Default value: `24`
 
 - `chunkSize` Fixed chunk size. If not specified, the optimal size will be automatically adjusted based on the network speed.
