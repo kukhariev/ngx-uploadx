@@ -1,5 +1,3 @@
-// @ts-check
-
 const args = process.argv.slice(2);
 const debug = args.includes('--debug');
 debug && (process.env.DEBUG = 'uploadx:*');
@@ -17,7 +15,7 @@ const upx = new Uploadx({ storage });
 const tus = new Tus({ storage });
 const mpt = new Multipart({ storage });
 
-const pathRegexp = new RegExp(`^${opts.path}([\/\?]|$)`);
+const pathRegexp = new RegExp(`^${opts.path}([/?]|$)`);
 
 createServer((req, res) => {
   const { pathname, query = { uploadType: '' } } = url.parse(req.url, true);

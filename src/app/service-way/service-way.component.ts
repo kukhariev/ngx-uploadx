@@ -5,7 +5,6 @@ import { takeUntil } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../auth.service';
 import { hasher, injectDigestHeader } from '../digest';
-import { Ufile } from '../ufile';
 
 @Injectable()
 export class CustomId implements IdService {
@@ -26,7 +25,7 @@ export class CustomId implements IdService {
 })
 export class ServiceWayComponent implements OnDestroy, OnInit {
   state$!: Observable<UploadState>;
-  uploads: Ufile[] = [];
+  uploads: Map<string, UploadState> = new Map();
   private unsubscribe$ = new Subject<void>();
   options!: UploadxOptions;
 
@@ -47,8 +46,7 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
         };
         this.state$ = this.uploadxService.init(this.options);
         this.state$.pipe(takeUntil(this.unsubscribe$)).subscribe(state => {
-          const file = this.uploads.find(item => item.uploadId === state.uploadId);
-          file ? file.update(state) : this.uploads.push(new Ufile(state));
+          this.uploads.set(state.uploadId, state);
         });
       },
       e => {
