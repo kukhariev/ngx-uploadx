@@ -104,9 +104,7 @@ export class UploadxService implements OnDestroy {
   handleFiles(files: FileList | File | File[], options = {} as UploadxOptions): void {
     isIOS() && iOSPatch(options);
     const instanceOptions: UploadxFactoryOptions = { ...this.options, ...options };
-    store.clear(
-      (instanceOptions.storeIncompleteUploadUrl || 0) && instanceOptions.storeIncompleteHours
-    );
+    store.clear(instanceOptions.storeIncompleteHours);
     this.options.concurrency = instanceOptions.concurrency;
     ('name' in files ? [files] : Array.from(files)).forEach(file =>
       this.addUploaderInstance(file, instanceOptions)

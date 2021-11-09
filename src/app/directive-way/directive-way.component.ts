@@ -16,7 +16,6 @@ export class DirectiveWayComponent {
     endpoint: `${environment.api}/files?uploadType=uploadx`,
     token: this.authService.getAccessToken(),
     maxChunkSize: 1024 * 1024 * 8,
-    storeIncompleteUploadUrl: true,
     storeIncompleteHours: 24,
     retryConfig: {
       maxAttempts: 30,
