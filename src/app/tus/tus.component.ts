@@ -24,7 +24,8 @@ export class TusComponent {
     metadata(file): Record<string, string> {
       return { original_name: file.name };
     },
-    retryConfig: { timeout: 60_000 }
+    retryConfig: { timeout: 60_000 },
+    responseType: 'json'
   };
   constructor(private authService: AuthService) {}
 

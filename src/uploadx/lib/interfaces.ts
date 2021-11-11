@@ -118,6 +118,10 @@ export interface UploaderOptions extends UploadItem {
   maxChunkSize?: number;
   withCredentials?: boolean;
   /**
+   * Set the expected server response type
+   */
+  responseType?: 'json' | 'text' | 'document';
+  /**
    * Function called before every request
    */
   prerequest?: PreRequest;

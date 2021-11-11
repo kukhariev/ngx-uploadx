@@ -54,7 +54,7 @@ export abstract class Uploader implements UploadState {
   retry: RetryHandler;
   canceler = new Canceler();
   /** Set HttpRequest responseType */
-  responseType?: 'json' | 'text';
+  responseType?: 'json' | 'text' | 'document';
   private _progressEventCount = 0;
   private readonly _authorize: AuthorizeRequest;
   private readonly _prerequest: PreRequest;
@@ -194,7 +194,7 @@ export abstract class Uploader implements UploadState {
       headers: { ...req.headers, ...headers },
       url,
       data: body,
-      responseType: this.responseType,
+      responseType: this.options.responseType ?? this.responseType,
       withCredentials: !!this.options.withCredentials,
       canceler: this.canceler,
       validateStatus: () => true,

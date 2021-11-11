@@ -87,6 +87,8 @@ export class AppHomeComponent {
 
 - `endpoint` URL to create new uploads. Default value: `'/upload'`
 
+- `responseType` Expected server response type
+
 - `headers` Headers to be appended to each HTTP request
 
 - `metadata` Custom metadata to be added to the uploaded files
