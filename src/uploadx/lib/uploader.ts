@@ -163,8 +163,9 @@ export abstract class Uploader implements UploadState {
             await this.updateToken();
             break;
           default:
-            // force getOffset() on http errors and repeat request on network errors
-            this.responseStatus >= 400 && (this.offset = undefined);
+            if (this.responseStatus >= 400 || this.chunkSize! > DynamicChunk.size) {
+              this.offset = undefined;
+            }
             this.status = 'retry';
             await this.retry.wait(this.getRetryAfterFromBackend());
         }
