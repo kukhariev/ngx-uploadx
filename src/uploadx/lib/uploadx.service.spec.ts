@@ -9,7 +9,6 @@ import { UploadxService } from './uploadx.service';
 
 const defaultOptions: UploadxFactoryOptions = {
   storeIncompleteHours: 1,
-  storeIncompleteUploadUrl: true,
   endpoint: '/upload',
   autoUpload: true,
   concurrency: 2,
