@@ -31,11 +31,6 @@ export interface UploadxOptions extends UploaderOptions {
    */
   multiple?: boolean;
   /**
-   * Keep an incomplete upload url to allow resuming after browser restart
-   * @deprecated use storeIncompleteHours = 0 to disable
-   */
-  storeIncompleteUploadUrl?: boolean;
-  /**
    * Retention time for incomplete uploads
    * @defaultValue 24
    */
@@ -48,7 +43,6 @@ export interface UploadxFactoryOptions extends UploadxOptions {
   concurrency: number;
   uploaderClass: UploaderClass;
   authorize: AuthorizeRequest;
-  storeIncompleteUploadUrl: boolean;
   storeIncompleteHours: number;
 }
 
@@ -61,7 +55,6 @@ const defaultOptions: UploadxFactoryOptions = {
     token && (req.headers['Authorization'] = `Bearer ${token}`);
     return req;
   },
-  storeIncompleteUploadUrl: true,
   storeIncompleteHours: 24
 };
 

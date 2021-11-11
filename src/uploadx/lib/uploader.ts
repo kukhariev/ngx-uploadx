@@ -1,5 +1,6 @@
 import { Ajax, AjaxRequestConfig } from './ajax';
 import { Canceler } from './canceler';
+import { DynamicChunk } from './dynamic-chunk';
 import {
   AuthorizeRequest,
   Metadata,
@@ -16,7 +17,7 @@ import {
 } from './interfaces';
 import { ErrorType, RetryHandler } from './retry-handler';
 import { store } from './store';
-import { DynamicChunk, isNumber, unfunc } from './utils';
+import { isNumber, unfunc } from './utils';
 
 const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
   pause: 'paused',
@@ -36,7 +37,7 @@ export abstract class Uploader implements UploadState {
   responseHeaders: Record<string, string> = {};
   progress!: number;
   remaining!: number;
-  speed!: number;
+  speed = 0;
   /** Custom headers */
   headers: RequestHeaders = {};
   /** Metadata Object */
@@ -54,10 +55,33 @@ export abstract class Uploader implements UploadState {
   canceler = new Canceler();
   /** Set HttpRequest responseType */
   responseType?: 'json' | 'text' | 'document';
+  private _progressEventCount = 0;
   private readonly _authorize: AuthorizeRequest;
   private readonly _prerequest: PreRequest;
-  private startTime!: number;
   private _token!: string;
+
+  constructor(
+    readonly file: File,
+    readonly options: Readonly<UploaderOptions>,
+    readonly stateChange: (evt: UploadState) => void,
+    readonly ajax: Ajax
+  ) {
+    this.retry = new RetryHandler(options.retryConfig);
+    this.name = file.name;
+    this.size = file.size;
+    this.metadata = {
+      name: file.name,
+      mimeType: file.type || 'application/octet-stream',
+      size: file.size,
+      lastModified:
+        file.lastModified || (file as File & { lastModifiedDate: Date }).lastModifiedDate.getTime()
+    };
+    options.maxChunkSize && (DynamicChunk.maxSize = options.maxChunkSize);
+    this._prerequest = options.prerequest || (req => req);
+    this._authorize = options.authorize || (req => req);
+    this.configure(options);
+  }
+
   private _url = '';
 
   get url(): string {
@@ -88,28 +112,6 @@ export abstract class Uploader implements UploadState {
     }
   }
 
-  constructor(
-    readonly file: File,
-    readonly options: Readonly<UploaderOptions>,
-    readonly stateChange: (evt: UploadState) => void,
-    readonly ajax: Ajax
-  ) {
-    this.retry = new RetryHandler(options.retryConfig);
-    this.name = file.name;
-    this.size = file.size;
-    this.metadata = {
-      name: file.name,
-      mimeType: file.type || 'application/octet-stream',
-      size: file.size,
-      lastModified:
-        file.lastModified || (file as File & { lastModifiedDate: Date }).lastModifiedDate.getTime()
-    };
-    options.maxChunkSize && (DynamicChunk.maxSize = options.maxChunkSize);
-    this._prerequest = options.prerequest || (req => req);
-    this._authorize = options.authorize || (req => req);
-    this.configure(options);
-  }
-
   /**
    * Configure uploader
    */
@@ -126,7 +128,6 @@ export abstract class Uploader implements UploadState {
    */
   async upload(): Promise<void> {
     this._status = 'uploading';
-    this.startTime = new Date().getTime();
     await this.updateToken();
     while (this.status === 'uploading' || this.status === 'retry') {
       this.status = 'uploading';
@@ -162,17 +163,14 @@ export abstract class Uploader implements UploadState {
             await this.updateToken();
             break;
           default:
-            // force getOffset() on http errors and repeat request on network errors
-            this.responseStatus >= 400 && (this.offset = undefined);
+            if (this.responseStatus >= 400 || this.chunkSize! > DynamicChunk.size) {
+              this.offset = undefined;
+            }
             this.status = 'retry';
             await this.retry.wait(this.getRetryAfterFromBackend());
         }
       }
     }
-  }
-
-  private getRetryAfterFromBackend(): number {
-    return Number(this.getValueFromResponse('retry-after')) * 1000;
   }
 
   /**
@@ -265,18 +263,24 @@ export abstract class Uploader implements UploadState {
     return { start, end, body };
   }
 
+  private getRetryAfterFromBackend(): number {
+    return Number(this.getValueFromResponse('retry-after')) * 1000;
+  }
+
   private cleanup = () => store.delete(this.uploadId);
 
   private onProgress(): (evt: ProgressEvent) => void {
     let throttle: ReturnType<typeof setTimeout> | undefined;
+    const startTime = new Date().getTime();
     return ({ loaded }) => {
-      const now = new Date().getTime();
-      const uploaded = (this.offset as number) + loaded;
-      const elapsedTime = (now - this.startTime) / 1000;
-      this.speed = Math.round(uploaded / elapsedTime);
+      const elapsedTime = (new Date().getTime() - startTime) / 1000;
+      this.speed = Math.round(
+        (this.speed * this._progressEventCount + loaded / elapsedTime) / ++this._progressEventCount
+      );
       DynamicChunk.scale(this.speed);
       if (!throttle) {
         throttle = setTimeout(() => (throttle = undefined), 500);
+        const uploaded = (this.offset as number) + loaded;
         this.progress = +((uploaded / this.size) * 100).toFixed(2);
         this.remaining = Math.ceil((this.size - uploaded) / this.speed);
         this.stateChange(this);

@@ -31,7 +31,7 @@ export class AppPage {
           element(by.css('.uploads-table'))
             .getText()
             .then(text => text.indexOf(status) >= 0),
-        15000
+        30000
       );
     } catch (e) {
       return false;
