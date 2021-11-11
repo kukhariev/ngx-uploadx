@@ -1,4 +1,4 @@
-import { b64, DynamicChunk, isNumber, resolveUrl, unfunc } from './utils';
+import { b64, isNumber, resolveUrl, unfunc } from './utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -45,20 +45,5 @@ describe('primitives', () => {
   it('unfunc', () => {
     expect(unfunc(10, 2)).toBe(10);
     expect(unfunc((x: number) => 10 * x, 2)).toBe(20);
-  });
-});
-
-describe('DynamicChunk', () => {
-  const init = DynamicChunk.size;
-  it('scale', () => {
-    expect(DynamicChunk.scale(0)).toEqual(init / 2);
-    expect(DynamicChunk.scale(0)).toEqual(init / 4);
-    expect(DynamicChunk.scale(Number.MAX_SAFE_INTEGER)).toEqual(init / 2);
-    expect(DynamicChunk.scale(Number.MAX_SAFE_INTEGER)).toEqual(init);
-    expect(DynamicChunk.scale(Number.MAX_SAFE_INTEGER)).toEqual(init * 2);
-    expect(DynamicChunk.scale(undefined as any)).toEqual(init * 2);
-  });
-  afterEach(() => {
-    DynamicChunk.size = init;
   });
 });
