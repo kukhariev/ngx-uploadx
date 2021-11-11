@@ -38,17 +38,19 @@ const mockXHR = {
   response: JSON.stringify(data)
 } as unknown as XMLHttpRequest;
 
+const mockedXHR = { ...mockXHR };
+
 describe('Ajax', () => {
   let ajax: UploadxAjax;
   beforeEach(() => {
     ajax = new UploadxAjax(() => mockXHR);
   });
   it('getResponseHeaders', () => {
-    const headers = ajax.getResponseHeaders(mockXHR);
+    const headers = ajax.getResponseHeaders(mockedXHR);
     expect(headers).toEqual(data);
   });
   it('getResponseBody', () => {
-    const body = ajax.getResponseBody<string>(mockXHR);
+    const body = ajax.getResponseBody<string>(mockedXHR);
     expect(body).toEqual(JSON.stringify(data));
   });
   it('request', async () => {
