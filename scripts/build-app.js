@@ -3,7 +3,7 @@
  */
 const { execSync } = require('child_process');
 const { copySync } = require('cpx');
-const { writeFileSync, copyFileSync, promises, mkdirSync } = require('fs');
+const { writeFileSync, copyFileSync, mkdirSync, readFileSync } = require('fs');
 const { join, resolve } = require('path');
 
 const TEMP = join(require('os').tmpdir(), 'ngx-uploadx-build');
@@ -12,7 +12,7 @@ const integrationsPath = resolve(baseDir, `integrations`);
 const buildCmd = 'ng build --configuration production';
 const ngUpdateCmd = 'ng update @angular/core --allow-dirty --migrateOnly=true --from=12';
 const ngNewCmd = projectName =>
-  `ng new ${projectName} --style=scss --skipInstall=true --skipGit=true --routing=true`;
+  `ng new ${projectName} --strict --style=scss --skip-install --skip-git --routing`;
 
 const cleanup = directory => new Promise(resolve => require('rimraf')(directory, resolve));
 
@@ -37,9 +37,7 @@ async function build(cliTag = 'latest') {
   execSync(`npx -p @angular/cli@${cliTag} ${ngNewCmd(projectName)}`, { cwd: TEMP });
   copySync(`${TEMP}/${projectName}/**/*`, `${projectPath}`, { clean: true });
 
-  const pack = JSON.parse(
-    (await promises.readFile(`${projectPath}/package.json`, 'utf8')).toString()
-  );
+  const pack = JSON.parse(readFileSync(`${projectPath}/package.json`, 'utf8').toString());
   const angularVersion = pack.dependencies['@angular/core'];
   const angularCLIVersion = pack.devDependencies['@angular/cli'];
   console.info(`- Versions: @angular/core: ${angularVersion}, @angular/cli: ${angularCLIVersion}`);
