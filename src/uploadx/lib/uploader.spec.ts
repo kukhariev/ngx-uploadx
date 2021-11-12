@@ -18,12 +18,12 @@ const mockAjax: Ajax = {
 };
 
 function getFile(): File {
-  return new File(['-'], 'filename.mp4', { type: 'video/mp4', lastModified: Date.now() });
+  return new File(['0123456789'], 'filename.mp4', { type: 'video/mp4', lastModified: Date.now() });
 }
 
 const file = getFile();
 
-const snip = { file, size: 1, name: 'filename.mp4' };
+const snip = { file, size: 10, name: 'filename.mp4' };
 
 let uploader: MockUploader;
 
@@ -44,7 +44,7 @@ export class MockUploader extends Uploader {
 
   async sendFileContent(): Promise<number> {
     await this.request({ method: 'PUT' });
-    return this.size;
+    return (this.offset || 0) + 1;
   }
 }
 
@@ -92,7 +92,7 @@ describe('Uploader', () => {
     it('should disable chunks', async () => {
       uploader = new MockUploader(file, { chunkSize: 0 });
       (uploader as any).getChunk();
-      expect(uploader.chunkSize).toEqual(1);
+      expect(uploader.chunkSize).toEqual(10);
     });
   });
 
@@ -139,7 +139,7 @@ describe('Uploader', () => {
       expect(updateToken).toHaveBeenCalledTimes(1);
       expect(getFileUrl).toHaveBeenCalledTimes(1);
       expect(getOffset).toHaveBeenCalledTimes(1);
-      expect(sendFileContent).toHaveBeenCalledTimes(1);
+      expect(sendFileContent).toHaveBeenCalledTimes(10);
       expect(cleanup).toHaveBeenCalled();
       expect(uploader.status).toEqual('complete');
     });
