@@ -4,7 +4,7 @@
 const { SpecReporter, StacktraceOption } = require('jasmine-spec-reporter');
 
 const chromeArgs = process.env.CI ? ['--headless'] : [];
-chromeDriver =
+const chromeDriver =
   process.env.CI && process.env.CHROMEWEBDRIVER
     ? process.env.CHROMEWEBDRIVER + '/chromedriver'
     : '';

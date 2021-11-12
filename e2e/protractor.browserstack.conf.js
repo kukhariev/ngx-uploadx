@@ -2,13 +2,13 @@ const { SpecReporter } = require('jasmine-spec-reporter');
 const browserstack = require('browserstack-local');
 const { StacktraceOption } = require('jasmine-spec-reporter');
 
-chromeDriver =
+const chromeDriver =
   process.env.CI && process.env.CHROMEWEBDRIVER
     ? process.env.CHROMEWEBDRIVER + '/chromedriver'
     : '';
 
 exports.config = {
-  allScriptsTimeout: 240_000,
+  allScriptsTimeout: 240000,
   specs: ['./**/*.e2e-spec.ts'],
   browserstackUser: process.env.BROWSERSTACK_USERNAME,
   browserstackKey: process.env.BROWSERSTACK_ACCESS_KEY,
