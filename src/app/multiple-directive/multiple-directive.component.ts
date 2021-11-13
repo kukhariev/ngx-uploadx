@@ -15,6 +15,7 @@ export class MultipleDirectiveComponent {
     endpoint: `${environment.api}/files?uploadType=uploadx`,
     allowedTypes: 'video/*'
   };
+
   options2: UploadxOptions = {
     endpoint: `${environment.api}/files?uploadType=tus`,
     allowedTypes: 'video/*',

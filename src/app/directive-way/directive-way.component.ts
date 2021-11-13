@@ -10,7 +10,7 @@ import { AuthService } from '../auth.service';
 export class DirectiveWayComponent {
   control!: UploadxControlEvent;
   state!: UploadState;
-  uploads: Map<string, UploadState> = new Map();
+  uploads: UploadState[] = [];
   options: UploadxOptions = {
     allowedTypes: 'image/*,video/*',
     endpoint: `${environment.api}/files?uploadType=uploadx`,
@@ -27,7 +27,6 @@ export class DirectiveWayComponent {
   };
 
   constructor(private authService: AuthService) {}
-
   cancel(uploadId?: string): void {
     this.control = { action: 'cancel', uploadId };
   }
@@ -42,6 +41,7 @@ export class DirectiveWayComponent {
 
   onStateChanged(state: UploadState): void {
     this.state = state;
-    this.uploads.set(state.uploadId, state);
+    const target = this.uploads.find(item => item.uploadId === state.uploadId);
+    target ? Object.assign(target, state) : this.uploads.push(state);
   }
 }
