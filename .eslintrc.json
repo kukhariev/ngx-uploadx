@@ -14,6 +14,7 @@
         "plugin:prettier/recommended"
       ],
       "rules": {
+        "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
         "@angular-eslint/component-selector": [
           "error",
           {

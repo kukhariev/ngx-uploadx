@@ -25,7 +25,7 @@ export class CustomId implements IdService {
 })
 export class ServiceWayComponent implements OnDestroy, OnInit {
   state$!: Observable<UploadState>;
-  uploads: Map<string, UploadState> = new Map();
+  uploads: UploadState[] = [];
   private unsubscribe$ = new Subject<void>();
   options!: UploadxOptions;
 
@@ -46,7 +46,8 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
         };
         this.state$ = this.uploadxService.init(this.options);
         this.state$.pipe(takeUntil(this.unsubscribe$)).subscribe(state => {
-          this.uploads.set(state.uploadId, state);
+          const target = this.uploads.find(item => item.uploadId === state.uploadId);
+          target ? Object.assign(target, state) : this.uploads.push(state);
         });
       },
       e => {

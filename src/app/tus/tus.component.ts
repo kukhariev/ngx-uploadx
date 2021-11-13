@@ -10,8 +10,7 @@ import { AuthService } from '../auth.service';
 export class TusComponent {
   control!: UploadxControlEvent;
   state!: UploadState;
-  uploads: Map<string, UploadState> = new Map();
-
+  uploads: UploadState[] = [];
   options: UploadxOptions = {
     allowedTypes: 'image/*,video/*',
     endpoint: `${environment.api}/files?uploadType=tus`,
@@ -27,6 +26,7 @@ export class TusComponent {
     retryConfig: { timeout: 60_000 },
     responseType: 'json'
   };
+
   constructor(private authService: AuthService) {}
 
   cancel(uploadId?: string): void {
@@ -43,6 +43,7 @@ export class TusComponent {
 
   onStateChanged(state: UploadState): void {
     this.state = state;
-    this.uploads.set(state.uploadId, state);
+    const target = this.uploads.find(item => item.uploadId === state.uploadId);
+    target ? Object.assign(target, state) : this.uploads.push(state);
   }
 }

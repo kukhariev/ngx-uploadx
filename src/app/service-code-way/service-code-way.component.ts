@@ -11,12 +11,13 @@ import { UploaderExt } from './uploader-ext.class';
 })
 export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   state$!: Observable<UploadState>;
-  uploads: Map<string, UploadState> = new Map();
+  uploads: UploadState[] = [];
   options: UploadxOptions = {
     endpoint: `${environment.api}/files?uploadType=multipart`,
     token: btoa('user:pass'),
     uploaderClass: UploaderExt
   };
+
   numberOfCopies = 0;
   @ViewChild('file', { read: ElementRef })
   fileInput!: ElementRef;
@@ -25,15 +26,14 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
 
   constructor(private uploadService: UploadxService) {
     // restore background uploads
-    this.uploadService.queue.forEach(uploader => {
-      this.uploads.set(uploader.uploadId, uploader);
-    });
+    this.uploadService.queue.forEach(uploader => this.uploads.push(uploader));
   }
 
   ngOnInit(): void {
     this.state$ = this.uploadService.init(this.options);
     this.state$.pipe(takeUntil(this.unsubscribe$)).subscribe(state => {
-      this.uploads.set(state.uploadId, state);
+      const target = this.uploads.find(item => item.uploadId === state.uploadId);
+      target ? Object.assign(target, state) : this.uploads.push(state);
     });
   }
 
