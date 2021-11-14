@@ -27,7 +27,7 @@
   },
   "scripts": {
     "start": "run-p serve:dev server",
-    "test": "ng test --watch=false --progress=false --browsers=ChromeHeadless",
+    "test": "ng test --watch=false --progress=false",
     "e2e": "ng e2e",
     "lint": "ng lint",
     "serve:dev": "ng serve",
