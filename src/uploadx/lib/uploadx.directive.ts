@@ -31,13 +31,13 @@ export class UploadxDirective implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const { multiple, allowedTypes } = this.options;
+    const { multiple, allowedTypes } = { ...this.uploadService.options, ...this.options };
     multiple !== false && this.renderer.setAttribute(this.elementRef.nativeElement, 'multiple', '');
     allowedTypes &&
       this.renderer.setAttribute(this.elementRef.nativeElement, 'accept', allowedTypes);
 
     this.uploadService.events
-      .pipe(takeWhile(_ => this.state.observers.length > 0))
+      .pipe(takeWhile(() => this.state.observers.length > 0))
       .subscribe(this.state);
   }
 
