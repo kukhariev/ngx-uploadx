@@ -26,7 +26,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
 
   constructor(private uploadService: UploadxService) {
     // restore background uploads
-    this.uploadService.queue.forEach(uploader => this.uploads.push(uploader));
+    this.uploads = this.uploadService.state();
   }
 
   ngOnInit(): void {

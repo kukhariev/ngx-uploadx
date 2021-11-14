@@ -239,6 +239,17 @@ selector: `uploadxDrop`
 
   Make HTTP request with `axios` like interface. [(example)](src/app/service-way/service-way.component.ts)
 
+- `state(): UploadState[]`
+
+  Returns the current state of uploads.
+
+  ```ts
+  constructor(private uploadService: UploadxService) {
+    // restore background uploads
+    this.uploads = this.uploadService.state();
+  }
+  ```
+
 - `queue: Uploader[]`
 
   Uploaders array.

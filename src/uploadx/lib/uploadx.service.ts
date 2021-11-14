@@ -13,9 +13,9 @@ import {
 } from './options';
 import { store } from './store';
 import { Uploader } from './uploader';
-import { isIOS, pick } from './utils';
+import { isIOS, onLine, pick } from './utils';
 
-const stateKeys: (keyof UploadState)[] = [
+export const UPLOAD_STATE_KEYS: (keyof UploadState)[] = [
   'file',
   'name',
   'progress',
@@ -91,6 +91,16 @@ export class UploadxService implements OnDestroy {
     this.queue = [];
   }
 
+  /**
+   * Returns current uploads state
+   * @example
+   * // restore background uploads
+   * this.uploads = this.uploadService.state();
+   */
+  state(): UploadState[] {
+    return this.queue.map(uploader => pick(uploader, UPLOAD_STATE_KEYS));
+  }
+
   ngOnDestroy(): void {
     this.disconnect();
     this.subs.forEach(sub => sub.unsubscribe());
@@ -142,7 +152,7 @@ export class UploadxService implements OnDestroy {
   }
 
   private stateChange = (uploader: Uploader) => {
-    this.ngZone.run(() => this.eventsStream.next(pick(uploader, stateKeys)));
+    this.ngZone.run(() => this.eventsStream.next(pick(uploader, UPLOAD_STATE_KEYS)));
     if (uploader.status !== 'uploading' && uploader.status !== 'added') {
       this.ngZone.runOutsideAngular(() => setTimeout(() => this.processQueue()));
     }
@@ -163,8 +173,4 @@ export class UploadxService implements OnDestroy {
       .slice(0, Math.max(this.options.concurrency - this.runningProcess(), 0))
       .forEach(uploader => uploader.upload());
   }
-}
-
-function onLine(): boolean {
-  return typeof window !== 'undefined' ? window.navigator.onLine : true;
 }

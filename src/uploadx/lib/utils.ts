@@ -23,9 +23,9 @@ export function unfunc<T, V>(value: T | ((ref: V) => T), ref: V): T {
   return value instanceof Function ? value(ref) : value;
 }
 
-export const pick = <T, K extends keyof T>(obj: T, whitelist: K[]): Pick<T, K> => {
+export const pick = <T, K extends keyof T>(obj: T, props: K[]): Pick<T, K> => {
   const result = {} as Pick<T, K>;
-  whitelist.forEach(key => (result[key] = obj[key]));
+  props.forEach(key => (result[key] = obj[key]));
   return result;
 };
 
@@ -83,4 +83,8 @@ export function isIOS(): boolean {
         navigator.maxTouchPoints > 2 &&
         /MacIntel/.test(navigator.platform)
       );
+}
+
+export function onLine(): boolean {
+  return typeof window !== 'undefined' ? window.navigator.onLine : true;
 }
