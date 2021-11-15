@@ -1,5 +1,7 @@
 import { InjectionToken } from '@angular/core';
-import { AuthorizeRequest, UploaderClass, UploaderOptions } from './interfaces';
+import { Ajax } from './ajax';
+import { AuthorizeRequest, UploaderOptions } from './interfaces';
+import { Uploader } from './uploader';
 import { UploaderX } from './uploaderx';
 
 /**
@@ -45,6 +47,13 @@ export interface UploadxFactoryOptions extends UploadxOptions {
   authorize: AuthorizeRequest;
   storeIncompleteHours: number;
 }
+
+export type UploaderClass = new (
+  file: File,
+  options: UploaderOptions,
+  stateChange: (uploader: Uploader) => void,
+  ajax: Ajax
+) => Uploader;
 
 const defaultOptions: UploadxFactoryOptions = {
   endpoint: '/upload',

@@ -63,7 +63,7 @@ export abstract class Uploader implements UploadState {
   constructor(
     readonly file: File,
     readonly options: Readonly<UploaderOptions>,
-    readonly stateChange: (evt: UploadState) => void,
+    readonly stateChange: (uploader: Uploader) => void,
     readonly ajax: Ajax
   ) {
     this.retry = new RetryHandler(options.retryConfig);

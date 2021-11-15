@@ -15,6 +15,7 @@ describe('ServiceCodeWayComponent', () => {
       init: jasmine.createSpy('init'),
       control: jasmine.createSpy('control'),
       handleFiles: jasmine.createSpy('handleFiles'),
+      state: () => [],
       queue: []
     };
     TestBed.configureTestingModule({

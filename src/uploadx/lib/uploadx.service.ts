@@ -1,10 +1,9 @@
-import { Inject, Injectable, NgZone, Optional } from '@angular/core';
-import { OnDestroy } from '@angular/core';
+import { Inject, Injectable, NgZone, OnDestroy, Optional } from '@angular/core';
 import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
-import { debounceTime, map, startWith } from 'rxjs/operators';
+import { debounceTime, map } from 'rxjs/operators';
 import { Ajax, AjaxRequestConfig, AjaxResponse, UPLOADX_AJAX } from './ajax';
 import { IdService } from './id.service';
-import { UploadState, UploadxControlEvent, Writable } from './interfaces';
+import { UploadState, UploadxControlEvent } from './interfaces';
 import {
   iOSPatch,
   UploadxFactoryOptions,
@@ -14,9 +13,9 @@ import {
 } from './options';
 import { store } from './store';
 import { Uploader } from './uploader';
-import { isIOS, pick } from './utils';
+import { isIOS, onLine, pick } from './utils';
 
-const stateKeys: (keyof UploadState)[] = [
+export const UPLOAD_STATE_KEYS: (keyof UploadState)[] = [
   'file',
   'name',
   'progress',
@@ -79,7 +78,6 @@ export class UploadxService implements OnDestroy {
    */
   connect(options?: UploadxOptions): Observable<Uploader[]> {
     return this.init(options).pipe(
-      startWith(null),
       map(() => this.queue),
       debounceTime(DUE_TIME)
     );
@@ -91,6 +89,16 @@ export class UploadxService implements OnDestroy {
   disconnect(): void {
     this.queue.forEach(uploader => (uploader.status = 'paused'));
     this.queue = [];
+  }
+
+  /**
+   * Returns current uploads state
+   * @example
+   * // restore background uploads
+   * this.uploads = this.uploadService.state();
+   */
+  state(): UploadState[] {
+    return this.queue.map(uploader => pick(uploader, UPLOAD_STATE_KEYS));
   }
 
   ngOnDestroy(): void {
@@ -143,16 +151,17 @@ export class UploadxService implements OnDestroy {
     return this.ajax.request(config);
   }
 
-  private stateChange = (evt: UploadState) => {
-    this.ngZone.run(() => this.eventsStream.next(pick(evt, stateKeys)));
-    if (evt.status !== 'uploading' && evt.status !== 'added') {
+  private stateChange = (uploader: Uploader) => {
+    this.ngZone.run(() => this.eventsStream.next(pick(uploader, UPLOAD_STATE_KEYS)));
+    if (uploader.status !== 'uploading' && uploader.status !== 'added') {
       this.ngZone.runOutsideAngular(() => setTimeout(() => this.processQueue()));
     }
   };
 
   private async addUploaderInstance(file: File, options: UploadxFactoryOptions): Promise<void> {
     const uploader = new options.uploaderClass(file, options, this.stateChange, this.ajax);
-    (uploader.uploadId as Writable<string>) = await this.idService.generateId(uploader);
+    (uploader as { uploadId: string }).uploadId = await this.idService.generateId(uploader);
+    // Object.defineProperty(uploader, 'uploadId', { configurable: false, writable: false });
     this.queue.push(uploader);
     uploader.status = options.autoUpload && onLine() ? 'queue' : 'added';
   }
@@ -164,8 +173,4 @@ export class UploadxService implements OnDestroy {
       .slice(0, Math.max(this.options.concurrency - this.runningProcess(), 0))
       .forEach(uploader => uploader.upload());
   }
-}
-
-function onLine(): boolean {
-  return typeof window !== 'undefined' ? window.navigator.onLine : true;
 }
