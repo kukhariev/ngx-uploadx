@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { UPLOADX_OPTIONS } from './options';
 import { UploadxDropDirective } from './uploadx-drop.directive';
+import { UploadxDirective } from './uploadx.directive';
 import { UploadxService } from './uploadx.service';
 
 @Component({
@@ -30,7 +31,7 @@ describe('Directive: UploadxDropDirective', () => {
   let serviceHandleFileListSpy: jasmine.Spy;
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [UploadxTestComponent, UploadxDropDirective],
+      declarations: [UploadxTestComponent, UploadxDirective, UploadxDropDirective],
       providers: [UploadxService, { provide: UPLOADX_OPTIONS, useValue: {} }]
     }).compileComponents();
     fixture = TestBed.createComponent(UploadxTestComponent);
