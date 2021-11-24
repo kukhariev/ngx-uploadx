@@ -55,7 +55,7 @@ export abstract class Uploader implements UploadState {
   canceler = new Canceler();
   /** Set HttpRequest responseType */
   responseType?: 'json' | 'text' | 'document';
-  private _progressEventCount = 0;
+  private _eventsCount = 0;
   private readonly _authorize: AuthorizeRequest;
   private readonly _prerequest: PreRequest;
   private _token!: string;
@@ -107,7 +107,7 @@ export abstract class Uploader implements UploadState {
       this.status === 'retry' && this.retry.cancel();
       this._status = s;
       s === 'paused' && this.abort();
-      ['cancelled', 'complete', 'error'].indexOf(s) !== -1 && this.cleanup();
+      ['cancelled', 'complete', 'error'].includes(s) && this.cleanup();
       s === 'cancelled' ? this.cancel() : this.stateChange(this);
     }
   }
@@ -271,18 +271,16 @@ export abstract class Uploader implements UploadState {
 
   private onProgress(): (evt: ProgressEvent) => void {
     let throttle: ReturnType<typeof setTimeout> | undefined;
-    const startTime = new Date().getTime();
+    const startTime = Date.now();
     return ({ loaded }) => {
-      const elapsedTime = (new Date().getTime() - startTime) / 1000;
-      this.speed = Math.round(
-        (this.speed * this._progressEventCount + loaded / elapsedTime) / ++this._progressEventCount
-      );
+      const current = loaded / ((Date.now() - startTime) / 1000);
+      this.speed = ~~((this.speed * this._eventsCount + current) / ++this._eventsCount);
       DynamicChunk.scale(this.speed);
       if (!throttle) {
         throttle = setTimeout(() => (throttle = undefined), 500);
         const uploaded = (this.offset as number) + loaded;
         this.progress = +((uploaded / this.size) * 100).toFixed(2);
-        this.remaining = Math.ceil((this.size - uploaded) / this.speed);
+        this.remaining = ~~((this.size - uploaded) / this.speed);
         this.stateChange(this);
       }
     };

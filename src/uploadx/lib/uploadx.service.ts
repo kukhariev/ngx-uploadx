@@ -13,7 +13,7 @@ import {
 } from './options';
 import { store } from './store';
 import { Uploader } from './uploader';
-import { isIOS, onLine, pick } from './utils';
+import { isBrowser, isIOS, onLine, pick } from './utils';
 
 export const UPLOAD_STATE_KEYS: (keyof UploadState)[] = [
   'file',
@@ -48,7 +48,7 @@ export class UploadxService implements OnDestroy {
     private idService: IdService
   ) {
     this.options = Object.assign({}, defaults, options);
-    if (typeof window !== 'undefined') {
+    if (isBrowser()) {
       this.subs.push(
         fromEvent(window, 'online').subscribe(() => this.control({ action: 'upload' })),
         fromEvent(window, 'offline').subscribe(() => this.control({ action: 'pause' }))

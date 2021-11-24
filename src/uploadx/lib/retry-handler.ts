@@ -34,7 +34,7 @@ const defaultRetryConfig: Required<RetryConfig> = {
   authErrorCodes: [401],
   shouldRetryCodes: [408, 423, 429],
   shouldRetry(code: number): boolean {
-    return code < 400 || code >= 500 || this.shouldRetryCodes.indexOf(code) !== -1;
+    return code < 400 || code >= 500 || this.shouldRetryCodes.includes(code);
   },
   minDelay: 500,
   maxDelay: 50000,
@@ -60,10 +60,10 @@ export class RetryHandler {
     if (this.attempts > this.config.maxAttempts) {
       return ErrorType.Fatal;
     }
-    if (this.config.authErrorCodes.indexOf(code) !== -1) {
+    if (this.config.authErrorCodes.includes(code)) {
       return ErrorType.Auth;
     }
-    if (this.config.shouldRestartCodes.indexOf(code) !== -1) {
+    if (this.config.shouldRestartCodes.includes(code)) {
       return ErrorType.NotFound;
     }
     if (this.config.shouldRetry(code, this.attempts)) {
