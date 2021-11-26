@@ -75,16 +75,18 @@ export const b64 = {
   }
 };
 
+export function isBrowser(): boolean {
+  return ![typeof window, typeof navigator].includes('undefined');
+}
+
 export function isIOS(): boolean {
-  return /iPad|iPhone|iPod/.test(navigator.platform)
-    ? true
-    : !!(
-        navigator.maxTouchPoints &&
-        navigator.maxTouchPoints > 2 &&
-        /MacIntel/.test(navigator.platform)
-      );
+  return (
+    isBrowser() &&
+    (/iPad|iPhone|iPod/.test(navigator.platform) ||
+      (navigator.maxTouchPoints > 2 && navigator.platform.includes('MacIntel')))
+  );
 }
 
 export function onLine(): boolean {
-  return typeof window !== 'undefined' ? window.navigator.onLine : true;
+  return isBrowser() ? navigator.onLine : true;
 }

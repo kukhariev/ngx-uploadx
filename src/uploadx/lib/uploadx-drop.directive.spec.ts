@@ -1,8 +1,8 @@
 import { Component, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { UPLOADX_OPTIONS } from './options';
 import { UploadxDropDirective } from './uploadx-drop.directive';
+import { UploadxDirective } from './uploadx.directive';
 import { UploadxService } from './uploadx.service';
 
 @Component({
@@ -17,40 +17,35 @@ class UploadxTestComponent {
 }
 
 const file = new File([''], 'filename.mp4');
-const files: FileList = {
-  0: file,
-  length: 1,
-  item: () => file
-};
 
 describe('Directive: UploadxDropDirective', () => {
   let fixture: ComponentFixture<UploadxTestComponent>;
   let dropEl: DebugElement;
-  let service: UploadxService;
-  let serviceHandleFileListSpy: jasmine.Spy;
+  let serviceHandleFiles: jasmine.Spy;
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [UploadxTestComponent, UploadxDropDirective],
-      providers: [UploadxService, { provide: UPLOADX_OPTIONS, useValue: {} }]
+      declarations: [UploadxTestComponent, UploadxDirective, UploadxDropDirective],
+      providers: [UploadxService]
     }).compileComponents();
     fixture = TestBed.createComponent(UploadxTestComponent);
     dropEl = fixture.debugElement.query(By.directive(UploadxDropDirective));
-    service = fixture.debugElement.injector.get<UploadxService>(UploadxService);
-    serviceHandleFileListSpy = spyOn(service, 'handleFiles');
+    const service = fixture.debugElement.injector.get<UploadxService>(UploadxService);
+    serviceHandleFiles = spyOn(service, 'handleFiles');
   });
 
   it('should ignore non files dragover', () => {
     const dragoverEvent = jasmine.createSpyObj('event', ['preventDefault', 'stopPropagation']);
-    dragoverEvent.dataTransfer = {};
+    dragoverEvent.dataTransfer = new DataTransfer();
     dropEl.triggerEventHandler('dragover', dragoverEvent);
-    expect(dragoverEvent.stopPropagation).toHaveBeenCalledTimes(0);
+    expect(serviceHandleFiles).toHaveBeenCalledTimes(0);
     fixture.detectChanges();
     expect(dropEl.nativeElement.classList.contains('uploadx-drop-active')).toBe(false);
   });
 
   it('should set class on dragover', () => {
     const dragoverEvent = jasmine.createSpyObj('event', ['preventDefault', 'stopPropagation']);
-    dragoverEvent.dataTransfer = { files };
+    dragoverEvent.dataTransfer = new DataTransfer();
+    dragoverEvent.dataTransfer.items.add(file);
     dropEl.triggerEventHandler('dragover', dragoverEvent);
     expect(dragoverEvent.stopPropagation).toHaveBeenCalledTimes(1);
     expect(dragoverEvent.preventDefault).toHaveBeenCalledTimes(1);
@@ -60,7 +55,8 @@ describe('Directive: UploadxDropDirective', () => {
 
   it('should remove class on dragleave', () => {
     const dragoverEvent = jasmine.createSpyObj('event', ['preventDefault', 'stopPropagation']);
-    dragoverEvent.dataTransfer = { files };
+    dragoverEvent.dataTransfer = new DataTransfer();
+    dragoverEvent.dataTransfer.items.add(file);
     dropEl.triggerEventHandler('dragover', dragoverEvent);
     fixture.detectChanges();
     expect(dropEl.nativeElement.classList.contains('uploadx-drop-active')).toBe(true);
@@ -72,11 +68,12 @@ describe('Directive: UploadxDropDirective', () => {
 
   it('should call HandleFiles', () => {
     const dropEvent = jasmine.createSpyObj('event', ['preventDefault', 'stopPropagation']);
-    dropEvent.dataTransfer = { files };
+    dropEvent.dataTransfer = new DataTransfer();
+    dropEvent.dataTransfer.items.add(file);
     dropEl.triggerEventHandler('drop', dropEvent);
     fixture.detectChanges();
     expect(dropEvent.stopPropagation).toHaveBeenCalledTimes(1);
     expect(dropEvent.preventDefault).toHaveBeenCalledTimes(1);
-    expect(serviceHandleFileListSpy).toHaveBeenCalledTimes(1);
+    expect(serviceHandleFiles).toHaveBeenCalledTimes(1);
   });
 });
