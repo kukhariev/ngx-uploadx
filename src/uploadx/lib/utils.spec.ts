@@ -24,14 +24,21 @@ describe('resolveUrl', () => {
 describe('b64', () => {
   const data = {
     name: 'спутник.mp4',
-    lastModified: '1437390138231'
+    lastModified: '1437390138231',
+    empty: ''
   };
-  const encoded = 'name 0YHQv9GD0YLQvdC40LoubXA0,lastModified MTQzNzM5MDEzODIzMQ==';
-  it('serialize', async () => {
+  const encoded = 'name 0YHQv9GD0YLQvdC40LoubXA0,lastModified MTQzNzM5MDEzODIzMQ==,empty';
+  it('serialize', () => {
     expect(b64.serialize(data)).toBe(encoded);
   });
-  it('parse', async () => {
+  it('parse', () => {
     expect(b64.parse(encoded)).toEqual(data);
+  });
+
+  it('encode', () => {
+    expect(b64.encode('')).toBe('');
+    expect(b64.encode(undefined as unknown as string)).toBe('dW5kZWZpbmVk');
+    expect(b64.encode('string')).toBe('c3RyaW5n');
   });
 });
 
