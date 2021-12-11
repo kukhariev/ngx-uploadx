@@ -41,7 +41,7 @@ describe('DirectiveWayComponent', () => {
     const { headers, url, data } = ajaxSpy.calls.mostRecent().args[0];
     expect(url).toBe(comp.options.endpoint!);
     expect(headers!['Authorization']).toContain('Bearer ');
-    expect(headers!['X-Upload-Content-Length']).toBe('0');
+    expect(headers!['X-Upload-Content-Length']).toBe(0);
     expect(JSON.parse(data as string)).toEqual(jasmine.objectContaining({ size: 0 }));
   });
 });

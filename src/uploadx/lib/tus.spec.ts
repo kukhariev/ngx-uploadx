@@ -9,9 +9,10 @@ describe('Tus', () => {
     let getValueFromResponse: jasmine.Spy;
     it('should set headers', async () => {
       uploader = new Tus(fileWithType, {}, () => {}, {} as Ajax);
-      req = spyOn<any>(uploader, 'request').and.callFake(({ headers }: any) => {
+      req = spyOn<any>(uploader, 'request').and.callFake(({ headers, method }: any) => {
         expect(headers['Upload-Metadata']).toContain('name');
-        expect(headers['Upload-Length']).toEqual('6');
+        expect(headers['Upload-Length']).toEqual(6);
+        expect(method).toBe('POST');
       });
       getValueFromResponse = spyOn<any>(uploader, 'getValueFromResponse').and.returnValue(
         '/12345678'
@@ -30,12 +31,27 @@ describe('Tus', () => {
     it('should set Upload-Offset header', async () => {
       uploader = new Tus(fileWithType, {}, () => {}, {} as Ajax);
       uploader.offset = 0;
-      req = spyOn<any>(uploader, 'request').and.callFake(({ headers }: any) => {
+      req = spyOn<any>(uploader, 'request').and.callFake(({ headers, method }: any) => {
         expect(headers['Content-Type']).toEqual('application/offset+octet-stream');
-        expect(headers['Upload-Offset']).toEqual('0');
+        expect(method).toBe('PATCH');
       });
       getOffsetFromResponse = spyOn<any>(uploader, 'getOffsetFromResponse').and.returnValue(6);
       expect(await uploader.sendFileContent()).toEqual(6);
+      expect(req).toHaveBeenCalled();
+      expect(getOffsetFromResponse).toHaveBeenCalled();
+    });
+  });
+  describe('getOffset', () => {
+    let uploader: Tus;
+    let req: jasmine.Spy;
+    let getOffsetFromResponse: jasmine.Spy;
+    it('should set Tus-Resumable header', async () => {
+      uploader = new Tus(fileWithType, {}, () => {}, {} as Ajax);
+      req = spyOn<any>(uploader, 'request').and.callFake(({ method }: any) => {
+        expect(method).toBe('HEAD');
+      });
+      getOffsetFromResponse = spyOn<any>(uploader, 'getOffsetFromResponse').and.returnValue(6);
+      expect(await uploader.getOffset()).toEqual(6);
       expect(req).toHaveBeenCalled();
       expect(getOffsetFromResponse).toHaveBeenCalled();
     });

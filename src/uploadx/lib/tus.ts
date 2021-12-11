@@ -12,23 +12,23 @@ export class Tus extends Uploader {
   async getFileUrl(): Promise<string> {
     const encodedMetaData = b64.serialize(this.metadata);
     const headers = {
-      'Upload-Length': `${this.size}`,
-      'Upload-Metadata': `${encodedMetaData}`
+      'Upload-Length': this.size,
+      'Upload-Metadata': encodedMetaData
     };
     await this.request({ method: 'POST', url: this.endpoint, headers });
+    this.offset = this.getOffsetFromResponse() || (this.responseStatus === 201 ? 0 : undefined);
     const location = this.getValueFromResponse('location');
     if (!location) {
       throw new Error('Invalid or missing Location header');
     }
-    this.offset = this.getOffsetFromResponse() || (this.responseStatus === 201 ? 0 : undefined);
     return resolveUrl(location, this.endpoint);
   }
 
   async sendFileContent(): Promise<number | undefined> {
-    const { body, end } = this.getChunk();
+    const { body, start, end } = this.getChunk();
     const headers = {
       'Content-Type': 'application/offset+octet-stream',
-      'Upload-Offset': `${this.offset}`
+      'Upload-Offset': start
     };
     await this.request({ method: 'PATCH', body, headers });
     return this.getOffsetFromResponse() || end;
