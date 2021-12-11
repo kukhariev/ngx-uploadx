@@ -14,7 +14,7 @@ describe('UploaderX', () => {
       uploader = new UploaderX(fileWithType, {}, () => {}, {} as Ajax);
       req = spyOn<any>(uploader, 'request').and.callFake(({ headers }: any) => {
         expect(headers['X-Upload-Content-Type']).toEqual('text/plain');
-        expect(headers['X-Upload-Content-Length']).toEqual('6');
+        expect(headers['X-Upload-Content-Length']).toEqual(6);
       });
       getValueFromResponse = spyOn<any>(uploader, 'getValueFromResponse').and.returnValue(
         '/12345678'
@@ -29,7 +29,7 @@ describe('UploaderX', () => {
       uploader = new UploaderX(fileWithoutType, {}, () => {}, {} as Ajax);
       req = spyOn<any>(uploader, 'request').and.callFake(({ headers }: any) => {
         expect(headers['X-Upload-Content-Type']).toEqual('application/octet-stream');
-        expect(headers['X-Upload-Content-Length']).toEqual('0');
+        expect(headers['X-Upload-Content-Length']).toEqual(0);
       });
       getValueFromResponse = spyOn<any>(uploader, 'getValueFromResponse').and.returnValue(
         '/12345678'

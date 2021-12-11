@@ -11,30 +11,26 @@ export class UploaderX extends Uploader {
   responseType = 'json' as const;
 
   async getFileUrl(): Promise<string> {
+    const body = JSON.stringify(this.metadata);
     const headers = {
       'Content-Type': 'application/json; charset=utf-8',
-      'X-Upload-Content-Length': this.size.toString(),
+      'X-Upload-Content-Length': this.size,
       'X-Upload-Content-Type': this.file.type || 'application/octet-stream'
     };
-    await this.request({
-      method: 'POST',
-      body: JSON.stringify(this.metadata),
-      url: this.endpoint,
-      headers
-    });
+    await this.request({ method: 'POST', body, url: this.endpoint, headers });
+    this.offset = this.getOffsetFromResponse() || (this.responseStatus === 201 ? 0 : undefined);
     const location = this.getValueFromResponse('location');
     if (!location) {
       throw new Error('Invalid or missing Location header');
     }
-    this.offset = this.getOffsetFromResponse() || (this.responseStatus === 201 ? 0 : undefined);
     return resolveUrl(location, this.endpoint);
   }
 
   async sendFileContent(): Promise<number | undefined> {
-    const { body, end } = this.getChunk();
+    const { body, start, end } = this.getChunk();
     const headers = {
       'Content-Type': 'application/octet-stream',
-      'Content-Range': `bytes ${this.offset}-${end - 1}/${this.size}`
+      'Content-Range': `bytes ${start}-${end - 1}/${this.size}`
     };
     await this.request({ method: 'PUT', body, headers });
     return this.responseStatus > 201 ? this.getOffsetFromResponse() : end;

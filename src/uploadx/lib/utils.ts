@@ -3,20 +3,14 @@
 import { Primitive } from './interfaces';
 
 function safeMatch(base: string, re: RegExp): string {
-  return (base.match(re) || [])[0] || '';
+  return (base.match(re) || [''])[0];
 }
 
 export function resolveUrl(url: string, base: string): string {
-  if (url.indexOf('https://') * url.indexOf('http://') === 0) {
-    return url;
-  }
-  if (url.indexOf('//') === 0) {
-    return safeMatch(base, /^(https?:)/) + url;
-  }
-  if (url.indexOf('/') === 0) {
-    return safeMatch(base, /^(?:https?:)?(?:\/\/)?([^\/\?]+)/) + url;
-  }
-  return safeMatch(base, /^(?:https?:)?(?:\/\/)?([^\/\?]+)?(.*\/)/) + url;
+  if (url.indexOf('https://') * url.indexOf('http://') === 0) return url;
+  if (url.indexOf('//') === 0) return safeMatch(base, /^(https?:)/) + url;
+  if (url.indexOf('/') === 0) return safeMatch(base, /^(?:https?:)?(?:\/\/)?([^\/?]+)/) + url;
+  return safeMatch(base, /^(?:https?:)?(?:\/\/)?([^\/?]+)?(.*\/)/) + url;
 }
 
 export function unfunc<T, V>(value: T | ((ref: V) => T), ref: V): T {
