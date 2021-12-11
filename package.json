@@ -27,7 +27,8 @@
   },
   "scripts": {
     "start": "run-p serve:dev server",
-    "test": "ng test --watch=false --progress=false",
+    "test": "ng test",
+    "coverage": "ng test --code-coverage",
     "e2e": "ng e2e",
     "lint": "ng lint",
     "serve:dev": "ng serve",
