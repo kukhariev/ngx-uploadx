@@ -62,7 +62,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
     }
   }
 
-  // this.numberOfCopies = this.uploadService.runningProcess();
+  // this.numberOfCopies = this.uploadService.activeUploadsCount;
   getFiles(): FileList {
     return this.fileInput.nativeElement.files;
   }

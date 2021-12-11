@@ -137,9 +137,9 @@ export class UploadxService implements OnDestroy {
   }
 
   /**
-   * Returns number of active uploads
+   * Number of active uploads
    */
-  runningProcess(): number {
+  get activeUploadsCount(): number {
     return this.queue.filter(({ status }) => status === 'uploading' || status === 'retry').length;
   }
 
@@ -147,7 +147,7 @@ export class UploadxService implements OnDestroy {
    * Performs http requests
    */
   async request<T = string>(config: AjaxRequestConfig): Promise<AjaxResponse<T>> {
-    config.data = config.body ? config.body : config.data;
+    config.data ||= config.body;
     return this.ajax.request(config);
   }
 
@@ -170,7 +170,7 @@ export class UploadxService implements OnDestroy {
     this.queue = this.queue.filter(({ status }) => status !== 'cancelled');
     this.queue
       .filter(({ status }) => status === 'queue')
-      .slice(0, Math.max(this.options.concurrency - this.runningProcess(), 0))
+      .slice(0, Math.max(this.options.concurrency - this.activeUploadsCount, 0))
       .forEach(uploader => uploader.upload());
   }
 }
