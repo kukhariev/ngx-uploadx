@@ -17,7 +17,10 @@ const mockAjax: Ajax = {
 };
 
 function getFile(): File {
-  return new File(['0123456789'], 'filename.mp4', { type: 'video/mp4', lastModified: Date.now() });
+  return new File(['0123456789'], 'filename.mp4', {
+    type: 'video/mp4',
+    lastModified: new Date(2020, 6).getTime()
+  });
 }
 
 const file = getFile();

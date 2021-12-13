@@ -73,8 +73,7 @@ export abstract class Uploader implements UploadState {
       name: file.name,
       mimeType: file.type || 'application/octet-stream',
       size: file.size,
-      lastModified:
-        file.lastModified || (file as File & { lastModifiedDate: Date }).lastModifiedDate.getTime()
+      lastModified: file.lastModified
     };
     options.maxChunkSize && (DynamicChunk.maxSize = options.maxChunkSize);
     this._prerequest = options.prerequest || (req => req);
