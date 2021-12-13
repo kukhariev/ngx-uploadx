@@ -6,13 +6,10 @@ const { copySync } = require('cpx');
 const { writeFileSync, copyFileSync, mkdirSync, readFileSync } = require('fs');
 const { join, resolve } = require('path');
 
-const TEMP = join(require('os').tmpdir(), 'ngx-uploadx-build');
+const tmpDir = join(require('os').tmpdir(), 'ngx-uploadx-build');
 const baseDir = resolve(`${__dirname}/..`);
 const integrationsPath = resolve(baseDir, `integrations`);
-const buildCmd = 'ng build --configuration production';
-const ngUpdateCmd = 'ng update @angular/core --allow-dirty --migrateOnly=true --from=12';
-const ngNewCmd = projectName =>
-  `ng new ${projectName} --strict --style=scss --skip-install --skip-git --routing`;
+process.env.NG_DISABLE_VERSION_CHECK = 'true';
 
 const cleanup = directory => new Promise(resolve => require('rimraf')(directory, resolve));
 
@@ -25,17 +22,21 @@ const cleanup = directory => new Promise(resolve => require('rimraf')(directory,
 async function build(cliTag = 'latest') {
   const projectName = (Number.isInteger(+cliTag[0]) ? 'ng' + cliTag : cliTag).replace(/\./, '');
   const projectPath = join(integrationsPath, projectName);
+  const ngNewCmd = `ng new ${projectName} --strict --style=scss --skip-install --skip-git --routing`;
+  const ngUpdateCmd = 'ng update @angular/core --allow-dirty --migrateOnly=true --from=12';
+  const buildCmd = 'ng build --configuration production';
+
   console.info(`- Angular CLI tag: ${cliTag}`);
   console.info(`- Project path: ${projectPath}`);
 
   console.info('- Prepare...');
-  mkdirSync(TEMP, { recursive: true });
-  await cleanup(`${TEMP}/${projectName}`);
+  mkdirSync(tmpDir, { recursive: true });
+  await cleanup(`${tmpDir}/${projectName}`);
   await cleanup(projectPath);
 
   console.info('- Generating project...');
-  execSync(`npx -p @angular/cli@${cliTag} ${ngNewCmd(projectName)}`, { cwd: TEMP });
-  copySync(`${TEMP}/${projectName}/**/*`, `${projectPath}`, { clean: true });
+  execSync(`npx -p @angular/cli@${cliTag} ${ngNewCmd}`, { cwd: tmpDir });
+  copySync(`${tmpDir}/${projectName}/**/*`, `${projectPath}`, { clean: true });
 
   const pack = JSON.parse(readFileSync(`${projectPath}/package.json`, 'utf8').toString());
   const angularVersion = pack.dependencies['@angular/core'];
