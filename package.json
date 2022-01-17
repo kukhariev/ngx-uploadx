@@ -66,7 +66,7 @@
     "@types/node": "12.12.41",
     "@typescript-eslint/eslint-plugin": "4.28.2",
     "@typescript-eslint/parser": "4.28.2",
-    "@uploadx/core": "^4.5.0",
+    "@uploadx/core": "^5.0.0",
     "angular-http-server": "^1.10.0",
     "browserstack-local": "^1.4.8",
     "cpx": "^1.5.0",
