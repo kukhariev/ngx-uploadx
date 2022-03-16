@@ -6,13 +6,11 @@ describe('MultipleDirectiveComponent', () => {
   let component: MultipleDirectiveComponent;
   let fixture: ComponentFixture<MultipleDirectiveComponent>;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [MultipleDirectiveComponent, UploadxDirective]
-      }).compileComponents();
-    })
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [MultipleDirectiveComponent, UploadxDirective]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(MultipleDirectiveComponent);

@@ -57,15 +57,12 @@ describe('ServiceCodeWayComponent', () => {
   });
 
   describe('onChange', () => {
-    it(
-      'should upload the files after the input files change',
-      waitForAsync(() => {
-        const dataTransfer = new ClipboardEvent('').clipboardData || new DataTransfer();
-        dataTransfer.items.add(new File(['foo'], 'programmatically_created.txt'));
-        spyOn(comp, 'getFiles').and.returnValue(dataTransfer.files);
-        comp.onChange();
-        expect(uploadService.handleFiles).toHaveBeenCalled();
-      })
-    );
+    it('should upload the files after the input files change', waitForAsync(() => {
+      const dataTransfer = new ClipboardEvent('').clipboardData || new DataTransfer();
+      dataTransfer.items.add(new File(['foo'], 'programmatically_created.txt'));
+      spyOn(comp, 'getFiles').and.returnValue(dataTransfer.files);
+      comp.onChange();
+      expect(uploadService.handleFiles).toHaveBeenCalled();
+    }));
   });
 });
