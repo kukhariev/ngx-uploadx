@@ -16,7 +16,7 @@ export class AuthService {
     return of(`${new Date().getTime()}`).pipe(delay(400));
   }
 
-  async getTokenAsPromise(): Promise<string | undefined> {
+  async getTokenAsPromise(): Promise<string> {
     return `${new Date().getTime()}`;
   }
 }
