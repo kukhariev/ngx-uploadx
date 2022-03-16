@@ -6,13 +6,11 @@ describe('OnPushComponent', () => {
   let component: OnPushComponent;
   let fixture: ComponentFixture<OnPushComponent>;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [OnPushComponent]
-      }).compileComponents();
-    })
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [OnPushComponent]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(OnPushComponent);
