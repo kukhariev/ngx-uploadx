@@ -127,10 +127,10 @@ export abstract class Uploader implements UploadState {
    */
   async upload(): Promise<void> {
     this._status = 'uploading';
-    await this.updateToken();
     while (this.status === 'uploading' || this.status === 'retry') {
       this.status = 'uploading';
       try {
+        this._token ||= await this.updateToken();
         this.url ||= await this.getFileUrl();
         if (this.offset !== this.size) {
           this.offset = isNumber(this.offset)
@@ -159,7 +159,7 @@ export abstract class Uploader implements UploadState {
             this.url = '';
             break;
           case ErrorType.Auth:
-            await this.updateToken();
+            this._token = '';
             break;
           default:
             if (this.responseStatus >= 400 || this.chunkSize! > DynamicChunk.size) {
@@ -212,10 +212,10 @@ export abstract class Uploader implements UploadState {
   }
 
   /**
-   * Set auth token cache
+   * Set auth token string
    */
-  updateToken = async (): Promise<string | void> => {
-    this._token = await unfunc(this.token || '', this.responseStatus);
+  updateToken = (): string | Promise<string> => {
+    return unfunc(this.token || '', this.responseStatus);
   };
 
   /**
