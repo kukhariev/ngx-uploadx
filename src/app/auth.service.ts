@@ -6,9 +6,13 @@ import { delay } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthService {
-  accessToken = () => `${new Date().getTime()}`;
+  accessToken = () => {
+    console.info('auth token updated');
+    return `${new Date().getTime()}`;
+  };
 
   getAccessToken(): string {
+    console.info('auth token updated');
     return `${new Date().getTime()}`;
   }
 
@@ -16,7 +20,8 @@ export class AuthService {
     return of(`${new Date().getTime()}`).pipe(delay(400));
   }
 
-  async getTokenAsPromise(): Promise<string> {
-    return `${new Date().getTime()}`;
+  getTokenAsPromise(): Promise<string> {
+    console.info('auth token updated');
+    return Promise.resolve(`${new Date().getTime()}`);
   }
 }

@@ -14,7 +14,8 @@ export class DirectiveWayComponent {
   options: UploadxOptions = {
     allowedTypes: 'image/*,video/*',
     endpoint: `${environment.api}/files?uploadType=uploadx`,
-    token: this.authService.getAccessToken,
+    token: this.authService.accessToken,
+    // token: this.authService.getAccessToken,
     // token: this.authService.getTokenAsPromise,
     maxChunkSize: 1024 * 1024 * 8,
     storeIncompleteHours: 24,
