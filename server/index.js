@@ -19,6 +19,25 @@ const pathRegexp = new RegExp(`^${opts.path}([/?]|$)`);
 
 createServer((req, res) => {
   const { pathname, query = { uploadType: '' } } = url.parse(req.url, true);
+  if (Math.random() > 0.6 && req.method !== 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.statusCode = 401;
+    res.end();
+    return;
+  }
+  if (pathname === '/auth') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Content-Type', 'application/json');
+    res.write(
+      JSON.stringify({
+        access_token: `${new Date().getTime()}`,
+        expires_in: 3600,
+        token_type: 'Bearer'
+      })
+    );
+    res.end();
+    return;
+  }
   if (pathRegexp.test(pathname)) {
     switch (query.uploadType) {
       case 'multipart':
