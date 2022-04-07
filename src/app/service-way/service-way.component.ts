@@ -4,7 +4,7 @@ import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../auth.service';
-import { hasher, injectDigestHeader } from '../digest';
+import { hasher, injectTusChecksumHeader } from '../digest';
 
 @Injectable()
 export class CustomId implements IdService {
@@ -41,8 +41,8 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
         this.options = {
           endpoint,
           uploaderClass: Tus,
-          token: this.authService.getAccessToken(),
-          prerequest: checkSumSupported ? injectDigestHeader : () => {}
+          token: this.authService.getAccessToken,
+          prerequest: checkSumSupported ? injectTusChecksumHeader : () => {}
         };
         this.state$ = this.uploadxService.init(this.options);
         this.state$.pipe(takeUntil(this.unsubscribe$)).subscribe(state => {
