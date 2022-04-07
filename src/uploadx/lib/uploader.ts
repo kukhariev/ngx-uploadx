@@ -35,7 +35,7 @@ export abstract class Uploader implements UploadState {
   response: ResponseBody = null;
   responseStatus = 0;
   responseHeaders: Record<string, string> = {};
-  progress!: number;
+  progress = 0;
   remaining!: number;
   speed = 0;
   /** Custom headers */
