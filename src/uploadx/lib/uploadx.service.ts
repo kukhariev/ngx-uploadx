@@ -161,9 +161,11 @@ export class UploadxService implements OnDestroy {
   private async addUploaderInstance(file: File, options: UploadxFactoryOptions): Promise<void> {
     const uploader = new options.uploaderClass(file, options, this.stateChange, this.ajax);
     (uploader as { uploadId: string }).uploadId = await this.idService.generateId(uploader);
-    // Object.defineProperty(uploader, 'uploadId', { configurable: false, writable: false });
     this.queue.push(uploader);
-    uploader.status = options.autoUpload && onLine() ? 'queue' : 'added';
+    uploader.status = 'added';
+    if (options.autoUpload && onLine()) {
+      uploader.status = 'queue';
+    }
   }
 
   private processQueue(): void {
