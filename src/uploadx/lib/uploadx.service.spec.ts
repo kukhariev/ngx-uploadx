@@ -1,5 +1,6 @@
 import { NgZone } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { skip } from 'rxjs/operators';
 import { Ajax } from './ajax';
 import { IdService } from './id.service';
 import { UploadAction } from './interfaces';
@@ -98,10 +99,13 @@ describe('UploadxService', () => {
 
   it('should add file to queue with status `queue`', done => {
     const file = getFile();
-    sub = service.init({ ...options, autoUpload: true }).subscribe(({ status }) => {
-      expect(status).toEqual('queue');
-      done();
-    });
+    sub = service
+      .init({ ...options, autoUpload: true })
+      .pipe(skip(1))
+      .subscribe(({ status }) => {
+        expect(status).toEqual('queue');
+        done();
+      });
     service.handleFiles(file);
   });
 
