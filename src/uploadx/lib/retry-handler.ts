@@ -32,7 +32,7 @@ const defaultRetryConfig: Required<RetryConfig> = {
   maxAttempts: 8,
   shouldRestartCodes: [404, 410],
   authErrorCodes: [401],
-  shouldRetryCodes: [408, 423, 429],
+  shouldRetryCodes: [408, 423, 429, 460],
   shouldRetry(code: number): boolean {
     return code < 400 || code >= 500 || this.shouldRetryCodes.includes(code);
   },
