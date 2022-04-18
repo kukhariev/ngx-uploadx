@@ -7,15 +7,18 @@ const { DiskStorage, Multipart, Tus, Uploadx } = require('@uploadx/core');
 const { createServer } = require('http');
 
 const PORT = 3002;
-const UPLOAD_DIR = `${tmpdir()}/ngx-uploadx/`;
+const directory = `${tmpdir()}/ngx-uploadx/`;
+const path = '/files';
+const pathRegexp = new RegExp(`^${path}([/?]|$)`);
 
-const opts = { directory: UPLOAD_DIR, path: '/files' };
-const storage = new DiskStorage(opts);
+const storage = new DiskStorage({
+  directory,
+  path,
+  expiration: { maxAge: '1h', purgeInterval: '30min', rolling: true }
+});
 const upx = new Uploadx({ storage });
 const tus = new Tus({ storage });
 const mpt = new Multipart({ storage });
-
-const pathRegexp = new RegExp(`^${opts.path}([/?]|$)`);
 
 createServer((req, res) => {
   const { pathname, query = { uploadType: '' } } = url.parse(req.url, true);
