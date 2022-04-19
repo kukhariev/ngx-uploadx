@@ -102,11 +102,11 @@ export class AppHomeComponent {
   - `maxAttempts` Maximum number of retry attempts. Default value: `8`
   - `shouldRestartCodes` Upload not exist and will be restarted. Default value: `[404, 410]`
   - `authErrorCodes` If one of these codes is received, the request will be repeated with an updated authorization token. Default value: `[401]`
-  - `shouldRetryCodes` Retryable 4xx status codes. Default value: `[423, 429]`
+  - `shouldRetryCodes` Retryable 4xx status codes. Default value: `[408, 423, 429, 460]`
   - `shouldRetry` Overrides the built-in function that determines whether the operation should be retried
   - `minDelay` Minimum (initial) retry interval. Default value: `500`
   - `maxDelay` Maximum retry interval. Default value: `50_000`
-  - `onBusyDelay` Delay used between retries for non-error responses with missing range/offset
+  - `onBusyDelay` Delay used between retries for non-error responses with missing range/offset. Default value: `1000`
   - `timeout` Time interval after which unfinished requests must be retried
 
 - `token` Authorization token as a `string` or function returning a `string` or `Promise<string>`
