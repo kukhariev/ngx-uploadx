@@ -156,6 +156,26 @@ describe('Uploader', () => {
     });
   });
 
+  describe('request', () => {
+    serverStatus = 200;
+
+    it('should report progress if content is uploading', async () => {
+      uploader = new MockUploader(file, {});
+      uploader.offset = 0;
+      const request = spyOn<any>(uploader.ajax, 'request').and.callThrough();
+      await uploader.request({ method: 'POST', body: new FormData() });
+      expect((request.calls.mostRecent().args[0] as any).onUploadProgress).toBeTruthy();
+    });
+
+    it('should not report progress if offset is undefined', async () => {
+      uploader = new MockUploader(file, {});
+      uploader.offset = undefined;
+      const request = spyOn<any>(uploader.ajax, 'request').and.callThrough();
+      await uploader.request({ method: 'POST', body: new FormData() });
+      expect((request.calls.mostRecent().args[0] as any).onUploadProgress).toBeUndefined();
+    });
+  });
+
   describe('prerequest', () => {
     const common = { common: 'true' };
     const auth = { auth: 'token' };

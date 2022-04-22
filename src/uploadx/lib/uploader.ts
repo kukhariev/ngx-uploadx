@@ -199,7 +199,8 @@ export abstract class Uploader implements UploadState {
       validateStatus: () => true,
       timeout: this.retry.config.timeout
     };
-    if (body && typeof body !== 'string') {
+    //todo: more reliable detection
+    if (isNumber(this.offset) && body && typeof body === 'object') {
       ajaxRequestConfig.onUploadProgress = this.onProgress();
     }
     const response = await this.ajax.request(ajaxRequestConfig);
@@ -277,7 +278,7 @@ export abstract class Uploader implements UploadState {
       DynamicChunk.scale(this.speed);
       if (!throttle) {
         throttle = setTimeout(() => (throttle = undefined), 500);
-        const uploaded = (this.offset as number) + loaded;
+        const uploaded = (this.offset || 0) + loaded;
         this.progress = +((uploaded / this.size) * 100).toFixed(2);
         this.remaining = ~~((this.size - uploaded) / this.speed);
         this.stateChange(this);
