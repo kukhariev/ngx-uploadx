@@ -255,6 +255,9 @@ export abstract class Uploader implements UploadState {
   }
 
   protected getChunk(): { start: number; end: number; body: Blob } {
+    if (this.responseStatus === 413) {
+      DynamicChunk.maxSize = DynamicChunk.size = Math.floor(DynamicChunk.size / 2);
+    }
     this.chunkSize =
       this.options.chunkSize === 0 ? this.size : this.options.chunkSize || DynamicChunk.size;
     const start = this.offset || 0;
