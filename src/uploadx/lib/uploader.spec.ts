@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Ajax, AjaxRequestConfig } from './ajax';
+import { DynamicChunk } from './dynamic-chunk';
 import { UploaderOptions } from './interfaces';
 import { Uploader } from './uploader';
 
@@ -26,6 +27,11 @@ function getFile(): File {
 const file = getFile();
 
 const snip = { file, size: 10, name: 'filename.mp4' };
+
+const chunkInit = {
+  maxSize: DynamicChunk.maxSize,
+  size: DynamicChunk.size
+};
 
 let uploader: MockUploader;
 
@@ -81,10 +87,14 @@ describe('Uploader', () => {
   });
 
   describe('chunkSize', () => {
+    afterEach(() => {
+      DynamicChunk.maxSize = chunkInit.maxSize;
+      DynamicChunk.size = chunkInit.size;
+    });
     it('should use adaptive chunkSize if not specified', async () => {
       uploader = new MockUploader(getFile(), {});
       (uploader as any).getChunk();
-      expect(uploader.chunkSize).toEqual(4096 * 256);
+      expect(uploader.chunkSize).toEqual(chunkInit.size);
     });
     it('should set fixed chunkSize', async () => {
       uploader = new MockUploader(file, { chunkSize: 4_194_304 });
@@ -96,13 +106,19 @@ describe('Uploader', () => {
       (uploader as any).getChunk();
       expect(uploader.chunkSize).toEqual(10);
     });
+    it('should limit on 413', async () => {
+      uploader = new MockUploader(file, {});
+      uploader.responseStatus = 413;
+      (uploader as any).getChunk();
+      expect(uploader.chunkSize).toEqual(chunkInit.size / 2);
+      expect(DynamicChunk.maxSize).toEqual(chunkInit.size / 2);
+    });
   });
 
   describe('upload()', () => {
     beforeEach(() => {
       uploader = new MockUploader(file, { retryConfig: { maxAttempts: 3 }, token: 'token' });
     });
-
     it('should retry on 0', async () => {
       const retry = spyOn<any>(uploader.retry, 'wait');
       serverStatus = 0;
