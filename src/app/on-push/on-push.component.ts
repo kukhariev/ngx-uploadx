@@ -15,6 +15,7 @@ export class OnPushComponent implements OnDestroy {
   uploads$: Observable<Uploader[]>;
   options: UploadxOptions = {
     endpoint: `${environment.api}/files?uploadType=uploadx`,
+    chunkSize: 1024 * 1024 * 8,
     prerequest: injectDigestHeader,
     authorize: (req, token) => {
       token && (req.headers['Authorization'] = `Token ${token}`);
