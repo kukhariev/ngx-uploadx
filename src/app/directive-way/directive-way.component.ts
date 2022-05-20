@@ -17,7 +17,7 @@ export class DirectiveWayComponent {
     token: this.authService.accessToken,
     // token: this.authService.getAccessToken,
     // token: this.authService.getTokenAsPromise,
-    maxChunkSize: 1024 * 1024 * 8,
+    maxChunkSize: 1024 * 1024 * 80,
     storeIncompleteHours: 24,
     retryConfig: {
       maxAttempts: 30,
@@ -42,6 +42,8 @@ export class DirectiveWayComponent {
   }
 
   onStateChanged(state: UploadState): void {
+    const err = state.response?.error?.message || state.response?.error || 'Unknown error';
+    console.log(`${state.uploadId}: ${state.status} (${err})`);
     this.state = state;
     const target = this.uploads.find(item => item.uploadId === state.uploadId);
     target ? Object.assign(target, state) : this.uploads.push(state);
