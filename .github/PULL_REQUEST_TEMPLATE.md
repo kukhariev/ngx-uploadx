@@ -1,16 +1,14 @@
 <!-- 
-Before submitting a PR, please read [CONTRIBUTING.md](CONTRIBUTING.md)
+Before submitting a PR, please read CONTRIBUTING.md
 
-1. Give the PR a descriptive title.
+1. Give the pull request a descriptive title.
 
   Examples of good title:
-
     - fix(directive): get options from service
     - docs: update endpoint option description
     - feat: support for file checksum
 
   Examples of bad title:
-
     - Update docs
     - Fix: #56556
     - Update directive code
