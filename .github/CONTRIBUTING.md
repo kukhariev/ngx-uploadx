@@ -12,16 +12,12 @@ Install dependencies:
 
 Make your changes. Add tests for your changes.
 
-Make sure the tests pass:
-
-    npm run ci
-
 👉 Please follow our [commit message conventions][commit] even if you're making a small change!
 
 👉 Please follow [the existing styles][style]!
 
 Push to your fork and [submit a pull request][pr].
 
-[style]: .prettierrc
+[style]: ../.prettierrc
 [commit]: https://www.conventionalcommits.org/en/v1.0.0/
 [pr]: https://github.com/kukhariev/ngx-uploadx/compare/
