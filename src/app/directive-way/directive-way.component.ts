@@ -17,7 +17,8 @@ export class DirectiveWayComponent {
     token: this.authService.accessToken,
     // token: this.authService.getAccessToken,
     // token: this.authService.getTokenAsPromise,
-    maxChunkSize: 1024 * 1024 * 80,
+    metadata: (file: File) => ({ originalName: file.name }),
+    maxChunkSize: 1024 * 1024 * 96, //--> Cloudflare Free/Pro maximum body size is 100MB
     storeIncompleteHours: 24,
     retryConfig: {
       maxAttempts: 30,
@@ -29,6 +30,7 @@ export class DirectiveWayComponent {
   };
 
   constructor(private authService: AuthService) {}
+
   cancel(uploadId?: string): void {
     this.control = { action: 'cancel', uploadId };
   }
@@ -42,8 +44,6 @@ export class DirectiveWayComponent {
   }
 
   onStateChanged(state: UploadState): void {
-    const err = state.response?.error?.message || state.response?.error || 'Unknown error';
-    console.log(`${state.uploadId}: ${state.status} (${err})`);
     this.state = state;
     const target = this.uploads.find(item => item.uploadId === state.uploadId);
     target ? Object.assign(target, state) : this.uploads.push(state);
