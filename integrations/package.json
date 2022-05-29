@@ -10,6 +10,7 @@
     "test:latest": "npm run test -prefix latest",
     "clean": "npx rimraf ./*/",
     "serve:latest": "npx angular-http-server --path latest/dist/latest",
+    "serve:next": "npx angular-http-server --path next/dist/next",
     "serve:ng12": "npx angular-http-server --path ng12/dist/ng12"
   }
 }
