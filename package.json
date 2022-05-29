@@ -58,15 +58,15 @@
     "@angular/platform-browser": "~12.2.16",
     "@angular/platform-browser-dynamic": "~12.2.16",
     "@angular/router": "~12.2.16",
-    "@commitlint/cli": "^13.1.0",
-    "@commitlint/config-conventional": "^13.1.0",
+    "@commitlint/cli": "^16.3.0",
+    "@commitlint/config-conventional": "^16.2.4",
     "@types/cpx": "^1.5.2",
     "@types/jasmine": "~3.8.0",
     "@types/jasminewd2": "~2.0.10",
     "@types/node": "12.12.41",
     "@typescript-eslint/eslint-plugin": "4.28.2",
     "@typescript-eslint/parser": "4.28.2",
-    "@uploadx/core": "^5.1.2",
+    "@uploadx/core": "^5.1.3",
     "angular-http-server": "^1.10.0",
     "browserstack-local": "^1.5.1",
     "cpx": "^1.5.0",
@@ -100,6 +100,11 @@
   "lint-staged": {
     "*.{js,json,scss,md,ts,html}": [
       "prettier --write"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
     ]
   }
 }
