@@ -287,13 +287,18 @@ selector: `uploadxDrop`
 
 ## Build
 
-Run `npm run build` to build the lib.
+Run `npm run build:pkg` to build the lib.
 
 > _packaged by_ [ng-packagr](https://github.com/dherges/ng-packagr)
 
+## Bugs and Feedback
+
+For bugs, questions and discussions please use the [GitHub Issues](https://github.com/kukhariev/ngx-uploadx/issues).
+
 ## Contributing
 
-Pull requests are welcome!
+Pull requests are welcome!\
+To contribute, please read [contributing instructions](https://github.com/kukhariev/ngx-uploadx/blob/master/.github/CONTRIBUTING.md#contributing).
 
 ## References
 
