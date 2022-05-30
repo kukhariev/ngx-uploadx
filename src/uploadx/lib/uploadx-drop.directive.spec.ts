@@ -1,5 +1,5 @@
 import { Component, DebugElement } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { UploadxDropDirective } from './uploadx-drop.directive';
 import { UploadxDirective } from './uploadx.directive';
@@ -22,7 +22,7 @@ describe('Directive: UploadxDropDirective', () => {
   let fixture: ComponentFixture<UploadxTestComponent>;
   let dropEl: DebugElement;
   let serviceHandleFiles: jasmine.Spy;
-  beforeEach(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [UploadxTestComponent, UploadxDirective, UploadxDropDirective],
       providers: [UploadxService]
@@ -31,7 +31,7 @@ describe('Directive: UploadxDropDirective', () => {
     dropEl = fixture.debugElement.query(By.directive(UploadxDropDirective));
     const service = fixture.debugElement.injector.get<UploadxService>(UploadxService);
     serviceHandleFiles = spyOn(service, 'handleFiles');
-  });
+  }));
 
   it('should ignore non files dragover', () => {
     const dragoverEvent = jasmine.createSpyObj('event', ['preventDefault', 'stopPropagation']);

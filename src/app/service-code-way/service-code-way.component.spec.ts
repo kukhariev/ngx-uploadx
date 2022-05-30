@@ -9,7 +9,7 @@ describe('ServiceCodeWayComponent', () => {
   let fixture: ComponentFixture<ServiceCodeWayComponent>;
   let uploadService: UploadxService;
 
-  beforeEach(() => {
+  beforeEach(waitForAsync(() => {
     const observableStub = {};
     const uploadServiceStub = {
       init: jasmine.createSpy('init'),
@@ -25,11 +25,11 @@ describe('ServiceCodeWayComponent', () => {
         { provide: Observable, useValue: observableStub },
         { provide: UploadxService, useValue: uploadServiceStub }
       ]
-    });
+    }).compileComponents();
     fixture = TestBed.createComponent(ServiceCodeWayComponent);
-    uploadService = TestBed.get(UploadxService);
+    uploadService = TestBed.inject(UploadxService);
     comp = fixture.componentInstance;
-  });
+  }));
 
   it('can load instance', () => {
     expect(comp).toBeTruthy();
@@ -57,12 +57,12 @@ describe('ServiceCodeWayComponent', () => {
   });
 
   describe('onChange', () => {
-    it('should upload the files after the input files change', waitForAsync(() => {
+    it('should upload the files after the input files change', () => {
       const dataTransfer = new ClipboardEvent('').clipboardData || new DataTransfer();
       dataTransfer.items.add(new File(['foo'], 'programmatically_created.txt'));
       spyOn(comp, 'getFiles').and.returnValue(dataTransfer.files);
       comp.onChange();
       expect(uploadService.handleFiles).toHaveBeenCalled();
-    }));
+    });
   });
 });
