@@ -1,5 +1,5 @@
 import { Component, DebugElement } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { UploadxControlEvent } from './interfaces';
 import { UPLOADX_OPTIONS } from './options';
@@ -31,7 +31,7 @@ describe('Directive: UploadxDirective', () => {
   let service: UploadxService;
   let serviceControlSpy: jasmine.Spy;
   let serviceHandleFileListSpy: jasmine.Spy;
-  beforeEach(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [UploadxTestComponent, UploadxDirective],
       providers: [UploadxService, { provide: UPLOADX_OPTIONS, useValue: {} }]
@@ -42,7 +42,7 @@ describe('Directive: UploadxDirective', () => {
     service = fixture.debugElement.injector.get<UploadxService>(UploadxService);
     serviceControlSpy = spyOn(service, 'control');
     serviceHandleFileListSpy = spyOn(service, 'handleFiles');
-  });
+  }));
 
   it('has attribute "accept"', () => {
     fixture.detectChanges();

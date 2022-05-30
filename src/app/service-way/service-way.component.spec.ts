@@ -30,17 +30,6 @@ describe('ServiceWayComponent', () => {
     expect(comp).toBeTruthy();
   });
 
-  // xdescribe('onUpload', () => {
-  //   it('makes expected calls', () => {
-  //     const observableStub: Observable<any> = fixture.debugElement.injector.get(Observable);
-  //     const uploadServiceStub: UploadxService =
-  //       fixture.debugElement.injector.get(UploadxService);
-  //     spyOn(uploadServiceStub, 'control');
-  //     comp.onUpload(observableStub);
-  //     expect(uploadServiceStub.control).toHaveBeenCalled();
-  //   });
-  // });
-
   describe('cancelAll', () => {
     it('makes expected calls', () => {
       const uploadServiceStub: UploadxService = fixture.debugElement.injector.get(UploadxService);
