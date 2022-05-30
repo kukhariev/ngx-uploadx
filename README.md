@@ -62,9 +62,7 @@ export class AppHomeComponent {
 
 ## Server-side setup
 
-- [node-uploadx](https://github.com/kukhariev/node-uploadx)
-- [tus-node-server](https://github.com/tus/tus-node-server)
-- [tusd](https://github.com/tus/tusd)
+- [node-uploadx](https://github.com/kukhariev/node-uploadx#readme)
 
 ## API
 
@@ -299,11 +297,6 @@ For bugs, questions and discussions please use the [GitHub Issues](https://githu
 
 Pull requests are welcome!\
 To contribute, please read [contributing instructions](https://github.com/kukhariev/ngx-uploadx/blob/master/.github/CONTRIBUTING.md#contributing).
-
-## References
-
-- [https://developers.google.com/drive/api/v3/manage-uploads#resumable](https://developers.google.com/drive/api/v3/manage-uploads#resumable)
-- [https://github.com/tus/tus-resumable-upload-protocol/blob/master/protocol.md](https://github.com/tus/tus-resumable-upload-protocol/blob/master/protocol.md)
 
 ## License
 
