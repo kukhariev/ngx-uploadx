@@ -1,21 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Ajax, AjaxRequestConfig } from './ajax';
+import { Ajax } from './ajax';
 import { DynamicChunk } from './dynamic-chunk';
 import { UploaderOptions } from './interfaces';
 import { Uploader } from './uploader';
-
-let serverStatus: number;
-
-const mockAjax: Ajax = {
-  request<T>(
-    config: AjaxRequestConfig
-  ): Promise<{ data: T; status: number; headers: Record<string, string> }> {
-    if (!serverStatus) {
-      return Promise.reject();
-    }
-    return Promise.resolve({ data: '' as unknown as T, headers: {}, status: serverStatus });
-  }
-};
 
 function getFile(): File {
   return new File(['0123456789'], 'filename.mp4', {
@@ -33,7 +20,15 @@ const chunkInit = {
   size: DynamicChunk.size
 };
 
-let uploader: MockUploader;
+let serverStatus: number;
+
+const mockAjax: Ajax = {
+  request(): Promise<{ data: any; status: number; headers: Record<string, string> }> {
+    return !serverStatus
+      ? Promise.reject()
+      : Promise.resolve({ data: '', headers: {}, status: serverStatus });
+  }
+};
 
 export class MockUploader extends Uploader {
   constructor(readonly f: File, readonly opts: UploaderOptions) {
@@ -59,16 +54,14 @@ export class MockUploader extends Uploader {
 describe('Uploader', () => {
   describe('constructor()', () => {
     it('should new()', () => {
-      uploader = new MockUploader(file, { retryConfig: { maxAttempts: 1 } });
+      const uploader = new MockUploader(file, { retryConfig: { maxAttempts: 1 } });
       expect(uploader).toEqual(jasmine.objectContaining(snip));
     });
   });
 
   describe('configure', () => {
-    beforeEach(() => {
-      uploader = new MockUploader(file, {});
-    });
     it('should abort on pause', () => {
+      const uploader = new MockUploader(file, {});
       const abort = spyOn<any>(uploader, 'abort').and.callThrough();
       const stateChange = spyOn<any>(uploader, 'stateChange').and.callThrough();
       uploader.configure({ action: 'pause' });
@@ -76,6 +69,7 @@ describe('Uploader', () => {
       expect(stateChange).toHaveBeenCalled();
     });
     it('should cancel', () => {
+      const uploader = new MockUploader(file, {});
       const abort = spyOn<any>(uploader, 'abort').and.callThrough();
       const onCancel = spyOn<any>(uploader, 'cancel').and.callThrough();
       const cleanup = spyOn<any>(uploader, 'cleanup').and.callThrough();
@@ -92,22 +86,22 @@ describe('Uploader', () => {
       DynamicChunk.size = chunkInit.size;
     });
     it('should use adaptive chunkSize if not specified', async () => {
-      uploader = new MockUploader(getFile(), {});
+      const uploader = new MockUploader(getFile(), {});
       (uploader as any).getChunk();
       expect(uploader.chunkSize).toEqual(chunkInit.size);
     });
     it('should set fixed chunkSize', async () => {
-      uploader = new MockUploader(file, { chunkSize: 4_194_304 });
+      const uploader = new MockUploader(file, { chunkSize: 4_194_304 });
       (uploader as any).getChunk();
       expect(uploader.chunkSize).toEqual(4_194_304);
     });
     it('should disable chunks', async () => {
-      uploader = new MockUploader(file, { chunkSize: 0 });
+      const uploader = new MockUploader(file, { chunkSize: 0 });
       (uploader as any).getChunk();
       expect(uploader.chunkSize).toEqual(10);
     });
     it('should limit on 413', async () => {
-      uploader = new MockUploader(file, {});
+      const uploader = new MockUploader(file, {});
       uploader.responseStatus = 413;
       (uploader as any).getChunk();
       expect(uploader.chunkSize).toEqual(chunkInit.size / 2);
@@ -116,10 +110,8 @@ describe('Uploader', () => {
   });
 
   describe('upload()', () => {
-    beforeEach(() => {
-      uploader = new MockUploader(file, { retryConfig: { maxAttempts: 3 }, token: 'token' });
-    });
     it('should retry on 0', async () => {
+      const uploader = new MockUploader(file, { retryConfig: { maxAttempts: 3 }, token: 'token' });
       const retry = spyOn<any>(uploader.retry, 'wait');
       serverStatus = 0;
       await uploader.upload();
@@ -127,12 +119,14 @@ describe('Uploader', () => {
       expect(retry).toHaveBeenCalledTimes(3);
     });
     it('should error on 400', async () => {
+      const uploader = new MockUploader(file, { retryConfig: { maxAttempts: 3 }, token: 'token' });
       serverStatus = 400;
       await uploader.upload();
       expect(uploader.responseStatus).toEqual(400);
       expect(uploader.status).toEqual('error');
     });
     it('should updateToken on 401', async () => {
+      const uploader = new MockUploader(file, { retryConfig: { maxAttempts: 3 }, token: 'token' });
       const updateToken = spyOn<any>(uploader, 'updateToken').and.callThrough();
       serverStatus = 401;
       await uploader.upload();
@@ -140,6 +134,7 @@ describe('Uploader', () => {
       expect(updateToken).toHaveBeenCalledTimes(4);
     });
     it('should retry on 500', async () => {
+      const uploader = new MockUploader(file, { retryConfig: { maxAttempts: 3 }, token: 'token' });
       serverStatus = 500;
       const retry = spyOn<any>(uploader.retry, 'wait');
       await uploader.upload();
@@ -147,6 +142,7 @@ describe('Uploader', () => {
       expect(uploader.status).toEqual('error');
     });
     it('should complete on 200', async () => {
+      const uploader = new MockUploader(file, { retryConfig: { maxAttempts: 3 }, token: 'token' });
       serverStatus = 200;
       const updateToken = spyOn<any>(uploader, 'updateToken').and.callThrough();
       const getFileUrl = spyOn(uploader, 'getFileUrl').and.callThrough();
@@ -162,6 +158,7 @@ describe('Uploader', () => {
       expect(uploader.status).toEqual('complete');
     });
     it('should complete on 201', async () => {
+      const uploader = new MockUploader(file, { retryConfig: { maxAttempts: 3 }, token: 'token' });
       serverStatus = 201;
       const start = spyOn(uploader, 'upload').and.callThrough();
       const cleanup = spyOn<any>(uploader, 'cleanup').and.callThrough();
@@ -173,22 +170,21 @@ describe('Uploader', () => {
   });
 
   describe('request', () => {
-    serverStatus = 200;
-
-    it('should report progress if content is uploading', async () => {
-      uploader = new MockUploader(file, {});
-      uploader.offset = 0;
-      const request = spyOn<any>(uploader.ajax, 'request').and.callThrough();
-      await uploader.request({ method: 'POST', body: new FormData() });
-      expect((request.calls.mostRecent().args[0] as any).onUploadProgress).toBeTruthy();
-    });
-
+    const body = new Blob(['test']);
     it('should not report progress if offset is undefined', async () => {
-      uploader = new MockUploader(file, {});
-      uploader.offset = undefined;
-      const request = spyOn<any>(uploader.ajax, 'request').and.callThrough();
-      await uploader.request({ method: 'POST', body: new FormData() });
-      expect((request.calls.mostRecent().args[0] as any).onUploadProgress).toBeUndefined();
+      serverStatus = 200;
+      const uploader = new MockUploader(file, {});
+      const onProgressSpy = spyOn<any>(uploader, 'onProgress').and.callThrough();
+      await uploader.request({ method: 'POST', body });
+      expect(onProgressSpy).not.toHaveBeenCalled();
+    });
+    it('should report progress if content is uploading', async () => {
+      serverStatus = 200;
+      const uploader = new MockUploader(file, {});
+      uploader.offset = 0;
+      const onProgressSpy = spyOn<any>(uploader, 'onProgress').and.callThrough();
+      await uploader.request({ method: 'POST', body });
+      expect(onProgressSpy).toHaveBeenCalled();
     });
   });
 
@@ -199,7 +195,7 @@ describe('Uploader', () => {
     const sample = { headers: { ...auth, ...common }, method: 'POST' };
     it('sync', async () => {
       serverStatus = 201;
-      uploader = new MockUploader(file, {
+      const uploader = new MockUploader(file, {
         prerequest: req => ({ ...req, ...injected })
       });
       const request = spyOn<any>(uploader.ajax, 'request').and.callThrough();
@@ -208,7 +204,7 @@ describe('Uploader', () => {
     });
     it('async', async () => {
       serverStatus = 201;
-      uploader = new MockUploader(file, {
+      const uploader = new MockUploader(file, {
         headers: common,
         prerequest: req => Promise.resolve({ ...req, ...injected })
       });
@@ -218,7 +214,7 @@ describe('Uploader', () => {
     });
     it('void', async () => {
       serverStatus = 201;
-      uploader = new MockUploader(file, {
+      const uploader = new MockUploader(file, {
         prerequest: req => {
           req.headers['auth'] = 'token';
         }
