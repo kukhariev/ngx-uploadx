@@ -1,5 +1,5 @@
 blank_issues_enabled: true
 contact_links:
-  - name: Join our GitHub Discussions community
-    url: https://github.com/kukhariev/ngx-uploadx/discussions
-    about: Ask questions and discuss with other community members
+  - name: node-uploadx
+    url: https://github.com/kukhariev/node-uploadx/issues
+    about: node-uploadx project support
