@@ -38,7 +38,7 @@ export class UploadxDropDirective {
     this.active = false;
   }
 
-  protected _stopEvents(event: DragEvent) {
+  protected _stopEvents(event: DragEvent): void {
     event.stopPropagation();
     event.preventDefault();
   }

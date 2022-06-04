@@ -2,6 +2,7 @@ import { InjectionToken } from '@angular/core';
 import { RequestOptions } from './interfaces';
 
 export interface AjaxRequestConfig extends RequestOptions {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [x: string]: any;
 
   data?: BodyInit | null;
@@ -23,6 +24,7 @@ function createXhr(): XMLHttpRequest {
 }
 
 function releaseXhr(xhr: unknown): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   xhr = null;
 }
 

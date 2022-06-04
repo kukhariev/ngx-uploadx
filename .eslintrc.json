@@ -11,9 +11,11 @@
       "extends": [
         "plugin:@angular-eslint/recommended",
         "plugin:@angular-eslint/template/process-inline-templates",
-        "plugin:prettier/recommended"
+        "plugin:prettier/recommended",
+        "plugin:@typescript-eslint/recommended"
       ],
       "rules": {
+        "@typescript-eslint/no-empty-function": "off",
         "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
         "@angular-eslint/component-selector": [
           "error",

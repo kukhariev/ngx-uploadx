@@ -43,7 +43,7 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
     });
 
     this.uploadxService.ajax
-      .request({ method: 'OPTIONS', url: this.options.endpoint! })
+      .request({ method: 'OPTIONS', url: this.options.endpoint as string })
       .then(({ headers }) => {
         if (hasher.isSupported && headers['tus-checksum-algorithm'].includes('sha1')) {
           this.uploadxService.options.prerequest = injectTusChecksumHeader;

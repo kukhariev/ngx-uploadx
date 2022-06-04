@@ -73,7 +73,7 @@ export const UPLOADX_FACTORY_OPTIONS = new InjectionToken<UploadxFactoryOptions>
 );
 export const UPLOADX_OPTIONS = new InjectionToken<UploadxOptions>('uploadx.options');
 
-export const iOSPatch = (options: UploadxOptions) => {
+export const iOSPatch = (options: UploadxOptions): void => {
   if (options.chunkSize || options.maxChunkSize) {
     console.warn('Detected iOS device, chunk uploads are problematic on this device.');
     return;

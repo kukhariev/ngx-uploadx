@@ -6,7 +6,7 @@ import { delay } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthService {
-  accessToken = () => {
+  accessToken: () => string = () => {
     console.info('auth token updated');
     return `${new Date().getTime()}`;
   };

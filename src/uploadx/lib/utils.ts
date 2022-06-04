@@ -19,7 +19,7 @@ export const pick = <T, K extends keyof T>(obj: T, props: K[]): Pick<T, K> => {
   return result;
 };
 
-export function isNumber(x?: number): x is number {
+export function isNumber(x?: unknown): x is number {
   return x === Number(x);
 }
 
@@ -37,13 +37,13 @@ export function createHash(str: string): number {
 }
 
 export const b64 = {
-  encode: (str: string) =>
+  encode: (str: string): string =>
     btoa(
       encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) =>
         String.fromCharCode(Number.parseInt(p1, 16))
       )
     ),
-  decode: (str: string) =>
+  decode: (str: string): string =>
     decodeURIComponent(
       atob(str)
         .split('')
@@ -56,7 +56,7 @@ export const b64 = {
       .map(key => [key, b64.encode(String(obj[key]))].filter(Boolean).join(' '))
       .toString(),
 
-  parse: (encoded: string) => {
+  parse: (encoded: string): Record<string, string> => {
     const kvPairs = encoded.split(',').map(kv => kv.split(' '));
     const decoded: Record<string, string> = {};
     for (const [key, value] of kvPairs) {
