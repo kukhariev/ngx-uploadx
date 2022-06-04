@@ -254,15 +254,20 @@ export abstract class Uploader implements UploadState {
     return this.responseHeaders[key.toLowerCase()] || null;
   }
 
-  protected getChunk(): { start: number; end: number; body: Blob } {
+  /**
+   * Get file chunk
+   * @param offset - number of bytes of the file to skip
+   * @param size - chunk size
+   */
+  getChunk(offset?: number, size?: number): { start: number; end: number; body: Blob } {
     if (this.responseStatus === 413) {
       DynamicChunk.maxSize = DynamicChunk.size = Math.floor(DynamicChunk.size / 2);
     }
     this.chunkSize =
       this.options.chunkSize === 0 ? this.size : this.options.chunkSize || DynamicChunk.size;
-    const start = this.offset || 0;
-    const end = Math.min(start + this.chunkSize, this.size);
-    const body = this.file.slice(this.offset, end);
+    const start = offset ?? this.offset ?? 0;
+    const end = Math.min(start + (size || this.chunkSize), this.size);
+    const body = this.file.slice(start, end);
     return { start, end, body };
   }
 
