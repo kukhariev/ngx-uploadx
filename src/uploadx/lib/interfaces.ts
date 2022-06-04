@@ -1,14 +1,12 @@
 import { Canceler } from './canceler';
 import { RetryConfig } from './retry-handler';
 
-export type Primitive = null | boolean | number | string;
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ResponseBody = any;
 
-export type RequestHeaders = Record<string, Primitive | Primitive[]>;
+export type RequestHeaders = Record<string, boolean | number | string>;
 
-export type Metadata = Record<string, Primitive | Primitive[]>;
+export type Metadata = Record<string, unknown>;
 
 export interface RequestConfig {
   body?: BodyInit | null;

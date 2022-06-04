@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { UploadxAjax } from './ajax';
 
 const data = { key0: '0', key1: '1' };

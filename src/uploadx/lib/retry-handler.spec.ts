@@ -1,4 +1,4 @@
-import { ErrorType, RetryHandler, ShouldRetryFunction } from './retry-handler';
+import { ErrorType, RetryHandler } from './retry-handler';
 
 describe('RetryHandler', () => {
   let retry: RetryHandler;
@@ -19,8 +19,7 @@ describe('RetryHandler', () => {
   });
 
   it('shouldRetry', () => {
-    const shouldRetry: ShouldRetryFunction = (code, attempts) => code === 500 && attempts < 2;
-    retry.config.shouldRetry = shouldRetry;
+    retry.config.shouldRetry = (code, attempts) => code === 500 && attempts < 2;
     expect(retry.kind(500)).toBe(ErrorType.Retryable);
     retry.attempts = 3;
     expect(retry.kind(500)).toBe(ErrorType.Fatal);

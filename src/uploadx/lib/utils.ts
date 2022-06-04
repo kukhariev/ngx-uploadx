@@ -1,7 +1,3 @@
-/* eslint-disable no-bitwise */
-
-import { Primitive } from './interfaces';
-
 function safeMatch(base: string, re: RegExp): string {
   return (base.match(re) || [''])[0];
 }
@@ -23,7 +19,7 @@ export const pick = <T, K extends keyof T>(obj: T, props: K[]): Pick<T, K> => {
   return result;
 };
 
-export function isNumber(x?: number): x is number {
+export function isNumber(x?: unknown): x is number {
   return x === Number(x);
 }
 
@@ -41,25 +37,26 @@ export function createHash(str: string): number {
 }
 
 export const b64 = {
-  encode: (str: string) =>
+  encode: (str: string): string =>
     btoa(
       encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) =>
         String.fromCharCode(Number.parseInt(p1, 16))
       )
     ),
-  decode: (str: string) =>
+  decode: (str: string): string =>
     decodeURIComponent(
       atob(str)
         .split('')
         .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
         .join('')
     ),
-  serialize: (obj: Record<string, Primitive | Primitive[]>) =>
+
+  serialize: (obj: Record<string, unknown>): string =>
     Object.keys(obj)
       .map(key => [key, b64.encode(String(obj[key]))].filter(Boolean).join(' '))
       .toString(),
 
-  parse: (encoded: string) => {
+  parse: (encoded: string): Record<string, string> => {
     const kvPairs = encoded.split(',').map(kv => kv.split(' '));
     const decoded: Record<string, string> = {};
     for (const [key, value] of kvPairs) {

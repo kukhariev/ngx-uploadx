@@ -45,7 +45,7 @@ export abstract class Uploader implements UploadState {
   /** Upload endpoint */
   endpoint = '/upload';
   /** Chunk size in bytes */
-  chunkSize?: number;
+  chunkSize = 0;
   /** Auth token/tokenGetter */
   token: UploadxControlEvent['token'];
   /** Byte offset within the whole file */
@@ -162,7 +162,7 @@ export abstract class Uploader implements UploadState {
             this._token = '';
             break;
           default:
-            if (this.responseStatus >= 400 || this.chunkSize! > DynamicChunk.size) {
+            if (this.responseStatus >= 400 || this.chunkSize > DynamicChunk.size) {
               this.offset = undefined;
             }
             this.status = 'retry';

@@ -10,11 +10,11 @@ export function readBlob(body: Blob, canceler?: Canceler): Promise<ArrayBuffer> 
   });
 }
 
-export function bufferToHex(buf: ArrayBuffer) {
+export function bufferToHex(buf: ArrayBuffer): string {
   return Array.from(new Uint8Array(buf), x => x.toString(16).padStart(2, '0')).join('');
 }
 
-export function bufferToBase64(hash: ArrayBuffer) {
+export function bufferToBase64(hash: ArrayBuffer): string {
   return btoa(String.fromCharCode(...new Uint8Array(hash)));
 }
 

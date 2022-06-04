@@ -8,7 +8,7 @@ describe('DynamicChunk', () => {
     expect(DynamicChunk.scale(Number.MAX_SAFE_INTEGER)).toEqual(init / 2);
     expect(DynamicChunk.scale(Number.MAX_SAFE_INTEGER)).toEqual(init);
     expect(DynamicChunk.scale(Number.MAX_SAFE_INTEGER)).toEqual(init * 2);
-    expect(DynamicChunk.scale(undefined as any)).toEqual(init * 2);
+    expect(DynamicChunk.scale(undefined as never)).toEqual(init * 2);
   });
   afterEach(() => {
     DynamicChunk.size = init;

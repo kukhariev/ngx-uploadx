@@ -1,5 +1,5 @@
 export class Canceler {
-  onCancel = () => {};
+  onCancel = (): void => {};
 
   cancel(): void {
     this.onCancel();

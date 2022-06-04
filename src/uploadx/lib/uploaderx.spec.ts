@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Ajax } from './ajax';
 import { getRangeEnd, UploaderX } from './uploaderx';
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 const fileWithType = new File(['123456'], 'filename.txt', { type: 'text/plain' });
 

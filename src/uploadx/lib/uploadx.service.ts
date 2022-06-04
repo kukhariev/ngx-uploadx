@@ -36,7 +36,7 @@ const DUE_TIME = 5;
 export class UploadxService implements OnDestroy {
   /** Upload Queue */
   queue: Uploader[] = [];
-  options: UploadxFactoryOptions;
+  readonly options: UploadxFactoryOptions;
   private readonly eventsStream: Subject<UploadState> = new Subject();
   private subs: Subscription[] = [];
 
