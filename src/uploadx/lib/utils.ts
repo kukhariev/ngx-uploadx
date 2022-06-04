@@ -1,7 +1,3 @@
-/* eslint-disable no-bitwise */
-
-import { Primitive } from './interfaces';
-
 function safeMatch(base: string, re: RegExp): string {
   return (base.match(re) || [''])[0];
 }
@@ -54,7 +50,8 @@ export const b64 = {
         .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
         .join('')
     ),
-  serialize: (obj: Record<string, Primitive | Primitive[]>) =>
+
+  serialize: (obj: Record<string, unknown>): string =>
     Object.keys(obj)
       .map(key => [key, b64.encode(String(obj[key]))].filter(Boolean).join(' '))
       .toString(),
