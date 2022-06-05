@@ -141,7 +141,7 @@ export abstract class Uploader implements UploadState {
         if (this.offset === this.size) {
           this.remaining = 0;
           this.progress = 100;
-          this.status = 'complete';
+          await this.complete();
         } else if (!this.offset) {
           this.stateChange(this);
           await this.retry.wait(this.getRetryAfterFromBackend() || this.retry.config.onBusyDelay);
@@ -170,6 +170,13 @@ export abstract class Uploader implements UploadState {
         }
       }
     }
+  }
+
+  /**
+   * Called when upload is complete and should usually set the status to `complete`
+   */
+  async complete(): Promise<void> {
+    this.status = 'complete';
   }
 
   /**
