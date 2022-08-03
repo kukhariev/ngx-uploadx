@@ -102,6 +102,7 @@ export abstract class Uploader implements UploadState {
     if (this._status === s) return;
     if (this._status === 'cancelled') return;
     if (this._status === 'complete' && s !== 'cancelled') return;
+    if (this._status === 'uploading' && s === 'queue') return;
     if (this._status === 'retry') this.retry.cancel();
     this._status = s;
     if (s === 'paused') this.abort();
