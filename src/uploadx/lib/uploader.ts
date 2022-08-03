@@ -99,16 +99,14 @@ export abstract class Uploader implements UploadState {
   }
 
   set status(s: UploadStatus) {
-    if (this._status === 'cancelled' || (this._status === 'complete' && s !== 'cancelled')) {
-      return;
-    }
-    if (s !== this._status) {
-      this.status === 'retry' && this.retry.cancel();
-      this._status = s;
-      s === 'paused' && this.abort();
-      ['cancelled', 'complete', 'error'].includes(s) && this.cleanup();
-      s === 'cancelled' ? this.cancel() : this.stateChange(this);
-    }
+    if (this._status === s) return;
+    if (this._status === 'cancelled') return;
+    if (this._status === 'complete' && s !== 'cancelled') return;
+    if (this._status === 'retry') this.retry.cancel();
+    this._status = s;
+    if (s === 'paused') this.abort();
+    if (s === 'cancelled' || s === 'complete' || s === 'error') this.cleanup();
+    s === 'cancelled' ? this.cancel() : this.stateChange(this);
   }
 
   /**
