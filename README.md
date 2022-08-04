@@ -106,6 +106,7 @@ export class AppHomeComponent {
   - `maxDelay` Maximum retry interval. Default value: `50_000`
   - `onBusyDelay` Delay used between retries for non-error responses with missing range/offset. Default value: `1000`
   - `timeout` Time interval after which unfinished requests must be retried
+  - `keepPartial` Determines whether partial chunks should be kept
 
 - `token` Authorization token as a `string` or function returning a `string` or `Promise<string>`
 

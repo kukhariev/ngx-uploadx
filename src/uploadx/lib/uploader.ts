@@ -161,7 +161,7 @@ export abstract class Uploader implements UploadState {
             this._token = '';
             break;
           default:
-            if (this.responseStatus >= 400 || this.chunkSize > DynamicChunk.size) {
+            if (unfunc(this.retry.config.keepPartial, this.responseStatus)) {
               this.offset = undefined;
             }
             this.status = 'retry';
