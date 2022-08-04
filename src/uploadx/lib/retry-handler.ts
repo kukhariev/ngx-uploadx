@@ -6,6 +6,7 @@ export enum ErrorType {
 }
 
 export type ShouldRetryFunction = (code: number, attempts: number) => boolean;
+export type KeepPartialFunction = (code: number) => boolean;
 
 export interface RetryConfig {
   /** Maximum number of retry attempts */
@@ -26,6 +27,8 @@ export interface RetryConfig {
   onBusyDelay?: number;
   /** Time interval after which hanged requests must be retried */
   timeout?: number;
+  /** Determines whether partial chunks should be kept */
+  keepPartial?: boolean | KeepPartialFunction;
 }
 
 const defaultRetryConfig: Required<RetryConfig> = {
@@ -39,7 +42,10 @@ const defaultRetryConfig: Required<RetryConfig> = {
   minDelay: 500,
   maxDelay: 50000,
   onBusyDelay: 1000,
-  timeout: 0
+  timeout: 0,
+  keepPartial(statusCode): boolean {
+    return statusCode >= 400;
+  }
 };
 
 /**
