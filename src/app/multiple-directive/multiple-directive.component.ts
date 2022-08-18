@@ -11,12 +11,12 @@ import { environment } from '../../environments/environment';
 export class MultipleDirectiveComponent {
   state$: Observable<UploadState>;
   uploads$: Observable<Uploader[]>;
-  options: UploadxOptions = {
+  imageUploadOptions: UploadxOptions = {
     endpoint: `${environment.api}/files?uploadType=uploadx`,
-    allowedTypes: 'video/*'
+    allowedTypes: 'image/*'
   };
 
-  options2: UploadxOptions = {
+  videoUploadOptions: UploadxOptions = {
     endpoint: `${environment.api}/files?uploadType=tus`,
     allowedTypes: 'video/*',
     uploaderClass: Tus
