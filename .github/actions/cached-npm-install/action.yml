@@ -1,0 +1,32 @@
+name: 'Cached npm packages installation'
+description: 'Cached npm packages installation without `package.lock.json` file (Project root directory only)'
+
+inputs:
+  node-version:
+    required: false
+    default: '14.x'
+    description: 'Node version'
+  cache-name:
+    required: false
+    default: 'build'
+    description: 'Cache name'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup node
+      id: setup-node
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node-version }}
+    - name: Cache packages
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.npm
+          ./node_modules
+        key: ${{ inputs.cache-name }}-${{ runner.OS }}-node-${{ steps.setup-node.outputs.node-version }}-${{ hashFiles('./package.json') }}
+        restore-keys: ${{ inputs.cache-name }}-${{ runner.OS }}-node-${{ steps.setup-node.outputs.node-version }}-
+    - name: Install dependencies
+      shell: bash
+      run: npm install
