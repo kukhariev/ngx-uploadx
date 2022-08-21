@@ -10,12 +10,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - name: Install
+        uses: './.github/actions/cached-npm-install'
         with:
           node-version: '14.x'
-      - name: Install dependencies
-        run: npm install
       - name: Browserstack e2e
         run: npm run browserstack
         env:
