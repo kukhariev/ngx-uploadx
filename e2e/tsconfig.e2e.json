@@ -4,8 +4,8 @@
     "outDir": "../out-tsc/e2e",
     "baseUrl": "./",
     "module": "commonjs",
-    "target": "es2015",
-    "types": ["jasmine", "jasminewd2", "node"],
+    "types": ["node"],
+    "sourceMap": false,
     "paths": {
       "ngx-uploadx": ["../src/uploadx/"]
     }

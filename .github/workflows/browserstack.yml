@@ -7,17 +7,19 @@ on:
   schedule:
     - cron: '0 7 * * 1'
 jobs:
-  test:
+  e2e:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
       - name: Install
         uses: './.github/actions/cached-npm-install'
+      - name: 'Browserstack env setup'
+        uses: 'browserstack/github-actions/setup-env@master'
         with:
-          node-version: '14.x'
+          username: ${{ secrets.BROWSERSTACK_USERNAME }}
+          access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
       - name: Browserstack e2e
         run: npm run browserstack
         env:
           CI: true
-          BROWSERSTACK_ACCESS_KEY: '${{ secrets.BROWSERSTACK_ACCESS_KEY }}'
-          BROWSERSTACK_USERNAME: '${{ secrets.BROWSERSTACK_USERNAME }}'
+          BROWSERSTACK_BUILD_ID: ${{ env.BROWSERSTACK_BUILD_NAME }}

@@ -1,41 +1,23 @@
-import { UploadStatus } from 'ngx-uploadx';
-import { browser, by, element, ElementFinder } from 'protractor';
-import * as remote from 'selenium-webdriver/remote';
+import { createWriteStream } from 'fs';
+import { tmpdir } from 'os';
+import { join } from 'path';
+import { Selector } from 'testcafe';
+
+require('../server');
 
 export class AppPage {
-  navigateTo(path: string): Promise<unknown> {
-    return browser.get(path) as Promise<unknown>;
-  }
+  fileInput = Selector('app-root input').nth(0);
+  table = Selector('app-root .uploads-table').nth(0);
+  cancelAll = Selector('button').withExactText('Cancel All').nth(0);
+  baseUrl = 'http://localhost:4200/';
+}
 
-  getFileInput(): ElementFinder {
-    browser.setFileDetector(new remote.FileDetector());
-    return element.all(by.css('app-root input')).first();
-  }
+export function getTestFile(): string {
+  const filename = join(tmpdir(), 'testfile.mp4');
+  const filesize = 64;
+  const file = createWriteStream(filename, { flags: 'w' });
+  file.write(Buffer.alloc(filesize));
+  file.end();
 
-  getTable(): ElementFinder {
-    return element(by.css('app-root .uploads-table'));
-  }
-
-  getButton(text: string): ElementFinder {
-    return element.all(by.buttonText(text)).first();
-  }
-
-  getPreText(): Promise<string> {
-    return element(by.css('app-root pre')).getText() as Promise<string>;
-  }
-
-  async waitForStatus(status: UploadStatus): Promise<boolean> {
-    try {
-      await browser.wait(
-        () =>
-          element(by.css('.uploads-table'))
-            .getText()
-            .then(text => text.indexOf(status) >= 0),
-        30000
-      );
-    } catch (e) {
-      return false;
-    }
-    return true;
-  }
+  return filename;
 }

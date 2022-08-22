@@ -2,12 +2,11 @@
 
 > Angular Resumable Upload Module
 
-[![npm version][npm-image]][npm-url]
-[![commits since latest release][comm-image]][comm-url]
-
 [![tests][tests-image]][tests-url]
 [![build][build-image]][build-url]
 [![browserstack][browserstack-image]][browserstack-url]
+[![npm version][npm-image]][npm-url]
+[![commits since latest release][comm-image]][comm-url]
 
 ## Key Features
 

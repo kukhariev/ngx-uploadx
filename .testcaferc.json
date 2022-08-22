@@ -1,0 +1,13 @@
+{
+  "browsers": ["chrome"],
+  "src": ["e2e/*.e2e-spec.ts"],
+  "quarantineMode": false,
+  "debugMode": false,
+  "debugOnFail": true,
+  "stopOnFirstFail": true,
+  "skipJsErrors": true,
+  "skipUncaughtErrors": true,
+  "appCommand": "npm run serve:dev",
+  "disablePageCaching ": true,
+  "pageRequestTimeout": 30000
+}

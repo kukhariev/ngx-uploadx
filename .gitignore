@@ -49,3 +49,6 @@ src/uploadx/package.json
 /integrations/*/
 
 
+/screenshots/
+/e2e/reports/
+

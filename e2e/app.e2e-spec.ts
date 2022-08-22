@@ -1,68 +1,64 @@
-import { browser, logging } from 'protractor';
-import { AppPage } from './app.po';
-import { getTestFile } from './testfile';
+import { AppPage, getTestFile } from './app.po';
+const page = new AppPage();
 
-describe('uploader App', async () => {
-  let page: AppPage;
-  const testFilePath = getTestFile();
-  beforeEach(() => {
-    page = new AppPage();
-  });
-  afterEach(async () => {
-    page.getButton('Cancel All').click();
+const file = getTestFile();
 
-    const caps = await browser.driver.getCapabilities();
-    browser['browserName'] = caps.get('browserName');
-    if (browser['browserName'] === 'chrome') {
-      // Assert that there are no errors emitted from the browser
-      const logs = await browser.manage().logs().get(logging.Type.BROWSER);
-      expect(logs).not.toContain(
-        jasmine.objectContaining({
-          level: logging.Level.SEVERE
-        } as logging.Entry)
-      );
-    }
-  });
+fixture`app`.page(`${page.baseUrl}`).afterEach(async t => {
+  await t.click(page.cancelAll);
+});
 
-  it('should upload (directive)', () => {
-    page.navigateTo('/directive-way');
-    page.getFileInput().sendKeys(testFilePath);
-    expect(page.waitForStatus('complete')).toBeTruthy();
-  });
+test('should upload /directive-way', async t => {
+  await t
+    .navigateTo('/directive-way')
+    .setFilesToUpload(page.fileInput, file)
+    .expect(page.table.innerText)
+    .contains('complete');
+});
 
-  it('should upload (mixed)', () => {
-    page.navigateTo('/service-way');
-    page.getFileInput().sendKeys(testFilePath);
-    expect(page.waitForStatus('complete')).toBeTruthy();
-  });
+test('should upload /service-way', async t => {
+  await t
+    .navigateTo('/service-way')
+    .setFilesToUpload(page.fileInput, file)
+    .expect(page.table.innerText)
+    .contains('complete');
+});
 
-  it('should upload (service)', () => {
-    page.navigateTo('/service-code-way');
-    page.getFileInput().sendKeys(testFilePath);
-    expect(page.waitForStatus('complete')).toBeTruthy();
-  });
+test('should upload /service-code-way', async t => {
+  await t
+    .navigateTo('/service-code-way')
+    .setFilesToUpload(page.fileInput, file)
+    .expect(page.table.innerText)
+    .contains('complete');
+});
 
-  it('should upload (onPush)', () => {
-    page.navigateTo('/on-push');
-    page.getFileInput().sendKeys(testFilePath);
-    expect(page.waitForStatus('complete')).toBeTruthy();
-  });
+test('should upload /on-push', async t => {
+  await t
+    .navigateTo('/on-push')
+    .setFilesToUpload(page.fileInput, file)
+    .expect(page.table.innerText)
+    .contains('complete');
+});
 
-  it('should upload (multi-options)', () => {
-    page.navigateTo('/multi');
-    page.getFileInput().sendKeys(testFilePath);
-    expect(page.waitForStatus('complete')).toBeTruthy();
-  });
+test('should upload /multi', async t => {
+  await t
+    .navigateTo('/multi')
+    .setFilesToUpload(page.fileInput, file)
+    .expect(page.table.innerText)
+    .contains('complete');
+});
 
-  it('should upload (multi-service)', () => {
-    page.navigateTo('/multi2');
-    page.getFileInput().sendKeys(testFilePath);
-    expect(page.waitForStatus('complete')).toBeTruthy();
-  });
+test('should upload /multi2', async t => {
+  await t
+    .navigateTo('/multi2')
+    .setFilesToUpload(page.fileInput, file)
+    .expect(page.table.innerText)
+    .contains('complete');
+});
 
-  it('should upload (tus)', () => {
-    page.navigateTo('/tus');
-    page.getFileInput().sendKeys(testFilePath);
-    expect(page.waitForStatus('complete')).toBeTruthy();
-  });
+test('should upload /tus', async t => {
+  await t
+    .navigateTo('/tus')
+    .setFilesToUpload(page.fileInput, file)
+    .expect(page.table.innerText)
+    .contains('complete');
 });

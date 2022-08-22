@@ -1,0 +1,16 @@
+{
+  "browsers": [
+    "browserstack:chrome:windows",
+    "browserstack:firefox:windows",
+    "browserstack:safari:os x"
+  ],
+  "src": ["e2e/*.e2e-spec.ts"],
+  "quarantineMode": false,
+  "debugMode": false,
+  "debugOnFail": true,
+  "stopOnFirstFail": true,
+  "skipJsErrors": true,
+  "skipUncaughtErrors": true,
+  "appCommand": "npm run serve:dev",
+  "pageRequestTimeout": 30000
+}
