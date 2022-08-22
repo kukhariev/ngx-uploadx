@@ -47,5 +47,6 @@ Thumbs.db
 src/uploadx/package.json
 
 /integrations/*/
-
-
+/test-results/
+/playwright-report/
+/playwright/.cache/

@@ -29,7 +29,9 @@ jobs:
       - name: Install
         uses: './.github/actions/cached-npm-install'
       - name: Run e2e tests
-        run: npm run e2e
+        continue-on-error: false
+        run: |
+          npx playwright test -c e2e/e2e.config.ts
         env:
           CI: true
   build:
