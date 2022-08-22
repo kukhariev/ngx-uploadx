@@ -2,8 +2,10 @@ name: build
 on:
   workflow_dispatch:
   push:
-    branches:
-      - master
+    branches: [main, master]
+  pull_request:
+    types: [opened, reopened]
+    branches: [main, master]
   schedule:
     - cron: '0 6 * * 1'
 jobs:
