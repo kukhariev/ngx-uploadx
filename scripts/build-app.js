@@ -2,7 +2,7 @@
  * Create and build a demo application using the specified version/tag of the Angular CLI
  */
 const { execSync } = require('child_process');
-const { copySync } = require('cpx');
+const copy = require('recursive-copy');
 const { writeFileSync, copyFileSync, mkdirSync, readFileSync } = require('fs');
 const { join, resolve } = require('path');
 
@@ -36,26 +36,26 @@ async function build(cliTag = 'latest') {
 
   console.info('- Generating project...');
   execSync(`npx -p @angular/cli@${cliTag} ${ngNewCmd}`, { cwd: tmpDir });
-  copySync(`${tmpDir}/${projectName}/**/*`, `${projectPath}`, { clean: true });
+  await copy(`${tmpDir}/${projectName}`, `${projectPath}`, { overwrite: true });
 
   const pack = JSON.parse(readFileSync(`${projectPath}/package.json`, 'utf8').toString());
   const angularVersion = pack.dependencies['@angular/core'];
   const angularCLIVersion = pack.devDependencies['@angular/cli'];
   console.info(`- Versions: @angular/core: ${angularVersion}, @angular/cli: ${angularCLIVersion}`);
 
-  copySync('src/app/**/*', `${projectPath}/src/app`, { clean: true });
+  await copy('src/app', `${projectPath}/src/app`, { overwrite: true });
   copyFileSync('src/styles.scss', `${projectPath}/src/styles.scss`);
   writeFileSync(
     `${projectPath}/src/app/package.json`,
     JSON.stringify({ sideEffects: false, projectName, private: true }, undefined, 2)
   );
   writeFileSync(`${projectPath}/server.js`, `require('../../server')\n`);
-  copySync('e2e/**/*', `${projectPath}/e2e`, { clean: true });
-  copySync('src/environments/**/*', `${projectPath}/src/environments`, { clean: true });
+  await copy('e2e', `${projectPath}/e2e`, { overwrite: true });
+  await copy('src/environments', `${projectPath}/src/environments`, { overwrite: true });
 
   console.info('- Installing dependencies...');
   execSync('npm install', { cwd: projectPath, stdio: [0, 1, 2] });
-  copySync('dist/uploadx/**/*', `${projectPath}/node_modules/ngx-uploadx`, { clean: true });
+  await copy('dist/uploadx', `${projectPath}/node_modules/ngx-uploadx`, { overwrite: true });
 
   console.info('- Migrate project...');
   execSync(ngUpdateCmd, { cwd: projectPath, stdio: [0, 1, 2] });
