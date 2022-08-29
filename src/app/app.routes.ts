@@ -1,3 +1,4 @@
+import { Routes } from '@angular/router';
 import { DirectiveWayComponent } from './directive-way/directive-way.component';
 import { FileGeneratorComponent } from './file-generator/file-generator.component';
 import { MultiServiceComponent } from './multi-service/multi-service.component';
@@ -7,7 +8,7 @@ import { ServiceCodeWayComponent } from './service-code-way/service-code-way.com
 import { ServiceWayComponent } from './service-way/service-way.component';
 import { TusComponent } from './tus/tus.component';
 
-export const appRoutes = [
+export const appRoutes: Routes = [
   { path: '', redirectTo: 'directive-way', pathMatch: 'full' },
   { path: 'directive-way', component: DirectiveWayComponent },
   { path: 'service-way', component: ServiceWayComponent },
