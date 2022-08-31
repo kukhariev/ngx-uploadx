@@ -1,6 +1,5 @@
 const args = process.argv.slice(2);
-const debug = args.includes('--debug');
-debug && (process.env.DEBUG = 'uploadx:*');
+const logLevel = args.includes('--debug') ? 'debug' : 'error';
 const url = require('url');
 const { tmpdir } = require('os');
 const { DiskStorage, Multipart, Tus, Uploadx } = require('@uploadx/core');
@@ -14,6 +13,7 @@ const pathRegexp = new RegExp(`^${path}([/?]|$)`);
 const storage = new DiskStorage({
   directory,
   path,
+  logLevel,
   expiration: { maxAge: '1h', purgeInterval: '30min', rolling: true }
 });
 const upx = new Uploadx({ storage });
