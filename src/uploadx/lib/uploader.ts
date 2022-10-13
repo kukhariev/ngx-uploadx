@@ -274,7 +274,10 @@ export abstract class Uploader implements UploadState {
     return Number(this.getValueFromResponse('retry-after')) * 1000;
   }
 
-  private cleanup = () => store.delete(this.uploadId);
+  private cleanup = () => {
+    store.delete(this._url);
+    store.delete(this.uploadId);
+  };
 
   private onProgress(): (evt: ProgressEvent) => void {
     let throttle: ReturnType<typeof setTimeout> | undefined;
