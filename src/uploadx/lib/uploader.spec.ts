@@ -186,6 +186,21 @@ describe('Uploader', () => {
       await uploader.request({ method: 'POST', body });
       expect(onProgressSpy).toHaveBeenCalled();
     });
+
+    it('should call authorize', async () => {
+      serverStatus = 200;
+      const uploader = new MockUploader(file, {});
+      const request = spyOn<any>(uploader, '_authorize').and.callThrough();
+      await uploader.request({ method: 'GET' });
+      expect(request).toHaveBeenCalledTimes(1);
+    });
+    it('should skip authorize', async () => {
+      serverStatus = 200;
+      const uploader = new MockUploader(file, {});
+      const request = spyOn<any>(uploader, '_authorize').and.callThrough();
+      await uploader.request({ method: 'GET', skipAuthorization: true });
+      expect(request).toHaveBeenCalledTimes(0);
+    });
   });
 
   describe('prerequest', () => {

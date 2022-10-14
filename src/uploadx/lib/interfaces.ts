@@ -20,7 +20,7 @@ export interface RequestConfig {
   withCredentials?: boolean;
 }
 
-export type RequestOptions = Partial<RequestConfig>;
+export type RequestOptions = Partial<RequestConfig> & { skipAuthorization?: boolean };
 export type AuthorizeRequest = (
   req: RequestConfig,
   token?: string
