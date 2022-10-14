@@ -185,7 +185,9 @@ export abstract class Uploader implements UploadState {
       method: requestOptions.method || 'GET',
       url: requestOptions.url || this.url
     };
-    req = await this._authorize(req, this._token);
+    if (!requestOptions.skipAuthorization) {
+      req = await this._authorize(req, this._token);
+    }
     const { body = null, headers, method, url = req.url } = (await this._prerequest(req)) || req;
     const ajaxRequestConfig: AjaxRequestConfig = {
       method,
