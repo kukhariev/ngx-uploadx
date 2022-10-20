@@ -23,9 +23,8 @@ function createXhr(): XMLHttpRequest {
   return new XMLHttpRequest();
 }
 
-function releaseXhr(xhr: unknown): void {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  xhr = null;
+function releaseXhr(_xhr: unknown): void {
+  _xhr = null;
 }
 
 export class UploadxAjax {
