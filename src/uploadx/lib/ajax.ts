@@ -36,15 +36,16 @@ export class UploadxAjax {
     headers = {},
     url,
     responseType,
-    canceler,
+    signal,
     onUploadProgress,
     timeout = 0,
     withCredentials = false,
     validateStatus = status => status < 400 && status >= 200
   }: AjaxRequestConfig): Promise<AjaxResponse<T>> => {
-    const xhr = this.buildXhr();
-    canceler && (canceler.onCancel = () => xhr && xhr.readyState !== xhr.DONE && xhr.abort());
     return new Promise((resolve, reject) => {
+      const xhr = this.buildXhr();
+      const abortListener = () => xhr && xhr.readyState !== xhr.DONE && xhr.abort();
+      signal?.addEventListener('abort', abortListener, { once: true });
       xhr.open(method, url, true);
       xhr.timeout = timeout;
       withCredentials && (xhr.withCredentials = true);
@@ -56,6 +57,7 @@ export class UploadxAjax {
         xhr.onabort =
           evt => {
             releaseXhr(xhr);
+            signal?.removeEventListener('abort', abortListener);
             return reject({ error: evt.type, url, method });
           };
       xhr.onload = () => {
@@ -65,6 +67,7 @@ export class UploadxAjax {
           headers: this.getResponseHeaders(xhr)
         };
         releaseXhr(xhr);
+        signal?.removeEventListener('abort', abortListener);
         return validateStatus(response.status) ? resolve(response) : reject(response);
       };
       xhr.send(data);

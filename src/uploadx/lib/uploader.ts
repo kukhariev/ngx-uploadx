@@ -53,6 +53,7 @@ export abstract class Uploader implements UploadState {
   /** Retries handler */
   retry: RetryHandler;
   canceler = new Canceler();
+  abortController = new AbortController();
   /** Set HttpRequest responseType */
   responseType?: 'json' | 'text' | 'document';
   private _eventsCount = 0;
@@ -178,9 +179,14 @@ export abstract class Uploader implements UploadState {
     this.responseStatus = 0;
     this.response = null;
     this.responseHeaders = {};
+    if (this.abortController.signal.aborted) {
+      this.abortController = new AbortController();
+    }
+    const signal = requestOptions.signal || this.abortController.signal;
     let req: RequestConfig = {
       body: requestOptions.body || null,
       canceler: this.canceler,
+      signal,
       headers: { ...this.headers, ...requestOptions.headers },
       method: requestOptions.method || 'GET',
       url: requestOptions.url || this.url
@@ -197,10 +203,10 @@ export abstract class Uploader implements UploadState {
       responseType: this.options.responseType ?? this.responseType,
       withCredentials: !!this.options.withCredentials,
       canceler: this.canceler,
+      signal,
       validateStatus: () => true,
       timeout: this.retry.config.timeout
     };
-    //todo: more reliable detection
     if (isNumber(this.offset) && body && typeof body === 'object') {
       ajaxRequestConfig.onUploadProgress = this.onProgress();
     }
@@ -237,6 +243,7 @@ export abstract class Uploader implements UploadState {
 
   protected abort(): void {
     this.offset = undefined;
+    this.abortController.abort();
     this.canceler.cancel();
   }
 
