@@ -37,9 +37,10 @@ export type UploadStatus =
   | 'error'
   | 'cancelled'
   | 'paused'
-  | 'retry';
+  | 'retry'
+  | 'updated';
 
-export type UploadAction = 'upload' | 'cancel' | 'pause';
+export type UploadAction = 'upload' | 'cancel' | 'pause' | 'update';
 
 export interface UploadState {
   /** Uploaded file */

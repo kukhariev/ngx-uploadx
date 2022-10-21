@@ -45,6 +45,14 @@ export class UploaderX extends Uploader {
     return this.responseStatus > 201 ? this.getOffsetFromResponse() : this.size;
   }
 
+  async update<T>(data: T): Promise<string> {
+    const body = JSON.stringify(data);
+    const headers = { 'Content-Type': 'application/json; charset=utf-8' };
+    await this.request({ method: 'PATCH', body, headers });
+    const location = this.getValueFromResponse('location') || this.url;
+    return resolveUrl(location, this.endpoint);
+  }
+
   protected getOffsetFromResponse(): number | undefined {
     const range = this.getValueFromResponse('Range');
     return range ? getRangeEnd(range) + 1 : undefined;
