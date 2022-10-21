@@ -45,8 +45,7 @@ function getFilelist(): FileList {
     2: file,
     3: file,
     length: 4,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    item: (index: number) => file
+    item: (_: number) => file
   };
 }
 

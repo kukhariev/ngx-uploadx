@@ -22,7 +22,8 @@ import { isNumber, unfunc } from './utils';
 const actionToStatusMap: { [K in UploadAction]: UploadStatus } = {
   pause: 'paused',
   upload: 'queue',
-  cancel: 'cancelled'
+  cancel: 'cancelled',
+  update: 'updated'
 };
 
 /**
@@ -53,6 +54,7 @@ export abstract class Uploader implements UploadState {
   /** Retries handler */
   retry: RetryHandler;
   canceler = new Canceler();
+  abortController = new AbortController();
   /** Set HttpRequest responseType */
   responseType?: 'json' | 'text' | 'document';
   private _eventsCount = 0;
@@ -99,15 +101,19 @@ export abstract class Uploader implements UploadState {
   }
 
   set status(s: UploadStatus) {
-    if (this._status === s) return;
+    if (s !== 'updated' && s !== 'cancelled') {
+      if (this._status === s) return;
+      if (this._status === 'complete') return;
+    }
     if (this._status === 'cancelled') return;
-    if (this._status === 'complete' && s !== 'cancelled') return;
     if (this._status === 'uploading' && s === 'queue') return;
     if (this._status === 'retry') this.retry.cancel();
     this._status = s;
     if (s === 'paused') this.abort();
     if (s === 'cancelled' || s === 'complete' || s === 'error') this.cleanup();
-    s === 'cancelled' ? this.cancel() : this.stateChange(this);
+    if (s === 'cancelled') this.cancelAndSendState();
+    else if (s === 'updated') this.updateAndSendState();
+    else this.stateChange(this);
   }
 
   /**
@@ -126,7 +132,7 @@ export abstract class Uploader implements UploadState {
    */
   async upload(): Promise<void> {
     this._status = 'uploading';
-    while (this.status === 'uploading' || this.status === 'retry') {
+    while (this.status === 'uploading' || this.status === 'retry' || this.status === 'updated') {
       this.status = 'uploading';
       try {
         this._token ||= await this.updateToken();
@@ -178,9 +184,14 @@ export abstract class Uploader implements UploadState {
     this.responseStatus = 0;
     this.response = null;
     this.responseHeaders = {};
+    if (this.abortController.signal.aborted) {
+      this.abortController = new AbortController();
+    }
+    const signal = requestOptions.signal || this.abortController.signal;
     let req: RequestConfig = {
       body: requestOptions.body || null,
       canceler: this.canceler,
+      signal,
       headers: { ...this.headers, ...requestOptions.headers },
       method: requestOptions.method || 'GET',
       url: requestOptions.url || this.url
@@ -197,10 +208,10 @@ export abstract class Uploader implements UploadState {
       responseType: this.options.responseType ?? this.responseType,
       withCredentials: !!this.options.withCredentials,
       canceler: this.canceler,
+      signal,
       validateStatus: () => true,
       timeout: this.retry.config.timeout
     };
-    //todo: more reliable detection
     if (isNumber(this.offset) && body && typeof body === 'object') {
       ajaxRequestConfig.onUploadProgress = this.onProgress();
     }
@@ -235,8 +246,16 @@ export abstract class Uploader implements UploadState {
    */
   protected abstract getOffset(): Promise<number | undefined>;
 
+  /**
+   *  Updating the metadata of the upload
+   */
+  protected update<T = { metadata?: Metadata }>(_data: T): Promise<string> {
+    return Promise.reject('Not implemented');
+  }
+
   protected abort(): void {
     this.offset = undefined;
+    this.abortController.abort();
     this.canceler.cancel();
   }
 
@@ -245,7 +264,6 @@ export abstract class Uploader implements UploadState {
     if (this.url) {
       await this.request({ method: 'DELETE' }).catch(() => {});
     }
-    this.stateChange(this);
   }
 
   /**
@@ -274,6 +292,14 @@ export abstract class Uploader implements UploadState {
 
   private getRetryAfterFromBackend(): number {
     return Number(this.getValueFromResponse('retry-after')) * 1000;
+  }
+
+  private cancelAndSendState() {
+    this.cancel().then(() => this.stateChange(this), console.error);
+  }
+
+  private updateAndSendState(): void {
+    this.update({ metadata: this.metadata }).then(() => this.stateChange(this), console.error);
   }
 
   private cleanup = () => {

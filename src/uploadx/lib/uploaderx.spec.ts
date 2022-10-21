@@ -7,36 +7,36 @@ const fileWithType = new File(['123456'], 'filename.txt', { type: 'text/plain' }
 const fileWithoutType = new File([''], 'filename');
 describe('UploaderX', () => {
   describe('getFileUrl', () => {
-    let uploader: UploaderX;
+    let uploaderX: UploaderX;
     let req: jasmine.Spy;
     let getValueFromResponse: jasmine.Spy;
     it('should set headers', async () => {
-      uploader = new UploaderX(fileWithType, {}, () => {}, {} as Ajax);
-      req = spyOn<any>(uploader, 'request').and.callFake(({ headers }: any) => {
+      uploaderX = new UploaderX(fileWithType, {}, () => {}, {} as Ajax);
+      req = spyOn<any>(uploaderX, 'request').and.callFake(({ headers }: any) => {
         expect(headers['X-Upload-Content-Type']).toEqual('text/plain');
         expect(headers['X-Upload-Content-Length']).toEqual(6);
       });
-      getValueFromResponse = spyOn<any>(uploader, 'getValueFromResponse').and.returnValue(
+      getValueFromResponse = spyOn<any>(uploaderX, 'getValueFromResponse').and.returnValue(
         '/12345678'
       );
-      expect(uploader.name).toEqual('filename.txt');
-      expect(uploader.size).toEqual(6);
-      expect(await uploader.getFileUrl()).toEqual('/12345678');
+      expect(uploaderX.name).toEqual('filename.txt');
+      expect(uploaderX.size).toEqual(6);
+      expect(await uploaderX.getFileUrl()).toEqual('/12345678');
       expect(req).toHaveBeenCalled();
       expect(getValueFromResponse).toHaveBeenCalled();
     });
     it('should set default type header', async () => {
-      uploader = new UploaderX(fileWithoutType, {}, () => {}, {} as Ajax);
-      req = spyOn<any>(uploader, 'request').and.callFake(({ headers }: any) => {
+      uploaderX = new UploaderX(fileWithoutType, {}, () => {}, {} as Ajax);
+      req = spyOn<any>(uploaderX, 'request').and.callFake(({ headers }: any) => {
         expect(headers['X-Upload-Content-Type']).toEqual('application/octet-stream');
         expect(headers['X-Upload-Content-Length']).toEqual(0);
       });
-      getValueFromResponse = spyOn<any>(uploader, 'getValueFromResponse').and.returnValue(
+      getValueFromResponse = spyOn<any>(uploaderX, 'getValueFromResponse').and.returnValue(
         '/12345678'
       );
-      expect(uploader.name).toEqual('filename');
-      expect(uploader.size).toEqual(0);
-      await uploader.getFileUrl();
+      expect(uploaderX.name).toEqual('filename');
+      expect(uploaderX.size).toEqual(0);
+      await uploaderX.getFileUrl();
       expect(req).toHaveBeenCalled();
       expect(getValueFromResponse).toHaveBeenCalled();
     });
@@ -78,6 +78,25 @@ describe('UploaderX', () => {
       );
       uploaderX.responseStatus = 308;
       expect(await uploaderX.getOffset()).toEqual(6);
+      expect(req).toHaveBeenCalled();
+      expect(getValueFromResponse).toHaveBeenCalled();
+    });
+  });
+
+  describe('update', () => {
+    let uploaderX: UploaderX;
+    let req: jasmine.Spy;
+    let getValueFromResponse: jasmine.Spy;
+    it('should send updated data and return location', async () => {
+      uploaderX = new UploaderX(fileWithType, {}, () => {}, {} as Ajax);
+      req = spyOn<any>(uploaderX, 'request').and.callFake(({ body, method }: any) => {
+        expect(body).toEqual('{"metadata":{"updated":true}}');
+        expect(method).toEqual('PATCH');
+      });
+      getValueFromResponse = spyOn<any>(uploaderX, 'getValueFromResponse').and.returnValue(
+        '/12345678'
+      );
+      expect(await uploaderX.update({ metadata: { updated: true } })).toEqual('/12345678');
       expect(req).toHaveBeenCalled();
       expect(getValueFromResponse).toHaveBeenCalled();
     });

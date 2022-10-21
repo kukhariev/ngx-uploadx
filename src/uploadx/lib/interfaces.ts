@@ -11,6 +11,7 @@ export type Metadata = Record<string, unknown>;
 export interface RequestConfig {
   body?: BodyInit | null;
   canceler: Canceler;
+  signal?: AbortSignal;
   headers: RequestHeaders;
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
   onUploadProgress?: (evt: ProgressEvent) => void;
@@ -36,9 +37,10 @@ export type UploadStatus =
   | 'error'
   | 'cancelled'
   | 'paused'
-  | 'retry';
+  | 'retry'
+  | 'updated';
 
-export type UploadAction = 'upload' | 'cancel' | 'pause';
+export type UploadAction = 'upload' | 'cancel' | 'pause' | 'update';
 
 export interface UploadState {
   /** Uploaded file */

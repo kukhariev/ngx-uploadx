@@ -46,4 +46,8 @@ export class OnPushComponent implements OnDestroy {
   uploadAll(): void {
     this.uploadService.control({ action: 'upload' });
   }
+
+  updateAll(): void {
+    this.uploadService.control({ action: 'update', metadata: { updated: Date.now() } });
+  }
 }
