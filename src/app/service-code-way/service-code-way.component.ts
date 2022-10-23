@@ -3,7 +3,7 @@ import { UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { UploaderExt } from './uploader-ext.class';
+import { UploaderXS3 } from './uploaderx-s3.class';
 
 @Component({
   selector: 'app-service-way',
@@ -13,9 +13,9 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   state$!: Observable<UploadState>;
   uploads: UploadState[] = [];
   options: UploadxOptions = {
-    endpoint: `${environment.api}/files?uploadType=multipart`,
+    endpoint: `${environment.api}/files?`,
     token: btoa('user:pass'),
-    uploaderClass: UploaderExt
+    uploaderClass: UploaderXS3
   };
 
   numberOfCopies = 0;
