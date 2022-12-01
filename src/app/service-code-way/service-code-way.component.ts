@@ -15,6 +15,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   options: UploadxOptions = {
     endpoint: `${environment.api}/files?`,
     token: btoa('user:pass'),
+    chunkSize: 16 * 1024 * 1024,
     uploaderClass: UploaderXS3
   };
 
