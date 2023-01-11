@@ -23,7 +23,7 @@ async function build(cliTag = 'latest') {
   const projectName = (Number.isInteger(+cliTag[0]) ? 'ng' + cliTag : cliTag).replace(/\./, '');
   const projectPath = join(integrationsPath, projectName);
   const ngNewCmd = `ng new ${projectName} --strict --style=scss --skip-install --skip-git --routing`;
-  const ngUpdateCmd = 'ng update @angular/core --allow-dirty --migrateOnly=true --from=12';
+  const ngUpdateCmd = 'ng update @angular/core --allow-dirty --migrate-only=true --from=12';
   const buildCmd = 'ng build --configuration production';
 
   console.info(`- Angular CLI tag: ${cliTag}`);
