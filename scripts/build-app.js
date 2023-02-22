@@ -3,6 +3,7 @@
  */
 const { execSync } = require('child_process');
 const copy = require('recursive-copy');
+const semver = require('semver');
 const { writeFileSync, copyFileSync, mkdirSync, readFileSync } = require('fs');
 const { join, resolve } = require('path');
 
@@ -23,7 +24,6 @@ async function build(cliTag = 'latest') {
   const projectName = (Number.isInteger(+cliTag[0]) ? `ng${cliTag}` : cliTag).replace(/\./, '');
   const projectPath = join(integrationsPath, projectName);
   const ngNewCmd = `ng new ${projectName} --strict --style=scss --skip-install --skip-git --routing`;
-  const ngUpdateCmd = 'npx ng update @angular/core --allow-dirty --migrate-only=true --from=12';
   const buildCmd = 'ng build --configuration production';
 
   console.info(`- Angular CLI tag: ${cliTag}`);
@@ -39,8 +39,8 @@ async function build(cliTag = 'latest') {
   await copy(`${tmpDir}/${projectName}`, `${projectPath}`, { overwrite: true });
 
   const pack = JSON.parse(readFileSync(`${projectPath}/package.json`, 'utf8').toString());
-  const angularVersion = pack.dependencies['@angular/core'];
-  const angularCLIVersion = pack.devDependencies['@angular/cli'];
+  const angularVersion = semver.minVersion(pack.dependencies['@angular/core']);
+  const angularCLIVersion = semver.minVersion(pack.devDependencies['@angular/cli']);
   console.info(`- Versions: @angular/core: ${angularVersion}, @angular/cli: ${angularCLIVersion}`);
 
   await copy('src/app', `${projectPath}/src/app`, { overwrite: true });
@@ -59,6 +59,7 @@ async function build(cliTag = 'latest') {
 
   console.info('- Migrate project...');
   process.chdir(projectPath);
+  const ngUpdateCmd = `npx ng update @angular/core --allow-dirty --migrate-only=true --from=12 --to=${angularVersion}`;
   execSync(ngUpdateCmd, { cwd: projectPath, stdio: [0, 1, 2] });
 
   console.info(`- Running "${buildCmd}" for "${projectPath}"`);
