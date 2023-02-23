@@ -4,6 +4,7 @@ const packagr = require('ng-packagr');
 async function buildPkg() {
   try {
     const libPackagePath = 'src/uploadx/package.json';
+    const ngPackagePath = 'src/uploadx/ng-package.json';
     const rootPackage = JSON.parse(await fsp.readFile('package.json', 'utf8'));
     const libPackage = {};
     libPackage.name = rootPackage.name;
@@ -15,17 +16,10 @@ async function buildPkg() {
     libPackage.homepage = rootPackage.homepage;
     libPackage.license = rootPackage.license;
     libPackage.peerDependencies = rootPackage.peerDependencies;
-    libPackage.ngPackage = {
-      lib: {
-        entryFile: 'public-api.ts'
-      },
-      dest: '../../dist/uploadx',
-      deleteDestPath: true
-    };
     await fsp.writeFile(libPackagePath, JSON.stringify(libPackage));
     await packagr
       .ngPackagr()
-      .forProject(libPackagePath)
+      .forProject(ngPackagePath)
       .withTsConfig('src/uploadx/tsconfig.lib.json')
       .build();
     await fsp.copyFile('LICENSE', 'dist/uploadx/LICENSE');

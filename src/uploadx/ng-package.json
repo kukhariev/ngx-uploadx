@@ -1,0 +1,7 @@
+{
+  "lib": {
+    "entryFile": "public-api.ts"
+  },
+  "dest": "../../dist/uploadx",
+  "deleteDestPath": true
+}

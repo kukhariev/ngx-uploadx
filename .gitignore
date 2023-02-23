@@ -50,3 +50,4 @@ src/uploadx/package.json
 /test-results/
 /playwright-report/
 /playwright/.cache/
+.angular
