@@ -59,7 +59,7 @@ async function build(cliTag = 'latest') {
 
   console.info('- Migrate project...');
   process.chdir(projectPath);
-  const ngUpdateCmd = `npx ng update @angular/core --allow-dirty --migrate-only=true --from=12 --to=${angularVersion}`;
+  const ngUpdateCmd = `npx ng update @angular/core --allow-dirty --migrate-only=true --from=14 --to=${angularVersion}`;
   execSync(ngUpdateCmd, { cwd: projectPath, stdio: [0, 1, 2] });
 
   console.info(`- Running "${buildCmd}" for "${projectPath}"`);
@@ -68,7 +68,7 @@ async function build(cliTag = 'latest') {
 
 async function processing() {
   const args = process.argv.slice(2);
-  const cmd = args[0] && args[0].trim();
+  const cmd = args[0].trim();
   let exitCode = 0;
   try {
     await build(cmd);
