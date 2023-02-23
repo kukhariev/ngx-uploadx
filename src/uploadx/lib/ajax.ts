@@ -70,7 +70,7 @@ export class UploadxAjax {
         signal?.removeEventListener('abort', abortListener);
         return validateStatus(response.status) ? resolve(response) : reject(response);
       };
-      xhr.send(data);
+      xhr.send(data as XMLHttpRequestBodyInit);
     });
   };
 
