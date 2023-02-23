@@ -13,14 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ng: [latest, 12, 13]
+        ng: [latest, 14]
     name: Build app with @angular/cli
     steps:
       - uses: actions/checkout@v3
       - name: Install
         uses: './.github/actions/cached-npm-install'
         with:
-          node-version: '14.x'
+          node-version: '16.x'
       - name: Build package
         run: npm run build:pkg
       - name: Build app
