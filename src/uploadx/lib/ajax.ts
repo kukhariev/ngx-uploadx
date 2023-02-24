@@ -90,7 +90,7 @@ export class UploadxAjax {
       return typeof xhr.response === 'undefined' ? xhr.responseXML : xhr.response;
     }
     let body = typeof xhr.response === 'undefined' ? xhr.responseText : xhr.response;
-    if (responseType === 'json' && typeof body === 'string') {
+    if (responseType === 'json' && body && typeof body === 'string') {
       try {
         body = JSON.parse(body);
       } catch {}
