@@ -49,7 +49,9 @@ export class UploadxAjax {
       xhr.open(method, url, true);
       xhr.timeout = timeout;
       withCredentials && (xhr.withCredentials = true);
-      responseType && (xhr.responseType = responseType);
+      if (responseType) {
+        xhr.responseType = responseType === 'json' ? 'text' : responseType;
+      }
       Object.keys(headers).forEach(key => xhr.setRequestHeader(key, String(headers[key])));
       xhr.upload.onprogress = onUploadProgress || null;
       xhr.onerror =
@@ -62,7 +64,7 @@ export class UploadxAjax {
           };
       xhr.onload = () => {
         const response = {
-          data: this.getResponseBody<T>(xhr),
+          data: this.getResponseBody<T>(xhr, responseType),
           status: xhr.status,
           headers: this.getResponseHeaders(xhr)
         };
@@ -83,17 +85,15 @@ export class UploadxAjax {
     }, {});
   }
 
-  getResponseBody<T>(xhr: XMLHttpRequest): T {
-    if (xhr.responseType === 'document') {
-      return 'response' in xhr ? xhr.response : xhr.responseXML;
+  getResponseBody<T>(xhr: XMLHttpRequest, responseType?: string): T {
+    if (responseType === 'document') {
+      return typeof xhr.response === 'undefined' ? xhr.responseXML : xhr.response;
     }
-    let body = 'response' in xhr ? xhr.response : xhr.responseText;
-    if (xhr.responseType === 'json') {
-      if (body && typeof body === 'string') {
-        try {
-          body = JSON.parse(body);
-        } catch {}
-      }
+    let body = typeof xhr.response === 'undefined' ? xhr.responseText : xhr.response;
+    if (responseType === 'json' && typeof body === 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch {}
     }
     return body;
   }
