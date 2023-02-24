@@ -86,9 +86,6 @@ export class UploadxAjax {
   }
 
   getResponseBody<T>(xhr: XMLHttpRequest, responseType?: string): T {
-    if (responseType === 'document') {
-      return typeof xhr.response === 'undefined' ? xhr.responseXML : xhr.response;
-    }
     let body = typeof xhr.response === 'undefined' ? xhr.responseText : xhr.response;
     if (responseType === 'json' && body && typeof body === 'string') {
       try {
