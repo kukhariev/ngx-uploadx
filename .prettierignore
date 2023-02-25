@@ -9,4 +9,5 @@ out-tsc
 /.vscode
 
 /integrations/*/
+.angular
 
