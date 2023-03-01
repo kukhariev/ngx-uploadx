@@ -131,8 +131,7 @@ export abstract class Uploader implements UploadState {
    * Starts uploading
    */
   async upload(): Promise<void> {
-    this._status = 'uploading';
-    while (this.status === 'uploading' || this.status === 'retry' || this.status === 'updated') {
+    do {
       this.status = 'uploading';
       try {
         this._token ||= await this.updateToken();
@@ -174,7 +173,7 @@ export abstract class Uploader implements UploadState {
             await this.retry.wait(this.getRetryAfterFromBackend());
         }
       }
-    }
+    } while (['uploading', 'retry', 'updated'].includes(this._status));
   }
 
   /**
