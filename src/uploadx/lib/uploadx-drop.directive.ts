@@ -26,7 +26,7 @@ export class UploadxDropDirective {
   @HostListener('dragover', ['$event'])
   onDragOver(event: DragEvent): void {
     this._stopEvents(event);
-    if (event.dataTransfer && event.dataTransfer.files.item(0)) {
+    if (event.dataTransfer?.items[0].kind === 'file') {
       event.dataTransfer.dropEffect = 'copy';
       this.active = true;
     }
