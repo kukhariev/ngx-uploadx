@@ -1,31 +1,21 @@
 /* You can add global styles to this file, and also import other style files */
-@import url('https://fonts.googleapis.com/css?family=Roboto');
+$primary-color: rgb(200, 200, 200);
+$background-color: rgb(36, 36, 36);
+$nav-header-primary-color: rgb(200, 200, 200);
+$nav-header-background-color: rgb(36, 36, 36);
+$sidebar-primary-color: rgb(200, 200, 200);
+$sidebar-background-color: rgb(36, 36, 36);
 
-$dark: rgb(48, 48, 50);
-$light: rgb(240, 240, 240);
-$nav: rgb(60, 60, 70);
+$border: 1px solid transparentize($primary-color, 0.7);
+$border-drop: 1px dashed $primary-color;
+$header-height: 2.5rem;
 
-.shadow {
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-}
-
-$dark-theme: 1;
-
-$background: $light;
-$main: $dark;
-
-@if $dark-theme == 1 {
-  $main: $light;
-  $background: $dark;
-}
-
-$border: 1px solid transparentize($main, 0.8);
-
-body {
-  background: $background;
-  color: $main;
-  font-family: Roboto, sans-serif;
-  font-size: 14px;
+body,
+html {
+  background: $background-color;
+  color: $primary-color;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: var(--font-size, 14px);
   height: 100%;
 }
 
@@ -36,103 +26,162 @@ body {
 }
 
 header {
-  @extend .shadow;
+  min-height: $header-height;
+  border-bottom: $border;
   align-items: center;
-  background-color: $nav;
-  color: $light;
+  background-color: $nav-header-background-color;
+  color: $nav-header-primary-color;
   display: flex;
   flex-wrap: nowrap;
-  justify-content: space-between;
+  justify-content: flex-start;
+
+  #menu {
+    display: none;
+  }
+
+  span {
+    margin-left: 1rem;
+  }
 
   .logo {
     a {
-      color: $light;
-      font-size: 16px;
+      color: $primary-color;
+      font-size: 1.1rem;
       text-decoration: none;
     }
   }
 
-  a {
-    color: $light;
+  @media all and (max-width: 900px) {
+    #menu {
+      display: block;
+    }
+  }
+
+  span > a {
     display: block;
-    padding: 8px;
+    color: transparentize($nav-header-primary-color, 0.7);
+    font-size: 1.6rem;
     text-decoration: none;
   }
 
-  .active {
-    font-style: italic;
-  }
-
   nav {
-    .hidden > li > div {
+    .hidden > div {
       display: none;
     }
 
-    ul {
-      display: block;
-      list-style-type: none;
-      width: 30px;
-    }
-
-    li > a {
-      font-size: 20px;
-      padding: 0;
-      text-align: right;
-    }
-
-    li {
+    span {
       position: relative;
 
       div {
-        background-color: lighten($nav, 5%);
         height: 100%;
         position: fixed;
-        right: 0;
-        width: 200px;
+        top: $header-height;
+        left: 0;
+        width: 270px;
         z-index: 1;
-        @extend .shadow;
       }
     }
   }
 }
 
-.container {
+#page {
+  height: 100vh;
   display: flex;
-  flex-flow: row;
-  margin: 0;
-  min-height: 250px;
-  padding: 0;
+  flex-direction: column;
+}
+
+#sidebar {
+  display: flex;
+  width: 25%;
+  max-width: 270px;
+}
+
+#content {
+  display: flex;
+  flex-grow: 1;
+}
+
+@media all and (max-width: 900px) {
+  #sidebar {
+    display: none;
+  }
+}
+
+.links {
+  padding-top: 3rem;
+  background-color: $sidebar-background-color;
+  flex-grow: 1;
+  font-size: 0.9rem;
+
+  a {
+    color: $sidebar-primary-color;
+    display: block;
+    padding: 0.5rem 3rem;
+    text-decoration: none;
+    white-space: nowrap;
+    border-radius: 5px;
+  }
+
+  a:hover {
+    background-color: lighten($sidebar-background-color, 5%);
+  }
+
+  span {
+    color: transparentize($sidebar-primary-color, 0.7);
+    display: block;
+    cursor: default;
+    padding: 2rem 3rem;
+  }
+
+  .active {
+    font-style: italic;
+  }
+}
+
+#main {
+  flex-grow: 1;
+  flex-direction: column;
+  display: flex;
+  width: 75%;
+
+  // [uploadxdrop],
+  .upload-zone {
+    margin: 0.2rem;
+    border: $border;
+    border-radius: 5px;
+  }
 }
 
 .uploadx-drop-active {
-  background-color: lighten($background, 10%);
+  background-color: lighten($background-color, 10%);
+  border: $border-drop !important;
 }
 
 button {
-  background-color: transparent;
+  background-color: lighten($background-color, 8%);
   border: $border;
   border-radius: 5px;
-  color: $main;
+  color: $primary-color;
   cursor: pointer;
   font-family: inherit;
-  font-size: 13px;
-  height: 28px;
-  // border: transparent;
-  margin: auto 2px;
+  font-size: 0.85rem;
+  height: 2rem;
+  margin: auto 0.2rem;
   overflow: hidden;
   text-align: center;
   text-overflow: ellipsis;
   text-transform: capitalize;
   transition: all 150ms;
-  width: 80px;
+  width: 6rem;
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: lighten($background-color, 15%);
   }
 }
 
 label {
   cursor: pointer;
+  margin: 0.5rem;
 }
 
 input[type='file'] {
@@ -141,26 +190,29 @@ input[type='file'] {
 
 .uploads-table,
 .uploads-table2 {
-  font-size: 90%;
-  height: 200px;
-  margin: 5px;
+  font-size: 0.9rem;
+  height: 9rem;
   overflow-x: hidden;
   overflow-y: auto;
 }
+@media all and (max-height: 670px) {
+  .uploads-table,
+  .uploads-table2 {
+    height: 7rem;
+  }
+}
 
 .control {
-  border: $border;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;
-
-  em {
-    padding-right: 5px;
-  }
+  align-items: center;
+  justify-content: flex-end;
+  background-color: lighten($background-color, 8%);
+  border-radius: 0 0 5px 5px;
 
   span {
-    margin: auto;
-    padding: 3px;
+    margin: auto 0.2rem;
+    padding: 0.2rem;
     white-space: nowrap;
   }
 }
@@ -169,29 +221,28 @@ input[type='file'] {
   align-items: baseline;
   display: flex;
   justify-content: flex-end;
+  margin-top: 0.2rem;
 
   span:first-child {
+    margin-left: 1rem;
     flex: auto;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   span {
-    margin: auto 10px;
+    margin: auto 0.2rem;
+    padding: 0 0.2rem;
     white-space: nowrap;
   }
 }
 
 .json {
-  display: block;
-  margin: 2px;
-  min-height: 200px;
-
   pre {
-    font-size: 80%;
+    font-size: 0.8rem;
     margin: auto;
+    padding: 0.2rem;
     overflow: hidden;
-    padding: 5px;
     text-overflow: ellipsis;
   }
 }

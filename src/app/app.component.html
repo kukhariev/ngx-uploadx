@@ -1,30 +1,42 @@
-<header>
-  <div class="logo">
-    <a href="#">ngx-uploadx</a>
+<div id="page">
+  <header>
+    <nav>
+      <span (click)="menuIsHidden = !menuIsHidden" [class.hidden]="menuIsHidden" id="menu">
+        <a href="" title="Select demo...">≡</a>
+        <ng-container *ngTemplateOutlet="LinksTemplate"> </ng-container>
+      </span>
+    </nav>
+    <span class="logo">
+      <a href="#" title="Click to reload...">ngx-uploadx</a>
+    </span>
+  </header>
+  <div id="content">
+    <aside id="sidebar">
+      <ng-container *ngTemplateOutlet="LinksTemplate"> </ng-container>
+    </aside>
+    <main id="main" (click)="menuIsHidden = true"><router-outlet></router-outlet></main>
   </div>
-  <nav>
-    <ul (click)="hidden = !hidden" [class.hidden]="hidden">
-      <li>
-        <a href="">⠇</a>
-        <div>
-          <a routerLink="/directive-way" routerLinkActive="active">directive</a>
+</div>
 
-          <a routerLink="/service-way" routerLinkActive="active">mixed</a>
+<ng-template #LinksTemplate>
+  <div class="links">
+    <span>Select demo:</span>
 
-          <a routerLink="/service-code-way" routerLinkActive="active">service</a>
+    <a routerLink="/directive-way" routerLinkActive="active">directive</a>
 
-          <a routerLink="/on-push" routerLinkActive="active">on-push</a>
+    <a routerLink="/service-way" routerLinkActive="active">mixed</a>
 
-          <a routerLink="/multi" routerLinkActive="active">multi-options</a>
+    <a routerLink="/service-code-way" routerLinkActive="active">service</a>
 
-          <a routerLink="/multi2" routerLinkActive="active">multi-service</a>
+    <a routerLink="/on-push" routerLinkActive="active">on-push</a>
 
-          <a routerLink="/tus" routerLinkActive="active">tus</a>
+    <a routerLink="/multi" routerLinkActive="active">multi-options</a>
 
-          <a routerLink="/file-generator" routerLinkActive="active">file-generator</a>
-        </div>
-      </li>
-    </ul>
-  </nav>
-</header>
-<router-outlet></router-outlet>
+    <a routerLink="/multi2" routerLinkActive="active">multi-service</a>
+
+    <a routerLink="/tus" routerLinkActive="active">tus</a>
+    <span></span>
+
+    <a routerLink="/file-generator" routerLinkActive="active">Generate test files</a>
+  </div>
+</ng-template>
