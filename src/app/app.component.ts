@@ -5,7 +5,7 @@ import { Component, DoCheck, HostListener } from '@angular/core';
   templateUrl: './app.component.html'
 })
 export class AppComponent implements DoCheck {
-  hidden = true;
+  menuIsHidden = true;
   changes = 0;
 
   @HostListener('dragenter', ['$event'])
