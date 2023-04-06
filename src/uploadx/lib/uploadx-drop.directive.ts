@@ -1,6 +1,7 @@
 import { ContentChild, Directive, HostBinding, HostListener } from '@angular/core';
 import { UploadxDirective } from './uploadx.directive';
 import { UploadxService } from './uploadx.service';
+import { typeis } from './utils';
 
 @Directive({ selector: '[uploadxDrop]' })
 export class UploadxDropDirective {
@@ -26,7 +27,7 @@ export class UploadxDropDirective {
   @HostListener('dragover', ['$event'])
   onDragOver(event: DragEvent): void {
     this._stopEvents(event);
-    if (event.dataTransfer?.items[0].kind === 'file') {
+    if (event.dataTransfer && this.validateMime(event)) {
       event.dataTransfer.dropEffect = 'copy';
       this.active = true;
     }
@@ -41,5 +42,20 @@ export class UploadxDropDirective {
   protected _stopEvents(event: DragEvent): void {
     event.stopPropagation();
     event.preventDefault();
+  }
+
+  protected validateMime(event: DragEvent): boolean {
+    if (event.dataTransfer?.items[0].kind === 'file') {
+      const allowedTypes = this.fileInput?.options?.allowedTypes?.split(',') || ['*/*'];
+      for (let i = 0; i < event.dataTransfer.items.length; i++) {
+        const mime = event.dataTransfer?.items[i].type;
+        if (!typeis(mime, allowedTypes)) {
+          event.dataTransfer.dropEffect = 'none';
+          return false;
+        }
+        return true;
+      }
+    }
+    return false;
   }
 }

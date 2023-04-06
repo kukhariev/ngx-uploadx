@@ -81,3 +81,8 @@ export function isIOS(): boolean {
 export function onLine(): boolean {
   return isBrowser() ? navigator.onLine : true;
 }
+
+export const typeis = (mime: string, types: string[] = ['/']): string | false => {
+  const re = new RegExp(types.map(str => str.replace(/[*+]/g, '')).join('|'));
+  return mime.replace(/[*+]/g, '').search(re) !== -1 ? mime : false;
+};
