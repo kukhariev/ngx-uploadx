@@ -16,7 +16,7 @@ export class UploadxDropDirective {
   dropHandler(event: DragEvent): void {
     this._stopEvents(event);
     this.active = false;
-    if (event.dataTransfer && event.dataTransfer.files.item(0)) {
+    if (event.dataTransfer?.files.length) {
       this.fileInput
         ? this.fileInput.fileListener(event.dataTransfer.files)
         : this.uploadService.handleFiles(event.dataTransfer.files);
@@ -26,9 +26,13 @@ export class UploadxDropDirective {
   @HostListener('dragover', ['$event'])
   onDragOver(event: DragEvent): void {
     this._stopEvents(event);
-    if (event.dataTransfer?.items[0].kind === 'file') {
-      event.dataTransfer.dropEffect = 'copy';
-      this.active = true;
+    if (event.dataTransfer?.items.length) {
+      if (this.fileInput?.options.multiple === false && event.dataTransfer.items.length > 1) {
+        event.dataTransfer.dropEffect = 'none';
+      } else if (event.dataTransfer.items[0].kind === 'file') {
+        event.dataTransfer.dropEffect = 'copy';
+        this.active = true;
+      }
     }
   }
 
