@@ -13,6 +13,7 @@ export class TusComponent {
   uploads: UploadState[] = [];
   options: UploadxOptions = {
     allowedTypes: 'image/*,video/*',
+    multiple: false,
     endpoint: `${environment.api}/files?uploadType=tus`,
     uploaderClass: Tus,
     authorize: async req => {
