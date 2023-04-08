@@ -38,15 +38,12 @@ const options: UploadxOptions = {
 };
 
 function getFilelist(): FileList {
-  const file = getFile();
-  return {
-    0: file,
-    1: file,
-    2: file,
-    3: file,
-    length: 4,
-    item: (_: number) => file
-  };
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(getFile());
+  dataTransfer.items.add(getFile());
+  dataTransfer.items.add(getFile());
+  dataTransfer.items.add(getFile());
+  return dataTransfer.files;
 }
 
 function getFile(): File {
