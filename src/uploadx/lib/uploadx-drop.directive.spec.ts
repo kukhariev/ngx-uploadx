@@ -1,6 +1,7 @@
 import { Component, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { UploadxOptions } from './options';
 import { UploadxDropDirective } from './uploadx-drop.directive';
 import { UploadxDirective } from './uploadx.directive';
 import { UploadxService } from './uploadx.service';
@@ -13,7 +14,7 @@ import { UploadxService } from './uploadx.service';
   `
 })
 class UploadxTestComponent {
-  options = { endpoint: `/upload/?parts=test` };
+  options: UploadxOptions = { endpoint: `/upload/?parts=test`, multiple: false };
 }
 
 const file = new File([''], 'filename.mp4');
@@ -31,11 +32,23 @@ describe('Directive: UploadxDropDirective', () => {
     dropEl = fixture.debugElement.query(By.directive(UploadxDropDirective));
     const service = fixture.debugElement.injector.get<UploadxService>(UploadxService);
     serviceHandleFiles = spyOn(service, 'handleFiles');
+    fixture.detectChanges();
   }));
 
   it('should ignore non files dragover', () => {
     const dragoverEvent = jasmine.createSpyObj('event', ['preventDefault', 'stopPropagation']);
     dragoverEvent.dataTransfer = new DataTransfer();
+    dropEl.triggerEventHandler('dragover', dragoverEvent);
+    expect(serviceHandleFiles).toHaveBeenCalledTimes(0);
+    fixture.detectChanges();
+    expect(dropEl.nativeElement.classList.contains('uploadx-drop-active')).toBe(false);
+  });
+
+  it('should not allow more than one if `multiple` disabled', () => {
+    const dragoverEvent = jasmine.createSpyObj('event', ['preventDefault', 'stopPropagation']);
+    dragoverEvent.dataTransfer = new DataTransfer();
+    dragoverEvent.dataTransfer.items.add(file);
+    dragoverEvent.dataTransfer.items.add(file);
     dropEl.triggerEventHandler('dragover', dragoverEvent);
     expect(serviceHandleFiles).toHaveBeenCalledTimes(0);
     fixture.detectChanges();
