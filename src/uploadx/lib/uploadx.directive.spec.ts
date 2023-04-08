@@ -19,11 +19,9 @@ class UploadxTestComponent {
 }
 
 const file = new File([''], 'filename.mp4');
-const files: FileList = {
-  0: file,
-  length: 1,
-  item: () => file
-};
+const dataTransfer = new DataTransfer();
+dataTransfer.items.add(file);
+const files = dataTransfer.files;
 
 describe('Directive: UploadxDirective', () => {
   let fixture: ComponentFixture<UploadxTestComponent>;
