@@ -34,6 +34,7 @@
     "playwright": "npx playwright test -c e2e/playwright.config.ts",
     "lint": "ng lint",
     "serve:dev": "ng serve",
+    "serve:dev:ext": "ng serve --host=0.0.0.0 --disable-host-check",
     "server": "node ./server/",
     "server:debug": "node ./server/ --debug",
     "build:pkg": "node scripts/build",
