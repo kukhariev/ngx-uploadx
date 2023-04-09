@@ -71,11 +71,7 @@ export function isBrowser(): boolean {
 }
 
 export function isIOS(): boolean {
-  return (
-    isBrowser() &&
-    (/iPad|iPhone|iPod/.test(navigator.platform) ||
-      (navigator.maxTouchPoints > 2 && navigator.platform.includes('MacIntel')))
-  );
+  return isBrowser() && /iPad|iPhone/.test(navigator.userAgent);
 }
 
 export function onLine(): boolean {
