@@ -43,7 +43,18 @@ header {
     margin-left: 1rem;
   }
 
-  .logo {
+  #gh {
+    margin-left: auto;
+
+    img {
+      display: block;
+      opacity: 0.7;
+      margin-right: 1rem;
+      height: 1.6rem;
+    }
+  }
+
+  #logo {
     a {
       color: $primary-color;
       font-size: 1.1rem;
@@ -195,6 +206,7 @@ input[type='file'] {
   overflow-x: hidden;
   overflow-y: auto;
 }
+
 @media all and (max-height: 670px) {
   .uploads-table,
   .uploads-table2 {
