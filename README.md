@@ -241,6 +241,8 @@ selector: `uploadxDrop`
   Returns the current state of uploads.
 
   ```ts
+  // @example:
+  uploads: UploadState[];
   constructor(private uploadService: UploadxService) {
     // restore background uploads
     this.uploads = this.uploadService.state();
@@ -277,7 +279,9 @@ selector: `uploadxDrop`
 
 - `UPLOADX_AJAX`: override internal ajax lib
 
-## Run demo
+## Demo
+
+Checkout the [Demo App](https://ngx-uploadx.vercel.app/) or run it on your local machine:
 
 - Run script `npm start`
 - Navigate to `http://localhost:4200/`
