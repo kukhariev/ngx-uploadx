@@ -1,12 +1,9 @@
 import { Uploader } from 'ngx-uploadx';
 
 /**
- * Implements nginx-upload-module resumable uploads protocol.
- *
- * {@link https://github.com/fdintino/nginx-upload-module/blob/master/upload-protocol.md|nginx-upload-module}
- *
+ * Implements nginx-upload-module resumable uploads protocol
+ * {@link https://github.com/fdintino/nginx-upload-module/blob/master/upload-protocol.md nginx-upload-module}
  * @example
- *
  *   options: UploadxOptions = {
  *     endpoint: '/files'
  *     uploaderClass: NginxUploadModuleUploader

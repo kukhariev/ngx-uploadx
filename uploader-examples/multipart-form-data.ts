@@ -2,9 +2,7 @@ import { resolveUrl, Uploader } from 'ngx-uploadx';
 
 /**
  * Multipart/form-data extended uploader for use with node-uploadx
- *
  * @example
- *
  *   options: UploadxOptions = {
  *     allowedTypes: 'image/*',
  *     uploaderClass: MultiPartFormData

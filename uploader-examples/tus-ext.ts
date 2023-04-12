@@ -2,11 +2,8 @@ import { b64, resolveUrl, Tus } from 'ngx-uploadx';
 
 /**
  * Implements tus resumable upload protocol
- *
- * {@link https://github.com/tus/tus-resumable-upload-protocol/blob/master/protocol.md|`Creation With Upload` extension}
- *
+ * {@link https://github.com/tus/tus-resumable-upload-protocol/blob/master/protocol.md `Creation With Upload` extension}
  * @example
- *
  *   options: UploadxOptions = {
  *     allowedTypes: 'image/*,video/*',
  *     endpoint: `https://master.tus.io/files/`,
