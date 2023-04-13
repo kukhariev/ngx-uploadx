@@ -1,20 +1,25 @@
 const args = process.argv.slice(2);
-const logLevel = args.includes('--debug') ? 'debug' : 'error';
 const url = require('url');
 const { tmpdir } = require('os');
 const { DiskStorage, Multipart, Tus, Uploadx } = require('@uploadx/core');
 const { createServer } = require('http');
 
-const PORT = 3002;
-const directory = `${tmpdir()}/ngx-uploadx/`;
+const logLevel = process.env.LOG_LEVEL || args.includes('--debug') ? 'debug' : 'error';
+const port = process.env.PORT || 3002;
+const directory = process.env.UPLOAD_DIR || `${tmpdir()}/ngx-uploadx/`;
+const maxUploadSize = process.env.MAX_UPLOAD_SIZE || '10GB';
+const allowMIME = process.env.ALLOW_MIME?.split(',') || ['*/*'];
 const path = '/files';
+
 const pathRegexp = new RegExp(`^${path}([/?]|$)`);
 
 const storage = new DiskStorage({
   directory,
   path,
   logLevel,
-  expiration: { maxAge: '1h', purgeInterval: '30min', rolling: true }
+  maxUploadSize,
+  allowMIME,
+  expiration: { maxAge: '30min', purgeInterval: '5min' }
 });
 const upx = new Uploadx({ storage });
 const tus = new Tus({ storage });
@@ -39,4 +44,4 @@ createServer((req, res) => {
     res.statusCode = 404;
     res.end();
   }
-}).listen(PORT);
+}).listen(port);
