@@ -85,7 +85,7 @@ interface UploadItem {
    * URL to create new uploads.
    * @defaultValue '/upload'
    */
-  endpoint?: string;
+  endpoint?: string | ((file: File) => string);
   /**
    * Headers to be appended to each HTTP request
    */

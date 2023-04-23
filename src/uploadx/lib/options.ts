@@ -40,7 +40,7 @@ export interface UploadxOptions extends UploaderOptions {
 }
 
 export interface UploadxFactoryOptions extends UploadxOptions {
-  endpoint: string;
+  endpoint: string | ((file: File) => string);
   autoUpload: boolean;
   concurrency: number;
   uploaderClass: UploaderClass;

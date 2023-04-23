@@ -120,7 +120,7 @@ export abstract class Uploader implements UploadState {
    * Configure uploader
    */
   configure({ metadata, headers, token, endpoint, action }: UploadxControlEvent): void {
-    endpoint && (this.endpoint = endpoint);
+    endpoint && (this.endpoint = unfunc(endpoint, this.file));
     token && (this.token = token);
     metadata && Object.assign(this.metadata, unfunc(metadata, this.file));
     headers && Object.assign(this.headers, unfunc(headers, this.file));
