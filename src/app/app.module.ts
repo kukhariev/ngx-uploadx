@@ -33,7 +33,7 @@ import { TusComponent } from './tus/tus.component';
     TusComponent
   ],
   imports: [
-    RouterModule.forRoot(appRoutes, { relativeLinkResolution: 'legacy' }),
+    RouterModule.forRoot(appRoutes, {}),
     BrowserModule,
     UploadxModule.withConfig({
       allowedTypes: 'image/*,video/*',
