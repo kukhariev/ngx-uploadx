@@ -15,10 +15,10 @@ process.env.NG_DISABLE_VERSION_CHECK = 'true';
 const cleanup = directory => new Promise(resolve => require('rimraf')(directory, resolve));
 
 /**
- *  Create and build a demo application using the specified version/tag of the Angular CLI
- * @param cliTag
- * @returns {Promise<void>}
- *
+ * Create and build a demo application using the specified version/tag of the Angular CLI
+ * @param cliTag Angular CLI version/tag to use.
+ * Default: `latest`
+ * @returns { Promise<void> }
  */
 async function build(cliTag = 'latest') {
   const projectName = (Number.isInteger(+cliTag[0]) ? `ng${cliTag}` : cliTag).replace(/\./, '');
@@ -45,10 +45,6 @@ async function build(cliTag = 'latest') {
 
   await copy('src/app', `${projectPath}/src/app`, { overwrite: true });
   copyFileSync('src/styles.scss', `${projectPath}/src/styles.scss`);
-  writeFileSync(
-    `${projectPath}/src/app/package.json`,
-    JSON.stringify({ sideEffects: false, projectName, private: true }, undefined, 2)
-  );
   writeFileSync(`${projectPath}/server.js`, `require('../../server')\n`);
   await copy('e2e', `${projectPath}/e2e`, { overwrite: true });
   await copy('src/environments', `${projectPath}/src/environments`, { overwrite: true });
