@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Uploader, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { serverUrl } from '../../config';
 
 @Component({
   selector: 'app-b',
@@ -12,7 +12,7 @@ import { environment } from '../../../environments/environment';
 export class BComponent {
   uploads$: Observable<Uploader[]>;
   options: UploadxOptions = {
-    endpoint: `${environment.api}/files?uploadType=uploadx`
+    endpoint: `${serverUrl}/files?uploadType=uploadx`
   };
 
   constructor(private uploadService: UploadxService) {

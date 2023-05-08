@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { UploadState, UploadxControlEvent, UploadxOptions } from 'ngx-uploadx';
-import { environment } from '../../environments/environment';
 import { AuthService } from '../auth.service';
+import { serverUrl as serverUrl } from '../config';
 
 @Component({
   selector: 'app-directive-way',
@@ -13,7 +13,7 @@ export class DirectiveWayComponent {
   uploads: UploadState[] = [];
   options: UploadxOptions = {
     allowedTypes: 'image/*,video/*',
-    endpoint: `${environment.api}/files?uploadType=uploadx`,
+    endpoint: `${serverUrl}/files?uploadType=uploadx`,
     token: this.authService.accessToken,
     // token: this.authService.getAccessToken,
     // token: this.authService.getTokenAsPromise,

@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { Uploader, UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
 import { AuthService } from '../auth.service';
+import { serverUrl } from '../config';
 import { injectDigestHeader } from '../digest';
 
 @Component({
@@ -14,7 +14,7 @@ export class OnPushComponent implements OnDestroy {
   state$: Observable<UploadState>;
   uploads$: Observable<Uploader[]>;
   options: UploadxOptions = {
-    endpoint: `${environment.api}/files?uploadType=uploadx`,
+    endpoint: `${serverUrl}/files?uploadType=uploadx`,
     chunkSize: 1024 * 1024 * 64,
     prerequest: injectDigestHeader,
     authorize: (req, token) => {

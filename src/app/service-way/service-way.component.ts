@@ -2,8 +2,8 @@ import { Component, Injectable, OnDestroy, OnInit } from '@angular/core';
 import { IdService, Tus, UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { environment } from '../../environments/environment';
 import { AuthService } from '../auth.service';
+import { serverUrl } from '../config';
 import { hasher, injectTusChecksumHeader } from '../digest';
 
 @Injectable()
@@ -27,7 +27,7 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
   uploads: UploadState[] = [];
   private unsubscribe$ = new Subject<void>();
   options: UploadxOptions = {
-    endpoint: `${environment.api}/files?uploadType=tus`,
+    endpoint: `${serverUrl}/files?uploadType=tus`,
     uploaderClass: Tus,
     token: this.authService.getAccessToken
     // prerequest: injectTusChecksumHeader
