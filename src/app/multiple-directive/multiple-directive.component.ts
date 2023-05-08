@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Tus, Uploader, UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { serverUrl } from '../config';
 
 @Component({
   selector: 'app-multiple-directive',
@@ -12,12 +12,12 @@ export class MultipleDirectiveComponent {
   state$: Observable<UploadState>;
   uploads$: Observable<Uploader[]>;
   imageUploadOptions: UploadxOptions = {
-    endpoint: `${environment.api}/files?uploadType=uploadx`,
+    endpoint: `${serverUrl}/files?uploadType=uploadx`,
     allowedTypes: 'image/*'
   };
 
   videoUploadOptions: UploadxOptions = {
-    endpoint: `${environment.api}/files?uploadType=tus`,
+    endpoint: `${serverUrl}/files?uploadType=tus`,
     allowedTypes: 'video/*',
     uploaderClass: Tus
   };

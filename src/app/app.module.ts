@@ -2,9 +2,9 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { UploadxModule } from 'ngx-uploadx';
-import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
+import { serverUrl } from './config';
 import { DirectiveWayComponent } from './directive-way/directive-way.component';
 import { DownloadComponent } from './file-generator/download/download.component';
 import { FileGeneratorComponent } from './file-generator/file-generator.component';
@@ -37,7 +37,7 @@ import { TusComponent } from './tus/tus.component';
     BrowserModule,
     UploadxModule.withConfig({
       allowedTypes: 'image/*,video/*',
-      endpoint: `${environment.api}/files?uploadType=uploadx`,
+      endpoint: `${serverUrl}/files?uploadType=uploadx`,
       headers: { 'ngsw-bypass': 'true' },
       retryConfig: { maxAttempts: 5 }
     })

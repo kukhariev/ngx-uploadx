@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Tus, UploadState, UploadxControlEvent, UploadxOptions } from 'ngx-uploadx';
-import { environment } from '../../environments/environment';
 import { AuthService } from '../auth.service';
+import { serverUrl } from '../config';
 
 @Component({
   selector: 'app-tus',
@@ -14,7 +14,7 @@ export class TusComponent {
   options: UploadxOptions = {
     allowedTypes: 'image/*,video/*',
     multiple: false,
-    endpoint: `${environment.api}/files?uploadType=tus`,
+    endpoint: `${serverUrl}/files?uploadType=tus`,
     uploaderClass: Tus,
     authorize: async req => {
       const token = await this.authService.getTokenAsPromise();

@@ -2,7 +2,7 @@ import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/co
 import { UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { environment } from '../../environments/environment';
+import { serverUrl } from '../config';
 import { UploaderXS3 } from './uploaderx-s3.class';
 
 @Component({
@@ -13,7 +13,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   state$!: Observable<UploadState>;
   uploads: UploadState[] = [];
   options: UploadxOptions = {
-    endpoint: `${environment.api}/files?`,
+    endpoint: `${serverUrl}/files?`,
     token: btoa('user:pass'),
     chunkSize: 16 * 1024 * 1024,
     uploaderClass: UploaderXS3
