@@ -1,4 +1,4 @@
-import { b64, isNumber, resolveUrl, unfunc } from './utils';
+import { b64, compareVersions, isNumber, resolveUrl, unfunc } from './utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -52,5 +52,13 @@ describe('primitives', () => {
   it('unfunc', () => {
     expect(unfunc(10, 2)).toBe(10);
     expect(unfunc((x: number) => 10 * x, 2)).toBe(20);
+  });
+
+  it('compareVersions', () => {
+    expect(compareVersions('1.2.4', '1.2.3')).toBe(1);
+    expect(compareVersions('1.2.4', '2.0.0')).toBe(-1);
+    expect(compareVersions('1.2.4', '1.2.4')).toBe(0);
+    expect(compareVersions('1.2', '1.3.0')).toBe(-1);
+    expect(compareVersions('1.2.0', '1.1')).toBe(1);
   });
 });
