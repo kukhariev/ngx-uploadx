@@ -1,0 +1,37 @@
+<div uploadxDrop class="upload-zone">
+  <div class="uploads-table">
+    <div *ngFor="let item of uploads" class="row">
+      <span>{{ item.name }}</span>
+      <span>{{ item.progress }}%</span>
+      <span>{{ item.status }}</span>
+      <span>
+        <button (click)="pause(item.uploadId)">pause</button>
+        <button (click)="upload(item.uploadId)">upload</button>
+      </span>
+    </div>
+  </div>
+  <div class="control">
+    <span>
+      <em>Drop files to upload, or</em>
+      <label accesskey="o" for="files"><strong>BROWSE</strong></label>
+      <input
+        #files
+        (click)="files.value = ''"
+        (state)="onStateChanged($event)"
+        [control]="control"
+        [uploadx]="options"
+        id="files"
+        type="file"
+      />
+    </span>
+    <span>
+      <button (click)="upload()">Upload All</button>
+      <button (click)="pause()">Pause All</button>
+      <button (click)="update()">Update All</button>
+      <button (click)="cancel()">Cancel All</button>
+    </span>
+  </div>
+</div>
+<div class="json">
+  <pre>{{ state | json }}</pre>
+</div>

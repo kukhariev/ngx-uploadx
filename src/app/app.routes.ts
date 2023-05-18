@@ -6,6 +6,7 @@ import { MultipleDirectiveComponent } from './multiple-directive/multiple-direct
 import { OnPushComponent } from './on-push/on-push.component';
 import { ServiceCodeWayComponent } from './service-code-way/service-code-way.component';
 import { ServiceWayComponent } from './service-way/service-way.component';
+import { StandaloneComponent } from './standalone/standalone.component';
 import { TusComponent } from './tus/tus.component';
 
 export const appRoutes: Routes = [
@@ -13,6 +14,7 @@ export const appRoutes: Routes = [
   { path: 'directive-way', component: DirectiveWayComponent },
   { path: 'service-way', component: ServiceWayComponent },
   { path: 'service-code-way', component: ServiceCodeWayComponent },
+  { path: 'standalone', component: StandaloneComponent },
   { path: 'on-push', component: OnPushComponent },
   { path: 'multi', component: MultipleDirectiveComponent },
   { path: 'multi2', component: MultiServiceComponent },
