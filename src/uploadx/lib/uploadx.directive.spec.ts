@@ -31,7 +31,8 @@ describe('Directive: UploadxDirective', () => {
   let serviceHandleFileListSpy: jasmine.Spy;
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [UploadxTestComponent, UploadxDirective],
+      declarations: [UploadxTestComponent],
+      imports: [UploadxDirective],
       providers: [UploadxService, { provide: UPLOADX_OPTIONS, useValue: {} }]
     }).compileComponents();
     fixture = TestBed.createComponent(UploadxTestComponent);

@@ -18,7 +18,8 @@ describe('DirectiveWayComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [DirectiveWayComponent, UploadxDirective],
+      declarations: [DirectiveWayComponent],
+      imports: [UploadxDirective],
       schemas: [NO_ERRORS_SCHEMA],
       providers: []
     });

@@ -5,7 +5,10 @@ import { UploadState, UploadxControlEvent } from './interfaces';
 import { UploadxOptions } from './options';
 import { UploadxService } from './uploadx.service';
 
-@Directive({ selector: '[uploadx]' })
+@Directive({
+  selector: '[uploadx]',
+  standalone: true
+})
 export class UploadxDirective implements OnInit {
   @Input()
   set uploadx(value: UploadxOptions | '') {

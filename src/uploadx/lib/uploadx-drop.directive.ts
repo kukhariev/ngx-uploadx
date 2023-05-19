@@ -2,7 +2,10 @@ import { ContentChild, Directive, HostBinding, HostListener } from '@angular/cor
 import { UploadxDirective } from './uploadx.directive';
 import { UploadxService } from './uploadx.service';
 
-@Directive({ selector: '[uploadxDrop]' })
+@Directive({
+  selector: '[uploadxDrop]',
+  standalone: true
+})
 export class UploadxDropDirective {
   @HostBinding('class.uploadx-drop-active')
   active = false;
