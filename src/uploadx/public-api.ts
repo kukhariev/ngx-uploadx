@@ -12,5 +12,6 @@ export * from './lib/uploaderx';
 export * from './lib/uploadx-drop.directive';
 export * from './lib/uploadx.directive';
 export * from './lib/uploadx.module';
+export * from './lib/uploadx.provider';
 export * from './lib/uploadx.service';
 export * from './lib/utils';
