@@ -1,24 +1,10 @@
-import { NgZone } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import { Subscription } from 'rxjs';
 import { skip } from 'rxjs/operators';
-import { Ajax } from './ajax';
-import { IdService } from './id.service';
 import { UploadAction } from './interfaces';
-import { UploadxFactoryOptions, UploadxOptions } from './options';
+import { UploadxOptions } from './options';
 import { UploaderX } from './uploaderx';
 import { UploadxService } from './uploadx.service';
-
-const defaultOptions: UploadxFactoryOptions = {
-  storeIncompleteHours: 1,
-  endpoint: '/upload',
-  autoUpload: true,
-  concurrency: 2,
-  uploaderClass: UploaderX,
-  authorize: (req, token) => {
-    token && (req.headers['Authorization'] = `Bearer ${token}`);
-    return req;
-  }
-};
 
 class MockUploader extends UploaderX {
   async upload(): Promise<void> {
@@ -37,7 +23,7 @@ const options: UploadxOptions = {
   uploaderClass: MockUploader
 };
 
-function getFilelist(): FileList {
+function getFileList(): FileList {
   const dataTransfer = new DataTransfer();
   dataTransfer.items.add(getFile());
   dataTransfer.items.add(getFile());
@@ -54,7 +40,8 @@ describe('UploadxService', () => {
   let service: UploadxService;
   let sub: Subscription;
   beforeEach(() => {
-    service = new UploadxService(null, defaultOptions, {} as Ajax, new NgZone({}), new IdService());
+    TestBed.configureTestingModule({ providers: [UploadxService] });
+    service = TestBed.inject(UploadxService);
   });
   afterEach(() => {
     sub && sub.unsubscribe();
@@ -106,7 +93,7 @@ describe('UploadxService', () => {
     service.handleFiles(file);
   });
 
-  it('should set correct status on `control` method call', done => {
+  it('should set the correct status on `control` method call', done => {
     sub = service.connect({ ...options, autoUpload: true }).subscribe(queue => {
       if (queue.length === 4) {
         const upload = service.queue[0];
@@ -127,7 +114,7 @@ describe('UploadxService', () => {
         done();
       }
     });
-    service.handleFiles(getFilelist());
+    service.handleFiles(getFileList());
   });
 
   it('should limit concurrent uploads', done => {
@@ -137,10 +124,10 @@ describe('UploadxService', () => {
         done();
       }
     });
-    service.handleFiles(getFilelist());
+    service.handleFiles(getFileList());
   });
 
-  it('should listen offline/online events', () => {
+  it('should listen to offline/online events', () => {
     const control = spyOn(service, 'control');
     window.dispatchEvent(new Event('offline'));
     window.dispatchEvent(new Event('online'));
