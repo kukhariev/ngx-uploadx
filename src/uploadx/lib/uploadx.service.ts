@@ -1,14 +1,14 @@
-import { Inject, Injectable, NgZone, OnDestroy, Optional } from '@angular/core';
+import { inject, Injectable, NgZone, OnDestroy } from '@angular/core';
 import { fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
-import { Ajax, AjaxRequestConfig, AjaxResponse, UPLOADX_AJAX } from './ajax';
+import { AjaxRequestConfig, AjaxResponse, UPLOADX_AJAX } from './ajax';
 import { IdService } from './id.service';
 import { UploadState, UploadxControlEvent } from './interfaces';
 import {
-  UploadxFactoryOptions,
-  UploadxOptions,
   UPLOADX_FACTORY_OPTIONS,
-  UPLOADX_OPTIONS
+  UPLOADX_OPTIONS,
+  UploadxFactoryOptions,
+  UploadxOptions
 } from './options';
 import { store } from './store';
 import { Uploader } from './uploader';
@@ -38,14 +38,13 @@ export class UploadxService implements OnDestroy {
   readonly options: UploadxFactoryOptions;
   private readonly eventsStream: Subject<UploadState> = new Subject();
   private subs: Subscription[] = [];
+  private ngZone = inject(NgZone);
+  readonly ajax = inject(UPLOADX_AJAX);
+  private idService = inject(IdService);
 
-  constructor(
-    @Optional() @Inject(UPLOADX_OPTIONS) options: UploadxOptions | null,
-    @Inject(UPLOADX_FACTORY_OPTIONS) defaults: UploadxFactoryOptions,
-    @Inject(UPLOADX_AJAX) readonly ajax: Ajax,
-    private ngZone: NgZone,
-    private idService: IdService
-  ) {
+  constructor() {
+    const options = inject(UPLOADX_OPTIONS, { optional: true });
+    const defaults = inject(UPLOADX_FACTORY_OPTIONS);
     this.options = Object.assign({}, defaults, options);
     if (isBrowser()) {
       this.subs.push(
