@@ -68,6 +68,7 @@ describe('Uploader', () => {
       expect(abort).toHaveBeenCalled();
       expect(stateChange).toHaveBeenCalled();
     });
+
     it('should cancel', () => {
       const uploader = new MockUploader(file, {});
       const abort = spyOn<any>(uploader, 'abort').and.callThrough();
@@ -85,21 +86,25 @@ describe('Uploader', () => {
       DynamicChunk.maxSize = chunkInit.maxSize;
       DynamicChunk.size = chunkInit.size;
     });
+
     it('should use adaptive chunkSize if not specified', async () => {
       const uploader = new MockUploader(getFile(), {});
       (uploader as any).getChunk();
       expect(uploader.chunkSize).toEqual(chunkInit.size);
     });
+
     it('should set fixed chunkSize', async () => {
       const uploader = new MockUploader(file, { chunkSize: 4_194_304 });
       (uploader as any).getChunk();
       expect(uploader.chunkSize).toEqual(4_194_304);
     });
+
     it('should disable chunks', async () => {
       const uploader = new MockUploader(file, { chunkSize: 0 });
       (uploader as any).getChunk();
       expect(uploader.chunkSize).toEqual(10);
     });
+
     it('should limit on 413', async () => {
       const uploader = new MockUploader(file, {});
       uploader.responseStatus = 413;
@@ -118,6 +123,7 @@ describe('Uploader', () => {
       expect(uploader.responseStatus).toEqual(0);
       expect(retry).toHaveBeenCalledTimes(3);
     });
+
     it('should error on 400', async () => {
       const uploader = new MockUploader(file, { retryConfig: { maxAttempts: 3 }, token: 'token' });
       serverStatus = 400;
@@ -125,6 +131,7 @@ describe('Uploader', () => {
       expect(uploader.responseStatus).toEqual(400);
       expect(uploader.status).toEqual('error');
     });
+
     it('should updateToken on 401', async () => {
       const uploader = new MockUploader(file, { retryConfig: { maxAttempts: 3 }, token: 'token' });
       const updateToken = spyOn<any>(uploader, 'updateToken').and.callThrough();
@@ -133,6 +140,7 @@ describe('Uploader', () => {
       expect(uploader.responseStatus).toEqual(401);
       expect(updateToken).toHaveBeenCalledTimes(4);
     });
+
     it('should retry on 500', async () => {
       const uploader = new MockUploader(file, { retryConfig: { maxAttempts: 3 }, token: 'token' });
       serverStatus = 500;
@@ -141,6 +149,7 @@ describe('Uploader', () => {
       expect(retry).toHaveBeenCalledTimes(3);
       expect(uploader.status).toEqual('error');
     });
+
     it('should complete on 200', async () => {
       const uploader = new MockUploader(file, { retryConfig: { maxAttempts: 3 }, token: 'token' });
       serverStatus = 200;
@@ -157,6 +166,7 @@ describe('Uploader', () => {
       expect(cleanup).toHaveBeenCalled();
       expect(uploader.status).toEqual('complete');
     });
+
     it('should complete on 201', async () => {
       const uploader = new MockUploader(file, { retryConfig: { maxAttempts: 3 }, token: 'token' });
       serverStatus = 201;
@@ -178,6 +188,7 @@ describe('Uploader', () => {
       await uploader.request({ method: 'POST', body });
       expect(onProgressSpy).not.toHaveBeenCalled();
     });
+
     it('should report progress if content is uploading', async () => {
       serverStatus = 200;
       const uploader = new MockUploader(file, {});
@@ -194,6 +205,7 @@ describe('Uploader', () => {
       await uploader.request({ method: 'GET' });
       expect(request).toHaveBeenCalledTimes(1);
     });
+
     it('should skip authorize', async () => {
       serverStatus = 200;
       const uploader = new MockUploader(file, {});
@@ -217,6 +229,7 @@ describe('Uploader', () => {
       await uploader.request({ method: 'POST', headers: common });
       expect(request).toHaveBeenCalledWith(jasmine.objectContaining(sample));
     });
+
     it('async', async () => {
       serverStatus = 201;
       const uploader = new MockUploader(file, {
@@ -227,6 +240,7 @@ describe('Uploader', () => {
       await uploader.request({ method: 'POST' });
       expect(request).toHaveBeenCalledWith(jasmine.objectContaining(sample));
     });
+
     it('void', async () => {
       serverStatus = 201;
       const uploader = new MockUploader(file, {

@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-
+import { UploadxModule } from 'ngx-uploadx';
 import { OnPushComponent } from './on-push.component';
 
 describe('OnPushComponent', () => {
@@ -8,7 +8,8 @@ describe('OnPushComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [OnPushComponent]
+      declarations: [OnPushComponent],
+      imports: [UploadxModule]
     }).compileComponents();
   }));
 

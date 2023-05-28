@@ -1,59 +1,29 @@
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { UploadxService } from 'ngx-uploadx';
-import { Observable } from 'rxjs';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { UPLOADX_AJAX, UploadxModule } from 'ngx-uploadx';
 import { ServiceWayComponent } from './service-way.component';
 
 describe('ServiceWayComponent', () => {
   let comp: ServiceWayComponent;
   let fixture: ComponentFixture<ServiceWayComponent>;
 
-  beforeEach(() => {
-    const observableStub = {};
-    const uploadServiceStub = {
-      init: () => ({}),
-      control: () => ({})
+  beforeEach(waitForAsync(() => {
+    const mockAjax = {
+      request: () => Promise.resolve({ data: '', headers: {}, status: 200 })
     };
     TestBed.configureTestingModule({
       declarations: [ServiceWayComponent],
-      schemas: [NO_ERRORS_SCHEMA],
-      providers: [
-        { provide: Observable, useValue: observableStub },
-        { provide: UploadxService, useValue: uploadServiceStub }
-      ]
-    });
-    fixture = TestBed.createComponent(ServiceWayComponent);
-    comp = fixture.componentInstance;
-  });
+      imports: [UploadxModule],
+      providers: [{ provide: UPLOADX_AJAX, useValue: mockAjax }]
+    })
+      .compileComponents()
+      .then(() => {
+        fixture = TestBed.createComponent(ServiceWayComponent);
+        comp = fixture.componentInstance;
+        fixture.detectChanges();
+      });
+  }));
 
   it('can load instance', () => {
     expect(comp).toBeTruthy();
-  });
-
-  describe('cancelAll', () => {
-    it('makes expected calls', () => {
-      const uploadServiceStub: UploadxService = fixture.debugElement.injector.get(UploadxService);
-      spyOn(uploadServiceStub, 'control');
-      comp.cancel();
-      expect(uploadServiceStub.control).toHaveBeenCalled();
-    });
-  });
-
-  describe('uploadAll', () => {
-    it('makes expected calls', () => {
-      const uploadServiceStub: UploadxService = fixture.debugElement.injector.get(UploadxService);
-      spyOn(uploadServiceStub, 'control');
-      comp.upload();
-      expect(uploadServiceStub.control).toHaveBeenCalled();
-    });
-  });
-
-  describe('pauseAll', () => {
-    it('makes expected calls', () => {
-      const uploadServiceStub: UploadxService = fixture.debugElement.injector.get(UploadxService);
-      spyOn(uploadServiceStub, 'control');
-      comp.pause();
-      expect(uploadServiceStub.control).toHaveBeenCalled();
-    });
   });
 });

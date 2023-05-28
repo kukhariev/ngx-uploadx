@@ -46,14 +46,17 @@ describe('Ajax', () => {
   beforeEach(() => {
     ajax = new UploadxAjax(() => mockXHR);
   });
+
   it('getResponseHeaders', () => {
     const headers = ajax.getResponseHeaders(mockedXHR);
     expect(headers).toEqual(data);
   });
+
   it('getResponseBody', () => {
     const body = ajax.getResponseBody<string>(mockedXHR);
     expect(body).toEqual(JSON.stringify(data));
   });
+
   it('request', async () => {
     const res = await ajax.request({ url: '/upload', responseType: 'json' });
     expect(res).toEqual(jasmine.objectContaining({ status: 200, headers: data, data }));

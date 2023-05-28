@@ -18,10 +18,11 @@ class UploadxTestComponent {
   action: UploadxControlEvent = { action: 'pause' };
 }
 
-const file = new File([''], 'filename.mp4');
-const dataTransfer = new DataTransfer();
-dataTransfer.items.add(file);
-const files = dataTransfer.files;
+function buildFileList() {
+  const dt = new DataTransfer();
+  dt.items.add(new File([''], 'filename.mp4'));
+  return dt.files;
+}
 
 describe('Directive: UploadxDirective', () => {
   let fixture: ComponentFixture<UploadxTestComponent>;
@@ -29,6 +30,7 @@ describe('Directive: UploadxDirective', () => {
   let service: UploadxService;
   let serviceControlSpy: jasmine.Spy;
   let serviceHandleFileListSpy: jasmine.Spy;
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [UploadxTestComponent],
@@ -36,7 +38,6 @@ describe('Directive: UploadxDirective', () => {
       providers: [UploadxService, { provide: UPLOADX_OPTIONS, useValue: {} }]
     }).compileComponents();
     fixture = TestBed.createComponent(UploadxTestComponent);
-
     inputEl = fixture.debugElement.query(By.css('input'));
     service = fixture.debugElement.injector.get<UploadxService>(UploadxService);
     serviceControlSpy = spyOn(service, 'control');
@@ -47,16 +48,19 @@ describe('Directive: UploadxDirective', () => {
     fixture.detectChanges();
     expect(inputEl.nativeElement.hasAttribute('accept')).toBe(true);
   });
+
   it('has attribute "multiple"', () => {
     fixture.detectChanges();
     expect(inputEl.nativeElement.hasAttribute('multiple')).toBe(true);
   });
+
   it('set control', () => {
     fixture.detectChanges();
     expect(serviceControlSpy).toHaveBeenCalled();
   });
+
   it('fileListener', () => {
-    inputEl.triggerEventHandler('change', { target: { files } });
+    inputEl.triggerEventHandler('change', { target: { files: buildFileList() } });
     fixture.detectChanges();
     expect(serviceHandleFileListSpy).toHaveBeenCalled();
   });
