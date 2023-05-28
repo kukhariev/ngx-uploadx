@@ -3,6 +3,7 @@ import { Ajax } from './ajax';
 import { Tus } from './tus';
 
 const fileWithType = new File(['123456'], 'filename.txt', { type: 'text/plain' });
+
 describe('Tus', () => {
   describe('getFileUrl', () => {
     let uploader: Tus;
@@ -25,6 +26,7 @@ describe('Tus', () => {
       expect(getValueFromResponse).toHaveBeenCalled();
     });
   });
+
   describe('sendFileContent', () => {
     let uploader: Tus;
     let req: jasmine.Spy;
@@ -42,6 +44,7 @@ describe('Tus', () => {
       expect(getOffsetFromResponse).toHaveBeenCalled();
     });
   });
+
   describe('getOffset', () => {
     let uploader: Tus;
     let req: jasmine.Spy;

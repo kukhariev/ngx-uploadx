@@ -3,13 +3,14 @@ import { Ajax } from './ajax';
 import { getRangeEnd, UploaderX } from './uploaderx';
 
 const fileWithType = new File(['123456'], 'filename.txt', { type: 'text/plain' });
-
 const fileWithoutType = new File([''], 'filename');
+
 describe('UploaderX', () => {
   describe('getFileUrl', () => {
     let uploaderX: UploaderX;
     let req: jasmine.Spy;
     let getValueFromResponse: jasmine.Spy;
+
     it('should set headers', async () => {
       uploaderX = new UploaderX(fileWithType, {}, () => {}, {} as Ajax);
       req = spyOn<any>(uploaderX, 'request').and.callFake(({ headers }: any) => {
@@ -25,6 +26,7 @@ describe('UploaderX', () => {
       expect(req).toHaveBeenCalled();
       expect(getValueFromResponse).toHaveBeenCalled();
     });
+
     it('should set default type header', async () => {
       uploaderX = new UploaderX(fileWithoutType, {}, () => {}, {} as Ajax);
       req = spyOn<any>(uploaderX, 'request').and.callFake(({ headers }: any) => {
@@ -46,7 +48,8 @@ describe('UploaderX', () => {
     let uploaderX: UploaderX;
     let req: jasmine.Spy;
     let getValueFromResponse: jasmine.Spy;
-    it('should set Content-Range header', async () => {
+
+    it('should send chunk and return offset', async () => {
       uploaderX = new UploaderX(fileWithType, {}, () => {}, {} as Ajax);
       uploaderX.offset = 0;
       req = spyOn<any>(uploaderX, 'request').and.callFake(({ headers }: any) => {
@@ -67,7 +70,8 @@ describe('UploaderX', () => {
     let uploaderX: UploaderX;
     let req: jasmine.Spy;
     let getValueFromResponse: jasmine.Spy;
-    it('should set Content-Range header', async () => {
+
+    it('should return offset', async () => {
       uploaderX = new UploaderX(fileWithType, {}, () => {}, {} as Ajax);
       uploaderX.offset = 0;
       req = spyOn<any>(uploaderX, 'request').and.callFake(({ headers }: any) => {
@@ -87,6 +91,7 @@ describe('UploaderX', () => {
     let uploaderX: UploaderX;
     let req: jasmine.Spy;
     let getValueFromResponse: jasmine.Spy;
+
     it('should send updated data and return location', async () => {
       uploaderX = new UploaderX(fileWithType, {}, () => {}, {} as Ajax);
       req = spyOn<any>(uploaderX, 'request').and.callFake(({ body, method }: any) => {
@@ -109,6 +114,7 @@ describe('UploaderX', () => {
       expect(getRangeEnd('-invalid-')).toEqual(-1);
       expect(getRangeEnd('Range: bytes=0--1')).toEqual(-1);
     });
+
     it('valid ranges', () => {
       expect(getRangeEnd('Range: bytes=0-1')).toEqual(1);
       expect(getRangeEnd('Range: bytes=0-0')).toEqual(0);

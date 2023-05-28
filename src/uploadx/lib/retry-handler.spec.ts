@@ -6,6 +6,7 @@ describe('RetryHandler', () => {
     retry = new RetryHandler();
     jasmine.clock().install();
   });
+
   afterEach(() => jasmine.clock().uninstall());
 
   it('kind(status)', () => {

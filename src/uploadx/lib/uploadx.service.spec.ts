@@ -43,6 +43,7 @@ describe('UploadxService', () => {
     TestBed.configureTestingModule({ providers: [UploadxService] });
     service = TestBed.inject(UploadxService);
   });
+
   afterEach(() => {
     sub && sub.unsubscribe();
   });
