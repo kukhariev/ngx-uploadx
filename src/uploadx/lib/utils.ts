@@ -85,15 +85,7 @@ export function osVersion() {
 }
 
 export function compareVersions(a: string, b: string): number {
-  const aTokens = a.split('.').map(Number);
-  const bTokens = b.split('.').map(Number);
-  for (let i = 0; i < 3; i++) {
-    const aToken = aTokens[i] || 0;
-    const bToken = bTokens[i] || 0;
-    if (aToken > bToken) return 1;
-    if (aToken < bToken) return -1;
-  }
-  return 0;
+  return a.localeCompare(b, undefined, { numeric: true });
 }
 
 export function isBadIOS() {
