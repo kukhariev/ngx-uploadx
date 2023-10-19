@@ -61,6 +61,10 @@ export class RetryHandler {
     this.config = Object.assign({}, defaultRetryConfig, configOptions);
   }
 
+  /**
+   * Determine error type based on response code
+   * @param code - HTTP response status code
+   */
   kind(code: number): ErrorType {
     this.attempts++;
     if (this.attempts > this.config.maxAttempts) {
@@ -78,6 +82,10 @@ export class RetryHandler {
     return ErrorType.Fatal;
   }
 
+  /**
+   * Wait before next retry attempt
+   * @param time - Delay in ms
+   */
   wait(time?: number): Promise<void> {
     const ms =
       time || Math.min(2 ** (this.attempts - 1) * this.config.minDelay, this.config.maxDelay);
@@ -92,6 +100,10 @@ export class RetryHandler {
     });
   }
 
+  /**
+   * Observes value to reset retry attempts counter
+   * @param value - Value to observe
+   */
   observe(value?: string | number): void {
     this.observedValue !== value && (this.attempts = 0);
     this.observedValue = value;
