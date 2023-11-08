@@ -23,7 +23,7 @@ const cleanup = directory => new Promise(resolve => require('rimraf')(directory,
 async function build(cliTag = 'latest') {
   const projectName = (Number.isInteger(+cliTag[0]) ? `ng${cliTag}` : cliTag).replace(/\./, '');
   const projectPath = join(integrationsPath, projectName);
-  const ngNewCmd = `ng new ${projectName} --strict --style=scss --skip-install --skip-git --routing`;
+  const ngNewCmd = `ng new ${projectName} --strict --style=scss --skip-install --skip-git --routing --standalone=false`;
   const buildCmd = 'ng build --configuration production';
 
   console.info(`- Angular CLI tag: ${cliTag}`);
