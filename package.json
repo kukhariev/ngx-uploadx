@@ -42,7 +42,7 @@
     "build:prod": "ng build --configuration production",
     "serve:prod": "angular-http-server --path dist/app",
     "build:latest": "npm run build:ng latest",
-    "serve:latest": "angular-http-server --path integrations/latest/dist/latest",
+    "serve:latest": "angular-http-server --path integrations/latest/dist/latest/browser",
     "prepare": "husky install",
     "prettier": "prettier --write \"**/*.{js,json,scss,md,ts,html}\""
   },
@@ -94,7 +94,7 @@
     "zone.js": "~0.11.4"
   },
   "peerDependencies": {
-    "@angular/core": ">=14.0.0 <17.0.0",
+    "@angular/core": ">=14.0.0 <18.0.0",
     "rxjs": "^6.4.0 || ^7.0.0"
   },
   "lint-staged": {
