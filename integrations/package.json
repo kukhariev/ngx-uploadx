@@ -9,8 +9,8 @@
     "build:next": "npm run build:ng next -prefix ../",
     "test:latest": "npm run test -prefix latest",
     "clean": "npx rimraf ./*/",
-    "serve:latest": "npx angular-http-server --path latest/dist/latest",
-    "serve:next": "npx angular-http-server --path next/dist/next",
+    "serve:latest": "npx angular-http-server --path latest/dist/latest/browser",
+    "serve:next": "npx angular-http-server --path next/dist/next/browser",
     "serve:ng14": "npx angular-http-server --path ng14/dist/ng14"
   }
 }
