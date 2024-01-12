@@ -20,7 +20,7 @@ jobs:
       - name: Install
         uses: './.github/actions/cached-npm-install'
         with:
-          node-version: '16.x'
+          node-version: '18.x'
       - name: Build package
         run: npm run build:pkg
       - name: Build app
