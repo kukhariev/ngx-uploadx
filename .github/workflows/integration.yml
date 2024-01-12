@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ng: [latest, 14]
+        ng: [latest, 16]
     name: Build app with @angular/cli
     steps:
       - uses: actions/checkout@v3
