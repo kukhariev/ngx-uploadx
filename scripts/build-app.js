@@ -11,6 +11,7 @@ const tmpDir = join(require('os').tmpdir(), 'ngx-uploadx-build');
 const baseDir = resolve(`${__dirname}/..`);
 const integrationsPath = resolve(baseDir, 'integrations');
 process.env.NG_DISABLE_VERSION_CHECK = 'true';
+process.env.NG_CLI_ANALYTICS = 'false';
 
 const cleanup = directory => new Promise(resolve => require('rimraf')(directory, resolve));
 
