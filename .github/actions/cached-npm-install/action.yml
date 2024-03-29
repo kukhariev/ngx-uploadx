@@ -4,7 +4,7 @@ description: 'Cached npm packages installation without `package.lock.json` file 
 inputs:
   node-version:
     required: false
-    default: '16.x'
+    default: '18.x'
     description: 'Node version'
   cache-name:
     required: false
