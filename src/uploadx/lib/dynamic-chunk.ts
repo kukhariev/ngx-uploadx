@@ -12,6 +12,13 @@ export class DynamicChunk {
   static minChunkTime = 8;
   static maxChunkTime = 24;
 
+  /**
+   * Scales the chunk size based on the throughput.
+   * If the elapsed time to upload a chunk is less than the min time, increase the chunk size.
+   * If the elapsed time is more than the max time, decrease the chunk size.
+   * Keeps the chunk size within the min and max limits.
+   * @param throughput - represents the upload rate in bytes/sec.
+   */
   static scale(throughput: number): number {
     const elapsedTime = DynamicChunk.size / throughput;
     if (elapsedTime < DynamicChunk.minChunkTime) {

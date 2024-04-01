@@ -9,6 +9,10 @@ export function resolveUrl(url: string, base: string): string {
   return safeMatch(base, /^(?:https?:)?(?:\/\/)?([^\/?]+)?(.*\/)/) + url;
 }
 
+/**
+ * Unwraps a value if it is a function, otherwise returns the value directly.
+ * Useful for allowing values to optionally be specified as functions.
+ */
 export function unfunc<T, V>(value: T | ((ref: V) => T), ref: V): T {
   return value instanceof Function ? value(ref) : value;
 }
@@ -36,6 +40,9 @@ export function createHash(str: string): number {
   return hash >>> 0;
 }
 
+/**
+ * Utility functions for base64 encoding and decoding strings and objects.
+ */
 export const b64 = {
   encode: (str: string): string =>
     btoa(
