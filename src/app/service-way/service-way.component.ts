@@ -33,7 +33,10 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
     // prerequest: injectTusChecksumHeader
   };
 
-  constructor(private uploadxService: UploadxService, private authService: AuthService) {}
+  constructor(
+    private uploadxService: UploadxService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.state$ = this.uploadxService.init(this.options);
