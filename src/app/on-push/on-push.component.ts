@@ -23,7 +23,10 @@ export class OnPushComponent implements OnDestroy {
     }
   };
 
-  constructor(private uploadService: UploadxService, private authService: AuthService) {
+  constructor(
+    private uploadService: UploadxService,
+    private authService: AuthService
+  ) {
     this.uploads$ = this.uploadService.connect(this.options);
     this.state$ = this.uploadService.events;
     this.authService.getToken().subscribe(token => {

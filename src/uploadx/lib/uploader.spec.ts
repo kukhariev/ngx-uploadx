@@ -31,7 +31,10 @@ const mockAjax: Ajax = {
 };
 
 export class MockUploader extends Uploader {
-  constructor(readonly f: File, readonly opts: UploaderOptions) {
+  constructor(
+    readonly f: File,
+    readonly opts: UploaderOptions
+  ) {
     super(f, opts, () => {}, mockAjax);
   }
 
