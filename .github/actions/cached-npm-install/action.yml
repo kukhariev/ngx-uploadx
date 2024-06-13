@@ -4,7 +4,7 @@ description: 'Cached npm packages installation without `package.lock.json` file 
 inputs:
   node-version:
     required: false
-    default: '18.x'
+    default: '20.x'
     description: 'Node version'
   cache-name:
     required: false
@@ -16,11 +16,11 @@ runs:
   steps:
     - name: Setup node
       id: setup-node
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
     - name: Cache packages
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.npm

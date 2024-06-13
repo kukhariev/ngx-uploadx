@@ -11,14 +11,14 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install
         uses: './.github/actions/cached-npm-install'
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
         run: npx playwright test -c e2e/playwright.config.ts
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
