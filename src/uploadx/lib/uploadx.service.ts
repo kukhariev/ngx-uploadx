@@ -12,7 +12,7 @@ import {
 } from './options';
 import { store } from './store';
 import { Uploader } from './uploader';
-import { iosOverride, isBrowser, onLine, pick } from './utils';
+import { isBrowser, onLine, pick } from './utils';
 
 export const UPLOAD_STATE_KEYS: (keyof UploadState)[] = [
   'file',
@@ -108,7 +108,7 @@ export class UploadxService implements OnDestroy {
    * Creates uploaders for files and adds them to the upload queue
    */
   handleFiles(files: FileList | File | File[], options = {} as UploadxOptions): void {
-    const instanceOptions: UploadxFactoryOptions = { ...this.options, ...iosOverride, ...options };
+    const instanceOptions: UploadxFactoryOptions = { ...this.options, ...options };
     store.clear(instanceOptions.storeIncompleteHours);
     this.options.concurrency = instanceOptions.concurrency;
     ('name' in files ? [files] : Array.from(files)).forEach(file =>
