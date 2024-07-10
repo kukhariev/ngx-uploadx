@@ -43,9 +43,7 @@ import { UploadxOptions, UploadState } from 'ngx-uploadx';
 
 @Component({
   selector: 'app-home',
-  templateUrl: `
-  <input type="file" [uploadx]="options" (state)="onUpload($event)">
-  `
+  template: ` <input type="file" [uploadx]="options" (state)="onUpload($event)" /> `
 })
 export class AppHomeComponent {
   options: UploadxOptions = { endpoint: `[URL]` };
