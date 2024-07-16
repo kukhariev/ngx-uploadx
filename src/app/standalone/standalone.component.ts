@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   UploadState,
   UploadxControlEvent,
@@ -20,13 +20,12 @@ export class StandaloneComponent {
   control!: UploadxControlEvent;
   state!: UploadState;
   uploads: UploadState[] = [];
+  private authService = inject(AuthService);
   options: UploadxOptions = {
     allowedTypes: 'image/*,video/*',
     endpoint: `${serverUrl}/files?uploadType=uploadx`,
     token: this.authService.getTokenAsPromise
   };
-
-  constructor(private authService: AuthService) {}
 
   cancel(uploadId?: string): void {
     this.control = { action: 'cancel', uploadId };

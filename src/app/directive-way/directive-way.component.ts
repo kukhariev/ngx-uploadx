@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { UploadState, UploadxControlEvent, UploadxOptions } from 'ngx-uploadx';
 import { AuthService } from '../auth.service';
 import { serverUrl as serverUrl } from '../config';
@@ -11,6 +11,7 @@ export class DirectiveWayComponent {
   control!: UploadxControlEvent;
   state!: UploadState;
   uploads: UploadState[] = [];
+  private authService = inject(AuthService);
   options: UploadxOptions = {
     allowedTypes: 'image/*,video/*',
     endpoint: `${serverUrl}/files?uploadType=uploadx`,
@@ -28,8 +29,6 @@ export class DirectiveWayComponent {
       }
     }
   };
-
-  constructor(private authService: AuthService) {}
 
   cancel(uploadId?: string): void {
     this.control = { action: 'cancel', uploadId };
