@@ -78,7 +78,9 @@ export abstract class Uploader implements UploadState {
       lastModified: file.lastModified
     };
     options.maxChunkSize && (DynamicChunk.maxSize = options.maxChunkSize);
+    /** A function that is executed before the request is sent */
     this._prerequest = options.prerequest || (req => req);
+    /** A function used to authorize the request */
     this._authorize = options.authorize || (req => req);
     this.configure(options);
   }
