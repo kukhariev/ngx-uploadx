@@ -59,8 +59,8 @@ export abstract class Uploader implements UploadState {
   responseType?: 'json' | 'text' | 'document';
   protected _authorize: AuthorizeRequest;
   protected _prerequest: PreRequest;
+  protected _token!: string;
   private _eventsCount = 0;
-  private _token!: string;
 
   constructor(
     readonly file: File,
