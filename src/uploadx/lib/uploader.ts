@@ -57,9 +57,9 @@ export abstract class Uploader implements UploadState {
   abortController = new AbortController();
   /** Set HttpRequest responseType */
   responseType?: 'json' | 'text' | 'document';
+  protected _authorize: AuthorizeRequest;
+  protected _prerequest: PreRequest;
   private _eventsCount = 0;
-  private readonly _authorize: AuthorizeRequest;
-  private readonly _prerequest: PreRequest;
   private _token!: string;
 
   constructor(
