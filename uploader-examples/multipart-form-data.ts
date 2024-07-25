@@ -1,11 +1,12 @@
-import { resolveUrl, Uploader } from 'ngx-uploadx';
+import { AuthorizeRequest, resolveUrl, Uploader } from 'ngx-uploadx';
 
 /**
  * Multipart/form-data extended uploader for use with node-uploadx
  * @example
  *   options: UploadxOptions = {
  *     allowedTypes: 'image/*',
- *     uploaderClass: MultiPartFormData
+ *     uploaderClass: MultiPartFormData,
+ *     token: getToken
  *   };
  */
 export class MultiPartFormData extends Uploader {
@@ -31,4 +32,9 @@ export class MultiPartFormData extends Uploader {
   async getOffset(): Promise<number | undefined> {
     return 0;
   }
+
+  protected override _authorize: AuthorizeRequest = (req, token) => {
+    token && (req.headers['Authorization'] = `Basic ${token}`);
+    return req;
+  };
 }

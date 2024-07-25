@@ -57,9 +57,9 @@ export abstract class Uploader implements UploadState {
   abortController = new AbortController();
   /** Set HttpRequest responseType */
   responseType?: 'json' | 'text' | 'document';
+  protected _authorize: AuthorizeRequest;
+  protected _prerequest: PreRequest;
   private _eventsCount = 0;
-  private readonly _authorize: AuthorizeRequest;
-  private readonly _prerequest: PreRequest;
   private _token!: string;
 
   constructor(
@@ -78,7 +78,9 @@ export abstract class Uploader implements UploadState {
       lastModified: file.lastModified
     };
     options.maxChunkSize && (DynamicChunk.maxSize = options.maxChunkSize);
+    /** A function that is executed before the request is sent */
     this._prerequest = options.prerequest || (req => req);
+    /** A function used to authorize the request */
     this._authorize = options.authorize || (req => req);
     this.configure(options);
   }
