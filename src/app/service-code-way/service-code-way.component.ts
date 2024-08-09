@@ -2,8 +2,11 @@ import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/co
 import { UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { serverUrl } from '../config';
-import { UploaderXS3 } from './uploaderx-s3.class';
+import { BlobUploader } from './blob-uploader ';
+const env = {
+  sasUrl:
+    'http://127.0.0.1:10000/devstoreaccount1/container1?sv=2018-03-28&spr=https%2Chttp&st=2024-07-25T10%3A05%3A20Z&se=2028-01-26T10%3A05%3A00Z&sr=c&sp=racwdl&sig=0SPSW3G1X5qrdGrIIfaCj%2ByLrRl6g5EfjdG7aaQK7rA%3D'
+};
 
 @Component({
   selector: 'app-service-way',
@@ -13,10 +16,9 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   state$!: Observable<UploadState>;
   uploads: UploadState[] = [];
   options: UploadxOptions = {
-    endpoint: `${serverUrl}/files?`,
-    token: btoa('user:pass'),
-    chunkSize: 16 * 1024 * 1024,
-    uploaderClass: UploaderXS3
+    maxChunkSize: 100 * 1024 * 1024,
+    uploaderClass: BlobUploader,
+    endpoint: env.sasUrl
   };
 
   numberOfCopies = 0;
