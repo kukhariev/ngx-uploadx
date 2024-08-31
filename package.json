@@ -43,7 +43,7 @@
     "serve:prod": "angular-http-server --path dist/app",
     "build:latest": "npm run build:ng latest",
     "serve:latest": "angular-http-server --path integrations/latest/dist/latest/browser",
-    "prepare": "husky install",
+    "prepare": "husky",
     "prettier": "prettier --write \"**/*.{js,json,scss,md,ts,html}\""
   },
   "devDependencies": {
