@@ -13,6 +13,7 @@ import { BComponent } from './multi-service/b/b.component';
 import { MultiServiceComponent } from './multi-service/multi-service.component';
 import { MultipleDirectiveComponent } from './multiple-directive/multiple-directive.component';
 import { OnPushComponent } from './on-push/on-push.component';
+import { SecondsToHMSPipe } from './seconds-to-hms.pipe';
 import { ServiceCodeWayComponent } from './service-code-way/service-code-way.component';
 import { ServiceWayComponent } from './service-way/service-way.component';
 import { TusComponent } from './tus/tus.component';
@@ -28,6 +29,7 @@ import { TusComponent } from './tus/tus.component';
     MultipleDirectiveComponent,
     MultiServiceComponent,
     OnPushComponent,
+    SecondsToHMSPipe,
     ServiceCodeWayComponent,
     ServiceWayComponent,
     TusComponent

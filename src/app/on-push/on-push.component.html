@@ -3,6 +3,7 @@
     <div *ngFor="let item of uploads$ | async" class="row">
       <span>{{ item.name }}</span>
       <span>{{ item.progress }}%</span>
+      <span>{{ item.remaining | secondsToHMS }}</span>
       <span>{{ item.status }}</span>
       <span>
         <button (click)="item.status = 'paused'">pause</button>
