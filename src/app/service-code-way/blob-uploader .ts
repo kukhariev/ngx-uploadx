@@ -33,9 +33,9 @@ export class BlobUploader extends Uploader {
   }
 
   async finish() {
-    const blocks = this.blockList.map(blockId => '<Latest>' + blockId + '</Latest>').join();
+    const blocks = this.blockList.map(blockId => `<Latest>${blockId}</Latest>`).join('');
     const body = `<?xml version="1.0" encoding="utf-8"?><BlockList>${blocks}</BlockList>`;
-    const url = this.url + `&comp=blocklist`;
+    const url = `${this.url}&comp=blocklist`;
     const headers = { ...commonHeaders(), 'Content-Type': 'text/xml; charset=UTF-8' };
     await this.request({ method: 'PUT', headers, url, body });
     return this.size;
