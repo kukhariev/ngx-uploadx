@@ -26,7 +26,6 @@ runs:
           ~/.npm
           ./node_modules
         key: ${{ inputs.cache-name }}-${{ runner.OS }}-node-${{ steps.setup-node.outputs.node-version }}-${{ hashFiles('./package.json') }}
-        restore-keys: ${{ inputs.cache-name }}-${{ runner.OS }}-node-${{ steps.setup-node.outputs.node-version }}-
     - name: Install dependencies
       shell: bash
       run: npm install
