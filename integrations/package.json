@@ -5,12 +5,12 @@
   "description": "Some script examples",
   "scripts": {
     "build:latest": "npm run build:ng latest -prefix ../",
-    "build:ng16": "npm run build:ng 16 -prefix ../",
+    "build:ng18": "npm run build:ng 18 -prefix ../",
     "build:next": "npm run build:ng next -prefix ../",
     "test:latest": "npm run test -prefix latest",
     "clean": "npx rimraf ./*/",
     "serve:latest": "npx angular-http-server --path latest/dist/latest/browser",
     "serve:next": "npx angular-http-server --path next/dist/next/browser",
-    "serve:ng16": "npx angular-http-server --path ng16/dist/ng16"
+    "serve:ng18": "npx angular-http-server --path ng18/dist/ng18"
   }
 }
