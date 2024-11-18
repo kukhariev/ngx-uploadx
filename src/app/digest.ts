@@ -3,7 +3,12 @@ import { Canceler, RequestConfig, Uploader } from 'ngx-uploadx';
 export function readBlob(body: Blob, canceler?: Canceler): Promise<ArrayBuffer> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    canceler && (canceler.onCancel = () => reject('aborted' && reader.abort()));
+    if (canceler) {
+      canceler.onCancel = () => {
+        reader.abort();
+        reject('aborted');
+      };
+    }
     reader.onload = () => resolve(reader.result as ArrayBuffer);
     reader.onerror = reject;
     reader.readAsArrayBuffer(body);
