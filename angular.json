@@ -50,18 +50,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "app-uploadx:build"
+            "buildTarget": "app-uploadx:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "app-uploadx:build:production"
+              "buildTarget": "app-uploadx:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "app-uploadx:build"
+            "buildTarget": "app-uploadx:build"
           }
         },
         "test": {
