@@ -12,8 +12,13 @@ export class Store<T = string> {
   get(key: string): T | null {
     const item = localStorage.getItem(this.prefix + key);
     if (item) {
-      const [value, expires] = JSON.parse(item);
-      return value && expires ? value : null;
+      try {
+        const [value, expires] = JSON.parse(item) as [T, number];
+        if (Date.now() < expires) {
+          return value;
+        }
+      } catch {}
+      this.delete(key);
     }
     return null;
   }
@@ -28,11 +33,13 @@ export class Store<T = string> {
     this.keys().forEach(key => {
       const item = localStorage.getItem(key);
       if (item && maxAgeHours) {
-        const [, expires] = JSON.parse(item);
-        now > Number(expires) && localStorage.removeItem(key);
-      } else {
-        localStorage.removeItem(key);
+        try {
+          const [, expires] = JSON.parse(item) as [T, number];
+          now > expires && localStorage.removeItem(key);
+          return;
+        } catch {}
       }
+      localStorage.removeItem(key);
     });
   }
 
