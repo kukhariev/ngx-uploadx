@@ -7,7 +7,7 @@ $nav-header-background-color: rgb(36, 36, 36);
 $sidebar-primary-color: rgb(200, 200, 200);
 $sidebar-background-color: rgb(36, 36, 36);
 
-$border: 1px solid color.adjust($primary-color, $alpha: -0.7);
+$border: 1px solid color.adjust($primary-color, $alpha: -0.9);
 $border-drop: 1px dashed $primary-color;
 $header-height: 2.5rem;
 
@@ -73,7 +73,7 @@ header {
 
   span > a {
     display: block;
-    color: color.adjust($nav-header-primary-color, $alpha: -0.7);
+    color: color.adjust($nav-header-primary-color, $alpha: -0.3);
     font-size: 2rem;
     text-decoration: none;
   }
@@ -137,11 +137,11 @@ header {
   }
 
   a:hover {
-    background-color: color.adjust($sidebar-background-color, $lightness: 5%);
+    background-color: color.adjust($sidebar-background-color, $lightness: 2%);
   }
 
   span {
-    color: color.adjust($sidebar-primary-color, $alpha: -0.7);
+    color: color.adjust($sidebar-primary-color, $alpha: -0.3);
     display: block;
     cursor: default;
     padding: 2rem 3rem;
@@ -149,6 +149,13 @@ header {
 
   .active {
     font-style: italic;
+    position: relative;
+    &::before {
+      color: darkred;
+      content: '●';
+      position: absolute;
+      transform: translateX(-1rem);
+    }
   }
 }
 
@@ -167,12 +174,12 @@ header {
 }
 
 .uploadx-drop-active {
-  background-color: color.adjust($background-color, $lightness: 10%);
+  background-color: color.adjust($background-color, $lightness: 2%);
   border: $border-drop !important;
 }
 
 button {
-  background-color: color.adjust($background-color, $lightness: 8%);
+  background-color: color.adjust($background-color, $lightness: 2%);
   border: $border;
   border-radius: 5px;
   color: $primary-color;
@@ -189,7 +196,7 @@ button {
   width: 6rem;
 
   &:hover {
-    background-color: color.adjust($background-color, $lightness: 15%);
+    background-color: color.adjust($background-color, $lightness: 4%);
   }
 }
 
@@ -222,7 +229,7 @@ input[type='file'] {
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
-  background-color: color.adjust($background-color, $lightness: 8%);
+  background-color: color.adjust($background-color, $lightness: 2%);
   border-radius: 0 0 5px 5px;
 
   span {
