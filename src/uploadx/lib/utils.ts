@@ -80,29 +80,3 @@ export function isBrowser(): boolean {
 export function onLine(): boolean {
   return isBrowser() ? navigator.onLine : true;
 }
-
-export function isIOS(): boolean {
-  return isBrowser() && /iPad|iPhone/.test(navigator.userAgent);
-}
-
-export function osVersion() {
-  const m = /OS (\d+)_(\d+)_?(\d+)?/.exec(navigator.userAgent);
-  if (m?.length) return m[1] + '.' + m[2] + '.' + m[3] || '0';
-  return;
-}
-
-export function compareVersions(a: string, b: string): number {
-  return a.localeCompare(b, undefined, { numeric: true });
-}
-
-export function isBadIOS() {
-  return isIOS() && compareVersions(osVersion() || '0.0', '15.3') < 0;
-}
-
-/**
- * [Big files upload error with iOS](https://github.com/kukhariev/ngx-uploadx/issues/316)
- * TODO: move to app
- */
-export const iosOverride = isBadIOS()
-  ? { chunkSize: 0, retryConfig: { shouldRetry: () => false } }
-  : {};
