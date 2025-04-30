@@ -44,9 +44,9 @@ const config: PlaywrightTestConfig = {
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'Google Chrome',
+      name: 'Chromium',
       use: {
-        channel: 'chrome'
+        channel: 'chromium'
       }
     }
   ],
