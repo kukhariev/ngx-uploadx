@@ -1,4 +1,4 @@
-name: sh-test
+name: ci-tests
 on:
     push:
     workflow_dispatch:
@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install
-        uses: './.github/actions/cached-npm-install'
+        run: npm install
       - name: Run linter
         run: npm run lint
   specs:
@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install
-        uses: './.github/actions/cached-npm-install'
+        run: npm install
       - name: Run unit tests
         run: npm test
         env:
@@ -29,7 +29,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install
-        uses: './.github/actions/cached-npm-install'
+        run: npm install
       - name: Run e2e tests
         continue-on-error: false
         run: |
@@ -42,6 +42,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install
-        uses: './.github/actions/cached-npm-install'
+        run: npm install
       - name: Build package
         run: npm run build:pkg
