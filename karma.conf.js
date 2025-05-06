@@ -2,6 +2,20 @@
 // https://karma-runner.github.io/1.0/config/configuration-file.html
 
 module.exports = function (config) {
+  const browsers = [];
+  if (process.env.CHROME_BIN) {
+    browsers.push('ChromeHeadless');
+  } else if (process.env.CHROMIUM_BIN) {
+    browsers.push('ChromiumHeadless');
+  }
+  if (browsers.length === 0) {
+    if (process.platform === 'win32') {
+      browsers.push('EdgeHeadless');
+    } else {
+      browsers.push('ChromiumHeadless');
+    }
+  }
+
   config.set({
     basePath: '',
     frameworks: ['jasmine', '@angular-devkit/build-angular'],
@@ -19,7 +33,8 @@ module.exports = function (config) {
         // for example, you can disable the random execution with `random: false`
         // or set a specific seed with `seed: 4321`
       },
-      clearContext: false // leave Jasmine Spec Runner output visible in browser
+      clearContext: false, // leave Jasmine Spec Runner output visible in browser
+      sourceMapSupport: true
     },
     jasmineHtmlReporter: {
       suppressAll: true // removes the duplicated traces
@@ -35,7 +50,7 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
     browserConsoleLogOptions: { level: 'info' },
     autoWatch: true,
-    browsers: ['ChromeHeadless'],
+    browsers: browsers,
     singleRun: true,
     restartOnFileChange: true
   });
