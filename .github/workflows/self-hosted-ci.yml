@@ -1,0 +1,47 @@
+name: ci-tests
+on:
+    push:
+    workflow_dispatch:
+jobs:
+  lint:
+    name: Lint
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install
+        run: npm install
+      - name: Run linter
+        run: npm run lint
+  specs:
+    name: Unit tests
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install
+        run: npm install
+      - name: Run unit tests
+        run: npm test
+        env:
+          CI: true
+  e2e:
+    name: End-to-end tests
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install
+        run: npm install
+      - name: Run e2e tests
+        continue-on-error: false
+        run: |
+          npx playwright test -c e2e/e2e.config.ts
+        env:
+          CI: true
+  build:
+    name: Build
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install
+        run: npm install
+      - name: Build package
+        run: npm run build:pkg
