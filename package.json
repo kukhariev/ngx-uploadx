@@ -68,7 +68,7 @@
     "@types/node": "^18.19.33",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
-    "@uploadx/core": "^6.1.4",
+    "@uploadx/core": "^6.1.7",
     "angular-http-server": "^1.11.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
