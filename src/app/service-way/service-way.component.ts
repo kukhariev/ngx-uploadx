@@ -1,10 +1,19 @@
 import { Component, inject, Injectable, OnDestroy, OnInit } from '@angular/core';
-import { IdService, Tus, UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
+import {
+  IdService,
+  Tus,
+  UploadState,
+  UploadxDirective,
+  UploadxDropDirective,
+  UploadxOptions,
+  UploadxService
+} from 'ngx-uploadx';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AuthService } from '../auth.service';
 import { serverUrl } from '../config';
 import { hasher, injectTusChecksumHeader } from '../digest';
+import { CommonModule } from '@angular/common';
 
 @Injectable()
 export class CustomId implements IdService {
@@ -20,6 +29,8 @@ export class CustomId implements IdService {
 @Component({
   selector: 'app-service-way',
   templateUrl: './service-way.component.html',
+  standalone: true,
+  imports: [CommonModule, UploadxDirective, UploadxDropDirective],
   providers: [UploadxService, { provide: IdService, useClass: CustomId }]
 })
 export class ServiceWayComponent implements OnDestroy, OnInit {

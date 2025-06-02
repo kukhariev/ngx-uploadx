@@ -7,9 +7,7 @@ describe('DownloadComponent', () => {
   let fixture: ComponentFixture<DownloadComponent>;
 
   beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [DownloadComponent]
-    }).compileComponents();
+    TestBed.configureTestingModule({}).compileComponents();
   }));
 
   beforeEach(() => {

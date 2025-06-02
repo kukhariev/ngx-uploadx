@@ -1,11 +1,21 @@
 import { Component } from '@angular/core';
-import { Tus, UploadState, UploadxControlEvent, UploadxOptions } from 'ngx-uploadx';
+import {
+  Tus,
+  UploadState,
+  UploadxControlEvent,
+  UploadxDirective,
+  UploadxDropDirective,
+  UploadxOptions
+} from 'ngx-uploadx';
 import { AuthService } from '../auth.service';
 import { serverUrl } from '../config';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-tus',
-  templateUrl: './tus.component.html'
+  templateUrl: './tus.component.html',
+  imports: [CommonModule, UploadxDirective, UploadxDropDirective],
+  standalone: true
 })
 export class TusComponent {
   control!: UploadxControlEvent;

@@ -7,7 +7,8 @@ const MIB = 1024 * 1024;
   // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'downloader',
   template: '<a (click)="generateAndDownload()">{{ size }}MB</a>',
-  styleUrls: ['./download.component.scss']
+  styleUrls: ['./download.component.scss'],
+  standalone: true
 })
 export class DownloadComponent {
   @Input() size!: number;

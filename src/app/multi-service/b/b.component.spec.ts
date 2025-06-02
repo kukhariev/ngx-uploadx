@@ -7,9 +7,7 @@ describe('BComponent', () => {
   let fixture: ComponentFixture<BComponent>;
 
   beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [BComponent]
-    }).compileComponents();
+    TestBed.configureTestingModule({}).compileComponents();
   }));
 
   beforeEach(() => {

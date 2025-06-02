@@ -5,7 +5,8 @@ import { serverUrl as serverUrl } from '../config';
 
 @Component({
   selector: 'app-directive-way',
-  templateUrl: './directive-way.component.html'
+  templateUrl: './directive-way.component.html',
+  standalone: false
 })
 export class DirectiveWayComponent {
   control!: UploadxControlEvent;

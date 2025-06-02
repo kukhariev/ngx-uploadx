@@ -1,12 +1,21 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Uploader, UploadxOptions, UploadxService } from 'ngx-uploadx';
+import {
+  Uploader,
+  UploadxDirective,
+  UploadxDropDirective,
+  UploadxOptions,
+  UploadxService
+} from 'ngx-uploadx';
 import { Observable } from 'rxjs';
 import { serverUrl } from '../../config';
+import { AsyncPipe, NgForOf } from '@angular/common';
 
 @Component({
   selector: 'app-a',
   templateUrl: './a.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [UploadxDirective, UploadxDropDirective, NgForOf, AsyncPipe],
+  standalone: true,
   providers: [UploadxService]
 })
 export class AComponent {

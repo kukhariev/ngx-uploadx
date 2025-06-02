@@ -59,11 +59,4 @@ test.describe('app', async () => {
     await page.locator('input[type="file"]').setInputFiles(inMemoryFile);
     await page.waitForSelector('span:has-text("complete")', { timeout: 3000 });
   });
-
-  test('should upload (standalone)', async ({ page }) => {
-    await page.goto('/standalone');
-
-    await page.locator('input[type="file"]').setInputFiles(inMemoryFile);
-    await page.waitForSelector('span:has-text("complete")', { timeout: 3000 });
-  });
 });

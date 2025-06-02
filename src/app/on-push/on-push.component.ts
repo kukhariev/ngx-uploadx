@@ -1,14 +1,24 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
-import { Uploader, UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
+import {
+  Uploader,
+  UploadState,
+  UploadxDirective,
+  UploadxDropDirective,
+  UploadxOptions,
+  UploadxService
+} from 'ngx-uploadx';
 import { Observable } from 'rxjs';
 import { AuthService } from '../auth.service';
 import { serverUrl } from '../config';
 import { injectDigestHeader } from '../digest';
+import { AsyncPipe, JsonPipe, NgForOf } from '@angular/common';
 
 @Component({
   selector: 'app-on-push',
   templateUrl: './on-push.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [NgForOf, JsonPipe, AsyncPipe, UploadxDropDirective, UploadxDirective],
+  standalone: true
 })
 export class OnPushComponent implements OnDestroy {
   state$: Observable<UploadState>;
