@@ -11,6 +11,6 @@
     "clean": "npx rimraf ./*/",
     "serve:latest": "npx angular-http-server --path latest/dist/latest/browser",
     "serve:next": "npx angular-http-server --path next/dist/next/browser",
-    "serve:ng18": "npx angular-http-server --path ng18/dist/ng18"
+    "serve:ng18": "npx angular-http-server --path ng18/dist/ng18/browser"
   }
 }
