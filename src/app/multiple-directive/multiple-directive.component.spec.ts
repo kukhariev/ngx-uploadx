@@ -8,7 +8,6 @@ describe('MultipleDirectiveComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [MultipleDirectiveComponent],
       imports: [UploadxDirective]
     }).compileComponents();
   }));

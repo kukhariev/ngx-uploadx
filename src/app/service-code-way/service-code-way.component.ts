@@ -1,13 +1,16 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
+import { UploadState, UploadxDropDirective, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { serverUrl } from '../config';
 import { UploaderXS3 } from './uploaderx-s3.class';
+import { AsyncPipe, JsonPipe, NgForOf } from '@angular/common';
 
 @Component({
   selector: 'app-service-way',
-  templateUrl: './service-code-way.component.html'
+  templateUrl: './service-code-way.component.html',
+  imports: [AsyncPipe, JsonPipe, NgForOf, UploadxDropDirective],
+  standalone: true
 })
 export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   state$!: Observable<UploadState>;

@@ -1,12 +1,22 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Tus, Uploader, UploadState, UploadxOptions, UploadxService } from 'ngx-uploadx';
+import {
+  Tus,
+  Uploader,
+  UploadState,
+  UploadxDirective,
+  UploadxOptions,
+  UploadxService
+} from 'ngx-uploadx';
 import { Observable } from 'rxjs';
 import { serverUrl } from '../config';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-multiple-directive',
   templateUrl: './multiple-directive.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, UploadxDirective],
+  standalone: true
 })
 export class MultipleDirectiveComponent {
   state$: Observable<UploadState>;

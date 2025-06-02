@@ -8,7 +8,6 @@ describe('OnPushComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [OnPushComponent],
       imports: [UploadxModule]
     }).compileComponents();
   }));

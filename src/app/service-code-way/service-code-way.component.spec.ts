@@ -9,7 +9,6 @@ describe('ServiceCodeWayComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ServiceCodeWayComponent],
       providers: [{ provide: UploadxService }]
     }).compileComponents();
   }));

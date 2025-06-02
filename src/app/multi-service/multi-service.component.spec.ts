@@ -8,7 +8,6 @@ describe('MultiServiceComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [MultiServiceComponent],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));

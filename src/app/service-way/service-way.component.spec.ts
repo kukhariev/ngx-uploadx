@@ -11,7 +11,6 @@ describe('ServiceWayComponent', () => {
       request: () => Promise.resolve({ data: '', headers: {}, status: 200 })
     };
     TestBed.configureTestingModule({
-      declarations: [ServiceWayComponent],
       imports: [UploadxModule],
       providers: [{ provide: UPLOADX_AJAX, useValue: mockAjax }]
     })
