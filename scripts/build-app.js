@@ -51,6 +51,7 @@ async function build(cliTag = 'latest') {
   await copy('e2e', `${projectPath}/e2e`, { overwrite: true });
   await copy('src/environments', `${projectPath}/src/environments`, { overwrite: true });
   await copy('src/assets', `${projectPath}/src/assets`, { overwrite: true });
+  await copy('src/main.ts', `${projectPath}/src/main.ts`, { overwrite: true });
 
   console.info('- Installing dependencies...');
   execSync('npm install', { cwd: projectPath, stdio: [0, 1, 2] });

@@ -2,7 +2,8 @@ import { Component, DoCheck, HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html'
+  templateUrl: './app.html',
+  standalone: false
 })
 export class AppComponent implements DoCheck {
   menuIsHidden = true;
