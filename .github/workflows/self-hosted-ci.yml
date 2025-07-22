@@ -1,47 +1,35 @@
 name: ci-tests
 on:
-    push:
-    workflow_dispatch:
+  push:
+  workflow_dispatch:
+
 jobs:
-  lint:
-    name: Lint
+  ci:
+    name: CI Pipeline
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+
       - name: Install
         run: npm install
-      - name: Run linter
+
+      - name: Lint
         run: npm run lint
-  specs:
-    name: Unit tests
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install
-        run: npm install
+
       - name: Run unit tests
         run: npm test
         env:
           CI: true
-  e2e:
-    name: End-to-end tests
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install
-        run: npm install
-      - name: Run e2e tests
-        continue-on-error: false
+
+      - name: End-to-end tests
         run: |
+          npx playwright install chromium 
           npx playwright test -c e2e/e2e.config.ts
         env:
           CI: true
-  build:
-    name: Build
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install
-        run: npm install
+
       - name: Build package
         run: npm run build:pkg
