@@ -4,13 +4,12 @@ import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { serverUrl } from '../config';
 import { UploaderXS3 } from './uploaderx-s3.class';
-import { AsyncPipe, JsonPipe, NgForOf } from '@angular/common';
+import { AsyncPipe, JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-service-way',
   templateUrl: './service-code-way.component.html',
-  imports: [AsyncPipe, JsonPipe, NgForOf, UploadxDropDirective],
-  standalone: true
+  imports: [AsyncPipe, JsonPipe, UploadxDropDirective]
 })
 export class ServiceCodeWayComponent implements OnDestroy, OnInit {
   state$!: Observable<UploadState>;

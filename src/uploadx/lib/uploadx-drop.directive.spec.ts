@@ -11,7 +11,8 @@ import { UploadxService } from './uploadx.service';
     <label uploadxDrop>
       <input type="file" [uploadx]="options" />
     </label>
-  `
+  `,
+  standalone: false
 })
 class UploadxTestComponent {
   options: UploadxOptions = { endpoint: `/upload/?parts=test`, multiple: false };

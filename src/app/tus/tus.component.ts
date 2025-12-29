@@ -14,8 +14,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-tus',
   templateUrl: './tus.component.html',
-  imports: [CommonModule, UploadxDirective, UploadxDropDirective],
-  standalone: true
+  imports: [CommonModule, UploadxDirective, UploadxDropDirective]
 })
 export class TusComponent {
   control!: UploadxControlEvent;

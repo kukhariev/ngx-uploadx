@@ -47,20 +47,20 @@
     "prettier": "prettier --write \"**/*.{js,json,scss,md,ts,html}\""
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^17.3.11",
-    "@angular-eslint/builder": "^17.5.3",
-    "@angular-eslint/eslint-plugin": "^17.5.3",
-    "@angular-eslint/eslint-plugin-template": "^17.5.3",
-    "@angular-eslint/schematics": "^17.5.3",
-    "@angular-eslint/template-parser": "^17.5.3",
-    "@angular/cli": "^17.3.11",
-    "@angular/common": "^17.3.0",
-    "@angular/compiler": "^17.3.0",
-    "@angular/compiler-cli": "^17.3.0",
-    "@angular/core": "^17.3.0",
-    "@angular/platform-browser": "^17.3.0",
-    "@angular/platform-browser-dynamic": "^17.3.0",
-    "@angular/router": "^17.3.0",
+    "@angular-eslint/builder": "^21.1.0",
+    "@angular-eslint/eslint-plugin": "^21.1.0",
+    "@angular-eslint/eslint-plugin-template": "^21.1.0",
+    "@angular-eslint/schematics": "^21.1.0",
+    "@angular-eslint/template-parser": "^21.1.0",
+    "@angular/build": "^21.0.4",
+    "@angular/cli": "^21.0.4",
+    "@angular/common": "^21.0.6",
+    "@angular/compiler": "^21.0.6",
+    "@angular/compiler-cli": "^21.0.6",
+    "@angular/core": "^21.0.6",
+    "@angular/platform-browser": "^21.0.6",
+    "@angular/platform-browser-dynamic": "^21.0.6",
+    "@angular/router": "^21.0.6",
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2",
     "@playwright/test": "^1.36.1",
@@ -81,7 +81,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "lint-staged": "^15.2.4",
-    "ng-packagr": "^17.3.0",
+    "ng-packagr": "^21.0.1",
     "npm-run-all": "^4.1.5",
     "prettier": "3.2.5",
     "recursive-copy": "^2.0.14",
@@ -90,12 +90,11 @@
     "semver": "^7.5.4",
     "ts-node": "^10.9.1",
     "tslib": "^2.3.0",
-    "typescript": "~5.4.2",
-    "zone.js": "~0.14.3"
+    "typescript": "~5.9.3",
+    "zone.js": "~0.15.1"
   },
   "peerDependencies": {
-    "@angular/core": ">=17.0.0 <21.0.0",
-    "rxjs": "^6.5.3 || ^7.4.0"
+    "rxjs": "^7.8.0"
   },
   "lint-staged": {
     "*.{js,json,scss,md,ts,html}": [

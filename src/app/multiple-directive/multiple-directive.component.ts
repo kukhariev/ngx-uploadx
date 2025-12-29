@@ -15,8 +15,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-multiple-directive',
   templateUrl: './multiple-directive.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, UploadxDirective],
-  standalone: true
+  imports: [CommonModule, UploadxDirective]
 })
 export class MultipleDirectiveComponent {
   state$: Observable<UploadState>;
