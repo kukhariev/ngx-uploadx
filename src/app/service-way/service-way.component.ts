@@ -29,7 +29,6 @@ export class CustomId implements IdService {
 @Component({
   selector: 'app-service-way',
   templateUrl: './service-way.component.html',
-  standalone: true,
   imports: [CommonModule, UploadxDirective, UploadxDropDirective],
   providers: [UploadxService, { provide: IdService, useClass: CustomId }]
 })

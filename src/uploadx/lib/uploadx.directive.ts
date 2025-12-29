@@ -44,7 +44,13 @@ export class UploadxDirective implements OnInit {
       .subscribe(this.state);
   }
 
-  @HostListener('change', ['$event.target.files'])
+  @HostListener('change', ['$event'])
+  fileChange(event: Event): void {
+    if (event.target) {
+      this.fileListener((event.target as HTMLInputElement).files || []);
+    }
+  }
+
   fileListener(files?: FileList | File[]): void {
     if (files?.length) {
       this.uploadService.handleFiles(files, this.options);

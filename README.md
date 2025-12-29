@@ -21,31 +21,19 @@
   npm install ngx-uploadx
 ```
 
-- Import UploadxModule:
-
-```ts
-//...
-import { UploadxModule } from 'ngx-uploadx';
-
-@NgModule({
-  imports: [
-    UploadxModule,
-   // ...
-});
-```
-
 - Add `uploadx` directive to the component template and provide the required options:
 
 ```ts
-// Component code
+// Standalone component code
 //...
-import { UploadxOptions, UploadState } from 'ngx-uploadx';
+import { UploadxDirective, UploadxOptions, UploadState } from 'ngx-uploadx';
 
 @Component({
-  selector: 'app-home',
-  template: ` <input type="file" [uploadx]="options" (state)="onUpload($event)" /> `
+  selector: 'upload-component',
+  template: ` <input type="file" [uploadx]="options" (state)="onUpload($event)" /> `,
+  imports: [UploadxDirective]
 })
-export class AppHomeComponent {
+export class UploadComponent {
   options: UploadxOptions = { endpoint: `[URL]` };
   onUpload(state: UploadState) {
     console.log(state);
@@ -73,7 +61,7 @@ export class AppHomeComponent {
 - `storeIncompleteHours` Limit upload lifetime. Default value: `24`
 
 - `chunkSize` Fixed chunk size. If not specified, the optimal size will be automatically adjusted based on the network speed.
-  If set to `0`, normal unloading will be used instead of chunked
+  If set to `0`, normal uploading will be used instead of chunked
 
 - `maxChunkSize` Dynamic chunk size limit
 
@@ -108,9 +96,44 @@ export class AppHomeComponent {
 
 - `uploaderClass` Upload API implementation. Built-in: `UploaderX`(default), `Tus`. More [examples](uploader-examples)
 
+### provideUploadx
+
+Provides configuration options for standalone app [(example)](src/app/app.config.ts).
+
+```ts
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideUploadx({
+      endpoint: 'http://example.com/upload',
+      allowedTypes: 'video/*,audio/*',
+      maxChunkSize: 96 * 1024 * 1024
+    })
+  ]
+});
+```
+
 ### UploadxModule
 
-Adds directives and provide static method `withConfig` for global configuration [(example)](src/app/app.module.ts).
+Adds directives and provide static method `withConfig` for global configuration
+
+```ts
+@NgModule({
+  declarations: [AppComponent, UploadComponent],
+  imports: [
+    AppRoutingModule,
+    BrowserModule,
+    UploadxModule.withConfig({
+      allowedTypes: 'image/*,video/*',
+      endpoint: `${serverUrl}/files?uploadType=uploadx`,
+      headers: { 'ngsw-bypass': 'true' },
+      retryConfig: { maxAttempts: 5 }
+    })
+  ],
+  providers: [],
+  bootstrap: [AppComponent],
+  exports: []
+})
+```
 
 > :bulb: _No need to import `UploadxModule` if you do not use the `uploadx` or `uploadxDrop` directives in your application._
 

@@ -11,14 +11,13 @@ import { Observable } from 'rxjs';
 import { AuthService } from '../auth.service';
 import { serverUrl } from '../config';
 import { injectDigestHeader } from '../digest';
-import { AsyncPipe, JsonPipe, NgForOf } from '@angular/common';
+import { AsyncPipe, JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-on-push',
   templateUrl: './on-push.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgForOf, JsonPipe, AsyncPipe, UploadxDropDirective, UploadxDirective],
-  standalone: true
+  imports: [JsonPipe, AsyncPipe, UploadxDropDirective, UploadxDirective]
 })
 export class OnPushComponent implements OnDestroy {
   state$: Observable<UploadState>;

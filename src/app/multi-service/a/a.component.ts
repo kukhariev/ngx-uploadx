@@ -8,14 +8,13 @@ import {
 } from 'ngx-uploadx';
 import { Observable } from 'rxjs';
 import { serverUrl } from '../../config';
-import { AsyncPipe, NgForOf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-a',
   templateUrl: './a.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [UploadxDirective, UploadxDropDirective, NgForOf, AsyncPipe],
-  standalone: true,
+  imports: [UploadxDirective, UploadxDropDirective, AsyncPipe],
   providers: [UploadxService]
 })
 export class AComponent {
