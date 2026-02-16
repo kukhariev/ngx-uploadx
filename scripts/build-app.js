@@ -25,7 +25,7 @@ const cleanup = directory => new Promise(resolve => require('rimraf')(directory,
 async function build(cliTag = 'latest') {
   const projectName = (Number.isInteger(+cliTag[0]) ? `ng${cliTag}` : cliTag).replace(/\./, '');
   const projectPath = join(integrationsPath, projectName);
-  const ngNewCmd = `npx ng new ${projectName} --strict --style=scss --skip-install --skip-git --routing --standalone=false`;
+  const ngNewCmd = `npx ng new ${projectName} --strict --style=scss --skip-install --skip-git --routing`;
   const buildCmd = 'npx ng build --configuration production';
 
   console.info(`- Angular CLI tag: ${cliTag}`);
@@ -59,7 +59,7 @@ async function build(cliTag = 'latest') {
 
   console.info('- Migrate project...');
   process.chdir(projectPath);
-  const ngUpdateCmd = `npx ng update @angular/core --allow-dirty --migrate-only=true --from=17 --to=${angularVersion}`;
+  const ngUpdateCmd = `npx ng update @angular/core --allow-dirty --migrate-only=true --from=21 --to=${angularVersion}`;
   execSync(ngUpdateCmd, { cwd: projectPath, stdio: [0, 1, 2] });
 
   console.info(`- Running "${buildCmd}" for "${projectPath}"`);

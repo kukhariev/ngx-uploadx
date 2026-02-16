@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UploadxModule } from 'ngx-uploadx';
 import { TusComponent } from './tus.component';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('TusComponent', () => {
   let comp: TusComponent;

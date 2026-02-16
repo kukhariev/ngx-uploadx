@@ -1,4 +1,12 @@
-import { ElementRef, EventEmitter, HostListener, Input, Output, Renderer2 } from '@angular/core';
+import {
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  inject,
+  Input,
+  Output,
+  Renderer2
+} from '@angular/core';
 import { Directive, OnInit } from '@angular/core';
 import { takeWhile } from 'rxjs/operators';
 import { UploadState, UploadxControlEvent } from './interfaces';
@@ -6,6 +14,7 @@ import { UploadxOptions } from './options';
 import { UploadxService } from './uploadx.service';
 
 @Directive({
+  // eslint-disable-next-line @angular-eslint/directive-selector
   selector: '[uploadx]',
   standalone: true
 })
@@ -27,11 +36,9 @@ export class UploadxDirective implements OnInit {
 
   @Output() state = new EventEmitter<UploadState>();
 
-  constructor(
-    private elementRef: ElementRef,
-    private renderer: Renderer2,
-    private uploadService: UploadxService
-  ) {}
+  private readonly elementRef = inject(ElementRef);
+  private readonly renderer = inject(Renderer2);
+  private readonly uploadService = inject(UploadxService);
 
   ngOnInit(): void {
     const { multiple, allowedTypes } = { ...this.uploadService.options, ...this.options };

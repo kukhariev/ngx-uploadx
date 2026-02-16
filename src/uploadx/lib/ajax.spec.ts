@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { describe, beforeEach, it, expect } from 'vitest';
 import { UploadxAjax } from './ajax';
 
 const data = { key0: '0', key1: '1' };
@@ -59,6 +60,6 @@ describe('Ajax', () => {
 
   it('request', async () => {
     const res = await ajax.request({ url: '/upload', responseType: 'json' });
-    expect(res).toEqual(jasmine.objectContaining({ status: 200, headers: data, data }));
+    expect(res).toEqual(expect.objectContaining({ status: 200, headers: data, data }));
   });
 });

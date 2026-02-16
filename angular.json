@@ -63,16 +63,10 @@
           }
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "src/test.ts",
-            "karmaConfig": "./karma.conf.js",
-            "polyfills": "src/polyfills.ts",
-            "tsConfig": "tsconfig.spec.json",
-            "scripts": [],
-            "styles": ["src/styles.scss"],
-            "assets": ["src/assets", "src/favicon.ico"],
-            "codeCoverageExclude": ["src/app/**", "src/environments/**"]
+            "buildTarget": "app-uploadx:build",
+            "include": ["src/uploadx/**/*.spec.ts"]
           }
         },
         "lint": {

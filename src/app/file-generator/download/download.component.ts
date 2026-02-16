@@ -1,4 +1,4 @@
-import { Component, Inject, Input, DOCUMENT } from '@angular/core';
+import { Component, Input, DOCUMENT, inject } from '@angular/core';
 
 const MIB = 1024 * 1024;
 
@@ -11,8 +11,8 @@ const MIB = 1024 * 1024;
 })
 export class DownloadComponent {
   @Input() size!: number;
-
-  constructor(@Inject(DOCUMENT) private document: Document) {}
+  private document: Document = inject(DOCUMENT);
+  constructor() {}
 
   get filename(): string {
     return `${this.size}_MB.MP4`;

@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { By } from '@angular/platform-browser';
 import { UPLOADX_AJAX, UploadxDirective, UploadxModule } from 'ngx-uploadx';
 import { DirectiveWayComponent } from './directive-way.component';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 function buildFileList() {
   const dt = new DataTransfer();
@@ -33,13 +34,13 @@ describe('DirectiveWayComponent', () => {
   it('should set request options', fakeAsync(() => {
     const ajax = fixture.debugElement.injector.get(UPLOADX_AJAX);
     const response = { data: { error: 'error' }, headers: {}, status: 400 };
-    const ajaxSpy = spyOn(ajax, 'request').and.resolveTo(response);
+    const ajaxSpy = vi.spyOn(ajax, 'request').mockResolvedValue(response);
     directiveElement.triggerEventHandler('change', { target: { files: buildFileList() } });
     tick();
-    const { headers = {}, url, data } = ajaxSpy.calls.mostRecent().args[0];
+    const { headers = {}, url, data } = vi.mocked(ajaxSpy).mock.lastCall[0];
     expect(url).toBe(comp.options.endpoint as string);
     expect(headers['Authorization']).toContain('Bearer ');
     expect(headers['X-Upload-Content-Length']).toBe(0);
-    expect(JSON.parse(data as string)).toEqual(jasmine.objectContaining({ size: 0 }));
+    expect(JSON.parse(data as string)).toEqual(expect.objectContaining({ size: 0 }));
   }));
 });

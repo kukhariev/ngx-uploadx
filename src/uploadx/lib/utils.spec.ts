@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { b64, compareVersions, isNumber, resolveUrl, unfunc } from './utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

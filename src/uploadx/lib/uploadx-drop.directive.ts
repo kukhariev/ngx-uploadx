@@ -1,4 +1,4 @@
-import { ContentChild, Directive, HostBinding, HostListener } from '@angular/core';
+import { ContentChild, Directive, HostBinding, HostListener, inject } from '@angular/core';
 import { UploadxDirective } from './uploadx.directive';
 import { UploadxService } from './uploadx.service';
 
@@ -13,7 +13,8 @@ export class UploadxDropDirective {
   @ContentChild(UploadxDirective, { static: false })
   fileInput?: UploadxDirective;
 
-  constructor(private uploadService: UploadxService) {}
+  private readonly uploadService = inject(UploadxService);
+  constructor() {}
 
   @HostListener('drop', ['$event'])
   dropHandler(event: DragEvent): void {
@@ -53,7 +54,7 @@ export class UploadxDropDirective {
     if (items?.length) {
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
-        if (item.kind === 'file' && !item.webkitGetAsEntry()?.isDirectory) {
+        if (isFile(item)) {
           const file = item.getAsFile();
           file && dataTransfer.items.add(file);
         }
@@ -66,4 +67,11 @@ export class UploadxDropDirective {
     event.stopPropagation();
     event.preventDefault();
   }
+}
+
+function isFile(item: DataTransferItem) {
+  if (item.kind === 'file' && 'webkitGetAsEntry' in item) {
+    return item.webkitGetAsEntry()?.isDirectory;
+  }
+  return false;
 }

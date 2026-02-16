@@ -5,6 +5,7 @@ import { UploadAction } from './interfaces';
 import { UploadxOptions } from './options';
 import { UploaderX } from './uploaderx';
 import { UploadxService } from './uploadx.service';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 class MockUploader extends UploaderX {
   async upload(): Promise<void> {
@@ -39,6 +40,7 @@ function getFile(): File {
 describe('UploadxService', () => {
   let service: UploadxService;
   let sub: Subscription;
+
   beforeEach(() => {
     TestBed.configureTestingModule({ providers: [UploadxService] });
     service = TestBed.inject(UploadxService);
@@ -73,28 +75,26 @@ describe('UploadxService', () => {
     expect(service.options.chunkSize).toEqual(4096);
   });
 
-  it('should add file to queue with status `added`', done => {
+  it('should add file to queue with status `added`', async () => {
     const file = getFile();
     sub = service.init(options).subscribe(({ status }) => {
       expect(status).toEqual('added');
-      done();
     });
     service.handleFiles(file);
   });
 
-  it('should add file to queue with status `queue`', done => {
+  it('should add file to queue with status `queue`', async () => {
     const file = getFile();
     sub = service
       .init({ ...options, autoUpload: true })
       .pipe(skip(1))
       .subscribe(({ status }) => {
         expect(status).toEqual('queue');
-        done();
       });
     service.handleFiles(file);
   });
 
-  it('should set the correct status on `control` method call', done => {
+  it('should set the correct status on `control` method call', async () => {
     sub = service.connect({ ...options, autoUpload: true }).subscribe(queue => {
       if (queue.length === 4) {
         const upload = service.queue[0];
@@ -112,24 +112,22 @@ describe('UploadxService', () => {
         expect(upload.status).toEqual('cancelled');
         service.control({ action: 'upload' });
         expect(upload.status).toEqual('cancelled');
-        done();
       }
     });
     service.handleFiles(getFileList());
   });
 
-  it('should limit concurrent uploads', done => {
+  it('should limit concurrent uploads', async () => {
     sub = service.connect({ ...options, autoUpload: true }).subscribe(queue => {
       if (queue.length === 4) {
         expect(queue.map(({ status }) => status).filter(s => s === 'uploading').length).toEqual(3);
-        done();
       }
     });
     service.handleFiles(getFileList());
   });
 
   it('should listen to offline/online events', () => {
-    const control = spyOn(service, 'control');
+    const control = vi.spyOn(service, 'control');
     window.dispatchEvent(new Event('offline'));
     window.dispatchEvent(new Event('online'));
     expect(control).toHaveBeenCalledTimes(2);
