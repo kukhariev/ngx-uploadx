@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 
-test.describe('app', async () => {
+test.describe.serial('app', async () => {
   const inMemoryFile = {
     name: 'file.txt',
     mimeType: 'text/plain',

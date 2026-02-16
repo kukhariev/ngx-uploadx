@@ -1,13 +1,14 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ErrorType, RetryHandler } from './retry-handler';
 
 describe('RetryHandler', () => {
   let retry: RetryHandler;
   beforeEach(() => {
     retry = new RetryHandler();
-    jasmine.clock().install();
+    vi.useFakeTimers();
   });
 
-  afterEach(() => jasmine.clock().uninstall());
+  afterEach(() => vi.useRealTimers());
 
   it('kind(status)', () => {
     expect(retry.kind(400)).toBe(ErrorType.Fatal);
@@ -36,31 +37,28 @@ describe('RetryHandler', () => {
     expect(retry.kind(500)).toBe(ErrorType.Fatal);
   });
 
-  it('wait()', done => {
+  it('wait()', async () => {
     const wait = retry.wait();
-    jasmine.clock().tick(1001);
-    wait.then(() => {
+    vi.advanceTimersByTime(1001);
+    await wait.then(() => {
       expect(retry.kind(500)).toBe(ErrorType.Retryable);
-      done();
     });
   });
 
-  it('wait(time)', done => {
-    const wait = retry.wait(30_000);
-    jasmine.clock().tick(30_001);
-    wait.then(() => {
+  it('wait(time)', async () => {
+    const wait = retry.wait(30000);
+    vi.advanceTimersByTime(30001);
+    await wait.then(() => {
       expect(retry.kind(500)).toBe(ErrorType.Retryable);
-      done();
     });
   });
 
-  it('wait cancel()', done => {
-    const wait = retry.wait(30_000);
-    jasmine.clock().tick(1);
+  it('wait cancel()', async () => {
+    const wait = retry.wait(30000);
+    vi.advanceTimersByTime(1);
     retry.cancel();
-    wait.then(() => {
+    await wait.then(() => {
       expect(retry.kind(500)).toBe(ErrorType.Retryable);
-      done();
     });
   });
 });

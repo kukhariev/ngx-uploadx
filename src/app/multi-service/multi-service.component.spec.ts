@@ -1,16 +1,17 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MultiServiceComponent } from './multi-service.component';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('MultiServiceComponent', () => {
   let component: MultiServiceComponent;
   let fixture: ComponentFixture<MultiServiceComponent>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(MultiServiceComponent);
