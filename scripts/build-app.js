@@ -6,6 +6,8 @@ const copy = require('recursive-copy');
 const semver = require('semver');
 const { writeFileSync, copyFileSync, mkdirSync, readFileSync } = require('fs');
 const { join, resolve } = require('path');
+const { rimraf } = require('rimraf');
+const cleanup = directory => rimraf(directory, { glob: true });
 
 const tmpDir = join(require('os').tmpdir(), 'ngx-uploadx-build');
 const baseDir = resolve(`${__dirname}/..`);
@@ -13,8 +15,6 @@ const integrationsPath = resolve(baseDir, 'integrations');
 process.env.NG_DISABLE_VERSION_CHECK = 'true';
 process.env.NG_CLI_ANALYTICS = 'false';
 process.env.NG_FORCE_TTY = 'false';
-
-const cleanup = directory => new Promise(resolve => require('rimraf')(directory, resolve));
 
 /**
  * Create and build a demo application using the specified version/tag of the Angular CLI

@@ -8,7 +8,7 @@
     "build:ng18": "npm run build:ng 18 -prefix ../",
     "build:next": "npm run build:ng next -prefix ../",
     "test:latest": "npm run test -prefix latest",
-    "clean": "npx rimraf ./*/",
+    "clean": "npx rimraf --glob ./*/",
     "serve:latest": "npx angular-http-server --path latest/dist/latest/browser",
     "serve:next": "npx angular-http-server --path next/dist/next/browser",
     "serve:ng18": "npx angular-http-server --path ng18/dist/ng18/browser"
