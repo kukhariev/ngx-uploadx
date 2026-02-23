@@ -1,12 +1,20 @@
+import { JsonPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { UploadState, UploadxControlEvent, UploadxOptions } from 'ngx-uploadx';
+import {
+  UploadState,
+  UploadxControlEvent,
+  UploadxDirective,
+  UploadxDropDirective,
+  UploadxOptions
+} from 'ngx-uploadx';
 import { AuthService } from '../auth.service';
 import { serverUrl as serverUrl } from '../config';
 
 @Component({
   selector: 'app-directive-way',
   templateUrl: './directive-way.component.html',
-  standalone: false
+  standalone: true,
+  imports: [UploadxDirective, UploadxDropDirective, JsonPipe]
 })
 export class DirectiveWayComponent {
   control!: UploadxControlEvent;
@@ -20,7 +28,7 @@ export class DirectiveWayComponent {
     // token: this.authService.getAccessToken,
     // token: this.authService.getTokenAsPromise,
     metadata: (file: File) => ({ originalName: file.name }),
-    maxChunkSize: 1024 * 1024 * 96, //--> Cloudflare Free/Pro maximum body size is 100MB
+    chunkSize: 1024 * 1024 * 96, //--> Cloudflare Free/Pro maximum body size is 100MB
     storeIncompleteHours: 24,
     retryConfig: {
       maxAttempts: 30,
@@ -50,6 +58,10 @@ export class DirectiveWayComponent {
   onStateChanged(state: UploadState): void {
     this.state = state;
     const target = this.uploads.find(item => item.uploadId === state.uploadId);
-    target ? Object.assign(target, state) : this.uploads.push(state);
+    if (target) {
+      Object.assign(target, state);
+    } else {
+      this.uploads.push(state);
+    }
   }
 }

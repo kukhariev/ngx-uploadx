@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   Tus,
   Uploader,
@@ -15,9 +15,12 @@ import { CommonModule } from '@angular/common';
   selector: 'app-multiple-directive',
   templateUrl: './multiple-directive.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
   imports: [CommonModule, UploadxDirective]
 })
 export class MultipleDirectiveComponent {
+  private uploadService = inject(UploadxService);
+
   state$: Observable<UploadState>;
   uploads$: Observable<Uploader[]>;
   imageUploadOptions: UploadxOptions = {
@@ -31,7 +34,7 @@ export class MultipleDirectiveComponent {
     uploaderClass: Tus
   };
 
-  constructor(private uploadService: UploadxService) {
+  constructor() {
     this.uploads$ = this.uploadService.connect();
     this.state$ = this.uploadService.events;
   }

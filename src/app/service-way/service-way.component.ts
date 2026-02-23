@@ -29,10 +29,13 @@ export class CustomId implements IdService {
 @Component({
   selector: 'app-service-way',
   templateUrl: './service-way.component.html',
+  standalone: true,
   imports: [CommonModule, UploadxDirective, UploadxDropDirective],
   providers: [UploadxService, { provide: IdService, useClass: CustomId }]
 })
 export class ServiceWayComponent implements OnDestroy, OnInit {
+  private uploadxService = inject(UploadxService);
+
   state$!: Observable<UploadState>;
   uploads: UploadState[] = [];
   private unsubscribe$ = new Subject<void>();
@@ -43,8 +46,6 @@ export class ServiceWayComponent implements OnDestroy, OnInit {
     token: this.authService.getAccessToken
     // prerequest: injectTusChecksumHeader
   };
-
-  constructor(private uploadxService: UploadxService) {}
 
   ngOnInit(): void {
     this.state$ = this.uploadxService.init(this.options);

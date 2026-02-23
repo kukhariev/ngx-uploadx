@@ -1,4 +1,5 @@
-import { Component, Input, DOCUMENT, inject } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Component, Input, inject } from '@angular/core';
 
 const MIB = 1024 * 1024;
 

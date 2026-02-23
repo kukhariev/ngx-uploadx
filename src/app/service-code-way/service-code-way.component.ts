@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { UploadState, UploadxDropDirective, UploadxOptions, UploadxService } from 'ngx-uploadx';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -9,9 +9,12 @@ import { AsyncPipe, JsonPipe } from '@angular/common';
 @Component({
   selector: 'app-service-way',
   templateUrl: './service-code-way.component.html',
+  standalone: true,
   imports: [AsyncPipe, JsonPipe, UploadxDropDirective]
 })
 export class ServiceCodeWayComponent implements OnDestroy, OnInit {
+  private uploadService = inject(UploadxService);
+
   state$!: Observable<UploadState>;
   uploads: UploadState[] = [];
   options: UploadxOptions = {
@@ -27,7 +30,7 @@ export class ServiceCodeWayComponent implements OnDestroy, OnInit {
 
   private unsubscribe$ = new Subject<void>();
 
-  constructor(private uploadService: UploadxService) {
+  constructor() {
     // restore background uploads
     this.uploads = this.uploadService.state();
   }
