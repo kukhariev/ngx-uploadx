@@ -1,9 +1,12 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, DoCheck, HostListener } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.html',
-  standalone: false
+  standalone: true,
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet]
 })
 export class AppComponent implements DoCheck {
   menuIsHidden = true;

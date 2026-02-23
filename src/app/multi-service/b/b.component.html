@@ -1,6 +1,6 @@
 <div uploadxDrop class="upload-zone">
   <div class="uploads-table2">
-    @for (item of uploads$ | async; track item) {
+    @for (item of uploads$ | async; track item.uploadId) {
       <div class="row">
         <span>{{ item.name }}</span>
         <span>{{ item.progress }}%</span>

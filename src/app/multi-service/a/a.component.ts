@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   Uploader,
   UploadxDirective,
@@ -14,16 +14,19 @@ import { AsyncPipe } from '@angular/common';
   selector: 'app-a',
   templateUrl: './a.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
   imports: [UploadxDirective, UploadxDropDirective, AsyncPipe],
   providers: [UploadxService]
 })
 export class AComponent {
+  private uploadService = inject(UploadxService);
+
   uploads$: Observable<Uploader[]>;
   options: UploadxOptions = {
     endpoint: `${serverUrl}/files?uploadType=uploadx`
   };
 
-  constructor(private uploadService: UploadxService) {
+  constructor() {
     this.uploads$ = this.uploadService.connect(this.options);
   }
 

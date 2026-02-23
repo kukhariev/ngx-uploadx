@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy } from '@angular/core';
 import {
   Uploader,
   UploadState,
@@ -17,6 +17,7 @@ import { AsyncPipe, JsonPipe } from '@angular/common';
   selector: 'app-on-push',
   templateUrl: './on-push.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
   imports: [JsonPipe, AsyncPipe, UploadxDropDirective, UploadxDirective]
 })
 export class OnPushComponent implements OnDestroy {
@@ -24,7 +25,7 @@ export class OnPushComponent implements OnDestroy {
   uploads$: Observable<Uploader[]>;
   options: UploadxOptions = {
     endpoint: `${serverUrl}/files?uploadType=uploadx`,
-    chunkSize: 1024 * 1024 * 64,
+    chunkSize: 0,
     prerequest: injectDigestHeader,
     authorize: (req, token) => {
       token && (req.headers['Authorization'] = `Token ${token}`);
@@ -32,10 +33,10 @@ export class OnPushComponent implements OnDestroy {
     }
   };
 
-  constructor(
-    private uploadService: UploadxService,
-    private authService: AuthService
-  ) {
+  private readonly uploadService = inject(UploadxService);
+  private readonly authService = inject(AuthService);
+
+  constructor() {
     this.uploads$ = this.uploadService.connect(this.options);
     this.state$ = this.uploadService.events;
     this.authService.getToken().subscribe(token => {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   Tus,
   UploadState,
@@ -14,9 +14,12 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-tus',
   templateUrl: './tus.component.html',
+  standalone: true,
   imports: [CommonModule, UploadxDirective, UploadxDropDirective]
 })
 export class TusComponent {
+  private authService = inject(AuthService);
+
   control!: UploadxControlEvent;
   state!: UploadState;
   uploads: UploadState[] = [];
@@ -36,8 +39,6 @@ export class TusComponent {
     retryConfig: { timeout: 60_000 },
     responseType: 'json'
   };
-
-  constructor(private authService: AuthService) {}
 
   cancel(uploadId?: string): void {
     this.control = { action: 'cancel', uploadId };

@@ -5,6 +5,7 @@ import { DownloadComponent } from './download/download.component';
   selector: 'app-file-generator',
   templateUrl: './file-generator.component.html',
   styleUrls: ['./file-generator.component.scss'],
+  standalone: true,
   imports: [DownloadComponent]
 })
 export class FileGeneratorComponent {

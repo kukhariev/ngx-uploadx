@@ -41,7 +41,7 @@
     "build:pkg": "node scripts/build",
     "build:ng": "node scripts/build-app",
     "build:prod": "ng build --configuration production",
-    "serve:prod": "angular-http-server --path dist/app",
+    "serve:prod": "angular-http-server --path dist/app/browser",
     "build:latest": "npm run build:ng latest",
     "serve:latest": "angular-http-server --path integrations/latest/dist/latest/browser",
     "prepare": "husky",

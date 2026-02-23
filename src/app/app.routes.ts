@@ -1,5 +1,4 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 import { DirectiveWayComponent } from './directive-way/directive-way.component';
 import { FileGeneratorComponent } from './file-generator/file-generator.component';
 import { MultiServiceComponent } from './multi-service/multi-service.component';
@@ -20,9 +19,3 @@ export const appRoutes: Routes = [
   { path: 'tus', component: TusComponent },
   { path: 'file-generator', component: FileGeneratorComponent }
 ];
-
-@NgModule({
-  imports: [RouterModule.forRoot(appRoutes)],
-  exports: [RouterModule]
-})
-export class AppRoutingModule {}
