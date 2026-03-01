@@ -14,7 +14,6 @@ export class UploadxDropDirective {
   fileInput?: UploadxDirective;
 
   private readonly uploadService = inject(UploadxService);
-  constructor() {}
 
   @HostListener('drop', ['$event'])
   dropHandler(event: DragEvent): void {
@@ -69,9 +68,12 @@ export class UploadxDropDirective {
   }
 }
 
-function isFile(item: DataTransferItem) {
-  if (item.kind === 'file' && 'webkitGetAsEntry' in item) {
-    return item.webkitGetAsEntry()?.isDirectory;
+function isFile(item: DataTransferItem): boolean {
+  if (item.kind !== 'file') return false;
+
+  const entry = item.webkitGetAsEntry?.();
+  if (entry) {
+    return !!entry.isFile;
   }
-  return false;
+  return true;
 }

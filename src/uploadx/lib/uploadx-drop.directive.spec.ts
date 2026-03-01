@@ -102,17 +102,19 @@ describe('Directive: UploadxDropDirective', () => {
     expect(dropEl.nativeElement.classList.contains('uploadx-drop-active')).toBe(false);
   });
 
-  it('should call HandleFiles', ({ skip }) => {
-    skip(); // FIXME
+  it('should call HandleFiles', () => {
+    const directive = dropEl.injector.get(UploadxDropDirective);
+    vi.spyOn(directive, 'getFiles').mockReturnValue([file] as unknown as FileList);
+
     const dropEvent = {
       preventDefault: vi.fn().mockName('event.preventDefault'),
       stopPropagation: vi.fn().mockName('event.stopPropagation'),
       dataTransfer: new DataTransfer()
-    };
-    dropEvent.dataTransfer = new DataTransfer();
-    dropEvent.dataTransfer.items.add(file);
+    } as unknown as DragEvent;
+
     dropEl.triggerEventHandler('drop', dropEvent);
     fixture.detectChanges();
+
     expect(dropEvent.stopPropagation).toHaveBeenCalledTimes(1);
     expect(dropEvent.preventDefault).toHaveBeenCalledTimes(1);
     expect(serviceHandleFiles).toHaveBeenCalledTimes(1);
