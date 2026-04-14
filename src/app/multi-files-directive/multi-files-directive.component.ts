@@ -12,13 +12,13 @@ import { serverUrl } from '../config';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-multiple-directive',
-  templateUrl: './multiple-directive.component.html',
+  selector: 'app-multi-files-directive',
+  templateUrl: './multi-files-directive.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [CommonModule, UploadxDirective]
 })
-export class MultipleDirectiveComponent {
+export class MultiFilesDirectiveComponent {
   private uploadService = inject(UploadxService);
 
   state$: Observable<UploadState>;

@@ -1,21 +1,21 @@
 import { Routes } from '@angular/router';
-import { DirectiveWayComponent } from './directive-way/directive-way.component';
-import { FileGeneratorComponent } from './file-generator/file-generator.component';
-import { MultiServiceComponent } from './multi-service/multi-service.component';
-import { MultipleDirectiveComponent } from './multiple-directive/multiple-directive.component';
-import { OnPushComponent } from './on-push/on-push.component';
-import { ServiceCodeWayComponent } from './service-code-way/service-code-way.component';
-import { ServiceWayComponent } from './service-way/service-way.component';
+import { SimpleUploadComponent } from './simple-upload/simple-upload.component';
+import { TusAdvancedComponent } from './tus-advanced/tus-advanced.component';
+import { S3UploadComponent } from './s3-upload/s3-upload.component';
+import { OnPushServiceComponent } from './onpush-service/onpush-service.component';
+import { MultiFilesDirectiveComponent } from './multi-files-directive/multi-files-directive.component';
+import { MultiInstancesComponent } from './multi-instances/multi-instances.component';
 import { TusComponent } from './tus/tus.component';
+import { FileGeneratorComponent } from './file-generator/file-generator.component';
 
 export const appRoutes: Routes = [
-  { path: '', redirectTo: 'directive-way', pathMatch: 'full' },
-  { path: 'directive-way', component: DirectiveWayComponent },
-  { path: 'service-way', component: ServiceWayComponent },
-  { path: 'service-code-way', component: ServiceCodeWayComponent },
-  { path: 'on-push', component: OnPushComponent },
-  { path: 'multi', component: MultipleDirectiveComponent },
-  { path: 'multi2', component: MultiServiceComponent },
+  { path: '', redirectTo: 'simple-upload', pathMatch: 'full' },
+  { path: 'simple-upload', component: SimpleUploadComponent },
+  { path: 'tus-advanced', component: TusAdvancedComponent },
+  { path: 's3-upload', component: S3UploadComponent },
+  { path: 'onpush-service', component: OnPushServiceComponent },
+  { path: 'multi-files-directive', component: MultiFilesDirectiveComponent },
+  { path: 'multi-instances', component: MultiInstancesComponent },
   { path: 'tus', component: TusComponent },
   { path: 'file-generator', component: FileGeneratorComponent }
 ];

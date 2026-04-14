@@ -8,15 +8,15 @@ import {
   UploadxOptions
 } from 'ngx-uploadx';
 import { AuthService } from '../auth.service';
-import { serverUrl as serverUrl } from '../config';
+import { serverUrl } from '../config';
 
 @Component({
-  selector: 'app-directive-way',
-  templateUrl: './directive-way.component.html',
+  selector: 'app-simple-upload',
+  templateUrl: './simple-upload.component.html',
   standalone: true,
   imports: [UploadxDirective, UploadxDropDirective, JsonPipe]
 })
-export class DirectiveWayComponent {
+export class SimpleUploadComponent {
   control!: UploadxControlEvent;
   state!: UploadState;
   uploads: UploadState[] = [];

@@ -11,14 +11,14 @@ import { serverUrl } from '../../config';
 import { AsyncPipe } from '@angular/common';
 
 @Component({
-  selector: 'app-b',
-  templateUrl: './b.component.html',
+  selector: 'app-multi-instance-b',
+  templateUrl: './multi-instance-b.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [UploadxDirective, UploadxDropDirective, AsyncPipe],
   providers: [UploadxService]
 })
-export class BComponent {
+export class MultiInstanceBComponent {
   private uploadService = inject(UploadxService);
 
   uploads$: Observable<Uploader[]>;

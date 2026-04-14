@@ -27,13 +27,13 @@ export class CustomId implements IdService {
 }
 
 @Component({
-  selector: 'app-service-way',
-  templateUrl: './service-way.component.html',
+  selector: 'app-tus-advanced',
+  templateUrl: './tus-advanced.component.html',
   standalone: true,
   imports: [CommonModule, UploadxDirective, UploadxDropDirective],
   providers: [UploadxService, { provide: IdService, useClass: CustomId }]
 })
-export class ServiceWayComponent implements OnDestroy, OnInit {
+export class TusAdvancedComponent implements OnDestroy, OnInit {
   private uploadxService = inject(UploadxService);
 
   state$!: Observable<UploadState>;
