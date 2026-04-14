@@ -54,7 +54,7 @@ export class UploadComponent {
 
 - `allowedTypes` Allowed file types (directive only)
 
-- `authorize` Function used to authorize requests [(example)](src/app/on-push/on-push.component.ts)
+- `authorize` Function used to authorize requests [(example)](src/app/onpush-service/onpush-service.component.ts)
 
 - `autoUpload` Auto start upload when files added. Default value: `true`
 
@@ -77,7 +77,7 @@ export class UploadComponent {
 
 - `multiple` Allow selecting multiple files. Default value: `true` (directive only)
 
-- `prerequest` Function called before every request [(example)](src/app/service-way/service-way.component.ts)
+- `prerequest` Function called before every request [(example)](src/app/tus-advanced/tus-advanced.component.ts)
 
 - `retryConfig` Object to configure retry settings:
 
@@ -255,7 +255,7 @@ selector: `uploadxDrop`
 
 - `request<T = string>(config: AjaxRequestConfig): Promise<AjaxResponse<T>>`
 
-  Make HTTP request with `axios` like interface. [(example)](src/app/service-way/service-way.component.ts)
+  Make HTTP request with `axios` like interface. [(example)](src/app/tus-advanced/tus-advanced.component.ts)
 
 - `state(): UploadState[]`
 

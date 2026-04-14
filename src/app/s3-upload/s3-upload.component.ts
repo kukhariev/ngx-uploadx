@@ -7,12 +7,12 @@ import { UploaderXS3 } from './uploaderx-s3.class';
 import { AsyncPipe, JsonPipe } from '@angular/common';
 
 @Component({
-  selector: 'app-service-way',
-  templateUrl: './service-code-way.component.html',
+  selector: 'app-s3-upload',
+  templateUrl: './s3-upload.component.html',
   standalone: true,
   imports: [AsyncPipe, JsonPipe, UploadxDropDirective]
 })
-export class ServiceCodeWayComponent implements OnDestroy, OnInit {
+export class S3UploadComponent implements OnDestroy, OnInit {
   private uploadService = inject(UploadxService);
 
   state$!: Observable<UploadState>;
