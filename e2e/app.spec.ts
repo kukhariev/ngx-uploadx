@@ -18,8 +18,8 @@ test.describe.serial('app', async () => {
     await page.waitForSelector('span:has-text("complete")', { timeout: 3000 });
   });
 
-  test('completes upload on tus-advanced page', async ({ page }) => {
-    await page.goto('/tus-advanced');
+  test('completes upload on uploadx-advanced page', async ({ page }) => {
+    await page.goto('/uploadx-advanced');
 
     await page.locator('input[type="file"]').setInputFiles(inMemoryFile);
     await page.waitForSelector('span:has-text("complete")', { timeout: 3000 });
