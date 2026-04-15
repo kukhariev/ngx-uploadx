@@ -1,0 +1,37 @@
+<div uploadxDrop class="upload-zone">
+  <div class="uploads-table">
+    @for (item of uploads; track item.uploadId) {
+      <div class="row">
+        <span>{{ item.name }}</span>
+        <span>{{ item.progress }}%</span>
+        <span>{{ item.status }}</span>
+        <span>
+          <button (click)="uploadxService.control({ action: 'pause', uploadId: item.uploadId })">
+            pause
+          </button>
+          <button (click)="uploadxService.control({ action: 'upload', uploadId: item.uploadId })">
+            upload
+          </button>
+          <button (click)="update(item.uploadId)">update</button>
+        </span>
+      </div>
+    }
+  </div>
+  <div class="control">
+    <span>
+      <em>Drop files to upload, or</em>
+      <label accesskey="o" for="files"> <strong>BROWSE</strong></label>
+      <input accept="image/*,video/*" id="files" multiple type="file" uploadx />
+    </span>
+    <span>
+      <button (click)="upload()">Upload All</button>
+      <button (click)="pause()">Pause All</button>
+      <button (click)="update()">Update All</button>
+      <button (click)="cancel()">Cancel All</button>
+    </span>
+  </div>
+</div>
+<div class="json">
+  <span>Active: {{ activeUploads }} / concurrency: {{ options.concurrency }}</span>
+  <pre>{{ state$ | async | json }}</pre>
+</div>
