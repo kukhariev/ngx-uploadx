@@ -24,16 +24,25 @@ export function bufferToBase64(hash: ArrayBuffer): string {
 }
 
 export const hasher = {
-  lookup: {} as Record<string, { key: string; sha: string }>,
-  isSupported: window.crypto && !!window.crypto.subtle,
+  /**
+   * Prefetched hash of the next chunk.
+   * Key: upload URL. Value: chunk data + hash.
+   * Cleared on completion or if offset/size do not match.
+   */
+  prefetch: {} as Record<string, { key: string; sha: string }>,
+  isSupported: typeof window !== 'undefined' && window.crypto && !!window.crypto.subtle,
   async sha(data: ArrayBuffer): Promise<ArrayBuffer> {
     return crypto.subtle.digest('SHA-1', data);
   },
-  digestHex(body: Blob, canceler?: Canceler): Promise<string> {
-    return readBlob(body, canceler).then(buffer => this.sha(buffer).then(bufferToHex));
+  async digestHex(body: Blob, canceler?: Canceler): Promise<string> {
+    const buffer = await readBlob(body, canceler);
+    const buf = await this.sha(buffer);
+    return bufferToHex(buf);
   },
-  digestBase64(body: Blob, canceler?: Canceler): Promise<string> {
-    return readBlob(body, canceler).then(buffer => this.sha(buffer).then(bufferToBase64));
+  async digestBase64(body: Blob, canceler?: Canceler): Promise<string> {
+    const buffer = await readBlob(body, canceler);
+    const hash = await this.sha(buffer);
+    return bufferToBase64(hash);
   }
 };
 
@@ -44,15 +53,20 @@ export async function injectTusChecksumHeader(
   if (hasher.isSupported && req.body instanceof Blob) {
     if (this.chunkSize) {
       const { body, start } = this.getChunk((this.offset || 0) + this.chunkSize);
-      hasher.digestBase64(body, req.canceler).then(digest => {
-        const key = `${body.size}-${start}`;
-        hasher.lookup[req.url] = { key, sha: digest };
-      });
+      hasher
+        .digestBase64(body, req.canceler)
+        .then(digest => {
+          const key = `${body.size}-${start}`;
+          hasher.prefetch[req.url] = { key, sha: digest };
+        })
+        .catch(() => {
+          delete hasher.prefetch[req.url];
+        });
     }
     const key = `${req.body.size}-${this.offset}`;
     const sha =
-      hasher.lookup[req.url]?.key === key
-        ? hasher.lookup[req.url].sha
+      hasher.prefetch[req.url]?.key === key
+        ? hasher.prefetch[req.url].sha
         : await hasher.digestBase64(req.body, req.canceler);
     Object.assign(req.headers, { 'Upload-Checksum': `sha1 ${sha}` });
   }
@@ -68,13 +82,13 @@ export async function injectDigestHeader(
       const { body, start } = this.getChunk((this.offset || 0) + this.chunkSize);
       hasher.digestBase64(body, req.canceler).then(digest => {
         const key = `${body.size}-${start}`;
-        hasher.lookup[req.url] = { key, sha: digest };
+        hasher.prefetch[req.url] = { key, sha: digest };
       });
     }
     const key = `${req.body.size}-${this.offset}`;
     const sha =
-      hasher.lookup[req.url]?.key === key
-        ? hasher.lookup[req.url].sha
+      hasher.prefetch[req.url]?.key === key
+        ? hasher.prefetch[req.url].sha
         : await hasher.digestBase64(req.body, req.canceler);
     Object.assign(req.headers, { Digest: `sha=${sha}` });
   }
