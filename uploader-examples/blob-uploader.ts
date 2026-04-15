@@ -68,6 +68,7 @@ export class BlobUploader extends Uploader {
 function commonHeaders() {
   return {
     'x-ms-version': BLOB_API_VERSION,
-    'x-ms-date': new Date().toISOString()
+    'x-ms-date': new Date().toISOString(),
+    'x-ms-blob-type': 'BlockBlob'
   };
 }
