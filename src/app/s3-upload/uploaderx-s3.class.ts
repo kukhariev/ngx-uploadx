@@ -10,7 +10,12 @@ interface Part {
 }
 
 /**
- * Added `upload directly to S3` support
+ * S3-compatible multipart uploader.
+ *
+ * UploaderXS3 enables direct multipart S3 uploads:
+ * (1) Initializes session via server to get presigned URLs;
+ * (2) Uploads parts directly to S3 (sequential), collects ETags;
+ * (3) Completes upload by sending ETag list to server for finalization.
  *
  * [server example](https://github.com/kukhariev/node-uploadx/blob/master/examples/s3-direct.ts)
  */
