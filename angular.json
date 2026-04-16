@@ -48,7 +48,8 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": {
-            "buildTarget": "app-uploadx:build"
+            "buildTarget": "app-uploadx:build",
+            "proxyConfig": "proxy.conf.json"
           },
           "configurations": {
             "production": {
