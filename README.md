@@ -77,7 +77,7 @@ export class UploadComponent {
 
 - `multiple` Allow selecting multiple files. Default value: `true` (directive only)
 
-- `prerequest` Function called before every request [(example)](src/app/tus-advanced/tus-advanced.component.ts)
+- `prerequest` Function called before every request [(example)](src/app/uploadx-advanced/uploadx-advanced.component.ts)
 
 - `retryConfig` Object to configure retry settings:
 
