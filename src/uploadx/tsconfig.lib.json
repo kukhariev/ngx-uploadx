@@ -1,8 +1,7 @@
 {
   "angularCompilerOptions": {
     "compilationMode": "partial",
-    "strictTemplates": true,
-    "enableResourceInlining": true
+    "strictTemplates": true
   },
   "buildOnSave": false,
   "compileOnSave": false,
