@@ -1,6 +1,7 @@
 /**
  * Allows canceling some operation by calling cancel().
  * onCancel callback can be used to execute cleanup logic when cancel is called.
+ * @deprecated Use AbortController instead. Will be removed in next major version.
  */
 export class Canceler {
   /**
