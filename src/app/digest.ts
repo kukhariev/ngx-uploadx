@@ -1,16 +1,15 @@
-import { Canceler, RequestConfig, Uploader } from 'ngx-uploadx';
+import { RequestConfig, Uploader } from 'ngx-uploadx';
 
-export function readBlob(body: Blob, canceler?: Canceler): Promise<ArrayBuffer> {
+export function readBlob(body: Blob, signal?: AbortSignal): Promise<ArrayBuffer> {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    if (canceler) {
-      canceler.onCancel = () => {
-        reader.abort();
-        reject('aborted');
-      };
+    if (signal?.aborted) {
+      reject(signal.reason ?? new DOMException('Aborted', 'AbortError'));
+      return;
     }
+    const reader = new FileReader();
+    signal?.addEventListener('abort', () => reader.abort(), { once: true });
     reader.onload = () => resolve(reader.result as ArrayBuffer);
-    reader.onerror = reject;
+    reader.onerror = () => reject(reader.error);
     reader.readAsArrayBuffer(body);
   });
 }
@@ -34,13 +33,13 @@ export const hasher = {
   async sha(data: ArrayBuffer): Promise<ArrayBuffer> {
     return crypto.subtle.digest('SHA-1', data);
   },
-  async digestHex(body: Blob, canceler?: Canceler): Promise<string> {
-    const buffer = await readBlob(body, canceler);
+  async digestHex(body: Blob, signal?: AbortSignal): Promise<string> {
+    const buffer = await readBlob(body, signal);
     const buf = await this.sha(buffer);
     return bufferToHex(buf);
   },
-  async digestBase64(body: Blob, canceler?: Canceler): Promise<string> {
-    const buffer = await readBlob(body, canceler);
+  async digestBase64(body: Blob, signal?: AbortSignal): Promise<string> {
+    const buffer = await readBlob(body, signal);
     const hash = await this.sha(buffer);
     return bufferToBase64(hash);
   }
@@ -54,7 +53,7 @@ export async function injectTusChecksumHeader(
     if (this.chunkSize) {
       const { body, start } = this.getChunk((this.offset || 0) + this.chunkSize);
       hasher
-        .digestBase64(body, req.canceler)
+        .digestBase64(body, req.signal)
         .then(digest => {
           const key = `${body.size}-${start}`;
           hasher.prefetch[req.url] = { key, sha: digest };
@@ -67,7 +66,7 @@ export async function injectTusChecksumHeader(
     const sha =
       hasher.prefetch[req.url]?.key === key
         ? hasher.prefetch[req.url].sha
-        : await hasher.digestBase64(req.body, req.canceler);
+        : await hasher.digestBase64(req.body, req.signal);
     Object.assign(req.headers, { 'Upload-Checksum': `sha1 ${sha}` });
   }
   return req;
@@ -80,7 +79,7 @@ export async function injectDigestHeader(
   if (hasher.isSupported && req.body instanceof Blob) {
     if (this.chunkSize) {
       const { body, start } = this.getChunk((this.offset || 0) + this.chunkSize);
-      hasher.digestBase64(body, req.canceler).then(digest => {
+      hasher.digestBase64(body, req.signal).then(digest => {
         const key = `${body.size}-${start}`;
         hasher.prefetch[req.url] = { key, sha: digest };
       });
@@ -89,7 +88,7 @@ export async function injectDigestHeader(
     const sha =
       hasher.prefetch[req.url]?.key === key
         ? hasher.prefetch[req.url].sha
-        : await hasher.digestBase64(req.body, req.canceler);
+        : await hasher.digestBase64(req.body, req.signal);
     Object.assign(req.headers, { Digest: `sha=${sha}` });
   }
   return req;

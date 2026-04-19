@@ -1,5 +1,4 @@
 import { Ajax, AjaxRequestConfig } from './ajax';
-import { Canceler } from './canceler';
 import { DynamicChunk } from './dynamic-chunk';
 import {
   AuthorizeRequest,
@@ -53,7 +52,6 @@ export abstract class Uploader implements UploadState {
   offset?: number;
   /** Retries handler */
   retry: RetryHandler;
-  canceler = new Canceler();
   abortController = new AbortController();
   /** Set HttpRequest responseType */
   responseType?: 'json' | 'text' | 'document';
@@ -191,7 +189,6 @@ export abstract class Uploader implements UploadState {
     const signal = requestOptions.signal || this.abortController.signal;
     let req: RequestConfig = {
       body: requestOptions.body || null,
-      canceler: this.canceler,
       signal,
       headers: { ...this.headers, ...requestOptions.headers },
       method: requestOptions.method || 'GET',
@@ -208,7 +205,6 @@ export abstract class Uploader implements UploadState {
       data: body,
       responseType: this.options.responseType ?? this.responseType,
       withCredentials: !!this.options.withCredentials,
-      canceler: this.canceler,
       signal,
       validateStatus: () => true,
       timeout: this.retry.config.timeout
@@ -257,7 +253,6 @@ export abstract class Uploader implements UploadState {
   protected abort(): void {
     this.offset = undefined;
     this.abortController.abort();
-    this.canceler.cancel();
   }
 
   protected async cancel(): Promise<void> {
