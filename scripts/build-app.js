@@ -68,7 +68,11 @@ async function build(cliTag = 'latest') {
 
 async function processing() {
   const args = process.argv.slice(2);
-  const cmd = args[0].trim();
+  const cmd = args[0]?.trim();
+  if (!cmd) {
+    console.error('Please specify Angular CLI version/tag to build.');
+    process.exit(1);
+  }
   let exitCode = 0;
   try {
     await build(cmd);
