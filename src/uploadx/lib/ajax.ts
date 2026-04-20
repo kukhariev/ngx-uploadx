@@ -2,10 +2,9 @@ import { InjectionToken } from '@angular/core';
 import { RequestOptions } from './interfaces';
 
 export interface AjaxRequestConfig extends RequestOptions {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [x: string]: any;
+  [x: string]: unknown;
 
-  data?: BodyInit | null;
+  data?: unknown;
   url: string;
 }
 
@@ -21,10 +20,6 @@ export interface Ajax {
 
 function createXhr(): XMLHttpRequest {
   return new XMLHttpRequest();
-}
-
-function releaseXhr(_xhr: unknown): void {
-  _xhr = null;
 }
 
 export class UploadxAjax {
@@ -58,7 +53,6 @@ export class UploadxAjax {
         xhr.ontimeout =
         xhr.onabort =
           evt => {
-            releaseXhr(xhr);
             signal?.removeEventListener('abort', abortListener);
             return reject({ error: evt.type, url, method });
           };
@@ -68,7 +62,6 @@ export class UploadxAjax {
           status: xhr.status,
           headers: this.getResponseHeaders(xhr)
         };
-        releaseXhr(xhr);
         signal?.removeEventListener('abort', abortListener);
         return validateStatus(response.status) ? resolve(response) : reject(response);
       };
@@ -96,6 +89,15 @@ export class UploadxAjax {
   }
 }
 
+/**
+ * Injection token for the AJAX client used by Uploadx.
+ *
+ * @example
+ * // Using a custom AJAX client (e.g., axios)
+ * import axios from 'axios';
+ * const axiosInstance = axios.create({ });
+ * { provide: UPLOADX_AJAX, useFactory: () => ({ request: axiosInstance.request }) }
+ */
 export const UPLOADX_AJAX: InjectionToken<Ajax> = new InjectionToken('uploadx.ajax', {
   factory: () => new UploadxAjax(createXhr),
   providedIn: 'root'
