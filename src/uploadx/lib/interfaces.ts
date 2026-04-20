@@ -17,6 +17,7 @@ export interface RequestConfig {
   onUploadProgress?: (evt: ProgressEvent) => void;
   responseType?: 'arraybuffer' | 'blob' | 'document' | 'json' | 'text';
   url: string;
+  timeout?: number;
   validateStatus?: (status: number) => boolean;
   withCredentials?: boolean;
 }

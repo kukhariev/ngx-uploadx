@@ -303,7 +303,7 @@ export abstract class Uploader implements UploadState {
     store.delete(this.uploadId);
   };
 
-  private onProgress(): (evt: ProgressEvent) => void {
+  private onProgress(): (evt: { loaded: number }) => void {
     let throttle: ReturnType<typeof setTimeout> | undefined;
     const startTime = Date.now();
     return ({ loaded }) => {
