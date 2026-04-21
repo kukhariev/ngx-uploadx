@@ -7,9 +7,16 @@ export function readBlob(body: Blob, signal?: AbortSignal): Promise<ArrayBuffer>
       return;
     }
     const reader = new FileReader();
-    signal?.addEventListener('abort', () => reader.abort(), { once: true });
-    reader.onload = () => resolve(reader.result as ArrayBuffer);
-    reader.onerror = () => reject(reader.error);
+    const onAbort = () => reader.abort();
+    signal?.addEventListener('abort', onAbort, { once: true });
+    reader.onload = () => {
+      signal?.removeEventListener('abort', onAbort);
+      resolve(reader.result as ArrayBuffer);
+    };
+    reader.onerror = () => {
+      signal?.removeEventListener('abort', onAbort);
+      reject(reader.error);
+    };
     reader.readAsArrayBuffer(body);
   });
 }
