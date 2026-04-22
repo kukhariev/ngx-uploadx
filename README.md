@@ -6,14 +6,19 @@
 [![build][build-image]][build-url]
 [![npm version][npm-image]][npm-url]
 [![commits since latest release][comm-image]][comm-url]
+[![License: MIT][license-image]][license-url]
+[![Angular](https://img.shields.io/badge/Angular-18.0+-blue.svg)](https://angular.io)
 
-## Key Features
+## ✨ Key Features
 
-- Pause / Resume / Cancel Uploads
-- Retries using exponential back-off strategy
-- Chunking
+- Pause / Resume / Cancel uploads
+- Automatic retries with exponential backoff
+- Chunked uploads with adaptive chunk size
+- Real-time progress, speed & ETA tracking
+- Custom headers, metadata, authorization
+- Drag & drop support via `uploadxDrop` directive
 
-## Basic usage
+## ⚡ Quick Start
 
 - Add ngx-uploadx module as dependency:
 
@@ -34,7 +39,7 @@ import { UploadxDirective, UploadxOptions, UploadState } from 'ngx-uploadx';
   imports: [UploadxDirective]
 })
 export class UploadComponent {
-  options: UploadxOptions = { endpoint: `[URL]` };
+  options: UploadxOptions = { endpoint: 'http://localhost:3000/upload' };
   onUpload(state: UploadState) {
     console.log(state);
     //...
@@ -44,17 +49,55 @@ export class UploadComponent {
 
 > _Please navigate to the [src/app sub-folder](src/app) for more detailed examples._
 
-## Server-side setup
+## 🖥️ Server-side setup
 
-- [node-uploadx](https://github.com/kukhariev/node-uploadx#readme)
+```sh
+  npm install @uploadx/core express
+```
 
-## API
+```js
+import { uploadx } from '@uploadx/core';
+import express from 'express';
+
+const app = express();
+
+app.use(
+  '/upload',
+  uploadx({
+    directory: './uploads',
+    maxUploadSize: '20GB',
+    onComplete: file => {
+      console.log('File upload complete: ', file);
+      return file;
+    }
+  })
+);
+
+app.listen(3002);
+```
+
+🔗 [Full server setup guide →](https://github.com/kukhariev/node-uploadx#readme)
+
+## 📘 API Reference
+
+**Contents:**
+
+- [UploadxOptions](#uploadxoptions)
+- [provideUploadx](#provideuploadx)
+- [UploadxModule](#uploadxmodule)
+- [Directives](#directives)
+  - [uploadx](#uploadx)
+  - [uploadxDrop](#uploadxdrop)
+- [UploadxService](#uploadxservice)
+- [UploadState](#uploadstate)
+- [UploadxControlEvent](#uploadxcontrolevent)
+- [DI tokens](#di-tokens)
 
 ### UploadxOptions
 
 - `allowedTypes` Allowed file types (directive only)
 
-- `authorize` Function used to authorize requests [(example)](src/app/onpush-service/onpush-service.component.ts)
+- `authorize` Replaces the default Bearer authorization logic[(example)](src/app/onpush-service/onpush-service.component.ts)
 
 - `autoUpload` Auto start upload when files added. Default value: `true`
 
@@ -173,12 +216,14 @@ selector: `uploadxDrop`
 
 ### UploadxService
 
+Programmatic API for upload management. Use it when you need direct control over uploads from component code, dynamic configuration, or deep integration with application state.
+
 - `init(options?: UploadxOptions): Observable<UploadState>`
 
   Initializes service. Returns Observable that emits a new value on progress or status changes.
 
   ```ts
-  //  @example:
+  // @example:
   uploadxOptions: UploadxOptions = {
     concurrency: 4,
     endpoint: `${environment.api}/upload`,
@@ -241,7 +286,7 @@ selector: `uploadxDrop`
 
 - `control(event: UploadxControlEvent): void`
 
-  Uploads control.
+  Uploads control. Available actions: `upload`, `cancel`, `pause`, `update`.
 
   ```ts
   // @example:
@@ -255,7 +300,25 @@ selector: `uploadxDrop`
 
 - `request<T = string>(config: AjaxRequestConfig): Promise<AjaxResponse<T>>`
 
-  Make HTTP request with `axios` like interface. [(example)](src/app/tus-advanced/tus-advanced.component.ts)
+  Make HTTP request with `axios` like interface.
+
+  ```ts
+  // @example:
+  import { AjaxRequestConfig, UploadxService } from 'ngx-uploadx';
+
+  class MyService {
+    constructor(private uploadService: UploadxService) {}
+
+    async fetchUploads() {
+      const config: AjaxRequestConfig = {
+        url: '/api/uploads',
+        method: 'GET'
+      };
+      const response = await this.uploadService.request(config);
+      return response.items;
+    }
+  }
+  ```
 
 - `state(): UploadState[]`
 
@@ -292,6 +355,53 @@ selector: `uploadxDrop`
 
   Uploads state events.
 
+### UploadState
+
+Upload state object emitted by the service:
+
+```ts
+interface UploadState {
+  readonly file: File; // Uploaded file
+  readonly name: string; // Original file name
+  readonly progress: number; // Progress percentage
+  readonly remaining: number; // Estimated remaining time
+  readonly response: ResponseBody; // HTTP response body
+  readonly responseStatus: number; // HTTP response status code
+  readonly responseHeaders: Record<string, string>; // HTTP response headers
+  readonly size: number; // File size in bytes
+  readonly speed: number; // Upload speed bytes/sec
+  readonly status: UploadStatus; // Upload status
+  readonly uploadId: string; // Unique upload id
+  readonly url: string; // File url
+}
+
+type UploadStatus =
+  | 'added'
+  | 'queue'
+  | 'uploading'
+  | 'complete'
+  | 'error'
+  | 'cancelled'
+  | 'paused'
+  | 'retry'
+  | 'updated';
+```
+
+### UploadxControlEvent
+
+Control event type for `uploadService.control()`:
+
+```ts
+interface UploadxControlEvent {
+  action?: 'upload' | 'cancel' | 'pause' | 'update';
+  uploadId?: string; // Target upload ID (optional - affects all if not provided)
+  endpoint?: string; // URL to create new uploads
+  headers?: RequestHeaders; // Headers to be appended
+  metadata?: Metadata; // Custom uploads metadata
+  token?: string; // Authorization token
+}
+```
+
 ### DI tokens
 
 - `UPLOADX_FACTORY_OPTIONS`: override default configuration
@@ -300,29 +410,29 @@ selector: `uploadxDrop`
 
 - `UPLOADX_AJAX`: override internal ajax lib
 
-## Demo
+## 🧪 Demo
 
 Checkout the [Demo App](https://ngx-uploadx.vercel.app/) or run it on your local machine:
 
 - Run script `npm start`
 - Navigate to `http://localhost:4200/`
 
-## Build
+## 🛠️ Build
 
 Run `npm run build:pkg` to build the lib.
 
 > _packaged by_ [ng-packagr](https://github.com/dherges/ng-packagr)
 
-## Bugs and Feedback
+## 🐞 Bugs and Feedback
 
 For bugs, questions and discussions please use the [GitHub Issues](https://github.com/kukhariev/ngx-uploadx/issues).
 
-## Contributing
+## 🤝 Contributing
 
 Pull requests are welcome!\
 To contribute, please read [contributing instructions](https://github.com/kukhariev/ngx-uploadx/blob/master/.github/CONTRIBUTING.md#contributing).
 
-## License
+## 📄 License
 
 The MIT License (see the [LICENSE](LICENSE) file for the full text)
 
@@ -334,3 +444,5 @@ The MIT License (see the [LICENSE](LICENSE) file for the full text)
 [build-url]: https://github.com/kukhariev/ngx-uploadx/actions/workflows/integration.yml
 [comm-image]: https://img.shields.io/github/commits-since/kukhariev/ngx-uploadx/latest
 [comm-url]: https://github.com/kukhariev/ngx-uploadx/releases/latest
+[license-image]: https://img.shields.io/badge/License-MIT-green.svg
+[license-url]: https://github.com/kukhariev/ngx-uploadx/blob/master/LICENSE
