@@ -40,6 +40,10 @@ Runs independent upload instances with separate configurations.
 
 Minimal setup for resumable uploads using the TUS protocol.
 
+---
+
+## Tools
+
 ### file-generator
 
 Creates test files of different sizes for performance testing.
