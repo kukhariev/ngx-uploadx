@@ -1,4 +1,4 @@
-# ngx-uploadx Uploaders Examples
+# Custom Uploaders Examples
 
 This directory contains uploader implementations for standard server setups.
 
@@ -23,3 +23,7 @@ For Node.js applications using Multer. Sends files in multipart format with meta
 ### UploaderNginx
 
 For NGINX with the upload-progress module. Handles uploads through proxy servers.
+
+### UploaderXS3
+
+S3-compatible multipart uploader. See [src/app/s3-upload/uploaderx-s3.class.ts](../src/app/s3-upload/uploaderx-s3.class.ts).
