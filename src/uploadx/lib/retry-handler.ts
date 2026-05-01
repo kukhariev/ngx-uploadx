@@ -52,6 +52,7 @@ const defaultRetryConfig: Required<RetryConfig> = {
  * Retryable ErrorHandler
  */
 export class RetryHandler {
+  static readonly STALL_THRESHOLD = 3;
   public attempts = 0;
   config: Required<RetryConfig>;
   private observedValue?: string | number;
@@ -124,6 +125,6 @@ export class RetryHandler {
       this.observedValue = value;
       this.attempts = 0;
     }
-    return this.repeatCount >= 3;
+    return this.repeatCount >= RetryHandler.STALL_THRESHOLD;
   }
 }
