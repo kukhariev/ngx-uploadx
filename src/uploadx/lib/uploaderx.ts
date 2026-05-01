@@ -54,7 +54,10 @@ export class UploaderX extends Uploader {
 
   protected getOffsetFromResponse(): number | undefined {
     const range = this.getValueFromResponse('Range');
-    return range ? getRangeEnd(range) + 1 : undefined;
+    if (range) {
+      return getRangeEnd(range) + 1;
+    }
+    return this.responseStatus === 308 ? 0 : undefined;
   }
 }
 
