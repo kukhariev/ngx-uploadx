@@ -141,7 +141,14 @@ export abstract class Uploader implements UploadState {
             ? await this.sendFileContent()
             : await this.getOffset();
         }
-        this.retry.observe(this.offset);
+        if (this.retry.checkForStall(this.offset)) {
+          this.status = 'error';
+          this.response = {
+            error: 'stalled',
+            message: 'No offset update received — upload is stalled'
+          };
+          return;
+        }
         if (this.offset === this.size) {
           this.remaining = 0;
           this.progress = 100;

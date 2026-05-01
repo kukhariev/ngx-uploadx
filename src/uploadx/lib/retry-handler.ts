@@ -55,6 +55,7 @@ export class RetryHandler {
   public attempts = 0;
   config: Required<RetryConfig>;
   private observedValue?: string | number;
+  private repeatCount = 0;
   cancel: () => void = () => {};
 
   constructor(configOptions: RetryConfig = {}) {
@@ -101,11 +102,28 @@ export class RetryHandler {
   }
 
   /**
-   * Observes value to reset retry attempts counter
-   * @param value - Value to observe
+   * @deprecated Use checkForStall instead
    */
   observe(value?: string | number): void {
-    this.observedValue !== value && (this.attempts = 0);
-    this.observedValue = value;
+    this.checkForStall(value);
+  }
+
+  /**
+   * Check if upload is stalled
+   */
+  checkForStall(value?: string | number): boolean {
+    if (value === undefined) {
+      this.repeatCount = 0;
+      this.observedValue = undefined;
+      return false;
+    }
+    if (this.observedValue === value) {
+      this.repeatCount++;
+    } else {
+      this.repeatCount = 0;
+      this.observedValue = value;
+      this.attempts = 0;
+    }
+    return this.repeatCount >= 3;
   }
 }

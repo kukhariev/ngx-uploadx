@@ -27,14 +27,14 @@ describe('RetryHandler', () => {
     expect(retry.kind(500)).toBe(ErrorType.Fatal);
   });
 
-  it('observe(offset)', () => {
+  it('checkForStall resets attempts on new value', () => {
     retry.config.maxAttempts = 2;
-    retry.observe('same value');
-    expect(retry.kind(500)).toBe(ErrorType.Retryable);
-    retry.observe('same value');
-    expect(retry.kind(500)).toBe(ErrorType.Retryable);
-    retry.observe('same value');
-    expect(retry.kind(500)).toBe(ErrorType.Fatal);
+    retry.checkForStall('value1');
+    expect(retry.attempts).toBe(0);
+    retry.kind(500);
+    expect(retry.attempts).toBe(1);
+    retry.checkForStall('value2'); // new value resets attempts
+    expect(retry.attempts).toBe(0);
   });
 
   it('wait()', async () => {
@@ -60,5 +60,28 @@ describe('RetryHandler', () => {
     await wait.then(() => {
       expect(retry.kind(500)).toBe(ErrorType.Retryable);
     });
+  });
+
+  it('should detect stalled upload (same offset)', () => {
+    expect(retry.checkForStall(0)).toBe(false);
+    expect(retry.checkForStall(0)).toBe(false);
+    expect(retry.checkForStall(0)).toBe(false);
+    expect(retry.checkForStall(0)).toBe(true);
+  });
+
+  it('should reset stalled counter when offset changes', () => {
+    expect(retry.checkForStall(0)).toBe(false);
+    expect(retry.checkForStall(0)).toBe(false);
+    expect(retry.checkForStall(100)).toBe(false);
+    expect(retry.checkForStall(100)).toBe(false);
+    expect(retry.checkForStall(100)).toBe(false);
+    expect(retry.checkForStall(100)).toBe(true);
+  });
+
+  it('should not count undefined as stalled', () => {
+    expect(retry.checkForStall(undefined)).toBe(false);
+    expect(retry.checkForStall(undefined)).toBe(false);
+    expect(retry.checkForStall(undefined)).toBe(false);
+    expect(retry.checkForStall(undefined)).toBe(false);
   });
 });
