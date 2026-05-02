@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Ajax } from './ajax';
 import { DynamicChunk } from './dynamic-chunk';
-import { UploaderOptions } from './interfaces';
+import { UploaderOptions, UploadStatus } from './interfaces';
 import { Uploader } from './uploader';
 
 function getFile(): File {
@@ -38,9 +38,10 @@ const mockAjax: Ajax = {
 export class MockUploader extends Uploader {
   constructor(
     readonly f: File,
-    readonly opts: UploaderOptions
+    readonly opts: UploaderOptions,
+    readonly stateChange: (uploader: Uploader) => void = () => {}
   ) {
-    super(f, opts, () => {}, mockAjax);
+    super(f, opts, stateChange, mockAjax);
   }
 
   async getFileUrl(): Promise<string> {
@@ -264,6 +265,92 @@ describe('Uploader', () => {
       const request = vi.spyOn<any, any>(uploader.ajax, 'request');
       await uploader.request({ method: 'POST', headers: common });
       expect(request).toHaveBeenCalledWith(expect.objectContaining(sample));
+    });
+  });
+
+  describe('status transitions', () => {
+    let uploader: MockUploader;
+
+    beforeEach(() => {
+      uploader = new MockUploader(file, {}, vi.fn());
+      vi.spyOn<any, any>(uploader, 'update').mockResolvedValue('');
+    });
+
+    // Valid transitions: [from, to]
+    const validTransitions: [UploadStatus, UploadStatus][] = [
+      ['queue', 'uploading'],
+      ['queue', 'paused'],
+      ['uploading', 'complete'],
+      ['uploading', 'error'],
+      ['uploading', 'paused'],
+      ['uploading', 'retry'],
+      ['uploading', 'updated'],
+      ['retry', 'uploading'],
+      ['paused', 'queue'],
+      ['paused', 'cancelled'],
+      ['error', 'queue'],
+      ['error', 'cancelled'],
+      ['complete', 'updated'],
+      ['complete', 'cancelled']
+    ];
+
+    // Invalid transitions: [from, to]
+    const invalidTransitions: [UploadStatus, UploadStatus][] = [
+      ['cancelled', 'queue'],
+      ['complete', 'uploading'],
+      ['complete', 'error'],
+      ['uploading', 'queue']
+    ];
+
+    describe('valid transitions', () => {
+      it.each(validTransitions)('should allow %s → %s', (from, to) => {
+        uploader.status = from;
+        uploader.status = to;
+        expect(uploader.status).toBe(to);
+      });
+    });
+
+    describe('invalid transitions', () => {
+      it.each(invalidTransitions)('should reject %s → %s', (from, to) => {
+        uploader.status = from;
+        uploader.status = to;
+        expect(uploader.status).toBe(from);
+      });
+    });
+
+    describe('side effects', () => {
+      it('should call abort on pause', () => {
+        const abortSpy = vi.spyOn<any, any>(uploader, 'abort');
+        uploader.status = 'paused';
+        expect(abortSpy).toHaveBeenCalled();
+      });
+
+      it.each<UploadStatus>(['cancelled', 'complete', 'error'])(
+        'should call cleanup on %s',
+        status => {
+          const cleanupSpy = vi.spyOn<any, any>(uploader, 'cleanup');
+          uploader.status = status;
+          expect(cleanupSpy).toHaveBeenCalled();
+        }
+      );
+
+      it('should cancel retry when leaving retry state', () => {
+        uploader.status = 'retry';
+        const retryCancelSpy = vi.spyOn(uploader.retry, 'cancel');
+        uploader.status = 'error';
+        expect(retryCancelSpy).toHaveBeenCalled();
+      });
+    });
+
+    describe('idempotency', () => {
+      it('should ignore duplicate status', () => {
+        const stateChange = vi.fn();
+        uploader = new MockUploader(file, {}, stateChange);
+        uploader.status = 'uploading';
+        const callCount = stateChange.mock.calls.length;
+        uploader.status = 'uploading';
+        expect(stateChange.mock.calls.length).toBe(callCount);
+      });
     });
   });
 });
