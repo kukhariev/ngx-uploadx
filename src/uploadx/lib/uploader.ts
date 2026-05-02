@@ -100,20 +100,58 @@ export abstract class Uploader implements UploadState {
     return this._status;
   }
 
-  set status(s: UploadStatus) {
-    if (s !== 'updated' && s !== 'cancelled') {
-      if (this._status === s) return;
-      if (this._status === 'complete') return;
+  /**
+   * Transition uploader to a new status.
+   *  @sideEffects
+   * - Calls this.abort() when transitioning to 'paused'
+   * - Calls this.cleanup() for terminal states
+   * - Emits state change via this.stateChange()
+   */
+  private moveTo(next: UploadStatus): void {
+    const current = this._status;
+
+    // Guard: cannot change from cancelled
+    if (current === 'cancelled') return;
+
+    // Guard: cannot change from complete (except updated/cancelled)
+    if (current === 'complete' && next !== 'updated' && next !== 'cancelled') return;
+
+    // Guard: cannot go back to queue from uploading
+    if (current === 'uploading' && next === 'queue') return;
+
+    // Guard: ignore duplicate status (updated is always allowed)
+    if (current === next && next !== 'updated') return;
+
+    // Cancel pending retry
+    if (current === 'retry') {
+      this.retry.cancel();
     }
-    if (this._status === 'cancelled') return;
-    if (this._status === 'uploading' && s === 'queue') return;
-    if (this._status === 'retry') this.retry.cancel();
-    this._status = s;
-    if (s === 'paused') this.abort();
-    if (s === 'cancelled' || s === 'complete' || s === 'error') this.cleanup();
-    if (s === 'cancelled') this.cancelAndSendState();
-    else if (s === 'updated') this.updateAndSendState();
-    else this.stateChange(this);
+
+    this._status = next;
+
+    // Side effects
+    if (next === 'paused') {
+      this.abort();
+    }
+    if (next === 'cancelled' || next === 'complete' || next === 'error') {
+      this.cleanup();
+    }
+
+    // Dispatch event
+    switch (next) {
+      case 'cancelled':
+        this.cancelAndSendState();
+        break;
+      case 'updated':
+        this.updateAndSendState();
+        break;
+      default:
+        this.stateChange(this);
+    }
+  }
+
+  set status(next: UploadStatus) {
+    this.moveTo(next);
   }
 
   /**
