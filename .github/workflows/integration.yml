@@ -16,7 +16,7 @@ jobs:
         ng: [latest, 18]
     name: Build app with @angular/cli
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install
         uses: './.github/actions/cached-npm-install'
         with:
