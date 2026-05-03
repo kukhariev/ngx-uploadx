@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { Component, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { type Mock } from 'vitest';
 import { UploadxControlEvent } from './interfaces';
 import { UPLOADX_OPTIONS } from './options';
 import { UploadxDirective } from './uploadx.directive';

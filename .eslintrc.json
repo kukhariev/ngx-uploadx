@@ -1,6 +1,6 @@
 {
   "root": true,
-  "ignorePatterns": ["projects/**/*"],
+  "ignorePatterns": ["vitest.config.ts"],
   "overrides": [
     {
       "files": ["*.ts"],
