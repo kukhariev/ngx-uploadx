@@ -1,4 +1,3 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ErrorType, RetryHandler } from './retry-handler';
 
 describe('RetryHandler', () => {

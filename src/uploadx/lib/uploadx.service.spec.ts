@@ -5,7 +5,6 @@ import { UploadAction } from './interfaces';
 import { UploadxOptions } from './options';
 import { UploaderX } from './uploaderx';
 import { UploadxService } from './uploadx.service';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 class MockUploader extends UploaderX {
   async upload(): Promise<void> {

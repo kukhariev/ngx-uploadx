@@ -1,5 +1,5 @@
-import { describe, expect, it, vi, type Mock } from 'vitest';
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { type Mock } from 'vitest';
 import { Ajax } from './ajax';
 import { getRangeEnd, UploaderX } from './uploaderx';
 
