@@ -5,4 +5,4 @@ declare let process: {
 };
 export const env = process.env.NODE_ENV;
 export const serverUrl =
-  env === 'production' ? 'https://uploadx-demo-server.onrender.com' : '/upload';
+  env === 'production' ? 'https://uploadx-demo-server.onrender.com' : '/dev/local';
