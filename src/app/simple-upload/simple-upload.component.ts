@@ -1,5 +1,5 @@
 import { JsonPipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import {
   UploadState,
   UploadxControlEvent,
@@ -7,7 +7,6 @@ import {
   UploadxDropDirective,
   UploadxOptions
 } from 'ngx-uploadx';
-import { AuthService } from '../auth.service';
 import { serverUrl } from '../config';
 
 @Component({
@@ -20,23 +19,10 @@ export class SimpleUploadComponent {
   control!: UploadxControlEvent;
   state!: UploadState;
   uploads: UploadState[] = [];
-  private authService = inject(AuthService);
   options: UploadxOptions = {
     allowedTypes: 'image/*,video/*',
     endpoint: `${serverUrl}/files?uploadType=uploadx`,
-    token: this.authService.accessToken,
-    // token: this.authService.getAccessToken,
-    // token: this.authService.getTokenAsPromise,
-    metadata: (file: File) => ({ originalName: file.name }),
-    chunkSize: 1024 * 1024 * 96, //--> Cloudflare Free/Pro maximum body size is 100MB
-    storeIncompleteHours: 24,
-    retryConfig: {
-      maxAttempts: 30,
-      maxDelay: 60_000,
-      shouldRetry: (code, attempts) => {
-        return code === 503 || ((code < 400 || code >= 501) && attempts < 5);
-      }
-    }
+    maxChunkSize: 1024 * 1024 * 96 //--> Cloudflare Free/Pro maximum body size is 100MB
   };
 
   cancel(uploadId?: string): void {
