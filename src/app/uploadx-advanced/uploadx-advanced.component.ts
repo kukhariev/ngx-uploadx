@@ -44,7 +44,7 @@ export class UploadxAdvancedComponent implements OnDestroy, OnInit {
     // Custom ID via IdService provider (Content-based: name + size + SHA-1)
     // Dynamic headers per file
     headers: (file: File) => ({
-      'X-File-Name': file.name,
+      'X-File-Name': encodeURIComponent(file.name),
       'X-File-Size': `${file.size}`,
       'X-Client-Source': this.constructor.name
     }),
@@ -62,7 +62,10 @@ export class UploadxAdvancedComponent implements OnDestroy, OnInit {
     // Retry configuration
     retryConfig: {
       maxAttempts: 10,
-      maxDelay: 30_000
+      maxDelay: 30_000,
+      shouldRetry: (code, attempts) => {
+        return code === 503 || ((code < 400 || code >= 501) && attempts < 5);
+      }
     }
   };
 
