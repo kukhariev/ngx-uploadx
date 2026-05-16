@@ -1,10 +1,10 @@
 {
-  "/upload/": {
+  "/dev/local/": {
     "target": "http://localhost:3002",
     "secure": false,
     "changeOrigin": true,
     "pathRewrite": {
-      "^/upload": ""
+      "^/dev/local": ""
     }
   }
 }
