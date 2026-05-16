@@ -1,31 +1,35 @@
-<div uploadxDrop class="upload-zone">
-  <div class="uploads-table">
-    @for (item of uploads$ | async; track item.uploadId) {
-      <div class="row">
-        <span>{{ item.name }}</span>
-        <span>{{ item.progress }}%</span>
-        <span>{{ item.status }}</span>
-        <span>
-          <button (click)="item.status = 'paused'">pause</button>
-          <button (click)="item.status = 'queue'">upload</button>
-        </span>
-      </div>
-    }
+<div class="upload-container">
+  <div class="upload-panel">
+    <div uploadxDrop class="drop-zone">
+      <span>
+        <em>Drop files to upload, or</em>
+        <label accesskey="o" for="files"><strong>BROWSE</strong></label>
+        <input accept="image/*,video/*" id="files" multiple type="file" uploadx />
+      </span>
+    </div>
+    <div class="control">
+      <span>
+        <button (click)="uploadAll()">Upload All</button>
+        <button (click)="pauseAll()">Pause All</button>
+        <button (click)="updateAll()">Update All</button>
+        <button (click)="cancelAll()">Cancel All</button>
+      </span>
+    </div>
+    <div class="uploads-table">
+      @for (item of uploads$ | async; track item.uploadId) {
+        <div class="row">
+          <span>{{ item.name }}</span>
+          <span>{{ item.progress }}%</span>
+          <span>{{ item.status }}</span>
+          <span>
+            <button (click)="item.status = 'paused'">pause</button>
+            <button (click)="item.status = 'queue'">upload</button>
+          </span>
+        </div>
+      }
+    </div>
   </div>
-  <div class="control">
-    <span>
-      <em>Drop files to upload, or</em>
-      <label accesskey="o" for="files"><strong>BROWSE</strong></label>
-      <input accept="image/*,video/*" id="files" multiple type="file" uploadx />
-    </span>
-    <span>
-      <button (click)="uploadAll()">Upload All</button>
-      <button (click)="pauseAll()">Pause All</button>
-      <button (click)="updateAll()">Update All</button>
-      <button (click)="cancelAll()">Cancel All</button>
-    </span>
+  <div class="debug-panel">
+    <pre>{{ state$ | async | json }}</pre>
   </div>
-</div>
-<div class="json">
-  <pre>{{ state$ | async | json }}</pre>
 </div>

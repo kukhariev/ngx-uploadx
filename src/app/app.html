@@ -2,7 +2,7 @@
   <header>
     <nav>
       <span (click)="menuIsHidden = !menuIsHidden" [class.hidden]="menuIsHidden" id="menu">
-        <a href="" title="Select demo...">≡</a>
+        <button type="button" title="Select demo...">≡</button>
         <ng-container *ngTemplateOutlet="LinksTemplate"> </ng-container>
       </span>
     </nav>
@@ -28,7 +28,7 @@
 
 <ng-template #LinksTemplate>
   <div class="links">
-    <span>Select demo:</span>
+    <h3>Select demo:</h3>
     <a routerLink="/simple-upload" routerLinkActive="active">simple-upload</a>
     <a routerLink="/uploadx-advanced" routerLinkActive="active">uploadx-advanced</a>
     <a routerLink="/s3-upload" routerLinkActive="active">s3-upload</a>
@@ -36,8 +36,7 @@
     <a routerLink="/multi-files-directive" routerLinkActive="active">multi-files-directive</a>
     <a routerLink="/multi-instances" routerLinkActive="active">multi-instances</a>
     <a routerLink="/tus" routerLinkActive="active">tus</a>
-    <span></span>
-    <span>Tools:</span>
+    <h3>Tools:</h3>
     <a routerLink="/file-generator" routerLinkActive="active">Generate test files</a>
   </div>
 </ng-template>

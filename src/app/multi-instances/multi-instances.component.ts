@@ -6,6 +6,7 @@ import { MultiInstanceBComponent } from './b/multi-instance-b.component';
   selector: 'app-multi-instances',
   standalone: true,
   imports: [MultiInstanceAComponent, MultiInstanceBComponent],
-  templateUrl: './multi-instances.component.html'
+  templateUrl: './multi-instances.component.html',
+  styleUrl: './multi-instances.component.scss'
 })
 export class MultiInstancesComponent {}
