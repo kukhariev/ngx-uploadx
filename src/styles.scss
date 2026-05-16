@@ -1,15 +1,29 @@
 @use 'sass:color';
-/* You can add global styles to this file, and also import other style files */
+
+// variables
 $primary-color: rgb(200, 200, 200);
 $background-color: rgb(36, 36, 36);
 $nav-header-primary-color: rgb(200, 200, 200);
 $nav-header-background-color: rgb(36, 36, 36);
 $sidebar-primary-color: rgb(200, 200, 200);
-$sidebar-background-color: rgb(36, 36, 36);
+$sidebar-background-color: rgb(20, 20, 20);
 
 $border: 1px solid color.adjust($primary-color, $alpha: -0.9);
 $border-drop: 1px dashed $primary-color;
 $header-height: 2.5rem;
+$sidebar-width: 220px;
+$upload-panel-min-width: 500px;
+$debug-panel-width: 480px;
+$drop-zone-height: 200px;
+$gap: 0.2rem;
+$section-gap: 0.4rem;
+
+// reset
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body,
 html {
@@ -20,12 +34,7 @@ html {
   height: 100%;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
+// header
 header {
   min-height: $header-height;
   border-bottom: $border;
@@ -38,39 +47,37 @@ header {
 
   #menu {
     display: none;
+    margin-left: 1rem;
+    button {
+      background: none;
+      border: none;
+      color: inherit;
+      font-size: 2rem;
+      width: auto;
+      height: auto;
+      cursor: pointer;
+    }
   }
-
   span {
     margin-left: 1rem;
   }
-
   #gh {
     margin-left: auto;
     margin-right: 1rem;
-    a {
-      opacity: 0.7;
-      display: block;
-      background: url(assets/github-mark-white.svg);
-      background-size: 1.5rem 1.5rem;
-      height: 1.5rem;
-      width: 1.5rem;
-    }
   }
-
-  #logo {
-    a {
-      color: $primary-color;
-      font-size: 1.1rem;
-      text-decoration: none;
-    }
+  #gh a {
+    opacity: 0.7;
+    display: block;
+    background: url(assets/github-mark-white.svg);
+    background-size: 1.5rem;
+    height: 1.5rem;
+    width: 1.5rem;
   }
-
-  @media all and (max-width: 900px) {
-    #menu {
-      display: block;
-    }
+  #logo a {
+    color: $primary-color;
+    font-size: 1.1rem;
+    text-decoration: none;
   }
-
   span > a {
     display: block;
     color: color.adjust($nav-header-primary-color, $alpha: -0.3);
@@ -78,75 +85,82 @@ header {
     text-decoration: none;
   }
 
+  @media (max-width: 900px) {
+    #menu {
+      display: block;
+    }
+  }
+
   nav {
     .hidden > div {
       display: none;
     }
-
-    span {
-      position: relative;
-
-      div {
-        height: 100%;
-        position: fixed;
-        top: $header-height;
-        left: 0;
-        width: 270px;
-        z-index: 1;
-      }
+    span div {
+      position: fixed;
+      top: $header-height;
+      left: 0;
+      width: $sidebar-width;
+      height: calc(100vh - $header-height);
+      z-index: 1;
     }
   }
 }
 
+// layout
 #page {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
-
 #sidebar {
   display: flex;
   width: 25%;
-  max-width: 270px;
+  max-width: $sidebar-width;
+  background: $sidebar-background-color;
 }
-
-#content {
-  display: flex;
-  flex-grow: 1;
-}
-
-@media all and (max-width: 900px) {
+@media (max-width: 900px) {
   #sidebar {
     display: none;
   }
 }
+#content {
+  display: flex;
+  flex-grow: 1;
+  min-height: 0;
+  gap: $section-gap;
+}
+#main {
+  flex-grow: 1;
+  flex-direction: column;
+  display: flex;
+  width: 75%;
+  min-height: 0;
+}
 
+// sidebar links
 .links {
-  padding-top: 3rem;
-  background-color: $sidebar-background-color;
+  padding-top: 1rem;
+  background: $sidebar-background-color;
   flex-grow: 1;
   font-size: 0.9rem;
-
   a {
     color: $sidebar-primary-color;
     display: block;
-    padding: 0.5rem 3rem;
+    padding: 0.5rem 2rem;
     text-decoration: none;
     white-space: nowrap;
-    border-radius: 5px;
   }
-
   a:hover {
-    background-color: color.adjust($sidebar-background-color, $lightness: 2%);
+    background: color.adjust($sidebar-background-color, $lightness: 2%);
   }
-
-  span {
+  h3 {
     color: color.adjust($sidebar-primary-color, $alpha: -0.3);
     display: block;
-    cursor: default;
-    padding: 2rem 3rem;
+    padding: 1rem 2rem;
+    font-size: inherit;
+    font-weight: normal;
   }
-
   .active {
     font-style: italic;
     position: relative;
@@ -159,69 +173,57 @@ header {
   }
 }
 
-#main {
-  flex-grow: 1;
-  flex-direction: column;
-  display: flex;
-  width: 75%;
-
-  // [uploadxdrop],
-  .upload-zone {
-    margin: 0.2rem;
-    border: $border;
-    border-radius: 5px;
-  }
-}
-
-.uploadx-drop-active {
-  background-color: color.adjust($background-color, $lightness: 2%);
-  border: $border-drop !important;
-}
-
+// buttons
 button {
-  background-color: color.adjust($background-color, $lightness: 2%);
+  background: color.adjust($background-color, $lightness: 2%);
   border: $border;
   border-radius: 5px;
   color: $primary-color;
-  cursor: pointer;
   font-family: inherit;
   font-size: 0.85rem;
   height: 2rem;
-  margin: auto 0.2rem;
-  overflow: hidden;
-  text-align: center;
-  text-overflow: ellipsis;
-  text-transform: capitalize;
-  transition: all 150ms;
   width: 6rem;
-
   &:hover {
-    background-color: color.adjust($background-color, $lightness: 4%);
+    background: color.adjust($background-color, $lightness: 4%);
   }
 }
-
 label {
   cursor: pointer;
   margin: 0.5rem;
 }
-
 input[type='file'] {
   display: none;
 }
 
-.uploads-table,
-.uploads-table2 {
-  font-size: 0.9rem;
-  height: 9rem;
-  overflow-x: hidden;
-  overflow-y: auto;
+// upload components
+.uploadx-drop-active {
+  background: color.adjust($background-color, $lightness: 2%);
+  border: $border-drop !important;
 }
 
-@media all and (max-height: 670px) {
-  .uploads-table,
-  .uploads-table2 {
-    height: 7rem;
-  }
+.upload-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $section-gap;
+  height: calc(100vh - #{$header-height});
+  overflow: auto;
+}
+
+.upload-panel {
+  flex: 1 1 $upload-panel-min-width;
+  display: flex;
+  flex-direction: column;
+  margin-top: $section-gap;
+  overflow: hidden;
+}
+
+.drop-zone {
+  height: $drop-zone-height;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: $border-drop;
+  border-radius: 5px;
 }
 
 .control {
@@ -229,42 +231,67 @@ input[type='file'] {
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
-  background-color: color.adjust($background-color, $lightness: 2%);
+  background: color.adjust($background-color, $lightness: 2%);
   border-radius: 0 0 5px 5px;
-
   span {
-    margin: auto 0.2rem;
-    padding: 0.2rem;
+    display: inline-flex;
+    gap: $gap;
+    padding: $gap;
     white-space: nowrap;
   }
+}
+
+.uploads-table,
+.uploads-table2 {
+  font-size: 0.9rem;
+  min-height: 5rem;
+  flex: 1;
+  overflow: auto;
 }
 
 .row {
   align-items: baseline;
   display: flex;
   justify-content: flex-end;
-  margin-top: 0.2rem;
-
+  margin-top: $gap;
   span:first-child {
     margin-left: 1rem;
     flex: auto;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
   span {
-    margin: auto 0.2rem;
-    padding: 0 0.2rem;
+    display: inline-flex;
+    gap: $gap;
+    padding: 0 $gap;
     white-space: nowrap;
   }
 }
 
-.json {
+@media (max-height: 670px) {
+  .uploads-table,
+  .uploads-table2 {
+    min-height: 4rem;
+  }
+}
+
+// debug panel
+.debug-panel {
+  flex: 1 1 $debug-panel-width;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: $sidebar-background-color;
+  border-left: $border;
+  span {
+    flex-shrink: 0;
+  }
   pre {
+    flex: 1;
     font-size: 0.8rem;
     margin: auto;
-    padding: 0.2rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    padding: $gap;
+    overflow: auto;
+    min-height: 0;
   }
 }

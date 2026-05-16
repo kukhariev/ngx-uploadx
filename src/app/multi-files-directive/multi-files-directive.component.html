@@ -1,45 +1,49 @@
-<div class="upload-zone">
-  <div class="uploads-table">
-    @for (item of uploads$ | async; track item.uploadId) {
-      <div class="row">
-        <span>{{ item.name }}</span>
-        <span>{{ item.progress }}%</span>
-        <span>{{ item.status }}</span>
-        <span>
-          <button (click)="pause(item.uploadId)">pause</button>
-          <button (click)="upload(item.uploadId)">upload</button>
-        </span>
-      </div>
-    }
+<div class="upload-container">
+  <div class="upload-panel">
+    <div class="drop-zone">
+      <span>
+        <label accesskey="i" for="images"><strong>BROWSE Images</strong></label>
+        <input
+          #images
+          (click)="images.value = ''"
+          [uploadx]="imageUploadOptions"
+          id="images"
+          type="file"
+        />
+      </span>
+      <span>
+        <label accesskey="v" for="videos"><strong>BROWSE Videos</strong></label>
+        <input
+          #videos
+          (click)="videos.value = ''"
+          [uploadx]="videoUploadOptions"
+          id="videos"
+          type="file"
+        />
+      </span>
+    </div>
+    <div class="control">
+      <span>
+        <button (click)="upload()">Upload All</button>
+        <button (click)="pause()">Pause All</button>
+        <button (click)="cancel()">Cancel All</button>
+      </span>
+    </div>
+    <div class="uploads-table">
+      @for (item of uploads$ | async; track item.uploadId) {
+        <div class="row">
+          <span>{{ item.name }}</span>
+          <span>{{ item.progress }}%</span>
+          <span>{{ item.status }}</span>
+          <span>
+            <button (click)="pause(item.uploadId)">pause</button>
+            <button (click)="upload(item.uploadId)">upload</button>
+          </span>
+        </div>
+      }
+    </div>
   </div>
-  <div class="control">
-    <span>
-      <label accesskey="i" for="images"><strong>BROWSE Images</strong></label>
-      <input
-        #images
-        (click)="images.value = ''"
-        [uploadx]="imageUploadOptions"
-        id="images"
-        type="file"
-      />
-    </span>
-    <span>
-      <label accesskey="v" for="videos"><strong>BROWSE Videos</strong></label>
-      <input
-        #videos
-        (click)="videos.value = ''"
-        [uploadx]="videoUploadOptions"
-        id="videos"
-        type="file"
-      />
-    </span>
-    <span>
-      <button (click)="upload()">Upload All</button>
-      <button (click)="pause()">Pause All</button>
-      <button (click)="cancel()">Cancel All</button>
-    </span>
+  <div class="debug-panel">
+    <pre>{{ state$ | async | json }}</pre>
   </div>
-</div>
-<div class="json">
-  <pre>{{ state$ | async | json }}</pre>
 </div>

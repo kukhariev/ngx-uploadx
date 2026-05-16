@@ -1,0 +1,16 @@
+.multi-instances {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  flex: 1;
+  gap: 0.4rem;
+
+  > * {
+    flex: 1 1 600px;
+    min-height: 0;
+  }
+
+  ::ng-deep .upload-container {
+    height: 100% !important;
+  }
+}
