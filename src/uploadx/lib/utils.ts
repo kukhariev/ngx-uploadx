@@ -5,8 +5,8 @@ function safeMatch(base: string, re: RegExp): string {
 export function resolveUrl(url: string, base: string): string {
   if (url.indexOf('https://') * url.indexOf('http://') === 0) return url;
   if (url.indexOf('//') === 0) return safeMatch(base, /^(https?:)/) + url;
-  if (url.indexOf('/') === 0) return safeMatch(base, /^(?:https?:)?(?:\/\/)?([^\/?]+)/) + url;
-  return safeMatch(base, /^(?:https?:)?(?:\/\/)?([^\/?]+)?(.*\/)/) + url;
+  if (url.indexOf('/') === 0) return safeMatch(base, /^(?:https?:)?(?:\/\/)?([^/?]+)/) + url;
+  return safeMatch(base, /^(?:https?:)?(?:\/\/)?([^/?]+)?(.*\/)/) + url;
 }
 
 /**

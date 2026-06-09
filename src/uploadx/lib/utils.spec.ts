@@ -1,7 +1,5 @@
 import { b64, isNumber, resolveUrl, unfunc } from './utils';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 describe('resolveUrl', () => {
   it('resolveUrl', () => {
     const testCases = [

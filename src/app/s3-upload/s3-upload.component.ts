@@ -62,7 +62,6 @@ export class S3UploadComponent implements OnDestroy, OnInit {
 
   onChange(): void {
     const files = this.getFiles();
-    // eslint-disable-next-line @typescript-eslint/prefer-for-of
     for (let i = 0; i < files.length; i++) {
       this.uploadService.handleFiles(files[i]);
     }
