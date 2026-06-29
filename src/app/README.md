@@ -36,6 +36,10 @@ Uploads multiple files via directive. Supports batch processing and per-file con
 
 Runs independent upload instances with separate configurations.
 
+### multipart-upload
+
+Standard `multipart/form-data` upload using a custom `uploaderClass`.
+
 ### tus
 
 Minimal setup for resumable uploads using the TUS protocol.
