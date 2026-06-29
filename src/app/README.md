@@ -24,9 +24,9 @@ UploadX protocol example with advanced features:
 Integration with AWS S3-compatible storage. Uses `UploaderXS3` for multipart uploads.
 Supports multipart uploads with presigned URLs, direct part upload to S3, and automatic resume.
 
-### onpush-service
+### service-upload
 
-Uses the upload service with Angular's `OnPush` change detection.
+Uses `UploadxService` programmatically with `connect()` for file management.
 
 ### multi-files-directive
 
