@@ -39,6 +39,13 @@ test.describe.serial('app', async () => {
     await page.waitForSelector('span:has-text("complete")', { timeout: 3000 });
   });
 
+  test('completes upload on multipart-upload page', async ({ page }) => {
+    await page.goto('/multipart-upload');
+
+    await page.locator('input[type="file"]').setInputFiles(inMemoryFile);
+    await page.waitForSelector('span:has-text("complete")', { timeout: 3000 });
+  });
+
   test('completes multi-file upload on multi-files-directive page', async ({ page }) => {
     await page.goto('/multi-files-directive');
 
