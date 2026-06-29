@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnDestroy } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import {
   Uploader,
   UploadState,
@@ -14,13 +14,12 @@ import { injectDigestHeader } from '../digest';
 import { AsyncPipe, JsonPipe } from '@angular/common';
 
 @Component({
-  selector: 'app-onpush-service',
-  templateUrl: './onpush-service.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-service-upload',
+  templateUrl: './service-upload.component.html',
   standalone: true,
   imports: [JsonPipe, AsyncPipe, UploadxDropDirective, UploadxDirective]
 })
-export class OnPushServiceComponent implements OnDestroy {
+export class ServiceUploadComponent implements OnDestroy {
   state$: Observable<UploadState>;
   uploads$: Observable<Uploader[]>;
   options: UploadxOptions = {
