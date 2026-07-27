@@ -72,8 +72,8 @@ export class UploadxAjax {
   getResponseHeaders(xhr: XMLHttpRequest): Record<string, string> {
     const rows = xhr.getAllResponseHeaders().split(/[\r\n]+/);
     return rows.reduce((headers: Record<string, string>, current) => {
-      const [name, value] = current.split(': ');
-      name && (headers[name.toLowerCase()] = value);
+      const [name, value] = current.split(/: (.*)/);
+      name && (headers[name.toLowerCase()] = value ?? '');
       return headers;
     }, {});
   }
