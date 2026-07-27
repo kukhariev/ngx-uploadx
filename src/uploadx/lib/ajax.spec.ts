@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { UploadxAjax } from './ajax';
 
-const data = { key0: '0', key1: '1' };
+const data = { key0: '0', key1: '1', key2: '2: 2', key3: '' };
 const mockXHR = {
   DONE: 0,
   HEADERS_RECEIVED: 0,
@@ -35,7 +35,7 @@ const mockXHR = {
       mockXHR.onload && mockXHR.onload({} as ProgressEvent);
     });
   },
-  getAllResponseHeaders: () => `key0: 0\r\nkey1: 1\r\n`,
+  getAllResponseHeaders: () => `key0: 0\r\nkey1: 1\r\nkey2: 2: 2\r\nkey3: \r\n`,
   response: JSON.stringify(data)
 } as unknown as XMLHttpRequest;
 
